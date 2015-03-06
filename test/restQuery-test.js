@@ -116,7 +116,7 @@ function clearDB( callback )
 		[ clearCollection , comments ]
 	] )
 	.exec( callback ) ;
-} ;
+}
 
 
 
@@ -129,7 +129,7 @@ function clearDBIndexes( callback )
 		[ clearCollectionIndexes , comments ]
 	] )
 	.exec( callback ) ;
-} ;
+}
 
 
 
