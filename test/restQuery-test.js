@@ -312,7 +312,7 @@ describe( "Parse HTTP request" , function() {
 		
 		var req = fakeHttpRequest() ;
 		
-		restQuery.parseHttpRequest( req , function( error , message ) {
+		restQuery.httpParser.parseRequest( req , function( error , message ) {
 			
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
@@ -331,7 +331,7 @@ describe( "Parse HTTP request" , function() {
 		
 		var req = fakeHttpRequest( { url: "/path/to.json?filter=on&id=123" } ) ;
 		
-		restQuery.parseHttpRequest( req , function( error , message ) {
+		restQuery.httpParser.parseRequest( req , function( error , message ) {
 			
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
@@ -350,7 +350,7 @@ describe( "Parse HTTP request" , function() {
 		
 		var req = fakeHttpRequest( { method: 'POST' } , '{"a":"simple","json":"file"}' ) ;
 		
-		restQuery.parseHttpRequest( req , function( error , message ) {
+		restQuery.httpParser.parseRequest( req , function( error , message ) {
 			
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
