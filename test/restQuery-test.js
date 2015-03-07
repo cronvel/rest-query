@@ -317,7 +317,7 @@ describe( "Parse HTTP request" , function() {
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
 				path: '/' ,
-				type: 'html' ,
+				type: 'json' ,
 				host: 'localhost' ,
 				method: 'get' ,
 				params: {}
@@ -355,7 +355,7 @@ describe( "Parse HTTP request" , function() {
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
 				path: '/' ,
-				type: 'html' ,
+				type: 'json' ,
 				host: 'localhost' ,
 				method: 'post' ,
 				params: {} ,
@@ -407,6 +407,8 @@ describe( "restQuery" , function() {
 		
 		var id = blog.$._id ;
 		
+		var performer = app.createPerformer() ;
+		
 		async.series( [
 			function( callback ) {
 				blog.save( callback ) ;
@@ -416,7 +418,7 @@ describe( "restQuery" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Blogs/' + id , function( error , object ) {
+				app.root.get( performer , '/Blogs/' + id , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					console.log( 'result of get:' ) ;
 					//console.log( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -446,11 +448,13 @@ describe( "restQuery" , function() {
 		blogsNode.contains( postsNode ) ;
 		postsNode.contains( commentsNode ) ;
 		
+		var performer = app.createPerformer() ;
+		
 		//console.log( app ) ;
 		
 		async.series( [
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)'
 				} , function( error ) {
@@ -464,7 +468,7 @@ describe( "restQuery" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					console.log( 'result of get:' ) ;
 					//console.log( string.inspect( { style: 'color' , proto: true } , object ) ) ;
