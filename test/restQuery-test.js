@@ -37,6 +37,7 @@ var childProcess = require( 'child_process' ) ;
 
 var async = require( 'async-kit' ) ;
 var tree = require( 'tree-kit' ) ;
+var string = require( 'string-kit' ) ;
 var odm = require( 'odm-kit' ) ;
 
 var buffertools = require( 'buffertools' ) ;
@@ -153,6 +154,21 @@ function clearCollectionIndexes( collection , callback )
 
 
 
+function commonApp()
+{
+	var app = restQuery.createApp() ;
+	
+	var blogsNode = app.createCollectionNode( 'blogs' , blogsDescriptor ) ;
+	var postsNode = app.createCollectionNode( 'posts' , postsDescriptor ) ;
+	var commentsNode = app.createCollectionNode( 'comments' , commentsDescriptor ) ;
+	
+	app.root.contains( blogsNode ) ;
+	blogsNode.contains( postsNode ) ;
+	postsNode.contains( commentsNode ) ;
+	
+	return app ;
+}
+
 
 
 			/* Tests */
@@ -195,28 +211,17 @@ describe( "restQuery" , function() {
 	} ) ;
 	*/
 	
-	it( "zzz" , function( done ) {
+	it( "GET" , function( done ) {
 		
-		var app = restQuery.createApp() ;
+		var app = commonApp() ;
+		var performer = app.createPerformer() ;
 		
-		var blogsNode = app.createCollectionNode( 'blogs' , blogsDescriptor ) ;
-		var postsNode = app.createCollectionNode( 'posts' , postsDescriptor ) ;
-		var commentsNode = app.createCollectionNode( 'comments' , commentsDescriptor ) ;
-		
-		app.root.contains( blogsNode ) ;
-		blogsNode.contains( postsNode ) ;
-		postsNode.contains( commentsNode ) ;
-		
-		//console.log( app ) ;
-		
-		var blog = blogsNode.collection.createDocument( {
+		var blog = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!'
 		} ) ;
 		
 		var id = blog.$._id ;
-		
-		var performer = app.createPerformer() ;
 		
 		async.series( [
 			function( callback ) {
@@ -245,21 +250,10 @@ describe( "restQuery" , function() {
 		
 	} ) ;
 	
-	it( "www" , function( done ) {
+	it( "PUT then GET" , function( done ) {
 		
-		var app = restQuery.createApp() ;
-		
-		var blogsNode = app.createCollectionNode( 'blogs' , blogsDescriptor ) ;
-		var postsNode = app.createCollectionNode( 'posts' , postsDescriptor ) ;
-		var commentsNode = app.createCollectionNode( 'comments' , commentsDescriptor ) ;
-		
-		app.root.contains( blogsNode ) ;
-		blogsNode.contains( postsNode ) ;
-		postsNode.contains( commentsNode ) ;
-		
+		var app = commonApp() ;
 		var performer = app.createPerformer() ;
-		
-		//console.log( app ) ;
 		
 		async.series( [
 			function( callback ) {
