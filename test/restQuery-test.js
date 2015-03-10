@@ -63,7 +63,7 @@ var blogsDescriptor = {
 	] ,
 	hooks: {
 	} ,
-	useMemProxy: true
+	useMemProxy: false
 } ;
 
 var postsDescriptor = {
@@ -77,7 +77,7 @@ var postsDescriptor = {
 	] ,
 	hooks: {
 	} ,
-	useMemProxy: true
+	useMemProxy: false
 } ;
 
 var commentsDescriptor = {
@@ -91,7 +91,7 @@ var commentsDescriptor = {
 	] ,
 	hooks: {
 	} ,
-	useMemProxy: true
+	useMemProxy: false
 } ;
 
 
@@ -358,6 +358,35 @@ describe( "restQuery" , function() {
 					console.log( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now overwritten!' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "PATCH on an unexisting item" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.patch( performer , '/Blogs/111111111111111111111111' , {
+					description: 'Oh yeah!'
+				} , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					expect( error.httpStatus ).to.be( 404 ) ;
+					console.log( error ) ;
+					console.log( object ) ;
 					callback() ;
 				} ) ;
 			}
