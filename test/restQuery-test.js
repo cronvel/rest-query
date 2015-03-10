@@ -168,7 +168,7 @@ before( function( done ) {
 
 
 
-describe( "restQuery" , function() {
+describe( "Basic queries of object of a top-level collection" , function() {
 	
 	it( "GET on an unexisting item" , function( done ) {
 		
@@ -522,5 +522,96 @@ describe( "restQuery" , function() {
 	} ) ;
 	
 } ) ;
+
+
+
+describe( "Basic queries of top-level collections" , function() {
+	
+	it( "GET on an empty collection" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				
+				app.root.get( performer , '/Blogs' , function( error , batch ) {
+					if ( error ) { callback( error ) ; return ; }
+					console.log( 'result of get:' ) ;
+					console.log( batch ) ;
+					console.log( JSON.stringify( batch ) ) ;
+					
+					expect( batch ).to.be.eql( [] ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "GET on a collection with items" , function( done ) {
+		
+		var app , performer , blog , id1 , id2 ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				id1 = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'YAB' ,
+					description: 'Yet Another Blog'
+				} ) ;
+				id2 = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.root.get( performer , '/Blogs' , function( error , batch ) {
+					if ( error ) { callback( error ) ; return ; }
+					console.log( 'result of get:' ) ;
+					console.log( batch ) ;
+					console.log( JSON.stringify( batch ) ) ;
+					
+					expect( batch ).to.be.eql( [
+						{
+							title: 'My wonderful life',
+							description: 'This is a supa blog!',
+							_id: id1,
+							SID: undefined
+						} ,
+						{
+							title: 'YAB' ,
+							description: 'Yet Another Blog' ,
+							_id: id2,
+							SID: undefined
+						}
+					] ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+} ) ;
+
 
 
