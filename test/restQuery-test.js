@@ -25,7 +25,7 @@
 */
 
 /* jshint unused:false */
-/* global describe, it, before, after */
+/* global describe, it, before, after, beforeEach */
 
 
 
@@ -108,32 +108,6 @@ var protoflatten = tree.extend.bind( undefined , { deep: true , deepFilter: { bl
 
 
 
-// clear DB: remove every item, so we can safely test
-function clearDB( callback )
-{
-	async.parallel( [
-		[ clearCollection , blogs ] ,
-		[ clearCollection , posts ] ,
-		[ clearCollection , comments ]
-	] )
-	.exec( callback ) ;
-}
-
-
-
-// clear DB: remove every item, so we can safely test
-function clearDBIndexes( callback )
-{
-	async.parallel( [
-		[ clearCollectionIndexes , blogs ] ,
-		[ clearCollectionIndexes , posts ] ,
-		[ clearCollectionIndexes , comments ]
-	] )
-	.exec( callback ) ;
-}
-
-
-
 function clearCollection( collection , callback )
 {
 	collection.driver.rawInit( function( error ) {
@@ -144,19 +118,10 @@ function clearCollection( collection , callback )
 
 
 
-function clearCollectionIndexes( collection , callback )
-{
-	collection.driver.rawInit( function( error ) {
-		if ( error ) { callback( error ) ; return ; }
-		collection.driver.raw.dropIndexes( callback ) ;
-	} ) ;
-}
-
-
-
-function commonApp()
+function commonApp( callback )
 {
 	var app = restQuery.createApp() ;
+	var performer = app.createPerformer() ;
 	
 	var blogsNode = app.createCollectionNode( 'blogs' , blogsDescriptor ) ;
 	var postsNode = app.createCollectionNode( 'posts' , postsDescriptor ) ;
@@ -166,7 +131,16 @@ function commonApp()
 	blogsNode.contains( postsNode ) ;
 	postsNode.contains( commentsNode ) ;
 	
-	return app ;
+	async.parallel( [
+		[ clearCollection , blogsNode.collection ] ,
+		[ clearCollection , postsNode.collection ] ,
+		[ clearCollection , commentsNode.collection ]
+	] )
+	.exec( function( error ) {
+		expect( error ).not.to.be.ok() ;
+		if ( error ) { callback( error ) ; return ; }
+		callback( undefined , app , performer ) ;
+	} ) ;
 }
 
 
@@ -211,19 +185,39 @@ describe( "restQuery" , function() {
 	} ) ;
 	*/
 	
-	it( "GET" , function( done ) {
+	it( "GET on an unexisting item" , function( done ) {
 		
-		var app = commonApp() ;
-		var performer = app.createPerformer() ;
-		
-		var blog = app.root.children.blogs.collection.createDocument( {
-			title: 'My wonderful life' ,
-			description: 'This is a supa blog!'
+		commonApp( function( error , app , performer ) {
+			
+			app.root.get( performer , '/Blogs/111111111111111111111111' , function( error , object ) {
+				
+				expect( error ).to.be.ok() ;
+				expect( error.type ).to.be( 'notFound' ) ;
+				expect( error.httpStatus ).to.be( 404 ) ;
+				console.log( error ) ;
+				console.log( object ) ;
+				done() ;
+			} ) ;
 		} ) ;
+	} ) ;
+	
+	it( "GET on an existing item" , function( done ) {
 		
-		var id = blog.$._id ;
+		var app , performer , blog , id ;
 		
 		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					blog = app.root.children.blogs.collection.createDocument( {
+						title: 'My wonderful life' ,
+						description: 'This is a supa blog!'
+					} ) ;
+					id = blog.$._id ;
+					callback() ;
+				} ) ;
+			} ,
 			function( callback ) {
 				blog.save( callback ) ;
 			} ,
@@ -247,15 +241,20 @@ describe( "restQuery" , function() {
 			}
 		] )
 		.exec( done ) ;
-		
 	} ) ;
 	
 	it( "PUT then GET" , function( done ) {
 		
-		var app = commonApp() ;
-		var performer = app.createPerformer() ;
+		var app , performer , blog , id ;
 		
 		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
 			function( callback ) {
 				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
@@ -286,9 +285,54 @@ describe( "restQuery" , function() {
 			}
 		] )
 		.exec( done ) ;
-		
 	} ) ;
 	
+	it( "PUT, then DELETE, then GET" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 2!!!' ,
+					description: 'This is a supa blog! (x2)'
+				} , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.delete( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
+				//app.root.get( '/Posts/' , function( error , object ) {
+				//app.root.get( '/Blogs/' , function( error , object ) {
+				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					expect( error.httpStatus ).to.be( 404 ) ;
+					console.log( error ) ;
+					console.log( object ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
 	
 } ) ;
 
