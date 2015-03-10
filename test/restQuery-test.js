@@ -170,35 +170,31 @@ before( function( done ) {
 
 describe( "restQuery" , function() {
 	
-	/*
-	it( "" , function( done ) {
-		
-		var root = restQuery.Root() ;
-		
-		root.attach( 'blogs' , blogsDescriptor ) ;
-		root.attach( 'posts' , postsDescriptor ) ;
-		root.attach( 'comments' , commentsDescriptor ) ;
-		
-		expect( root.children ).to.only.have.keys( 'Blogs' , 'Posts' , 'Comments' ) ;
-		
-		done() ;
-	} ) ;
-	*/
-	
 	it( "GET on an unexisting item" , function( done ) {
 		
-		commonApp( function( error , app , performer ) {
-			
-			app.root.get( performer , '/Blogs/111111111111111111111111' , function( error , object ) {
-				
-				expect( error ).to.be.ok() ;
-				expect( error.type ).to.be( 'notFound' ) ;
-				expect( error.httpStatus ).to.be( 404 ) ;
-				console.log( error ) ;
-				console.log( object ) ;
-				done() ;
-			} ) ;
-		} ) ;
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( performer , '/Blogs/111111111111111111111111' , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					expect( error.httpStatus ).to.be( 404 ) ;
+					console.log( error ) ;
+					console.log( object ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
 	} ) ;
 	
 	it( "GET on an existing item" , function( done ) {
@@ -210,15 +206,15 @@ describe( "restQuery" , function() {
 				commonApp( function( error , a , p ) {
 					app = a ;
 					performer = p ;
-					blog = app.root.children.blogs.collection.createDocument( {
-						title: 'My wonderful life' ,
-						description: 'This is a supa blog!'
-					} ) ;
-					id = blog.$._id ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				id = blog.$._id ;
 				blog.save( callback ) ;
 			} ,
 			function( callback ) {
@@ -280,6 +276,87 @@ describe( "restQuery" , function() {
 					console.log( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "Test of the test: test helper commonApp() should clean previously created items" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Same ID than in previous test
+				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					expect( error.httpStatus ).to.be( 404 ) ;
+					console.log( error ) ;
+					console.log( object ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "PUT, then PATCH, then GET" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 3!!!' ,
+					description: 'This is a supa blog! (x3)'
+				} , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.patch( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					description: 'This is a supa blog! Now patched!'
+				} , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
+				//app.root.get( '/Posts/' , function( error , object ) {
+				//app.root.get( '/Blogs/' , function( error , object ) {
+				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					console.log( 'result of get:' ) ;
+					//console.log( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					console.log( object ) ;
+					console.log( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
+					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
 					callback() ;
 				} ) ;
 			}
