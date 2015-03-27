@@ -29,7 +29,12 @@
 
 
 
-var restQuery = require( '../lib/restQuery.js' ) ;
+var cli = getCliOptions() ;
+
+var smartPreprocessor = require( 'smart-preprocessor' ) ;
+var restQuery = cli['log-lib'] ?
+	smartPreprocessor.require( __dirname + '/../lib/restQuery.js' , { debug: true } ) :
+	require( '../lib/restQuery.js' ) ;
 
 var net = require( 'net' ) ;
 var stream = require( 'stream' ) ;
@@ -105,6 +110,31 @@ var commentsDescriptor = {
 
 // it flatten prototype chain, so a single object owns every property of its parents
 var protoflatten = tree.extend.bind( undefined , { deep: true , deepFilter: { blacklist: [ mongodb.ObjectID.prototype ] } } , null ) ;
+
+
+
+// Return options while trying to avoid mocha's parameters
+function getCliOptions()
+{
+	var i , max = 0 ;
+	
+	for ( i = 2 ; i < process.argv.length ; i ++ )
+	{
+		if ( process.argv[ i ].match( /\*|.+\.js/ ) )
+		{
+			max = i ;
+		}
+	}
+	
+	return require( 'minimist' )( process.argv.slice( max + 1 ) ) ;
+}
+
+
+
+function debug( arguments )
+{
+	if ( cli.log ) { console.log.apply( console , arguments ) ; }
+}
 
 
 
@@ -188,8 +218,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					console.log( error ) ;
-					console.log( object ) ;
+					debug( error ) ;
+					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -224,12 +254,12 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( performer , '/Blogs/' + id , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( 'result of get:' ) ;
-					//console.log( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
 					//delete object._id ;
-					console.log( object ) ;
-					console.log( JSON.stringify( object ) ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life' ) ;
 					expect( object.description ).to.be( 'This is a supa blog!' ) ;
 					callback() ;
@@ -257,7 +287,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (x2)'
 				} , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -268,12 +298,12 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( 'result of get:' ) ;
-					//console.log( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
 					//delete object._id ;
-					console.log( object ) ;
-					console.log( JSON.stringify( object ) ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
 					callback() ;
@@ -302,8 +332,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					console.log( error ) ;
-					console.log( object ) ;
+					debug( error ) ;
+					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -329,7 +359,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (x3)'
 				} , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -339,7 +369,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! Now overwritten!'
 				} , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -350,12 +380,12 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( 'result of get:' ) ;
-					//console.log( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
 					//delete object._id ;
-					console.log( object ) ;
-					console.log( JSON.stringify( object ) ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now overwritten!' ) ;
 					callback() ;
@@ -385,8 +415,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					console.log( error ) ;
-					console.log( object ) ;
+					debug( error ) ;
+					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -412,7 +442,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (x3)'
 				} , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -421,7 +451,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! Now patched!'
 				} , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -432,12 +462,12 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( 'result of get:' ) ;
-					//console.log( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
 					//delete object._id ;
-					console.log( object ) ;
-					console.log( JSON.stringify( object ) ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
 					callback() ;
@@ -465,8 +495,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					console.log( error ) ;
-					console.log( object ) ;
+					debug( error ) ;
+					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -492,14 +522,14 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (x2)'
 				} , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.delete( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -512,8 +542,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					console.log( error ) ;
-					console.log( object ) ;
+					debug( error ) ;
+					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -543,9 +573,9 @@ describe( "Basic queries of top-level collections" , function() {
 				
 				app.root.get( performer , '/Blogs' , function( error , batch ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( 'result of get:' ) ;
-					console.log( batch ) ;
-					console.log( JSON.stringify( batch ) ) ;
+					debug( 'result of get:' ) ;
+					debug( batch ) ;
+					debug( JSON.stringify( batch ) ) ;
 					
 					expect( batch ).to.be.eql( [] ) ;
 					callback() ;
@@ -586,9 +616,9 @@ describe( "Basic queries of top-level collections" , function() {
 			function( callback ) {
 				app.root.get( performer , '/Blogs' , function( error , batch ) {
 					if ( error ) { callback( error ) ; return ; }
-					console.log( 'result of get:' ) ;
-					console.log( batch ) ;
-					console.log( JSON.stringify( batch ) ) ;
+					debug( 'result of get:' ) ;
+					debug( batch ) ;
+					debug( JSON.stringify( batch ) ) ;
 					
 					expect( batch ).to.be.eql( [
 						{

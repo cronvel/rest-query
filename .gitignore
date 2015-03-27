@@ -9,6 +9,7 @@
 *.js.gz
 *.png
 .spellcast
+*.pproc.js
 build
 _build
 _templates
