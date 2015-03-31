@@ -122,6 +122,6 @@ Object's data:
 Object's data:
 * SID `SID` (optionnal) Slug ID, sometime unique, sometime only unique on the current path's directory
 * title `String` full featured title for this resource, most of time this property is used to create automatically a SID
-
+* parent `Object`, each key is the name of a collection, and each value is an ID of a parent object
 
 

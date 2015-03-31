@@ -60,7 +60,7 @@ var blogs , posts , comments ;
 var blogsDescriptor = {
 	url: 'mongodb://localhost:27017/restQuery/blogs' ,
 	properties: {
-		title: { constraint: 'string' } ,
+		//title: { constraint: 'string' } , // already defined by restQuery
 		description: { constraint: 'string' }
 	} ,
 	meta: {
@@ -75,7 +75,7 @@ var blogsDescriptor = {
 var postsDescriptor = {
 	url: 'mongodb://localhost:27017/restQuery/posts' ,
 	properties: {
-		title: { constraint: 'string' } ,
+		//title: { constraint: 'string' } ,	// already defined by restQuery
 		content: { constraint: 'string' }
 	} ,
 	meta: {
@@ -627,12 +627,14 @@ describe( "Basic queries of top-level collections" , function() {
 							title: 'My wonderful life',
 							description: 'This is a supa blog!',
 							_id: id1,
+							parent: undefined,
 							SID: undefined
 						} ,
 						{
 							title: 'YAB' ,
 							description: 'Yet Another Blog' ,
 							_id: id2,
+							parent: undefined,
 							SID: undefined
 						}
 					] ) ;
@@ -704,11 +706,18 @@ describe( "Queries of nested object" , function() {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
-					content: 'Blah blah blah.'
+					content: 'Blah blah blah.' ,
+					parent: { blogs: blogId }
 				} ) ;
 				postId = post.$._id ;
 				console.log( "postId: " , postId ) ;
 				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				post = app.root.children.blogs.children.posts.collection.get( postId , function( error , document ) {
+					console.log( string.inspect( { style: 'color' } , document ) ) ;
+					callback( 'not an error' ) ;
+				} ) ;
 			} ,
 			function( callback ) {
 				//app.root.get( '/' , function( error , object ) {
