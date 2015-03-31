@@ -133,7 +133,7 @@ function getCliOptions()
 
 
 
-function debug( arguments )
+function debug()
 {
 	if ( cli.log ) { console.log.apply( console , arguments ) ; }
 }
@@ -651,7 +651,7 @@ describe( "Basic queries of top-level collections" , function() {
 
 describe( "Queries of nested object" , function() {
 	
-	it( "GET on an unexisting item" , function( done ) {
+	it( "GET on an unexisting nested item" , function( done ) {
 		
 		var app , performer , blog , id ;
 		
@@ -682,7 +682,7 @@ describe( "Queries of nested object" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "aaa GET on a regular item" , function( done ) {
+	it( "GET on a regular nested item" , function( done ) {
 		
 		var app , performer , blog , post , blogId , postId ;
 		
@@ -710,20 +710,10 @@ describe( "Queries of nested object" , function() {
 					parent: { blogs: blogId }
 				} ) ;
 				postId = post.$._id ;
-				console.log( "postId: " , postId ) ;
+				//console.log( "postId: " , postId ) ;
 				post.save( callback ) ;
 			} ,
 			function( callback ) {
-				post = app.root.children.blogs.children.posts.collection.get( postId , function( error , document ) {
-					console.log( string.inspect( { style: 'color' } , document ) ) ;
-					callback( 'not an error' ) ;
-				} ) ;
-			} ,
-			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
@@ -740,6 +730,73 @@ describe( "Queries of nested object" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	
+	it( "GET on an existed nested item that does not belong to the given parent" , function( done ) {
+		
+		var app , performer , blog , anotherBlog , post , blogId , anotherBlogId , postId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				blogId = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			function( callback ) {
+				anotherBlog = app.root.children.blogs.collection.createDocument( {
+					title: 'Another blog' ,
+					description: 'Oh yeah'
+				} ) ;
+				anotherBlogId = anotherBlog.$._id ;
+				anotherBlog.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My second post!' ,
+					content: 'Blah blah blah.' ,
+					parent: { blogs: blogId }
+				} ) ;
+				postId = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My second post!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
+					expect( object ).to.be( undefined ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 } ) ;
 
 
