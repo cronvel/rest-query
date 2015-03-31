@@ -60,6 +60,7 @@ var blogs , posts , comments ;
 var blogsDescriptor = {
 	url: 'mongodb://localhost:27017/restQuery/blogs' ,
 	properties: {
+		title: { constraint: 'string' } ,
 		description: { constraint: 'string' }
 	} ,
 	meta: {
@@ -74,6 +75,7 @@ var blogsDescriptor = {
 var postsDescriptor = {
 	url: 'mongodb://localhost:27017/restQuery/posts' ,
 	properties: {
+		title: { constraint: 'string' } ,
 		content: { constraint: 'string' }
 	} ,
 	meta: {
@@ -642,6 +644,95 @@ describe( "Basic queries of top-level collections" , function() {
 		.exec( done ) ;
 	} ) ;
 } ) ;
+
+
+
+describe( "Queries of nested object" , function() {
+	
+	it( "GET on an unexisting item" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get(
+					'/Blogs/111111111111111111111111/Posts/111111111111111111111111' ,
+					{ performer: performer } ,
+					function( error , object ) {
+						
+						expect( error ).to.be.ok() ;
+						expect( error.type ).to.be( 'notFound' ) ;
+						expect( error.httpStatus ).to.be( 404 ) ;
+						debug( error ) ;
+						debug( object ) ;
+						callback() ;
+					}
+				) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "aaa GET on a regular item" , function( done ) {
+		
+		var app , performer , blog , post , blogId , postId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				blogId = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.'
+				} ) ;
+				postId = post.$._id ;
+				console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
+				//app.root.get( '/Posts/' , function( error , object ) {
+				//app.root.get( '/Blogs/' , function( error , object ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My first post!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+} ) ;
+
 
 
 
