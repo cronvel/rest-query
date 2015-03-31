@@ -797,6 +797,74 @@ describe( "Queries of nested object" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "GET on a regular nested² item" , function( done ) {
+		
+		var app , performer , blog , post , comment , blogId , postId , commentId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				blogId = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.' ,
+					parent: { blogs: blogId }
+				} ) ;
+				postId = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
+					content: 'First!' ,
+					parent: { posts: postId }
+				} ) ;
+				commentId = comment.$._id ;
+				//console.log( "commentId: " , commentId ) ;
+				comment.save( callback ) ;
+			} ,
+			/*
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				comment = app.root.children.blogs.children.posts.children.comments.collection.get( commentId , function( error , doc ) {
+					//console.log( string.inspect( { style: 'color' , proto: true } , doc.$ ) ) ;
+					callback() ;
+				} ) ;
+			} ,
+			//*/
+			function( callback ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( undefined ) ;
+					expect( object.content ).to.be( 'First!' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 } ) ;
 
 
