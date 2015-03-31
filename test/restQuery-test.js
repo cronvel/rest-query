@@ -213,7 +213,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( performer , '/Blogs/111111111111111111111111' , function( error , object ) {
+				app.root.get( '/Blogs/111111111111111111111111' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -252,7 +252,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/' + id , function( error , object ) {
+				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -282,10 +282,10 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -296,7 +296,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -327,7 +327,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			} ,
 			function( callback ) {
 				// Same ID than in previous test
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -354,20 +354,20 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! Now overwritten!'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -378,7 +378,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -408,9 +408,9 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( performer , '/Blogs/111111111111111111111111' , {
+				app.root.patch( '/Blogs/111111111111111111111111' , {
 					description: 'Oh yeah!'
-				} , function( error , object ) {
+				} , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -437,19 +437,19 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					description: 'This is a supa blog! Now patched!'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -460,7 +460,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -490,7 +490,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( performer , '/Blogs/111111111111111111111111' , function( error , object ) {
+				app.root.delete( '/Blogs/111111111111111111111111' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -517,17 +517,17 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error ) {
+				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -538,7 +538,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
@@ -571,7 +571,7 @@ describe( "Basic queries of top-level collections" , function() {
 			} ,
 			function( callback ) {
 				
-				app.root.get( performer , '/Blogs' , function( error , batch ) {
+				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					debug( batch ) ;
@@ -614,7 +614,7 @@ describe( "Basic queries of top-level collections" , function() {
 				blog.save( callback ) ;
 			} ,
 			function( callback ) {
-				app.root.get( performer , '/Blogs' , function( error , batch ) {
+				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					debug( batch ) ;
