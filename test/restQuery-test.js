@@ -60,6 +60,7 @@ var blogs , posts , comments ;
 var blogsDescriptor = {
 	url: 'mongodb://localhost:27017/restQuery/blogs' ,
 	properties: {
+		//title: { constraint: 'string' } , // already defined by restQuery
 		description: { constraint: 'string' }
 	} ,
 	meta: {
@@ -74,6 +75,7 @@ var blogsDescriptor = {
 var postsDescriptor = {
 	url: 'mongodb://localhost:27017/restQuery/posts' ,
 	properties: {
+		//title: { constraint: 'string' } ,	// already defined by restQuery
 		content: { constraint: 'string' }
 	} ,
 	meta: {
@@ -131,7 +133,7 @@ function getCliOptions()
 
 
 
-function debug( arguments )
+function debug()
 {
 	if ( cli.log ) { console.log.apply( console , arguments ) ; }
 }
@@ -213,7 +215,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( performer , '/Blogs/111111111111111111111111' , function( error , object ) {
+				app.root.get( '/Blogs/111111111111111111111111' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -252,7 +254,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/' + id , function( error , object ) {
+				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -282,10 +284,10 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -296,7 +298,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -327,7 +329,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			} ,
 			function( callback ) {
 				// Same ID than in previous test
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -354,20 +356,20 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! Now overwritten!'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -378,7 +380,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -408,9 +410,9 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( performer , '/Blogs/111111111111111111111111' , {
+				app.root.patch( '/Blogs/111111111111111111111111' , {
 					description: 'Oh yeah!'
-				} , function( error , object ) {
+				} , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -437,19 +439,19 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					description: 'This is a supa blog! Now patched!'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -460,7 +462,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -490,7 +492,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( performer , '/Blogs/111111111111111111111111' , function( error , object ) {
+				app.root.delete( '/Blogs/111111111111111111111111' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -517,17 +519,17 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)'
-				} , function( error ) {
+				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error ) {
+				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -538,7 +540,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( performer , '/Blogs/5437f846c41d0e910ec9a5d8' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
@@ -571,7 +573,7 @@ describe( "Basic queries of top-level collections" , function() {
 			} ,
 			function( callback ) {
 				
-				app.root.get( performer , '/Blogs' , function( error , batch ) {
+				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					debug( batch ) ;
@@ -614,7 +616,7 @@ describe( "Basic queries of top-level collections" , function() {
 				blog.save( callback ) ;
 			} ,
 			function( callback ) {
-				app.root.get( performer , '/Blogs' , function( error , batch ) {
+				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					debug( batch ) ;
@@ -625,12 +627,14 @@ describe( "Basic queries of top-level collections" , function() {
 							title: 'My wonderful life',
 							description: 'This is a supa blog!',
 							_id: id1,
+							parent: undefined,
 							SID: undefined
 						} ,
 						{
 							title: 'YAB' ,
 							description: 'Yet Another Blog' ,
 							_id: id2,
+							parent: undefined,
 							SID: undefined
 						}
 					] ) ;
@@ -642,6 +646,159 @@ describe( "Basic queries of top-level collections" , function() {
 		.exec( done ) ;
 	} ) ;
 } ) ;
+
+
+
+describe( "Queries of nested object" , function() {
+	
+	it( "GET on an unexisting nested item" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get(
+					'/Blogs/111111111111111111111111/Posts/111111111111111111111111' ,
+					{ performer: performer } ,
+					function( error , object ) {
+						
+						expect( error ).to.be.ok() ;
+						expect( error.type ).to.be( 'notFound' ) ;
+						expect( error.httpStatus ).to.be( 404 ) ;
+						debug( error ) ;
+						debug( object ) ;
+						callback() ;
+					}
+				) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "GET on a regular nested item" , function( done ) {
+		
+		var app , performer , blog , post , blogId , postId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				blogId = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.' ,
+					parent: { blogs: blogId }
+				} ) ;
+				postId = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My first post!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "GET on an existed nested item that does not belong to the given parent" , function( done ) {
+		
+		var app , performer , blog , anotherBlog , post , blogId , anotherBlogId , postId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				blogId = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			function( callback ) {
+				anotherBlog = app.root.children.blogs.collection.createDocument( {
+					title: 'Another blog' ,
+					description: 'Oh yeah'
+				} ) ;
+				anotherBlogId = anotherBlog.$._id ;
+				anotherBlog.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My second post!' ,
+					content: 'Blah blah blah.' ,
+					parent: { blogs: blogId }
+				} ) ;
+				postId = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My second post!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
+					expect( object ).to.be( undefined ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+} ) ;
+
 
 
 

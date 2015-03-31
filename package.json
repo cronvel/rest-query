@@ -11,7 +11,7 @@
     "buffertools": "^2.1.2",
     "error-status": "^0.0.1",
     "odm-kit": "^0.0.5",
-    "string-kit": "^0.1.7",
+    "string-kit": "^0.1.8",
     "tree-kit": "^0.5.0"
   },
   "devDependencies": {

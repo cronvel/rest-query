@@ -10,6 +10,7 @@
 *.png
 .spellcast
 *.pproc.js
+*.bak
 build
 _build
 _templates
