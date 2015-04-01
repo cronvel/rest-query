@@ -993,7 +993,7 @@ describe( "Queries of nested object" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "aaa GET a nested collection" , function( done ) {
+	it( "GET a nested collection" , function( done ) {
 		
 		var app , performer , blog , anotherBlog , post , blogId , anotherBlogId , postId1 , postId2 , postId3 , postIdAlt ;
 		
