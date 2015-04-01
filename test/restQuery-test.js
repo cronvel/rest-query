@@ -61,7 +61,8 @@ var blogsDescriptor = {
 	url: 'mongodb://localhost:27017/restQuery/blogs' ,
 	properties: {
 		//title: { constraint: 'string' } , // already defined by restQuery
-		description: { constraint: 'string' }
+		description: { constraint: 'string' },
+		embedded: { constraint: 'object' }	// just for the test
 	} ,
 	meta: {
 	} ,
@@ -428,7 +429,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "PUT, then PATCH, then GET" , function( done ) {
+	it( "PUT, then PATCH, then GET (featuring embedded data)" , function( done ) {
 		
 		var app , performer , blog , id ;
 		
@@ -443,7 +444,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			function( callback ) {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
-					description: 'This is a supa blog! (x3)'
+					description: 'This is a supa blog! (x3)' ,
+					embedded: { a: 'a' , b: 'b' }
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -452,7 +454,9 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			} ,
 			function( callback ) {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					description: 'This is a supa blog! Now patched!'
+					description: 'This is a supa blog! Now patched!',
+					"embedded.a": 'A',
+					parent: "should not overwrite"
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -474,6 +478,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
+					expect( object.embedded ).to.eql( { a: 'A' , b: 'b' } ) ;
 					expect( object.parent ).to.eql( {} ) ;
 					callback() ;
 				} ) ;
@@ -481,8 +486,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
-	
-	it( "PATCH featuring embedded data" ) ;
 	
 	it( "DELETE on an unexisting item" , function( done ) {
 		
@@ -632,6 +635,7 @@ describe( "Basic queries of top-level collections" , function() {
 							title: 'My wonderful life',
 							description: 'This is a supa blog!',
 							_id: id1,
+							embedded: undefined,
 							parent: undefined,
 							SID: undefined
 						} ,
@@ -639,6 +643,7 @@ describe( "Basic queries of top-level collections" , function() {
 							title: 'YAB' ,
 							description: 'Yet Another Blog' ,
 							_id: id2,
+							embedded: undefined,
 							parent: undefined,
 							SID: undefined
 						}
