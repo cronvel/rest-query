@@ -731,7 +731,7 @@ describe( "Queries of nested object" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "GET on an existed nested item that does not belong to the given parent" , function( done ) {
+	it( "GET on an existed nested item with bad ancestry chain" , function( done ) {
 		
 		var app , performer , blog , anotherBlog , post , blogId , anotherBlogId , postId ;
 		
@@ -861,6 +861,121 @@ describe( "Queries of nested object" , function() {
 					callback() ;
 				} ) ;
 			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "GET on a regular nested² item with bad ancestry chain" , function( done ) {
+		
+		var app , performer ,
+			blog , anotherBlog , post , anotherPost , comment ,
+			blogId , anotherBlogId , postId , anotherPostId , commentId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				blogId = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			function( callback ) {
+				anotherBlog = app.root.children.blogs.collection.createDocument( {
+					title: 'Another blog' ,
+					description: 'Oh yeah'
+				} ) ;
+				anotherBlogId = anotherBlog.$._id ;
+				anotherBlog.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.' ,
+					parent: { blogs: blogId }
+				} ) ;
+				postId = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				anotherPost = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My second post!' ,
+					content: 'Blih blih blih.' ,
+					parent: { blogs: blogId }
+				} ) ;
+				anotherPostId = anotherPost.$._id ;
+				//console.log( "postId: " , postId ) ;
+				anotherPost.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
+					content: 'First!' ,
+					parent: { posts: postId }
+				} ) ;
+				commentId = comment.$._id ;
+				//console.log( "commentId: " , commentId ) ;
+				comment.save( callback ) ;
+			} ,
+			/*
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				comment = app.root.children.blogs.children.posts.children.comments.collection.get( commentId , function( error , doc ) {
+					//console.log( string.inspect( { style: 'color' , proto: true } , doc.$ ) ) ;
+					callback() ;
+				} ) ;
+			} ,
+			//*/
+			function( callback ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( undefined ) ;
+					expect( object.content ).to.be( 'First!' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
+					expect( object ).to.be( undefined ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + anotherPostId , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					expect( object.title ).to.be( 'My second post!' ) ;
+					expect( object.content ).to.be( 'Blih blih blih.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + anotherPostId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
+					expect( object ).to.be( undefined ) ;
+					callback() ;
+				} ) ;
+			} ,
 		] )
 		.exec( done ) ;
 	} ) ;
