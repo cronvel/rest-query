@@ -1163,4 +1163,11 @@ describe( "Queries of nested object" , function() {
 
 
 
+describe( "Misc" , function() {
+	
+	it( "Test CORS" ) ;
+} ) ;
+		
+
+
 
