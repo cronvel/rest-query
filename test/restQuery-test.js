@@ -993,6 +993,115 @@ describe( "Queries of nested object" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "aaa GET a nested collection" , function( done ) {
+		
+		var app , performer , blog , anotherBlog , post , blogId , anotherBlogId , postId1 , postId2 , postId3 , postIdAlt ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				blogId = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			function( callback ) {
+				anotherBlog = app.root.children.blogs.collection.createDocument( {
+					title: 'Another blog' ,
+					description: 'Oh yeah'
+				} ) ;
+				anotherBlogId = anotherBlog.$._id ;
+				anotherBlog.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.' ,
+					parent: { blogs: blogId }
+				} ) ;
+				postId1 = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My second post!' ,
+					content: 'Hi ho!' ,
+					parent: { blogs: blogId }
+				} ) ;
+				postId2 = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My alternate post!' ,
+					content: 'It does not belong to the same blog!' ,
+					parent: { blogs: anotherBlogId }
+				} ) ;
+				postIdAlt = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My third post!' ,
+					content: 'Yay!' ,
+					parent: { blogs: blogId }
+				} ) ;
+				postId3 = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts' , { performer: performer } , function( error , batch ) {
+					
+					var i ;
+					
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( batch ) ;
+					debug( JSON.stringify( batch ) ) ;
+					
+					// MongoID and expect() do not coop well together... -_-'
+					// We have to check properties one by one...
+					
+					expect( batch.length ).to.be( 3 ) ;
+					
+					expect( batch[ 0 ].title ).to.be( 'My first post!' ) ;
+					expect( batch[ 0 ].content ).to.be( 'Blah blah blah.' ) ;
+					expect( batch[ 0 ].parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					
+					expect( batch[ 1 ].title ).to.be( 'My second post!' ) ;
+					expect( batch[ 1 ].content ).to.be( 'Hi ho!' ) ;
+					expect( batch[ 1 ].parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					
+					expect( batch[ 2 ].title ).to.be( 'My third post!' ) ;
+					expect( batch[ 2 ].content ).to.be( 'Yay!' ) ;
+					expect( batch[ 2 ].parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 	it( "PUT on nested object should set the parent property correctly, same for PUT in overwrite mode" , function( done ) {
 		
 		var app , performer , blog , post , blogId , postId = '5437f8f6c41d00910ec9a5d8' ;
@@ -1082,21 +1191,8 @@ describe( "Queries of nested object" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	it( "PUT on an existed nested item with bad ancestry chain" , function( done ) {
+	it( "PUT on an existed, nested item, with bad ancestry chain" , function( done ) {
 		
-		expect().fail() ;
 		var app , performer , blog , anotherBlog , post , blogId , anotherBlogId , postId ;
 		
 		async.series( [
@@ -1134,24 +1230,35 @@ describe( "Queries of nested object" , function() {
 				//console.log( "postId: " , postId ) ;
 				post.save( callback ) ;
 			} ,
+			// Ancestry mismatch
 			function( callback ) {
 				app.root.put(
-					'/Blogs/' + blogId + '/Posts/' + postId ,
+					'/Blogs/' + anotherBlogId + '/Posts/' + postId ,
 					{ title: 'My edited post!' , content: 'Plop.' } ,
 					{ performer: performer } ,
 					function( error , object ) {
-						if ( error ) { callback( error ) ; return ; }
+						expect( error ).to.be.ok() ;
+						expect( error.type ).to.be( 'notFound' ) ;
+						expect( error.httpStatus ).to.be( 404 ) ;
+						expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
+						expect( object ).to.be( undefined ) ;
 						callback() ;
 					}
 				) ;
 			} ,
+			// Should not be edited
 			function( callback ) {
-				app.root.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					expect( error.httpStatus ).to.be( 404 ) ;
-					expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
-					expect( object ).to.be( undefined ) ;
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My second post!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					expect( object.parent.blogs.toString() ).to.be( blogId.toString() ) ;
 					callback() ;
 				} ) ;
 			}
