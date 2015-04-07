@@ -272,6 +272,53 @@ describe( "Basic queries of object of a top-level collection" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "POST then GET" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Blogs' , {
+					title: 'My wonderful life posted!!!' ,
+					description: 'This is a supa blog! (posted!)'
+				} , { performer: performer } , function( error , rawDocument ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					id = rawDocument.id ;
+					//console.log( 'ID:' , id ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
+				//app.root.get( '/Posts/' , function( error , object ) {
+				//app.root.get( '/Blogs/' , function( error , object ) {
+				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life posted!!!' ) ;
+					expect( object.description ).to.be( 'This is a supa blog! (posted!)' ) ;
+					expect( object.parent ).to.eql( {} ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 	it( "PUT then GET" , function( done ) {
 		
 		var app , performer , blog , id ;
@@ -1095,6 +1142,70 @@ describe( "Queries of nested object" , function() {
 					expect( batch[ 2 ].content ).to.be( 'Yay!' ) ;
 					expect( batch[ 2 ].parent.blogs.toString() ).to.be( blogId.toString() ) ;
 					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "POST on nested object should set the parent property correctly" , function( done ) {
+		
+		var app , performer , blog , post , blogId , postId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!'
+				} ) ;
+				blogId = blog.$._id ;
+				blog.save( callback ) ;
+			} ,
+			/*
+			function( callback ) {
+				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
+				post = app.root.children.blogs.children.posts.collection.createDocument( {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.' ,
+					parent: { blogs: blogId }
+				} ) ;
+				postId = post.$._id ;
+				//console.log( "postId: " , postId ) ;
+				post.save( callback ) ;
+			} ,
+			*/
+			function( callback ) {
+				app.root.post(
+					'/Blogs/' + blogId + '/Posts' ,
+					{ title: 'My first post!!!' , content: 'Blah blah blah...' , parent: { blogs: 'should not overwrite' } } ,
+					{ performer: performer } ,
+					function( error , rawDocument ) {
+						if ( error ) { callback( error ) ; return ; }
+						postId = rawDocument.id ;
+						callback() ;
+					}
+				) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My first post!!!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah...' ) ;
+					expect( object.parent.blogs.toString() ).to.be( blogId.toString() ) ;
 					callback() ;
 				} ) ;
 			}
