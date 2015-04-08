@@ -36,10 +36,6 @@ var restQuery = cli['log-lib'] ?
 	smartPreprocessor.require( __dirname + '/../lib/restQuery.js' , { debug: true } ) :
 	require( '../lib/restQuery.js' ) ;
 
-var net = require( 'net' ) ;
-var stream = require( 'stream' ) ;
-var childProcess = require( 'child_process' ) ;
-
 var async = require( 'async-kit' ) ;
 var tree = require( 'tree-kit' ) ;
 var string = require( 'string-kit' ) ;
