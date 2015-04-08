@@ -85,3 +85,32 @@ exports.descriptors.comments = {
 
 
 
+exports.descriptors.users = {
+	url: 'mongodb://localhost:27017/restQuery/users' ,
+	properties: {
+		firstName: { constraint: 'string' } ,
+		lastName: { constraint: 'string' }
+	} ,
+	meta: {
+	} ,
+	indexes: [
+	] ,
+	hooks: {
+	} ,
+	useMemProxy: false
+} ;
+
+
+
+exports.descriptors.auth = {
+	url: 'mongodb://localhost:27017/restQuery/auth' ,
+	properties: {
+	} ,
+	meta: {
+	} ,
+	indexes: [
+	] ,
+	hooks: {
+	} ,
+	useMemProxy: false
+} ;

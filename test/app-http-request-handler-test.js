@@ -97,7 +97,8 @@ function clearDB( callback )
 	async.parallel( [
 		[ clearCollection , 'blogs' ] ,
 		[ clearCollection , 'posts' ] ,
-		[ clearCollection , 'comments' ]
+		[ clearCollection , 'comments' ] ,
+		[ clearCollection , 'users' ]
 	] )
 	.exec( callback ) ;
 }
@@ -225,8 +226,463 @@ after( function( done ) {
 
 
 
-describe( "Full test using app.httpRequestHandler()" , function() {
+describe( "Basics tests" , function() {
 	
-	it( "Test not written ATM." ) ;
+	it( "GET on an unexistant blog" , function( done ) {
+		
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Blogs/111111111111111111111111' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		requester( getQuery , function( error , response ) {
+			
+			expect( error ).not.to.be.ok() ;
+			expect( response.status ).to.be( 404 ) ;
+			expect( response.body ).not.to.be.ok() ;
+			
+			//console.log( "Response:" , response ) ;
+			
+			done() ;
+		} ) ;
+	} ) ;
+	
+	it( "PUT then GET on a blog" , function( done ) {
+		
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Blogs/543bb877bd15489d0d7b0120' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: "My website!",
+				description: "... about my wonderful life"
+			} )
+		} ;
+		
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Blogs/543bb877bd15489d0d7b0120' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		async.series( [
+			function( callback ) {
+				requester( putQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					expect( JSON.parse( response.body ) ).to.be.eql( {
+						_id: "543bb877bd15489d0d7b0120",
+						title: "My website!",
+						description: "... about my wonderful life",
+						parent: {}
+					} ) ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+		
+	} ) ;
+	
+	it( "POST then GET on a blog" , function( done ) {
+		
+		var postDocument ;
+		
+		var postQuery = {
+			method: 'POST' ,
+			path: '/Blogs' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: "My website!",
+				description: "... about my wonderful life"
+			} )
+		} ;
+		
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Blogs/' ,	// this should be completed with the ID after the POST
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		async.series( [
+			function( callback ) {
+				requester( postQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					postDocument = JSON.parse( response.body ) ;
+					
+					expect( typeof postDocument.id ).to.be( 'string' ) ;
+					expect( postDocument.id.length ).to.be( 24 ) ;
+					
+					//console.log( response.headers.location ) ;
+					expect( response.headers.location ).to.be( appProto + '://localhost:' + appPort + '/Blogs/' + postDocument.id ) ;
+					
+					getQuery.path += postDocument.id ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					expect( JSON.parse( response.body ) ).to.be.eql( {
+						_id: postDocument.id,
+						title: "My website!",
+						description: "... about my wonderful life",
+						parent: {}
+					} ) ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+		
+	} ) ;
+	
+	it( "PUT, PATCH then GET on a blog" , function( done ) {
+		
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Blogs/543bb877bd15489d0d7b0121' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: "My website!",
+				description: "... about my wonderful life"
+			} )
+		} ;
+		
+		var patchQuery = {
+			method: 'PATCH' ,
+			path: '/Blogs/543bb877bd15489d0d7b0121' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: "My *NEW* website!",
+				description: "... about my wonderful life"
+			} )
+		} ;
+		
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Blogs/543bb877bd15489d0d7b0121' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		async.series( [
+			function( callback ) {
+				requester( putQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( patchQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					expect( JSON.parse( response.body ) ).to.be.eql( {
+						_id: "543bb877bd15489d0d7b0121",
+						title: "My *NEW* website!",
+						description: "... about my wonderful life",
+						parent: {}
+					} ) ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+		
+	} ) ;
+	
+	it( "PUT, DELETE then GET on a blog" , function( done ) {
+		
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Blogs/543bb877bd15489d0d7b0122' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: "My website!",
+				description: "... about my wonderful life"
+			} )
+		} ;
+		
+		var deleteQuery = {
+			method: 'DELETE' ,
+			path: '/Blogs/543bb877bd15489d0d7b0122' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			}
+		} ;
+		
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Blogs/543bb877bd15489d0d7b0122' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		async.series( [
+			function( callback ) {
+				requester( putQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( deleteQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 404 ) ;
+					expect( response.body ).not.to.be.ok() ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+		
+	} ) ;
+	
 } ) ;
 
+
+
+describe( "Basics tests on users" , function() {
+	
+	it( "GET on an unexistant user" , function( done ) {
+		
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Users/111111111111111111111111' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		requester( getQuery , function( error , response ) {
+			
+			expect( error ).not.to.be.ok() ;
+			expect( response.status ).to.be( 404 ) ;
+			expect( response.body ).not.to.be.ok() ;
+			
+			//console.log( "Response:" , response ) ;
+			
+			done() ;
+		} ) ;
+	} ) ;
+	
+	it( "PUT then GET on a user" , function( done ) {
+		
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb877bd15489d0d7b0130' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				SID: "joe-doe",
+				email: "joe.doe@gmail.com"
+			} )
+		} ;
+		
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb877bd15489d0d7b0130' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		async.series( [
+			function( callback ) {
+				requester( putQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					expect( JSON.parse( response.body ) ).to.be.eql( {
+						_id: "543bb877bd15489d0d7b0130",
+						SID: "joe-doe",
+						email: "joe.doe@gmail.com",
+						parent: {}
+					} ) ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+		
+	} ) ;
+	
+	it( "PUT, DELETE then GET on a user" , function( done ) {
+		
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb877bd15489d0d7b0132' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				SID: "john-doe",
+				email: "john.doe@gmail.com"
+			} )
+		} ;
+		
+		var deleteQuery = {
+			method: 'DELETE' ,
+			path: '/Users/543bb877bd15489d0d7b0132' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			}
+		} ;
+		
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb877bd15489d0d7b0132' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		async.series( [
+			function( callback ) {
+				requester( putQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( deleteQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 404 ) ;
+					expect( response.body ).not.to.be.ok() ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+		
+	} ) ;
+	
+} ) ;

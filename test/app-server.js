@@ -39,10 +39,14 @@ var port = process.argv[ 2 ] || 1234 ;
 var app = restQuery.createApp( { protocol: 'http' , host: 'localhost' , port: port } ) ;
 //var performer = app.createPerformer() ;
 
+var usersNode = app.createUsersCollectionNode( config.descriptors.users ) ;
+var authNode = app.createAuthCollectionNode( config.descriptors.auth ) ;   
+
 var blogsNode = app.createCollectionNode( 'blogs' , config.descriptors.blogs ) ;
 var postsNode = app.createCollectionNode( 'posts' , config.descriptors.posts ) ;
 var commentsNode = app.createCollectionNode( 'comments' , config.descriptors.comments ) ;
 
+app.root.contains( usersNode ) ;
 app.root.contains( blogsNode ) ;
 blogsNode.contains( postsNode ) ;
 postsNode.contains( commentsNode ) ;
@@ -62,7 +66,7 @@ server.on( 'request' , function requestHandler( httpRequest , httpResponse ) {
 } ) ;
 //*/
 
-server.on( 'request' , app.httpRequestHandler.bind( app ) ) ;
+server.on( 'request' , app.httpRequestHandler ) ;
 
 
 
