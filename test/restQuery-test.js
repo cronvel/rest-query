@@ -50,58 +50,14 @@ var mongodb = require( 'mongodb' ) ;
 
 var expect = require( 'expect.js' ) ;
 
+var config = require( './app-config.js' ) ;
+
 
 
 
 
 // Collections...
 var blogs , posts , comments ;
-
-var blogsDescriptor = {
-	url: 'mongodb://localhost:27017/restQuery/blogs' ,
-	properties: {
-		//title: { constraint: 'string' } , // already defined by restQuery
-		description: { constraint: 'string' },
-		embedded: { constraint: 'object' }	// just for the test
-	} ,
-	meta: {
-	} ,
-	indexes: [
-	] ,
-	hooks: {
-	} ,
-	useMemProxy: false
-} ;
-
-var postsDescriptor = {
-	url: 'mongodb://localhost:27017/restQuery/posts' ,
-	properties: {
-		//title: { constraint: 'string' } ,	// already defined by restQuery
-		content: { constraint: 'string' }
-	} ,
-	meta: {
-	} ,
-	indexes: [
-	] ,
-	hooks: {
-	} ,
-	useMemProxy: false
-} ;
-
-var commentsDescriptor = {
-	url: 'mongodb://localhost:27017/restQuery/comments' ,
-	properties: {
-		content: { constraint: 'string' }
-	} ,
-	meta: {
-	} ,
-	indexes: [
-	] ,
-	hooks: {
-	} ,
-	useMemProxy: false
-} ;
-
 
 
 
@@ -156,9 +112,9 @@ function commonApp( callback )
 	var app = restQuery.createApp() ;
 	var performer = app.createPerformer() ;
 	
-	var blogsNode = app.createCollectionNode( 'blogs' , blogsDescriptor ) ;
-	var postsNode = app.createCollectionNode( 'posts' , postsDescriptor ) ;
-	var commentsNode = app.createCollectionNode( 'comments' , commentsDescriptor ) ;
+	var blogsNode = app.createCollectionNode( 'blogs' , config.descriptors.blogs ) ;
+	var postsNode = app.createCollectionNode( 'posts' , config.descriptors.posts ) ;
+	var commentsNode = app.createCollectionNode( 'comments' , config.descriptors.comments ) ;
 	
 	app.root.contains( blogsNode ) ;
 	blogsNode.contains( postsNode ) ;
@@ -186,13 +142,13 @@ function commonApp( callback )
 /*
 before( function( done ) {
 	
-	blogs = world.createCollection( 'blogs' , blogsDescriptor ) ;
+	blogs = world.createCollection( 'blogs' , config.descriptors.blogs ) ;
 	expect( blogs ).to.be.a( odm.Collection ) ;
 	
-	posts = world.createCollection( 'posts' , postsDescriptor ) ;
+	posts = world.createCollection( 'posts' , config.descriptors.posts ) ;
 	expect( posts ).to.be.a( odm.Collection ) ;
 	
-	comments = world.createCollection( 'comments' , commentsDescriptor ) ;
+	comments = world.createCollection( 'comments' , config.descriptors.comments ) ;
 	expect( comments ).to.be.a( odm.Collection ) ;
 	
 	done() ;
