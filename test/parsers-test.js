@@ -90,56 +90,56 @@ function fakeHttpRequest( r , body )
 describe( "Path's node parsing" , function() {
 	
 	it( "should parse a valid property node as an property of the current object" , function() {
-		expect( restQuery.parsePathNode( 'Users' ) ).to.be.eql( { type: 'property' , identifier: 'users' } ) ;
+		expect( restQuery.Node.parsePathNode( 'Users' ) ).to.be.eql( { type: 'property' , identifier: 'users' } ) ;
 		
 		// Invalid entries
-		expect( restQuery.parsePathNode( 'U-' ) ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode( 'U-' ) ).to.be.an( Error ) ;
 	} ) ;
 	
 	it( "should parse a valid offset node as an offset" , function() {
-		expect( restQuery.parsePathNode( '1258' ) ).to.be.eql( { type: 'offset' , identifier: 1258 } ) ;
-		expect( restQuery.parsePathNode( '01258' ) ).to.be.eql( { type: 'offset' , identifier: 1258 } ) ;
-		expect( restQuery.parsePathNode( '0' ) ).to.be.eql( { type: 'offset' , identifier: 0 } ) ;
-		expect( restQuery.parsePathNode( '000' ) ).to.be.eql( { type: 'offset' , identifier: 0 } ) ;
+		expect( restQuery.Node.parsePathNode( '1258' ) ).to.be.eql( { type: 'offset' , identifier: 1258 } ) ;
+		expect( restQuery.Node.parsePathNode( '01258' ) ).to.be.eql( { type: 'offset' , identifier: 1258 } ) ;
+		expect( restQuery.Node.parsePathNode( '0' ) ).to.be.eql( { type: 'offset' , identifier: 0 } ) ;
+		expect( restQuery.Node.parsePathNode( '000' ) ).to.be.eql( { type: 'offset' , identifier: 0 } ) ;
 		
 		// Invalid entries
-		expect( restQuery.parsePathNode( '000b' ).type ).not.to.be.equal( 'offset' ) ;
+		expect( restQuery.Node.parsePathNode( '000b' ).type ).not.to.be.equal( 'offset' ) ;
 	} ) ;
 	
 	it( "should parse a valid ID node as an ID" , function() {
-		expect( restQuery.parsePathNode( '51d18492541d2e3614ca2a80' ) ).to.be.eql( { type: 'ID' , identifier: '51d18492541d2e3614ca2a80' } ) ;
-		expect( restQuery.parsePathNode( 'a1d18492541d2e3614ca2a80' ) ).to.be.eql( { type: 'ID' , identifier: 'a1d18492541d2e3614ca2a80' } ) ;
-		expect( restQuery.parsePathNode( 'aaaaaaaaaaaaaaaaaaaaaaaa' ) ).to.be.eql( { type: 'ID' , identifier: 'aaaaaaaaaaaaaaaaaaaaaaaa' } ) ;
-		expect( restQuery.parsePathNode( '111111111111111111111111' ) ).to.be.eql( { type: 'ID' , identifier: '111111111111111111111111' } ) ;
+		expect( restQuery.Node.parsePathNode( '51d18492541d2e3614ca2a80' ) ).to.be.eql( { type: 'ID' , identifier: '51d18492541d2e3614ca2a80' } ) ;
+		expect( restQuery.Node.parsePathNode( 'a1d18492541d2e3614ca2a80' ) ).to.be.eql( { type: 'ID' , identifier: 'a1d18492541d2e3614ca2a80' } ) ;
+		expect( restQuery.Node.parsePathNode( 'aaaaaaaaaaaaaaaaaaaaaaaa' ) ).to.be.eql( { type: 'ID' , identifier: 'aaaaaaaaaaaaaaaaaaaaaaaa' } ) ;
+		expect( restQuery.Node.parsePathNode( '111111111111111111111111' ) ).to.be.eql( { type: 'ID' , identifier: '111111111111111111111111' } ) ;
 		
 		// Invalid entries
-		expect( restQuery.parsePathNode( '51d18492541d2e3614ca2a8' ).type ).not.to.be.equal( 'ID' ) ;
-		expect( restQuery.parsePathNode( '51d18492541d2e3614ca2a80a' ).type ).not.to.be.equal( 'ID' ) ;
-		expect( restQuery.parsePathNode( '51d18492541h2e3614ca2a80' ).type ).not.to.be.equal( 'ID' ) ;
+		expect( restQuery.Node.parsePathNode( '51d18492541d2e3614ca2a8' ).type ).not.to.be.equal( 'ID' ) ;
+		expect( restQuery.Node.parsePathNode( '51d18492541d2e3614ca2a80a' ).type ).not.to.be.equal( 'ID' ) ;
+		expect( restQuery.Node.parsePathNode( '51d18492541h2e3614ca2a80' ).type ).not.to.be.equal( 'ID' ) ;
 	} ) ;
 	
 	it( "should parse a valid SID node as a SID" , function() {
-		expect( restQuery.parsePathNode( 'abc' ) ).to.be.eql( { type: 'SID' , identifier: 'abc' } ) ;
-		expect( restQuery.parsePathNode( 'cronvel' ) ).to.be.eql( { type: 'SID' , identifier: 'cronvel' } ) ;
-		expect( restQuery.parsePathNode( 'c20nv31' ) ).to.be.eql( { type: 'SID' , identifier: 'c20nv31' } ) ;
-		expect( restQuery.parsePathNode( 'my-blog-entry' ) ).to.be.eql( { type: 'SID' , identifier: 'my-blog-entry' } ) ;
-		expect( restQuery.parsePathNode( 'a-24-characters-long-sid' ) ).to.be.eql( { type: 'SID' , identifier: 'a-24-characters-long-sid' } ) ;
-		expect( restQuery.parsePathNode( 'agaaaaaaaaaaaaaaaaaaaaaa' ) ).to.be.eql( { type: 'SID' , identifier: 'agaaaaaaaaaaaaaaaaaaaaaa' } ) ;
-		expect( restQuery.parsePathNode( '01b' ) ).to.be.eql( { type: 'SID' , identifier: '01b' } ) ;
-		expect( restQuery.parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' ) ).to.be.eql( { type: 'SID' , identifier: 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' } ) ;
+		expect( restQuery.Node.parsePathNode( 'abc' ) ).to.be.eql( { type: 'SID' , identifier: 'abc' } ) ;
+		expect( restQuery.Node.parsePathNode( 'cronvel' ) ).to.be.eql( { type: 'SID' , identifier: 'cronvel' } ) ;
+		expect( restQuery.Node.parsePathNode( 'c20nv31' ) ).to.be.eql( { type: 'SID' , identifier: 'c20nv31' } ) ;
+		expect( restQuery.Node.parsePathNode( 'my-blog-entry' ) ).to.be.eql( { type: 'SID' , identifier: 'my-blog-entry' } ) ;
+		expect( restQuery.Node.parsePathNode( 'a-24-characters-long-sid' ) ).to.be.eql( { type: 'SID' , identifier: 'a-24-characters-long-sid' } ) ;
+		expect( restQuery.Node.parsePathNode( 'agaaaaaaaaaaaaaaaaaaaaaa' ) ).to.be.eql( { type: 'SID' , identifier: 'agaaaaaaaaaaaaaaaaaaaaaa' } ) ;
+		expect( restQuery.Node.parsePathNode( '01b' ) ).to.be.eql( { type: 'SID' , identifier: '01b' } ) ;
+		expect( restQuery.Node.parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' ) ).to.be.eql( { type: 'SID' , identifier: 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' } ) ;
 		
 		// Invalid entries
-		expect( restQuery.parsePathNode( 'aa' ) ).to.be.an( Error ) ;
-		expect( restQuery.parsePathNode( 'afaaaaaaaaaaaaaaaaaaaaaa' ).type ).not.to.be.equal( 'SID' ) ;
-		expect( restQuery.parsePathNode( 'my-Blog-entry' ) ).to.be.an( Error ) ;
-		expect( restQuery.parsePathNode( 'My-blog-entry' ) ).to.be.an( Error ) ;
-		expect( restQuery.parsePathNode( 'aa' ) ).to.be.an( Error ) ;
-		expect( restQuery.parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfgaz' ) ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode( 'aa' ) ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode( 'afaaaaaaaaaaaaaaaaaaaaaa' ).type ).not.to.be.equal( 'SID' ) ;
+		expect( restQuery.Node.parsePathNode( 'my-Blog-entry' ) ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode( 'My-blog-entry' ) ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode( 'aa' ) ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfgaz' ) ).to.be.an( Error ) ;
 	} ) ;
 	
 	it( "should handle edge cases correctly" , function() {
-		expect( restQuery.parsePathNode( '' ) ).to.be.an( Error ) ;
-		expect( restQuery.parsePathNode() ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode( '' ) ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode() ).to.be.an( Error ) ;
 	} ) ;
 	
 } ) ;
