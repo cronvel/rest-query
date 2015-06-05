@@ -6,10 +6,14 @@
   "directories": {
     "test": "test"
   },
+  "bin": {
+    "rest-query": "./bin/rest-query"
+  },
   "dependencies": {
     "async-kit": "^0.5.7",
     "buffertools": "^2.1.2",
     "error-status": "^0.0.1",
+    "minimist": "^1.1.1",
     "odm-kit": "^0.0.7",
     "server-kit": "^0.2.5",
     "string-kit": "^0.1.8",

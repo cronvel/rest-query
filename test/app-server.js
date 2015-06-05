@@ -66,7 +66,7 @@ server.on( 'request' , function requestHandler( httpRequest , httpResponse ) {
 } ) ;
 //*/
 
-server.on( 'request' , app.httpRequestHandler ) ;
+server.on( 'request' , restQuery.httpModule.requestHandler.bind( app ) ) ;
 
 
 
