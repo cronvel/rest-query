@@ -4,3 +4,5 @@ odm-kit has a bug, unit test wont pass with 'useMemProxy' on @bug
 (B) POST should return a resource location header to be compliant with the RFC @code
 (A) @bug when performing a GET on '/', e.g. http-requester http://localhost:1234
 (C) A validator lib should be built (e.g. useful for checkAndFixConfig()) @code
+allowOrigine setup @code
+MAX_LENGTH of body request setup @check
