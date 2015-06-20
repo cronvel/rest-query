@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.0.40",
+  "version": "0.1.0",
   "description": "Perform REST queries directly on your database!",
   "main": "lib/restQuery.js",
   "directories": {
@@ -12,10 +12,10 @@
   "dependencies": {
     "async-kit": "^0.5.9",
     "buffertools": "^2.1.2",
-    "doormen": "0.0.39",
-    "error-status": "^0.0.1",
+    "doormen": "^0.1.0",
+    "error-status": "^1.0.0",
     "minimist": "^1.1.1",
-    "odm-kit": "^0.0.9",
+    "odm-kit": "^0.1.0",
     "server-kit": "^0.2.5",
     "string-kit": "^0.1.12",
     "tree-kit": "^0.5.5"
