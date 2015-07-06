@@ -567,6 +567,8 @@ describe( "Basics tests on users" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
+				firstName: "Joe",
+				lastName: "Doe",
 				SID: "joe-doe",
 				email: "joe.doe@gmail.com"
 			} )
@@ -600,6 +602,8 @@ describe( "Basics tests on users" , function() {
 					expect( response.body ).to.be.ok() ;
 					expect( JSON.parse( response.body ) ).to.be.eql( {
 						_id: "543bb877bd15489d0d7b0130",
+						firstName: "Joe",
+						lastName: "Doe",
 						SID: "joe-doe",
 						email: "joe.doe@gmail.com",
 						parent: {}
@@ -625,6 +629,8 @@ describe( "Basics tests on users" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
+				firstName: "John",
+				lastName: "Doe",
 				SID: "john-doe",
 				email: "john.doe@gmail.com"
 			} )

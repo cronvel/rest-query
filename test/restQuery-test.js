@@ -841,6 +841,7 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
 				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
+					title: 'nope!' ,
 					content: 'First!' ,
 					parent: { posts: postId }
 				} ) ;
@@ -866,7 +867,7 @@ describe( "Queries of nested object" , function() {
 					//delete object._id ;
 					debug( object ) ;
 					debug( JSON.stringify( object ) ) ;
-					expect( object.title ).to.be( undefined ) ;
+					expect( object.title ).to.be( 'nope!' ) ;
 					expect( object.content ).to.be( 'First!' ) ;
 					callback() ;
 				} ) ;
@@ -930,6 +931,7 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
 				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
+					title: 'nope!' ,
 					content: 'First!' ,
 					parent: { posts: postId }
 				} ) ;
@@ -955,7 +957,7 @@ describe( "Queries of nested object" , function() {
 					//delete object._id ;
 					debug( object ) ;
 					debug( JSON.stringify( object ) ) ;
-					expect( object.title ).to.be( undefined ) ;
+					expect( object.title ).to.be( 'nope!' ) ;
 					expect( object.content ).to.be( 'First!' ) ;
 					callback() ;
 				} ) ;

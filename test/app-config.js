@@ -37,9 +37,9 @@ exports.descriptors = {} ;
 exports.descriptors.blogs = {
 	url: 'mongodb://localhost:27017/restQuery/blogs' ,
 	properties: {
-		//title: { constraint: 'string' } , // already defined by restQuery
-		description: { constraint: 'string' },
-		embedded: { constraint: 'object' }	// just for the test
+		//title: { type: 'string' } , // already defined by restQuery
+		description: { type: 'string' },
+		embedded: { optional: true, type: 'object' }	// just for the test
 	} ,
 	meta: {
 	} ,
@@ -55,8 +55,8 @@ exports.descriptors.blogs = {
 exports.descriptors.posts = {
 	url: 'mongodb://localhost:27017/restQuery/posts' ,
 	properties: {
-		//title: { constraint: 'string' } ,	// already defined by restQuery
-		content: { constraint: 'string' }
+		//title: { type: 'string' } ,	// already defined by restQuery
+		content: { type: 'string' }
 	} ,
 	meta: {
 	} ,
@@ -72,7 +72,7 @@ exports.descriptors.posts = {
 exports.descriptors.comments = {
 	url: 'mongodb://localhost:27017/restQuery/comments' ,
 	properties: {
-		content: { constraint: 'string' }
+		content: { type: 'string' }
 	} ,
 	meta: {
 	} ,
@@ -88,8 +88,8 @@ exports.descriptors.comments = {
 exports.descriptors.users = {
 	url: 'mongodb://localhost:27017/restQuery/users' ,
 	properties: {
-		firstName: { constraint: 'string' } ,
-		lastName: { constraint: 'string' }
+		firstName: { type: 'string' } ,
+		lastName: { type: 'string' }
 	} ,
 	meta: {
 	} ,
