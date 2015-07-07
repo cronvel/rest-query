@@ -89,7 +89,8 @@ exports.descriptors.users = {
 	url: 'mongodb://localhost:27017/restQuery/users' ,
 	properties: {
 		firstName: { type: 'string' } ,
-		lastName: { type: 'string' }
+		lastName: { type: 'string' } ,
+		email: { type: 'email' }
 	} ,
 	meta: {
 	} ,

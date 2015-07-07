@@ -606,6 +606,7 @@ describe( "Basics tests on users" , function() {
 						lastName: "Doe",
 						SID: "joe-doe",
 						email: "joe.doe@gmail.com",
+						token: {},
 						parent: {}
 					} ) ;
 					
