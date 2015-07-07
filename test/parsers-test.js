@@ -90,7 +90,7 @@ function fakeHttpRequest( r , body )
 describe( "Path's node parsing" , function() {
 	
 	it( "should parse a valid property node as an property of the current object" , function() {
-		expect( restQuery.Node.parsePathNode( 'Users' ) ).to.be.eql( { type: 'property' , identifier: 'users' } ) ;
+		expect( restQuery.Node.parsePathNode( 'Users' ) ).to.be.eql( { type: 'member' , identifier: 'users' } ) ;
 		
 		// Invalid entries
 		expect( restQuery.Node.parsePathNode( 'U-' ) ).to.be.an( Error ) ;
