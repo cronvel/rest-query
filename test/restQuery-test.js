@@ -237,16 +237,19 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
+				try {
 				app.root.post( '/Blogs' , {
 					title: 'My wonderful life posted!!!' ,
 					description: 'This is a supa blog! (posted!)'
 				} , { performer: performer } , function( error , rawDocument ) {
+					console.log( 'Error here:' , error , error.stack ) ;
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					id = rawDocument.id ;
 					//console.log( 'ID:' , id ) ;
 					callback() ;
 				} ) ;
+				} catch ( error ) { console.log( '##############' ) ; }
 			} ,
 			function( callback ) {
 				//app.root.get( '/' , function( error , object ) {
