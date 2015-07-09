@@ -34,6 +34,28 @@ exports.descriptors = {} ;
 
 
 
+exports.descriptors.users = {
+	url: 'mongodb://localhost:27017/restQuery/users' ,
+	properties: {
+		firstName: { type: 'string' } ,
+		lastName: { type: 'string' } ,
+		email: { type: 'email' }
+	} ,
+	meta: {
+	} ,
+	indexes: [
+	] ,
+	hooks: {
+		beforeCreateDocument: function( rawDocument ) {
+			if ( ! rawDocument.login ) { rawDocument.login = rawDocument.email ; }
+			return rawDocument ;
+		}
+	} ,
+	useMemProxy: false
+} ;
+
+
+
 exports.descriptors.blogs = {
 	url: 'mongodb://localhost:27017/restQuery/blogs' ,
 	properties: {
@@ -73,24 +95,6 @@ exports.descriptors.comments = {
 	url: 'mongodb://localhost:27017/restQuery/comments' ,
 	properties: {
 		content: { type: 'string' }
-	} ,
-	meta: {
-	} ,
-	indexes: [
-	] ,
-	hooks: {
-	} ,
-	useMemProxy: false
-} ;
-
-
-
-exports.descriptors.users = {
-	url: 'mongodb://localhost:27017/restQuery/users' ,
-	properties: {
-		firstName: { type: 'string' } ,
-		lastName: { type: 'string' } ,
-		email: { type: 'email' }
 	} ,
 	meta: {
 	} ,

@@ -46,7 +46,7 @@ var mongodb = require( 'mongodb' ) ;
 
 var expect = require( 'expect.js' ) ;
 
-var config = require( './app-config.js' ) ;
+var config = require( './sample/app-config.js' ) ;
 
 
 

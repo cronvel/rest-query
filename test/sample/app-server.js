@@ -26,7 +26,7 @@
 
 
 var http = require( 'http' ) ;
-var restQuery = require( '../lib/restQuery.js' ) ;
+var restQuery = require( '../../lib/restQuery.js' ) ;
 
 var config = require( './app-config.js' ) ;
 

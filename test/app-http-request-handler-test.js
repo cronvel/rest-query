@@ -36,7 +36,7 @@ var restQuery = cli['log-lib'] ?
 	smartPreprocessor.require( __dirname + '/../lib/restQuery.js' , { debug: true } ) :
 	require( '../lib/restQuery.js' ) ;
 
-var config = require( './app-config.js' ) ;
+var config = require( './sample/app-config.js' ) ;
 
 var expect = require( 'expect.js' ) ;
 
@@ -126,7 +126,7 @@ function connect( callback )
 
 function runApp( maybeCallback )
 {
-	appProcess = childProcess.spawn( 'node' , [ './app-server.js' , appPort ] ) ;
+	appProcess = childProcess.spawn( 'node' , [ __dirname + '/sample/app-server.js' , appPort ] ) ;
 	
 	appProcess.stdout.on( 'data' , function( data ) {
 		//console.log( "[appProcess STDOUT] " , data.toString() ) ;
@@ -570,7 +570,8 @@ describe( "Basics tests on users" , function() {
 				firstName: "Joe",
 				lastName: "Doe",
 				SID: "joe-doe",
-				email: "joe.doe@gmail.com"
+				email: "joe.doe@gmail.com",
+				password: "pw"
 			} )
 		} ;
 		
@@ -600,12 +601,23 @@ describe( "Basics tests on users" , function() {
 					expect( response.status ).to.be( 200 ) ;
 					
 					expect( response.body ).to.be.ok() ;
-					expect( JSON.parse( response.body ) ).to.be.eql( {
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data.password ).to.be.an( 'object' ) ;
+					expect( data.password.algo ).to.be.a( 'string' ) ;
+					expect( data.password.salt ).to.be.a( 'string' ) ;
+					expect( data.password.hash ).to.be.a( 'string' ) ;
+					//console.log( data.password ) ;
+					delete data.password ;
+					
+					expect( data ).to.be.eql( {
 						_id: "543bb877bd15489d0d7b0130",
 						firstName: "Joe",
 						lastName: "Doe",
 						SID: "joe-doe",
 						email: "joe.doe@gmail.com",
+						login: "joe.doe@gmail.com",
 						token: {},
 						parent: {}
 					} ) ;
@@ -633,7 +645,8 @@ describe( "Basics tests on users" , function() {
 				firstName: "John",
 				lastName: "Doe",
 				SID: "john-doe",
-				email: "john.doe@gmail.com"
+				email: "john.doe@gmail.com",
+				password: "pw"
 			} )
 		} ;
 		
