@@ -111,12 +111,15 @@ function commonApp( callback )
 	var blogsNode = app.createCollectionNode( 'blogs' , config.descriptors.blogs ) ;
 	var postsNode = app.createCollectionNode( 'posts' , config.descriptors.posts ) ;
 	var commentsNode = app.createCollectionNode( 'comments' , config.descriptors.comments ) ;
+	var usersNode = app.createUsersCollectionNode( config.descriptors.users ) ;
 	
+	app.root.contains( usersNode ) ;
 	app.root.contains( blogsNode ) ;
 	blogsNode.contains( postsNode ) ;
 	postsNode.contains( commentsNode ) ;
 	
 	async.parallel( [
+		[ clearCollection , usersNode.collection ] ,
 		[ clearCollection , blogsNode.collection ] ,
 		[ clearCollection , postsNode.collection ] ,
 		[ clearCollection , commentsNode.collection ]
@@ -242,7 +245,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life posted!!!' ,
 					description: 'This is a supa blog! (posted!)'
 				} , { performer: performer } , function( error , rawDocument ) {
-					console.log( 'Error here:' , error , error.stack ) ;
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					id = rawDocument.id ;
@@ -266,7 +268,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life posted!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (posted!)' ) ;
-					expect( object.parent ).to.eql( {} ) ;
+					expect( object.parent ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			}
@@ -311,7 +313,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.eql( {} ) ;
+					expect( object.parent ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			}
@@ -394,7 +396,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now overwritten!' ) ;
-					expect( object.parent ).to.eql( {} ) ;
+					expect( object.parent ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			}
@@ -481,7 +483,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
 					expect( object.embedded ).to.eql( { a: 'A' , b: 'b' } ) ;
-					expect( object.parent ).to.eql( {} ) ;
+					expect( object.parent ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			}
@@ -719,7 +721,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -776,7 +778,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My second post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs' , id: blogId }
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -835,7 +837,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -846,7 +848,7 @@ describe( "Queries of nested object" , function() {
 				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
 					title: 'nope!' ,
 					content: 'First!' ,
-					parent: { posts: postId }
+					parent: { collection: 'posts', id: postId }
 				} ) ;
 				commentId = comment.$._id ;
 				//console.log( "commentId: " , commentId ) ;
@@ -914,7 +916,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -925,7 +927,7 @@ describe( "Queries of nested object" , function() {
 				anotherPost = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My second post!' ,
 					content: 'Blih blih blih.' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				anotherPostId = anotherPost.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -936,7 +938,7 @@ describe( "Queries of nested object" , function() {
 				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
 					title: 'nope!' ,
 					content: 'First!' ,
-					parent: { posts: postId }
+					parent: { collection: 'posts', id: postId }
 				} ) ;
 				commentId = comment.$._id ;
 				//console.log( "commentId: " , commentId ) ;
@@ -1030,7 +1032,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				postId1 = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1041,7 +1043,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My second post!' ,
 					content: 'Hi ho!' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				postId2 = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1052,7 +1054,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My alternate post!' ,
 					content: 'It does not belong to the same blog!' ,
-					parent: { blogs: anotherBlogId }
+					parent: { collection: 'blogs', id: anotherBlogId }
 				} ) ;
 				postIdAlt = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1063,7 +1065,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My third post!' ,
 					content: 'Yay!' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				postId3 = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1089,15 +1091,18 @@ describe( "Queries of nested object" , function() {
 					
 					expect( batch[ 0 ].title ).to.be( 'My first post!' ) ;
 					expect( batch[ 0 ].content ).to.be( 'Blah blah blah.' ) ;
-					expect( batch[ 0 ].parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					expect( batch[ 0 ].parent.collection ).to.be( 'blogs' ) ;
+					expect( batch[ 0 ].parent.id.toString() ).to.be( blogId.toString() ) ;
 					
 					expect( batch[ 1 ].title ).to.be( 'My second post!' ) ;
 					expect( batch[ 1 ].content ).to.be( 'Hi ho!' ) ;
-					expect( batch[ 1 ].parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					expect( batch[ 1 ].parent.collection ).to.be( 'blogs' ) ;
+					expect( batch[ 1 ].parent.id.toString() ).to.be( blogId.toString() ) ;
 					
 					expect( batch[ 2 ].title ).to.be( 'My third post!' ) ;
 					expect( batch[ 2 ].content ).to.be( 'Yay!' ) ;
-					expect( batch[ 2 ].parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					expect( batch[ 2 ].parent.collection ).to.be( 'blogs' ) ;
+					expect( batch[ 2 ].parent.id.toString() ).to.be( blogId.toString() ) ;
 					
 					callback() ;
 				} ) ;
@@ -1132,7 +1137,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1142,7 +1147,7 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.post(
 					'/Blogs/' + blogId + '/Posts' ,
-					{ title: 'My first post!!!' , content: 'Blah blah blah...' , parent: { blogs: 'should not overwrite' } } ,
+					{ title: 'My first post!!!' , content: 'Blah blah blah...' , parent: 'should not overwrite' } ,
 					{ performer: performer } ,
 					function( error , rawDocument ) {
 						if ( error ) { callback( error ) ; return ; }
@@ -1162,7 +1167,8 @@ describe( "Queries of nested object" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My first post!!!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah...' ) ;
-					expect( object.parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					expect( object.parent.id.toString() ).to.be( blogId.toString() ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1196,7 +1202,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1206,7 +1212,7 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.put(
 					'/Blogs/' + blogId + '/Posts/' + postId ,
-					{ title: 'My first post!!!' , content: 'Blah blah blah...' , parent: { blogs: 'should not overwrite' } } ,
+					{ title: 'My first post!!!' , content: 'Blah blah blah...' , parent: 'should not overwrite' } ,
 					{ performer: performer } ,
 					function( error , object ) {
 						if ( error ) { callback( error ) ; return ; }
@@ -1225,14 +1231,15 @@ describe( "Queries of nested object" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My first post!!!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah...' ) ;
-					expect( object.parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					expect( object.parent.id.toString() ).to.be( blogId.toString() ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.put(
 					'/Blogs/' + blogId + '/Posts/' + postId ,
-					{ title: 'My first post???' , content: 'Blah?' , parent: { blogs: 'should not overwrite' } } ,
+					{ title: 'My first post???' , content: 'Blah?' , parent: 'should not overwrite' } ,
 					{ performer: performer } ,
 					function( error , object ) {
 						if ( error ) { callback( error ) ; return ; }
@@ -1251,7 +1258,8 @@ describe( "Queries of nested object" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My first post???' ) ;
 					expect( object.content ).to.be( 'Blah?' ) ;
-					expect( object.parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					expect( object.parent.id.toString() ).to.be( blogId.toString() ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1292,7 +1300,7 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My second post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { blogs: blogId }
+					parent: { collection: 'blogs', id: blogId }
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1326,7 +1334,8 @@ describe( "Queries of nested object" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My second post!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah.' ) ;
-					expect( object.parent.blogs.toString() ).to.be( blogId.toString() ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					expect( object.parent.id.toString() ).to.be( blogId.toString() ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1336,6 +1345,72 @@ describe( "Queries of nested object" , function() {
 	
 } ) ;
 
+
+
+describe( "Users" , function() {
+	
+	it( "PUT then GET" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Users/5437f846e41d0e910ec9a5d8' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					SID: "joe-doe",
+					email: "joe.doe@gmail.com",
+					password: "pw"
+				} , { performer: performer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
+				//app.root.get( '/Posts/' , function( error , object ) {
+				//app.root.get( '/Blogs/' , function( error , object ) {
+				app.root.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.firstName ).to.be( 'Joe' ) ;
+					expect( object.lastName ).to.be( 'Doe' ) ;
+					expect( object.SID ).to.be( 'joe-doe' ) ;
+					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
+					//console.log( object.password ) ;
+					expect( object.password ).to.be.an( 'object' ) ;
+					expect( object.parent ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "Incomplete test suit for special collection 'users'..." ) ;
+} ) ;
+
+
+
+describe( "App config" , function() {
+	
+	it( "Test loading a JSON config" ) ;
+} ) ;
+		
 
 
 describe( "Misc" , function() {

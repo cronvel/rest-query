@@ -294,8 +294,7 @@ describe( "Basics tests" , function() {
 					expect( JSON.parse( response.body ) ).to.be.eql( {
 						_id: "543bb877bd15489d0d7b0120",
 						title: "My website!",
-						description: "... about my wonderful life",
-						parent: {}
+						description: "... about my wonderful life"
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
@@ -364,8 +363,7 @@ describe( "Basics tests" , function() {
 					expect( JSON.parse( response.body ) ).to.be.eql( {
 						_id: postDocument.id,
 						title: "My website!",
-						description: "... about my wonderful life",
-						parent: {}
+						description: "... about my wonderful life"
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
@@ -445,8 +443,7 @@ describe( "Basics tests" , function() {
 					expect( JSON.parse( response.body ) ).to.be.eql( {
 						_id: "543bb877bd15489d0d7b0121",
 						title: "My *NEW* website!",
-						description: "... about my wonderful life",
-						parent: {}
+						description: "... about my wonderful life"
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
@@ -618,8 +615,7 @@ describe( "Basics tests on users" , function() {
 						SID: "joe-doe",
 						email: "joe.doe@gmail.com",
 						login: "joe.doe@gmail.com",
-						token: {},
-						parent: {}
+						token: {}
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
