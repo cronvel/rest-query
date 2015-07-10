@@ -567,7 +567,7 @@ describe( "Basics tests on users" , function() {
 				firstName: "Joe",
 				lastName: "Doe",
 				SID: "joe-doe",
-				email: "joe.doe@gmail.com",
+				email: "joe.doe2@gmail.com",
 				password: "pw"
 			} )
 		} ;
@@ -613,8 +613,8 @@ describe( "Basics tests on users" , function() {
 						firstName: "Joe",
 						lastName: "Doe",
 						SID: "joe-doe",
-						email: "joe.doe@gmail.com",
-						login: "joe.doe@gmail.com",
+						email: "joe.doe2@gmail.com",
+						login: "joe.doe2@gmail.com",
 						token: {}
 					} ) ;
 					

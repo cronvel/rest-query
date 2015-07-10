@@ -127,7 +127,11 @@ function commonApp( callback )
 	.exec( function( error ) {
 		expect( error ).not.to.be.ok() ;
 		if ( error ) { callback( error ) ; return ; }
-		callback( undefined , app , performer ) ;
+		
+		app.buildIndexes( function( error ) {
+			if ( error ) { callback( error ) ; return ; }
+			callback( undefined , app , performer ) ;
+		} ) ;
 	} ) ;
 }
 
@@ -268,7 +272,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life posted!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (posted!)' ) ;
-					expect( object.parent ).not.to.be.ok() ;
+					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -313,7 +317,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).not.to.be.ok() ;
+					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -396,7 +400,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now overwritten!' ) ;
-					expect( object.parent ).not.to.be.ok() ;
+					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -483,7 +487,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
 					expect( object.embedded ).to.eql( { a: 'A' , b: 'b' } ) ;
-					expect( object.parent ).not.to.be.ok() ;
+					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -612,6 +616,7 @@ describe( "Basic queries of top-level collections" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
+				console.log( "one" ) ;
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!'
@@ -620,6 +625,8 @@ describe( "Basic queries of top-level collections" , function() {
 				blog.save( callback ) ;
 			} ,
 			function( callback ) {
+				console.log( "two" ) ;
+				console.log( "\n\nOMG: Mongo's sparse on multikey index create an index even if one of the key is missing..\n\n" ) ;
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'YAB' ,
 					description: 'Yet Another Blog'
@@ -628,6 +635,7 @@ describe( "Basic queries of top-level collections" , function() {
 				blog.save( callback ) ;
 			} ,
 			function( callback ) {
+				console.log( "three" ) ;
 				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
@@ -640,7 +648,7 @@ describe( "Basic queries of top-level collections" , function() {
 							description: 'This is a supa blog!',
 							_id: id1,
 							embedded: undefined,
-							parent: undefined,
+							parent: { id: null, collection: '/' },
 							SID: undefined
 						} ,
 						{
@@ -648,7 +656,7 @@ describe( "Basic queries of top-level collections" , function() {
 							description: 'Yet Another Blog' ,
 							_id: id2,
 							embedded: undefined,
-							parent: undefined,
+							parent: { id: null, collection: '/' },
 							SID: undefined
 						}
 					] ) ;
@@ -1349,6 +1357,12 @@ describe( "Queries of nested object" , function() {
 
 describe( "Users" , function() {
 	
+	it( "GET on an unexisting user" ) ;
+	
+	it( "GET on a regular user" ) ;
+	
+	it( "POST then GET" ) ;
+	
 	it( "PUT then GET" , function( done ) {
 		
 		var app , performer , blog , id ;
@@ -1393,7 +1407,10 @@ describe( "Users" , function() {
 					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
 					//console.log( object.password ) ;
 					expect( object.password ).to.be.an( 'object' ) ;
-					expect( object.parent ).not.to.be.ok() ;
+					expect( object.password.algo ).to.be( 'sha512' ) ;
+					expect( object.password.salt ).to.be.a( 'string' ) ;
+					expect( object.password.hash ).to.be.a( 'string' ) ;
+					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1401,7 +1418,17 @@ describe( "Users" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "Incomplete test suit for special collection 'users'..." ) ;
+	it( "PUT, then PUT (overwrite), then GET" ) ;
+	
+	it( "PATCH on an unexisting user" ) ;
+	
+	it( "PUT, then PATCH, then GET" ) ;
+	
+	it( "DELETE on an unexisting user" ) ;
+	
+	it( "PUT, then DELETE, then GET" ) ;
+	
+	it( "POST /Users/CreateToken" ) ;
 } ) ;
 
 
@@ -1409,6 +1436,13 @@ describe( "Users" , function() {
 describe( "App config" , function() {
 	
 	it( "Test loading a JSON config" ) ;
+} ) ;
+
+
+
+describe( "Indexes" , function() {
+	
+	it( "Test indexes" ) ;
 } ) ;
 		
 

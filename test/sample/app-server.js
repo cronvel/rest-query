@@ -52,7 +52,9 @@ blogsNode.contains( postsNode ) ;
 postsNode.contains( commentsNode ) ;
 
 
-
+// Callback needed? not sure...
+// Let's create the server right now and let mongo deal with indexes in the background...
+app.buildIndexes() ;
 
 
 var server = http.createServer() ;
