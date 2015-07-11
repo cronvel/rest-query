@@ -616,7 +616,6 @@ describe( "Basic queries of top-level collections" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				console.log( "one" ) ;
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!'
@@ -625,8 +624,6 @@ describe( "Basic queries of top-level collections" , function() {
 				blog.save( callback ) ;
 			} ,
 			function( callback ) {
-				console.log( "two" ) ;
-				console.log( "\n\nOMG: Mongo's sparse on multikey index create an index even if one of the key is missing..\n\n" ) ;
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'YAB' ,
 					description: 'Yet Another Blog'
@@ -635,7 +632,6 @@ describe( "Basic queries of top-level collections" , function() {
 				blog.save( callback ) ;
 			} ,
 			function( callback ) {
-				console.log( "three" ) ;
 				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
@@ -649,7 +645,7 @@ describe( "Basic queries of top-level collections" , function() {
 							_id: id1,
 							embedded: undefined,
 							parent: { id: null, collection: '/' },
-							SID: undefined
+							slugId: batch[ 0 ].slugId		// cannot be predicted
 						} ,
 						{
 							title: 'YAB' ,
@@ -657,7 +653,7 @@ describe( "Basic queries of top-level collections" , function() {
 							_id: id2,
 							embedded: undefined,
 							parent: { id: null, collection: '/' },
-							SID: undefined
+							slugId: batch[ 1 ].slugId		// cannot be predicted
 						}
 					] ) ;
 					
@@ -1379,7 +1375,6 @@ describe( "Users" , function() {
 				app.root.put( '/Users/5437f846e41d0e910ec9a5d8' , {
 					firstName: "Joe",
 					lastName: "Doe",
-					SID: "joe-doe",
 					email: "joe.doe@gmail.com",
 					password: "pw"
 				} , { performer: performer } , function( error ) {
@@ -1403,7 +1398,7 @@ describe( "Users" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.firstName ).to.be( 'Joe' ) ;
 					expect( object.lastName ).to.be( 'Doe' ) ;
-					expect( object.SID ).to.be( 'joe-doe' ) ;
+					expect( object.slugId ).to.be( 'joe-doe' ) ;
 					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
 					//console.log( object.password ) ;
 					expect( object.password ).to.be.an( 'object' ) ;

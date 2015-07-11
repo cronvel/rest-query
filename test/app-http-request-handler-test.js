@@ -566,7 +566,7 @@ describe( "Basics tests on users" , function() {
 			body: JSON.stringify( {
 				firstName: "Joe",
 				lastName: "Doe",
-				SID: "joe-doe",
+				slugId: "joe-doe",
 				email: "joe.doe2@gmail.com",
 				password: "pw"
 			} )
@@ -612,7 +612,7 @@ describe( "Basics tests on users" , function() {
 						_id: "543bb877bd15489d0d7b0130",
 						firstName: "Joe",
 						lastName: "Doe",
-						SID: "joe-doe",
+						slugId: "joe-doe",
 						email: "joe.doe2@gmail.com",
 						login: "joe.doe2@gmail.com",
 						token: {}
@@ -640,7 +640,7 @@ describe( "Basics tests on users" , function() {
 			body: JSON.stringify( {
 				firstName: "John",
 				lastName: "Doe",
-				SID: "john-doe",
+				slugId: "john-doe",
 				email: "john.doe@gmail.com",
 				password: "pw"
 			} )
