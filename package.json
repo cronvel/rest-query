@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "Perform REST queries directly on your database!",
   "main": "lib/restQuery.js",
   "directories": {
@@ -16,7 +16,7 @@
     "error-status": "^1.1.1",
     "hash-kit": "^0.1.1",
     "minimist": "^1.1.1",
-    "odm-kit": "^0.2.15",
+    "odm-kit": "^0.2.16",
     "server-kit": "^0.2.5",
     "string-kit": "^0.1.12",
     "tree-kit": "^0.5.5"
