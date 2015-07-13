@@ -129,11 +129,10 @@ describe( "Path's node parsing" , function() {
 		expect( restQuery.Node.parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' ) ).to.be.eql( { type: 'slugId' , identifier: 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' } ) ;
 		
 		// Invalid entries
-		expect( restQuery.Node.parsePathNode( 'aa' ) ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode( 'a' ) ).to.be.an( Error ) ;
 		expect( restQuery.Node.parsePathNode( 'afaaaaaaaaaaaaaaaaaaaaaa' ).type ).not.to.be.equal( 'slugId' ) ;
 		expect( restQuery.Node.parsePathNode( 'my-Blog-entry' ) ).to.be.an( Error ) ;
 		expect( restQuery.Node.parsePathNode( 'My-blog-entry' ) ).to.be.an( Error ) ;
-		expect( restQuery.Node.parsePathNode( 'aa' ) ).to.be.an( Error ) ;
 		expect( restQuery.Node.parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfgaz' ) ).to.be.an( Error ) ;
 	} ) ;
 	

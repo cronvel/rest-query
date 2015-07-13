@@ -1,5 +1,5 @@
 /*
-	The Cedric's Swiss Knife (CSK) - CSK REST Query
+	The Cedric's Swiss Knife (CSK) - CSK REST Query test suite
 
 	Copyright (c) 2015 Cédric Ronvel 
 	
@@ -24,34 +24,31 @@
 	SOFTWARE.
 */
 
-/*
-	TODO:
-		- remove binding in restQuery.App(), should probably turn those into functions...
-		- handle connection/session
-		- handle auth
-*/
+/* jshint unused:false */
+/* global describe, it, before, after, beforeEach */
 
 
 
-var restQuery = {} ;
-module.exports = restQuery ;
+var doormen = require( 'doormen' ) ;
 
-require( './doormen-extensions.js' ) ;
-restQuery.misc = require( './misc.js' ) ;
-restQuery.charmap = require( './charmap.js' ) ;
-restQuery.slugify = require( './slugify.js' ) ;
-restQuery.httpModule = require( './httpModule.js' ) ;
-restQuery.App = require( './App.js' ) ;
-restQuery.Node = require( './Node.js' ) ;
-restQuery.ObjectNode = require( './ObjectNode.js' ) ;
-restQuery.CollectionNode = require( './CollectionNode.js' ) ;
-restQuery.UsersCollectionNode = require( './UsersCollectionNode.js' ) ;
-restQuery.AuthCollectionNode = require( './AuthCollectionNode.js' ) ;
-restQuery.Performer = require( './Performer.js' ) ;
-restQuery.cli = require( './cli.js' ) ;
+// restQuery will extend doormen, so it should be loaded
+var restQuery = require( '../lib/restQuery.js' ) ;	// jshint ignore:line
 
 
 
-restQuery.createApp = restQuery.App.create ;
+describe( "doormen's restQuery specific" , function() {
+
+	it( "restQuery.slug type checker" , function() {
+		
+		doormen( { type: 'restQuery.slug' } , 'my-slug' ) ;
+		doormen.not( { type: 'restQuery.slug' } , 'Not-a-slug' ) ;
+	} ) ;
+	
+	it( "restQuery.randomSlug sanitizer" , function() {
+		
+		var slug = doormen( { type: 'restQuery.slug' , sanitize: 'restQuery.randomSlug' } , null ) ;
+		//console.log( slug ) ;
+	} ) ;
+} ) ;
 
 

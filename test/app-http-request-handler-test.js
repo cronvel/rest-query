@@ -291,10 +291,18 @@ describe( "Basics tests" , function() {
 					expect( response.status ).to.be( 200 ) ;
 					
 					expect( response.body ).to.be.ok() ;
-					expect( JSON.parse( response.body ) ).to.be.eql( {
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data ).to.be.eql( {
 						_id: "543bb877bd15489d0d7b0120",
 						title: "My website!",
-						description: "... about my wonderful life"
+						description: "... about my wonderful life",
+						slugId: data.slugId,	// Cannot be predicted
+						parent: {
+							collection: '/',
+							id: null
+						}
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
@@ -360,10 +368,18 @@ describe( "Basics tests" , function() {
 					expect( response.status ).to.be( 200 ) ;
 					
 					expect( response.body ).to.be.ok() ;
-					expect( JSON.parse( response.body ) ).to.be.eql( {
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data ).to.be.eql( {
 						_id: postDocument.id,
 						title: "My website!",
-						description: "... about my wonderful life"
+						description: "... about my wonderful life",
+						slugId: data.slugId,	// Cannot be predicted
+						parent: {
+							collection: '/',
+							id: null
+						}
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
@@ -440,10 +456,18 @@ describe( "Basics tests" , function() {
 					expect( response.status ).to.be( 200 ) ;
 					
 					expect( response.body ).to.be.ok() ;
-					expect( JSON.parse( response.body ) ).to.be.eql( {
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data ).to.be.eql( {
 						_id: "543bb877bd15489d0d7b0121",
 						title: "My *NEW* website!",
-						description: "... about my wonderful life"
+						description: "... about my wonderful life",
+						slugId: data.slugId,	// Cannot be predicted
+						parent: {
+							collection: '/',
+							id: null
+						}
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
@@ -565,8 +589,7 @@ describe( "Basics tests on users" , function() {
 			} ,
 			body: JSON.stringify( {
 				firstName: "Joe",
-				lastName: "Doe",
-				slugId: "joe-doe",
+				lastName: "Doe2",
 				email: "joe.doe2@gmail.com",
 				password: "pw"
 			} )
@@ -611,11 +634,15 @@ describe( "Basics tests on users" , function() {
 					expect( data ).to.be.eql( {
 						_id: "543bb877bd15489d0d7b0130",
 						firstName: "Joe",
-						lastName: "Doe",
-						slugId: "joe-doe",
+						lastName: "Doe2",
 						email: "joe.doe2@gmail.com",
 						login: "joe.doe2@gmail.com",
-						token: {}
+						token: {},
+						slugId: data.slugId,	// Cannot be predicted
+						parent: {
+							collection: '/',
+							id: null
+						}
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
@@ -640,7 +667,6 @@ describe( "Basics tests on users" , function() {
 			body: JSON.stringify( {
 				firstName: "John",
 				lastName: "Doe",
-				slugId: "john-doe",
 				email: "john.doe@gmail.com",
 				password: "pw"
 			} )
