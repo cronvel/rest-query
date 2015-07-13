@@ -645,6 +645,9 @@ describe( "Basic queries of top-level collections" , function() {
 							_id: id1,
 							embedded: undefined,
 							parent: { id: null, collection: '/' },
+							userAccess: {},
+							groupAccess: {},
+							otherAccess: 2,
 							slugId: batch[ 0 ].slugId		// cannot be predicted
 						} ,
 						{
@@ -653,6 +656,9 @@ describe( "Basic queries of top-level collections" , function() {
 							_id: id2,
 							embedded: undefined,
 							parent: { id: null, collection: '/' },
+							userAccess: {},
+							groupAccess: {},
+							otherAccess: 2,
 							slugId: batch[ 1 ].slugId		// cannot be predicted
 						}
 					] ) ;

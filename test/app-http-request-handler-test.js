@@ -299,6 +299,9 @@ describe( "Basics tests" , function() {
 						title: "My website!",
 						description: "... about my wonderful life",
 						slugId: data.slugId,	// Cannot be predicted
+						userAccess: {},
+						groupAccess: {},
+						otherAccess: 2,
 						parent: {
 							collection: '/',
 							id: null
@@ -376,6 +379,9 @@ describe( "Basics tests" , function() {
 						title: "My website!",
 						description: "... about my wonderful life",
 						slugId: data.slugId,	// Cannot be predicted
+						userAccess: {},
+						groupAccess: {},
+						otherAccess: 2,
 						parent: {
 							collection: '/',
 							id: null
@@ -464,6 +470,9 @@ describe( "Basics tests" , function() {
 						title: "My *NEW* website!",
 						description: "... about my wonderful life",
 						slugId: data.slugId,	// Cannot be predicted
+						userAccess: {},
+						groupAccess: {},
+						otherAccess: 2,
 						parent: {
 							collection: '/',
 							id: null
@@ -639,6 +648,9 @@ describe( "Basics tests on users" , function() {
 						login: "joe.doe2@gmail.com",
 						token: {},
 						slugId: data.slugId,	// Cannot be predicted
+						userAccess: {},
+						groupAccess: {},
+						otherAccess: 2,
 						parent: {
 							collection: '/',
 							id: null
