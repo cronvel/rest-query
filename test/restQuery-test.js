@@ -45,6 +45,7 @@ var buffertools = require( 'buffertools' ) ;
 var mongodb = require( 'mongodb' ) ;
 
 var expect = require( 'expect.js' ) ;
+var doormen = require( 'doormen' ) ;
 
 var config = require( './sample/app-config.js' ) ;
 
@@ -204,7 +205,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				id = blog.$._id ;
 				blog.save( callback ) ;
@@ -244,10 +246,11 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				try {
+				//try {
 				app.root.post( '/Blogs' , {
 					title: 'My wonderful life posted!!!' ,
-					description: 'This is a supa blog! (posted!)'
+					description: 'This is a supa blog! (posted!)' ,
+					otherAccess: restQuery.ALL
 				} , { performer: performer } , function( error , rawDocument ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -255,7 +258,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					//console.log( 'ID:' , id ) ;
 					callback() ;
 				} ) ;
-				} catch ( error ) { console.log( '##############' ) ; }
+				//} catch ( error ) { console.log( '##############' ) ; }
 			} ,
 			function( callback ) {
 				//app.root.get( '/' , function( error , object ) {
@@ -272,7 +275,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life posted!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (posted!)' ) ;
-					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -295,7 +298,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			function( callback ) {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)'
+					description: 'This is a supa blog! (x2)' ,
+					otherAccess: restQuery.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -317,7 +321,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -368,7 +372,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			function( callback ) {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
-					description: 'This is a supa blog! (x3)'
+					description: 'This is a supa blog! (x3)' ,
+					otherAccess: restQuery.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -378,7 +383,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			function( callback ) {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
-					description: 'This is a supa blog! Now overwritten!'
+					description: 'This is a supa blog! Now overwritten!' ,
+					otherAccess: restQuery.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -400,7 +406,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now overwritten!' ) ;
-					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -453,7 +459,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
-					embedded: { a: 'a' , b: 'b' }
+					embedded: { a: 'a' , b: 'b' } ,
+					otherAccess: restQuery.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -462,9 +469,10 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			} ,
 			function( callback ) {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					description: 'This is a supa blog! Now patched!',
-					"embedded.a": 'A',
-					parent: "should not overwrite"
+					description: 'This is a supa blog! Now patched!' ,
+					"embedded.a": 'A' ,
+					parent: "should not overwrite" ,
+					otherAccess: restQuery.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -487,7 +495,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
 					expect( object.embedded ).to.eql( { a: 'A' , b: 'b' } ) ;
-					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -537,7 +545,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			function( callback ) {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)'
+					description: 'This is a supa blog! (x2)' ,
+					otherAccess: restQuery.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -618,7 +627,8 @@ describe( "Basic queries of top-level collections" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				id1 = blog.$._id ;
 				blog.save( callback ) ;
@@ -626,7 +636,8 @@ describe( "Basic queries of top-level collections" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'YAB' ,
-					description: 'Yet Another Blog'
+					description: 'Yet Another Blog' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				id2 = blog.$._id ;
 				blog.save( callback ) ;
@@ -644,10 +655,10 @@ describe( "Basic queries of top-level collections" , function() {
 							description: 'This is a supa blog!',
 							_id: id1,
 							embedded: undefined,
-							parent: { id: null, collection: '/' },
+							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: 2,
+							otherAccess: restQuery.ALL,
 							slugId: batch[ 0 ].slugId		// cannot be predicted
 						} ,
 						{
@@ -655,10 +666,10 @@ describe( "Basic queries of top-level collections" , function() {
 							description: 'Yet Another Blog' ,
 							_id: id2,
 							embedded: undefined,
-							parent: { id: null, collection: '/' },
+							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: 2,
+							otherAccess: restQuery.ALL,
 							slugId: batch[ 1 ].slugId		// cannot be predicted
 						}
 					] ) ;
@@ -721,7 +732,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -731,7 +743,8 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs', id: blogId }
+					parent: { collection: 'blogs', id: blogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -770,7 +783,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -778,7 +792,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
-					description: 'Oh yeah'
+					description: 'Oh yeah' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				anotherBlogId = anotherBlog.$._id ;
 				anotherBlog.save( callback ) ;
@@ -788,7 +803,8 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My second post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs' , id: blogId }
+					parent: { collection: 'blogs' , id: blogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -837,7 +853,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -847,7 +864,8 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs', id: blogId }
+					parent: { collection: 'blogs', id: blogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -858,7 +876,8 @@ describe( "Queries of nested object" , function() {
 				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
 					title: 'nope!' ,
 					content: 'First!' ,
-					parent: { collection: 'posts', id: postId }
+					parent: { collection: 'posts', id: postId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				commentId = comment.$._id ;
 				//console.log( "commentId: " , commentId ) ;
@@ -908,7 +927,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -916,7 +936,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
-					description: 'Oh yeah'
+					description: 'Oh yeah' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				anotherBlogId = anotherBlog.$._id ;
 				anotherBlog.save( callback ) ;
@@ -926,7 +947,8 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs', id: blogId }
+					parent: { collection: 'blogs', id: blogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -937,7 +959,8 @@ describe( "Queries of nested object" , function() {
 				anotherPost = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My second post!' ,
 					content: 'Blih blih blih.' ,
-					parent: { collection: 'blogs', id: blogId }
+					parent: { collection: 'blogs', id: blogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				anotherPostId = anotherPost.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -948,7 +971,8 @@ describe( "Queries of nested object" , function() {
 				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
 					title: 'nope!' ,
 					content: 'First!' ,
-					parent: { collection: 'posts', id: postId }
+					parent: { collection: 'posts', id: postId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				commentId = comment.$._id ;
 				//console.log( "commentId: " , commentId ) ;
@@ -1024,7 +1048,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -1032,7 +1057,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
-					description: 'Oh yeah'
+					description: 'Oh yeah' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				anotherBlogId = anotherBlog.$._id ;
 				anotherBlog.save( callback ) ;
@@ -1042,7 +1068,8 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs', id: blogId }
+					parent: { collection: 'blogs', id: blogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				postId1 = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1053,7 +1080,8 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My second post!' ,
 					content: 'Hi ho!' ,
-					parent: { collection: 'blogs', id: blogId }
+					parent: { collection: 'blogs', id: blogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				postId2 = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1064,7 +1092,8 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My alternate post!' ,
 					content: 'It does not belong to the same blog!' ,
-					parent: { collection: 'blogs', id: anotherBlogId }
+					parent: { collection: 'blogs', id: anotherBlogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				postIdAlt = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1075,7 +1104,8 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My third post!' ,
 					content: 'Yay!' ,
-					parent: { collection: 'blogs', id: blogId }
+					parent: { collection: 'blogs', id: blogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				postId3 = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1136,7 +1166,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -1157,7 +1188,12 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.post(
 					'/Blogs/' + blogId + '/Posts' ,
-					{ title: 'My first post!!!' , content: 'Blah blah blah...' , parent: 'should not overwrite' } ,
+					{
+						title: 'My first post!!!' ,
+						content: 'Blah blah blah...' ,
+						parent: 'should not overwrite' ,
+						otherAccess: restQuery.ALL
+					} ,
 					{ performer: performer } ,
 					function( error , rawDocument ) {
 						if ( error ) { callback( error ) ; return ; }
@@ -1201,7 +1237,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -1222,7 +1259,12 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.put(
 					'/Blogs/' + blogId + '/Posts/' + postId ,
-					{ title: 'My first post!!!' , content: 'Blah blah blah...' , parent: 'should not overwrite' } ,
+					{
+						title: 'My first post!!!' ,
+						content: 'Blah blah blah...' ,
+						parent: 'should not overwrite' ,
+						otherAccess: restQuery.ALL
+					} ,
 					{ performer: performer } ,
 					function( error , object ) {
 						if ( error ) { callback( error ) ; return ; }
@@ -1249,7 +1291,12 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.put(
 					'/Blogs/' + blogId + '/Posts/' + postId ,
-					{ title: 'My first post???' , content: 'Blah?' , parent: 'should not overwrite' } ,
+					{
+						title: 'My first post???' ,
+						content: 'Blah?' ,
+						parent: 'should not overwrite' ,
+						otherAccess: restQuery.ALL
+					} ,
 					{ performer: performer } ,
 					function( error , object ) {
 						if ( error ) { callback( error ) ; return ; }
@@ -1292,7 +1339,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
-					description: 'This is a supa blog!'
+					description: 'This is a supa blog!' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -1300,7 +1348,8 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
-					description: 'Oh yeah'
+					description: 'Oh yeah' ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				anotherBlogId = anotherBlog.$._id ;
 				anotherBlog.save( callback ) ;
@@ -1310,7 +1359,8 @@ describe( "Queries of nested object" , function() {
 				post = app.root.children.blogs.children.posts.collection.createDocument( {
 					title: 'My second post!' ,
 					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs', id: blogId }
+					parent: { collection: 'blogs', id: blogId } ,
+					otherAccess: restQuery.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1320,7 +1370,11 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.put(
 					'/Blogs/' + anotherBlogId + '/Posts/' + postId ,
-					{ title: 'My edited post!' , content: 'Plop.' } ,
+					{
+						title: 'My edited post!' ,
+						content: 'Plop.' ,
+						otherAccess: restQuery.ALL
+					} ,
 					{ performer: performer } ,
 					function( error , object ) {
 						expect( error ).to.be.ok() ;
@@ -1411,7 +1465,7 @@ describe( "Users" , function() {
 					expect( object.password.algo ).to.be( 'sha512' ) ;
 					expect( object.password.salt ).to.be.a( 'string' ) ;
 					expect( object.password.hash ).to.be.a( 'string' ) ;
-					expect( object.parent ).to.be.eql( { id: null, collection: '/' } ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1430,6 +1484,227 @@ describe( "Users" , function() {
 	it( "PUT, then DELETE, then GET" ) ;
 	
 	it( "POST /Users/CreateToken" ) ;
+} ) ;
+
+
+
+describe( "Access" , function() {
+	
+	it( "login, a.k.a. token creation using POST /Users/CreateToken" , function( done ) {
+		
+		var app , performer , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Bobby",
+					lastName: "Fisher",
+					email: "bobby.fisher@gmail.com",
+					password: "pw"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					id = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					by: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					expect( response.userId.toString() ).to.be( id.toString() ) ;
+					expect( response.token.length ).to.be( 27 ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "token creation using a bad login should fail" , function( done ) {
+		
+		var app , performer , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Bobby",
+					lastName: "Fisher",
+					email: "bobby.fisher@gmail.com",
+					password: "pw"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					id = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					by: "header" ,
+					login: "wrong@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'unauthorized' ) ;
+					expect( error.httpStatus ).to.be( 401 ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "token creation using a bad login should fail" , function( done ) {
+		
+		var app , performer , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Bobby",
+					lastName: "Fisher",
+					email: "bobby.fisher@gmail.com",
+					password: "pw"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					id = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					by: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "bad pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'unauthorized' ) ;
+					expect( error.httpStatus ).to.be( 401 ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "Using performer" , function( done ) {
+		
+		var app , performer , userId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Bobby",
+					lastName: "Fisher",
+					email: "bobby.fisher@gmail.com",
+					password: "pw"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					userId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					by: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					expect( response.userId.toString() ).to.be( userId.toString() ) ;
+					expect( response.token.length ).to.be( 27 ) ;
+					
+					performer = app.createPerformer( {
+						by: "header" ,
+						userId: "1234567890123456789012aa" , //response.userId ,
+						token: response.token ,
+						agentId: "myAgent"
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ userId ] = restQuery.ALL ;
+				
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 2!!!' ,
+					description: 'This is a supa blog! (x2)' ,
+					userAccess: userAccess ,
+					otherAccess: restQuery.NONE
+				} , { performer: performer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
+				//app.root.get( '/Posts/' , function( error , object ) {
+				//app.root.get( '/Blogs/' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
+					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
 } ) ;
 
 

@@ -24,10 +24,11 @@ Authorization's levels
 
 0: no access
 1: access/pass-through (give access to the children but not on data of the current resource)
-2: read-only
-3: read, create
-4: read, create, modify
-5: read, create, modify, delete, move (if 'create' allowed on target)
+2: partial-read (some parts of the data is hidden)
+3: read
+4: read, create
+5: read, create, modify
+6: read, create, modify, delete, move (if 'create' allowed on target)
 
 
 
@@ -39,17 +40,17 @@ Resource's schema: {
 }
 
 Resource: {
-	usersAccess: {
+	userAccess: {
 		ID1: level,
 		ID2: level,
 		...
 	},
-	groupsAccess: {
+	groupAccess: {
 		ID1: level,
 		ID2: level,
 		...
 	},
-	othersAccess: level
+	otherAccess: level
 }
 
 
