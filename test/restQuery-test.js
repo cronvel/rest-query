@@ -1488,7 +1488,7 @@ describe( "Users" , function() {
 
 
 
-describe( "Access" , function() {
+describe( "Token creation" , function() {
 	
 	it( "login, a.k.a. token creation using POST /Users/CreateToken" , function( done ) {
 		
@@ -1620,9 +1620,15 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "Using performer" , function( done ) {
+} ) ;
+
+
+
+describe( "Access" , function() {
+	
+	it( "Access to a restricted resource using the right performer should succeed, should fail for public access and for user with not enough right" , function( done ) {
 		
-		var app , performer , userId ;
+		var app , performer , authorizedId , unauthorizedId , authorizedPerformer , unauthorizedPerformer ;
 		
 		async.series( [
 			function( callback ) {
@@ -1642,7 +1648,7 @@ describe( "Access" , function() {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
-					userId = response.id ;
+					authorizedId = response.id ;
 					callback() ;
 				} ) ;
 			} ,
@@ -1655,12 +1661,48 @@ describe( "Access" , function() {
 				} , { performer: performer } , function( error , response ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					expect( response.userId.toString() ).to.be( userId.toString() ) ;
+					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
 					expect( response.token.length ).to.be( 27 ) ;
 					
-					performer = app.createPerformer( {
+					authorizedPerformer = app.createPerformer( {
 						by: "header" ,
-						userId: "1234567890123456789012aa" , //response.userId ,
+						userId: response.userId ,
+						token: response.token ,
+						agentId: "myAgent"
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Peon",
+					lastName: "Peon",
+					email: "peon@gmail.com",
+					password: "peon"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					unauthorizedId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					by: "header" ,
+					login: "peon@gmail.com" ,
+					password: "peon",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					expect( response.userId.toString() ).to.be( unauthorizedId.toString() ) ;
+					expect( response.token.length ).to.be( 27 ) ;
+					
+					unauthorizedPerformer = app.createPerformer( {
+						by: "header" ,
+						userId: response.userId ,
 						token: response.token ,
 						agentId: "myAgent"
 					} ) ;
@@ -1670,25 +1712,21 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				var userAccess = {} ;
-				userAccess[ userId ] = restQuery.ALL ;
+				userAccess[ authorizedId ] = restQuery.ALL ;
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: restQuery.NONE
-				} , { performer: performer } , function( error ) {
+				} , { performer: authorizedPerformer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
@@ -1699,6 +1737,26 @@ describe( "Access" , function() {
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Non-connected user
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'unauthorized' ) ;
+					expect( error.message ).to.be( 'Public access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Non-connected user
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
 					callback() ;
 				} ) ;
 			}
