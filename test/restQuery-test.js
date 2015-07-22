@@ -1626,9 +1626,14 @@ describe( "Token creation" , function() {
 
 describe( "Access" , function() {
 	
-	it( "Access to a restricted resource using the right performer should succeed, should fail for public access and for user with not enough right" , function( done ) {
-		
-		var app , performer , authorizedId , unauthorizedId , authorizedPerformer , unauthorizedPerformer ;
+	var app , performer ,
+		authorizedId , authorizedPerformer ,
+		notEnoughAuthorizedId , notEnoughAuthorizedPerformer ,
+		unauthorizedId , unauthorizedPerformer ;
+	
+	// Create the users for the test
+	
+	beforeEach( function( done ) {
 		
 		async.series( [
 			function( callback ) {
@@ -1676,6 +1681,42 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Users' , {
+					firstName: "not",
+					lastName: "enough",
+					email: "not-enough@gmail.com",
+					password: "notenough"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					notEnoughAuthorizedId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					by: "header" ,
+					login: "not-enough@gmail.com" ,
+					password: "notenough",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					expect( response.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
+					expect( response.token.length ).to.be( 27 ) ;
+					
+					notEnoughAuthorizedPerformer = app.createPerformer( {
+						by: "header" ,
+						userId: response.userId ,
+						token: response.token ,
+						agentId: "myAgent"
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
 					firstName: "Peon",
 					lastName: "Peon",
 					email: "peon@gmail.com",
@@ -1709,10 +1750,18 @@ describe( "Access" , function() {
 					
 					callback() ;
 				} ) ;
-			} ,
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "GET a restricted resource performed by various connected and non-connected users" , function( done ) {
+		
+		async.series( [
 			function( callback ) {
 				var userAccess = {} ;
-				userAccess[ authorizedId ] = restQuery.ALL ;
+				userAccess[ authorizedId ] = restQuery.READ ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.PASS_THROUGH ;	// Maximal right that does not pass
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
@@ -1751,12 +1800,152 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				// Non-connected user
+				// User not listed in specific rights
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User listed, but with too low rights
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "PUT (overwrite) a restricted resource performed by various connected and non-connected users" , function( done ) {
+		
+		async.series( [
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ authorizedId ] = restQuery.READ_CREATE_MODIFY ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.READ ;	// Maximal right that does not pass
+				
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 2!!!' ,
+					description: 'This is a supa blog! (x2)' ,
+					userAccess: userAccess ,
+					otherAccess: restQuery.NONE
+				} , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ authorizedId ] = restQuery.READ_CREATE_MODIFY ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.READ ;	// Maximal right that does not pass
+				
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: "I've changed my mind!" ,
+					description: 'Seriously!' ,
+					userAccess: userAccess ,
+					otherAccess: restQuery.NONE
+				} , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Non-connected user
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: "I cant do that!" ,
+					description: 'Seriously!'
+				} , { performer: performer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'unauthorized' ) ;
+					expect( error.message ).to.be( 'Public access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User not listed in specific rights
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: "I cant do that!" ,
+					description: 'Seriously!'
+				} , { performer: unauthorizedPerformer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User listed, but with too low rights
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: "I cant do that!" ,
+					description: 'Seriously!'
+				} , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "DELETE a restricted resource performed by various connected and non-connected users" , function( done ) {
+		
+		async.series( [
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ authorizedId ] = restQuery.ALL ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.READ_CREATE_MODIFY ;	// Maximal right that does not pass
+				
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 2!!!' ,
+					description: 'This is a supa blog! (x2)' ,
+					userAccess: userAccess ,
+					otherAccess: restQuery.NONE
+				} , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Non-connected user
+				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'unauthorized' ) ;
+					expect( error.message ).to.be( 'Public access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User not listed in specific rights
+				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User listed, but with too low rights
+				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
 					callback() ;
 				} ) ;
 			}

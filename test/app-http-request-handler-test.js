@@ -220,6 +220,10 @@ after( function( done ) {
 
 
 
+beforeEach( clearDB ) ;
+
+
+
 
 
 			/* Tests */
@@ -301,10 +305,10 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: 2,
+						otherAccess: restQuery.READ,
 						parent: {
-							collection: '/',
-							id: null
+							collection: null,
+							id: '/'
 						}
 					} ) ;
 					
@@ -381,10 +385,10 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: 2,
+						otherAccess: restQuery.READ,
 						parent: {
-							collection: '/',
-							id: null
+							collection: null,
+							id: '/'
 						}
 					} ) ;
 					
@@ -409,7 +413,8 @@ describe( "Basics tests" , function() {
 			} ,
 			body: JSON.stringify( {
 				title: "My website!",
-				description: "... about my wonderful life"
+				description: "... about my wonderful life",
+				otherAccess: restQuery.ALL
 			} )
 		} ;
 		
@@ -472,10 +477,10 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: 2,
+						otherAccess: restQuery.ALL,
 						parent: {
-							collection: '/',
-							id: null
+							collection: null,
+							id: '/'
 						}
 					} ) ;
 					
@@ -500,7 +505,8 @@ describe( "Basics tests" , function() {
 			} ,
 			body: JSON.stringify( {
 				title: "My website!",
-				description: "... about my wonderful life"
+				description: "... about my wonderful life",
+				otherAccess: restQuery.ALL
 			} )
 		} ;
 		
@@ -650,10 +656,10 @@ describe( "Basics tests on users" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: 2,
+						otherAccess: restQuery.READ,
 						parent: {
-							collection: '/',
-							id: null
+							collection: null,
+							id: '/'
 						}
 					} ) ;
 					
@@ -680,7 +686,8 @@ describe( "Basics tests on users" , function() {
 				firstName: "John",
 				lastName: "Doe",
 				email: "john.doe@gmail.com",
-				password: "pw"
+				password: "pw",
+				otherAccess: restQuery.ALL
 			} )
 		} ;
 		
