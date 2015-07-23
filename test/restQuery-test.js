@@ -1823,6 +1823,97 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "GET a collection having restricted resources, performed by various connected and non-connected users" , function( done ) {
+		
+		async.series( [
+			function( callback ) {
+				app.root.post( '/Blogs' , {
+					title: 'Public' ,
+					description: 'This is public' ,
+					otherAccess: restQuery.accessLevel.READ
+				} , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ authorizedId ] = restQuery.accessLevel.READ ;
+				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.READ ;
+				
+				app.root.post( '/Blogs' , {
+					title: 'Selective' ,
+					description: 'This is selective' ,
+					userAccess: userAccess ,
+					otherAccess: restQuery.accessLevel.NONE
+				} , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ authorizedId ] = restQuery.accessLevel.READ ;
+				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.PASS_THROUGH ;
+				
+				app.root.post( '/Blogs' , {
+					title: 'Closed' ,
+					description: 'This is closed' ,
+					userAccess: userAccess ,
+					otherAccess: restQuery.accessLevel.NONE
+				} , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' , { performer: authorizedPerformer } , function( error , batch ) {
+					
+					if ( error ) { callback( error ) ; return ; }
+					//console.log( batch ) ;
+					expect( batch.length ).to.be( 3 ) ;
+					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
+					expect( batch[ 1 ].title ).to.be( 'Selective' ) ;
+					expect( batch[ 2 ].title ).to.be( 'Closed' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Non-connected user
+				app.root.get( '/Blogs/' , { performer: performer } , function( error , batch ) {
+					
+					if ( error ) { callback( error ) ; return ; }
+					expect( batch.length ).to.be( 1 ) ;
+					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User not listed in specific rights
+				app.root.get( '/Blogs/' , { performer: unauthorizedPerformer } , function( error , batch ) {
+					
+					expect( batch.length ).to.be( 1 ) ;
+					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User listed, but with too low rights
+				app.root.get( '/Blogs/' , { performer: notEnoughAuthorizedPerformer } , function( error , batch ) {
+					
+					expect( batch.length ).to.be( 2 ) ;
+					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
+					expect( batch[ 1 ].title ).to.be( 'Selective' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 	it( "PUT (overwrite) a restricted resource performed by various connected and non-connected users" , function( done ) {
 		
 		async.series( [
@@ -1897,6 +1988,8 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "PATCH a restricted resource performed by various connected and non-connected users" ) ;
+	
 	it( "DELETE a restricted resource performed by various connected and non-connected users" , function( done ) {
 		
 		async.series( [
@@ -1952,6 +2045,8 @@ describe( "Access" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	
+	it( "Nested resources access right" ) ;
 } ) ;
 
 
