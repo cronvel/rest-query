@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "description": "Perform REST queries directly on your database!",
   "main": "lib/restQuery.js",
   "directories": {
