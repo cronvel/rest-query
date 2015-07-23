@@ -206,7 +206,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				id = blog.$._id ;
 				blog.save( callback ) ;
@@ -250,7 +250,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.post( '/Blogs' , {
 					title: 'My wonderful life posted!!!' ,
 					description: 'This is a supa blog! (posted!)' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} , { performer: performer } , function( error , rawDocument ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -299,7 +299,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -373,7 +373,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -384,7 +384,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! Now overwritten!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -460,7 +460,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
 					embedded: { a: 'a' , b: 'b' } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -472,7 +472,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! Now patched!' ,
 					"embedded.a": 'A' ,
 					parent: "should not overwrite" ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -546,7 +546,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} , { performer: performer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -628,7 +628,7 @@ describe( "Basic queries of top-level collections" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				id1 = blog.$._id ;
 				blog.save( callback ) ;
@@ -637,7 +637,7 @@ describe( "Basic queries of top-level collections" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'YAB' ,
 					description: 'Yet Another Blog' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				id2 = blog.$._id ;
 				blog.save( callback ) ;
@@ -658,7 +658,7 @@ describe( "Basic queries of top-level collections" , function() {
 							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: restQuery.ALL,
+							otherAccess: restQuery.accessLevel.ALL,
 							slugId: batch[ 0 ].slugId		// cannot be predicted
 						} ,
 						{
@@ -669,7 +669,7 @@ describe( "Basic queries of top-level collections" , function() {
 							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: restQuery.ALL,
+							otherAccess: restQuery.accessLevel.ALL,
 							slugId: batch[ 1 ].slugId		// cannot be predicted
 						}
 					] ) ;
@@ -733,7 +733,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -744,7 +744,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -784,7 +784,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -793,7 +793,7 @@ describe( "Queries of nested object" , function() {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
 					description: 'Oh yeah' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				anotherBlogId = anotherBlog.$._id ;
 				anotherBlog.save( callback ) ;
@@ -804,7 +804,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My second post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs' , id: blogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -854,7 +854,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -865,7 +865,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -877,7 +877,7 @@ describe( "Queries of nested object" , function() {
 					title: 'nope!' ,
 					content: 'First!' ,
 					parent: { collection: 'posts', id: postId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				commentId = comment.$._id ;
 				//console.log( "commentId: " , commentId ) ;
@@ -928,7 +928,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -937,7 +937,7 @@ describe( "Queries of nested object" , function() {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
 					description: 'Oh yeah' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				anotherBlogId = anotherBlog.$._id ;
 				anotherBlog.save( callback ) ;
@@ -948,7 +948,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -960,7 +960,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My second post!' ,
 					content: 'Blih blih blih.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				anotherPostId = anotherPost.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -972,7 +972,7 @@ describe( "Queries of nested object" , function() {
 					title: 'nope!' ,
 					content: 'First!' ,
 					parent: { collection: 'posts', id: postId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				commentId = comment.$._id ;
 				//console.log( "commentId: " , commentId ) ;
@@ -1049,7 +1049,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -1058,7 +1058,7 @@ describe( "Queries of nested object" , function() {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
 					description: 'Oh yeah' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				anotherBlogId = anotherBlog.$._id ;
 				anotherBlog.save( callback ) ;
@@ -1069,7 +1069,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				postId1 = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1081,7 +1081,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My second post!' ,
 					content: 'Hi ho!' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				postId2 = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1093,7 +1093,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My alternate post!' ,
 					content: 'It does not belong to the same blog!' ,
 					parent: { collection: 'blogs', id: anotherBlogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				postIdAlt = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1105,7 +1105,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My third post!' ,
 					content: 'Yay!' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				postId3 = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1167,7 +1167,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -1192,7 +1192,7 @@ describe( "Queries of nested object" , function() {
 						title: 'My first post!!!' ,
 						content: 'Blah blah blah...' ,
 						parent: 'should not overwrite' ,
-						otherAccess: restQuery.ALL
+						otherAccess: restQuery.accessLevel.ALL
 					} ,
 					{ performer: performer } ,
 					function( error , rawDocument ) {
@@ -1238,7 +1238,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -1263,7 +1263,7 @@ describe( "Queries of nested object" , function() {
 						title: 'My first post!!!' ,
 						content: 'Blah blah blah...' ,
 						parent: 'should not overwrite' ,
-						otherAccess: restQuery.ALL
+						otherAccess: restQuery.accessLevel.ALL
 					} ,
 					{ performer: performer } ,
 					function( error , object ) {
@@ -1295,7 +1295,7 @@ describe( "Queries of nested object" , function() {
 						title: 'My first post???' ,
 						content: 'Blah?' ,
 						parent: 'should not overwrite' ,
-						otherAccess: restQuery.ALL
+						otherAccess: restQuery.accessLevel.ALL
 					} ,
 					{ performer: performer } ,
 					function( error , object ) {
@@ -1340,7 +1340,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				blogId = blog.$._id ;
 				blog.save( callback ) ;
@@ -1349,7 +1349,7 @@ describe( "Queries of nested object" , function() {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
 					description: 'Oh yeah' ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				anotherBlogId = anotherBlog.$._id ;
 				anotherBlog.save( callback ) ;
@@ -1360,7 +1360,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My second post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: restQuery.ALL
+					otherAccess: restQuery.accessLevel.ALL
 				} ) ;
 				postId = post.$._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1373,7 +1373,7 @@ describe( "Queries of nested object" , function() {
 					{
 						title: 'My edited post!' ,
 						content: 'Plop.' ,
-						otherAccess: restQuery.ALL
+						otherAccess: restQuery.accessLevel.ALL
 					} ,
 					{ performer: performer } ,
 					function( error , object ) {
@@ -1760,14 +1760,14 @@ describe( "Access" , function() {
 		async.series( [
 			function( callback ) {
 				var userAccess = {} ;
-				userAccess[ authorizedId ] = restQuery.READ ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = restQuery.PASS_THROUGH ;	// Maximal right that does not pass
+				userAccess[ authorizedId ] = restQuery.accessLevel.READ ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.PASS_THROUGH ;	// Maximal right that does not pass
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: restQuery.NONE
+					otherAccess: restQuery.accessLevel.NONE
 				} , { performer: authorizedPerformer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -1828,14 +1828,14 @@ describe( "Access" , function() {
 		async.series( [
 			function( callback ) {
 				var userAccess = {} ;
-				userAccess[ authorizedId ] = restQuery.READ_CREATE_MODIFY ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = restQuery.READ ;	// Maximal right that does not pass
+				userAccess[ authorizedId ] = restQuery.accessLevel.READ_CREATE_MODIFY ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.READ ;	// Maximal right that does not pass
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: restQuery.NONE
+					otherAccess: restQuery.accessLevel.NONE
 				} , { performer: authorizedPerformer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -1844,14 +1844,14 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				var userAccess = {} ;
-				userAccess[ authorizedId ] = restQuery.READ_CREATE_MODIFY ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = restQuery.READ ;	// Maximal right that does not pass
+				userAccess[ authorizedId ] = restQuery.accessLevel.READ_CREATE_MODIFY ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.READ ;	// Maximal right that does not pass
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I've changed my mind!" ,
 					description: 'Seriously!' ,
 					userAccess: userAccess ,
-					otherAccess: restQuery.NONE
+					otherAccess: restQuery.accessLevel.NONE
 				} , { performer: authorizedPerformer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					callback() ;
@@ -1902,14 +1902,14 @@ describe( "Access" , function() {
 		async.series( [
 			function( callback ) {
 				var userAccess = {} ;
-				userAccess[ authorizedId ] = restQuery.ALL ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = restQuery.READ_CREATE_MODIFY ;	// Maximal right that does not pass
+				userAccess[ authorizedId ] = restQuery.accessLevel.ALL ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.READ_CREATE_MODIFY ;	// Maximal right that does not pass
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: restQuery.NONE
+					otherAccess: restQuery.accessLevel.NONE
 				} , { performer: authorizedPerformer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
