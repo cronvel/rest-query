@@ -36,10 +36,11 @@ Resource-based authorization
 ============================
 
 Resource's schema: {
-	inherit: none|parent|max|min
+	defaultInheritAccess: none|all|max|min
 }
 
 Resource: {
+	inheritAccess: none|all|max|min,
 	userAccess: {
 		ID1: level,
 		ID2: level,
@@ -60,7 +61,7 @@ Authorization inheritance
 
 * none: the parent authorization's level is ignored, the authorization's level of the current resource is computed,
 	and will be passed to eventual children
-* parent: no authorization is computed for the resource, instead the authorization of the parent is used, and will be passed to
+* all: no authorization is computed for the resource, instead the authorization of the parent is used, and will be passed to
 	eventual children.
 	### This is faster, especially for collections. ###
 * max: the authorization's level of the current resource is computed, the greater level between the current resource and the
@@ -102,6 +103,6 @@ Group: {
 }
 
 To its eventual children, only GRANTED or DENIED is transmitted.
-It is sufficient since the children should know the required level of authorization, so none|parent|max|min is solvable.
+It is sufficient since the children should know the required level of authorization, so none|all|max|min is solvable.
 
 

@@ -306,6 +306,7 @@ describe( "Basics tests" , function() {
 						userAccess: {},
 						groupAccess: {},
 						otherAccess: restQuery.accessLevel.READ,
+						inheritAccess: 'none',
 						parent: {
 							collection: null,
 							id: '/'
@@ -386,6 +387,7 @@ describe( "Basics tests" , function() {
 						userAccess: {},
 						groupAccess: {},
 						otherAccess: restQuery.accessLevel.READ,
+						inheritAccess: 'none',
 						parent: {
 							collection: null,
 							id: '/'
@@ -478,6 +480,7 @@ describe( "Basics tests" , function() {
 						userAccess: {},
 						groupAccess: {},
 						otherAccess: restQuery.accessLevel.ALL,
+						inheritAccess: 'none',
 						parent: {
 							collection: null,
 							id: '/'
@@ -657,6 +660,7 @@ describe( "Basics tests on users" , function() {
 						userAccess: {},
 						groupAccess: {},
 						otherAccess: restQuery.accessLevel.READ,
+						inheritAccess: 'none',
 						parent: {
 							collection: null,
 							id: '/'

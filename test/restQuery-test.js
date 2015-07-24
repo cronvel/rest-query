@@ -659,6 +659,7 @@ describe( "Basic queries of top-level collections" , function() {
 							userAccess: {},
 							groupAccess: {},
 							otherAccess: restQuery.accessLevel.ALL,
+							inheritAccess: 'none',
 							slugId: batch[ 0 ].slugId		// cannot be predicted
 						} ,
 						{
@@ -670,6 +671,7 @@ describe( "Basic queries of top-level collections" , function() {
 							userAccess: {},
 							groupAccess: {},
 							otherAccess: restQuery.accessLevel.ALL,
+							inheritAccess: 'none',
 							slugId: batch[ 1 ].slugId		// cannot be predicted
 						}
 					] ) ;
