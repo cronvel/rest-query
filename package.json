@@ -1,8 +1,8 @@
 {
   "name": "rest-query",
-  "version": "0.3.0",
-  "engines" : {
-  	"node": ">=0.12"
+  "version": "0.3.1",
+  "engines": {
+    "node": ">=0.12"
   },
   "description": "Perform REST queries directly on your database!",
   "main": "lib/restQuery.js",
