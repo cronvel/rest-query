@@ -1988,7 +1988,73 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "PATCH a restricted resource performed by various connected and non-connected users" ) ;
+	it( "PATCH a restricted resource performed by various connected and non-connected users" , function( done ) {
+		
+		async.series( [
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ authorizedId ] = restQuery.accessLevel.READ_CREATE_MODIFY ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.READ ;	// Maximal right that does not pass
+				
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 2!!!' ,
+					description: 'This is a supa blog! (x2)' ,
+					userAccess: userAccess ,
+					otherAccess: restQuery.accessLevel.NONE
+				} , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ authorizedId ] = restQuery.accessLevel.READ_CREATE_MODIFY ;	// Minimal right that pass
+				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.READ ;	// Maximal right that does not pass
+				
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: "I've changed my mind!"
+				} , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Non-connected user
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: "I cant do that!"
+				} , { performer: performer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'unauthorized' ) ;
+					expect( error.message ).to.be( 'Public access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User not listed in specific rights
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: "I cant do that!"
+				} , { performer: unauthorizedPerformer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User listed, but with too low rights
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: "I cant do that!"
+				} , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
 	
 	it( "DELETE a restricted resource performed by various connected and non-connected users" , function( done ) {
 		
@@ -2046,7 +2112,7 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "Nested resources access right" ) ;
+	it( "Nested resources access right (PUT, POST, etc)" ) ;
 } ) ;
 
 
