@@ -19,7 +19,7 @@
     "error-status": "^1.1.1",
     "hash-kit": "^0.1.1",
     "minimist": "^1.1.1",
-    "odm-kit": "^0.2.16",
+    "odm-kit": "^0.2.18",
     "server-kit": "^0.2.5",
     "string-kit": "^0.1.12",
     "tree-kit": "^0.5.5"

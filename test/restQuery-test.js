@@ -831,7 +831,6 @@ describe( "Queries of nested object" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
 					expect( object ).to.be( undefined ) ;
 					callback() ;
 				} ) ;
@@ -1008,7 +1007,6 @@ describe( "Queries of nested object" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
 					expect( object ).to.be( undefined ) ;
 					callback() ;
 				} ) ;
@@ -1026,7 +1024,6 @@ describe( "Queries of nested object" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
 					expect( object ).to.be( undefined ) ;
 					callback() ;
 				} ) ;
@@ -1380,9 +1377,9 @@ describe( "Queries of nested object" , function() {
 					{ performer: performer } ,
 					function( error , object ) {
 						expect( error ).to.be.ok() ;
-						expect( error.type ).to.be( 'notFound' ) ;
-						expect( error.httpStatus ).to.be( 404 ) ;
-						expect( error.message ).to.be( 'Ancestry mismatch.' ) ;
+						expect( error.type ).to.be( 'badRequest' ) ;
+						expect( error.httpStatus ).to.be( 400 ) ;
+						expect( error.message ).to.be( 'Ambigous PUT request: this ID exists but is the child of another parent.' ) ;
 						expect( object ).to.be( undefined ) ;
 						callback() ;
 					}
