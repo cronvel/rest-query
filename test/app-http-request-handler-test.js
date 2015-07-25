@@ -141,8 +141,8 @@ function runApp( maybeCallback )
 	} ) ;
 	
 	// Okay, we have no way to know if the app is ready, except to send it command,
-	// it's way out of the scope of this test suite, so we just hope it is ready after 250ms
-	setTimeout( maybeCallback , 500 ) ;
+	// it's way out of the scope of this test suite, so we just hope it is ready after few ms
+	setTimeout( maybeCallback , 700 ) ;
 }
 
 
