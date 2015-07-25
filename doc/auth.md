@@ -30,6 +30,8 @@ Authorization's levels
 5: read, create, modify
 6: read, create, modify, delete, move (if 'create' allowed on target)
 
+? read, create, modify, modify access ?
+
 
 
 Resource-based authorization

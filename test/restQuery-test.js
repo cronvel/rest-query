@@ -113,14 +113,17 @@ function commonApp( callback )
 	var postsNode = app.createCollectionNode( 'posts' , config.descriptors.posts ) ;
 	var commentsNode = app.createCollectionNode( 'comments' , config.descriptors.comments ) ;
 	var usersNode = app.createUsersCollectionNode( config.descriptors.users ) ;
+	var groupsNode = app.createGroupsCollectionNode( config.descriptors.groups ) ;
 	
 	app.root.contains( usersNode ) ;
+	app.root.contains( groupsNode ) ;
 	app.root.contains( blogsNode ) ;
 	blogsNode.contains( postsNode ) ;
 	postsNode.contains( commentsNode ) ;
 	
 	async.parallel( [
 		[ clearCollection , usersNode.collection ] ,
+		[ clearCollection , groupsNode.collection ] ,
 		[ clearCollection , blogsNode.collection ] ,
 		[ clearCollection , postsNode.collection ] ,
 		[ clearCollection , commentsNode.collection ]
@@ -1749,7 +1752,20 @@ describe( "Access" , function() {
 					
 					callback() ;
 				} ) ;
-			}
+			} ,
+			/*
+			function( callback ) {
+				app.root.post( '/Groups' , {
+					name: "group one"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					authorizedId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			//*/
 		] )
 		.exec( done ) ;
 	} ) ;

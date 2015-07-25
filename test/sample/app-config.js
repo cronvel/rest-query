@@ -61,6 +61,21 @@ exports.descriptors.users = {
 
 
 
+exports.descriptors.groups = {
+	url: 'mongodb://localhost:27017/restQuery/groups' ,
+	properties: {
+	} ,
+	meta: {
+	} ,
+	indexes: [
+	] ,
+	hooks: {
+	} ,
+	useMemProxy: false
+} ;
+
+
+
 exports.descriptors.blogs = {
 	url: 'mongodb://localhost:27017/restQuery/blogs' ,
 	properties: {
@@ -100,21 +115,6 @@ exports.descriptors.comments = {
 	url: 'mongodb://localhost:27017/restQuery/comments' ,
 	properties: {
 		content: { type: 'string' }
-	} ,
-	meta: {
-	} ,
-	indexes: [
-	] ,
-	hooks: {
-	} ,
-	useMemProxy: false
-} ;
-
-
-
-exports.descriptors.auth = {
-	url: 'mongodb://localhost:27017/restQuery/auth' ,
-	properties: {
 	} ,
 	meta: {
 	} ,

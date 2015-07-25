@@ -40,13 +40,14 @@ var app = restQuery.createApp( { protocol: 'http' , host: 'localhost' , port: po
 //var performer = app.createPerformer() ;
 
 var usersNode = app.createUsersCollectionNode( config.descriptors.users ) ;
-var authNode = app.createAuthCollectionNode( config.descriptors.auth ) ;   
+var groupsNode = app.createGroupsCollectionNode( config.descriptors.groups ) ;
 
 var blogsNode = app.createCollectionNode( 'blogs' , config.descriptors.blogs ) ;
 var postsNode = app.createCollectionNode( 'posts' , config.descriptors.posts ) ;
 var commentsNode = app.createCollectionNode( 'comments' , config.descriptors.comments ) ;
 
 app.root.contains( usersNode ) ;
+app.root.contains( groupsNode ) ;
 app.root.contains( blogsNode ) ;
 blogsNode.contains( postsNode ) ;
 postsNode.contains( commentsNode ) ;
