@@ -1484,8 +1484,29 @@ describe( "Users" , function() {
 	it( "DELETE on an unexisting user" ) ;
 	
 	it( "PUT, then DELETE, then GET" ) ;
+} ) ;
+
+
+
+describe( "Groups" , function() {
 	
-	it( "POST /Users/CreateToken" ) ;
+	it( "GET on an unexisting group" ) ;
+	
+	it( "GET on a regular group" ) ;
+	
+	it( "POST then GET" ) ;
+	
+	it( "PUT then GET" ) ;
+	
+	it( "PUT, then PUT (overwrite), then GET" ) ;
+	
+	it( "PATCH on an unexisting user" ) ;
+	
+	it( "PUT, then PATCH, then GET" ) ;
+	
+	it( "DELETE on an unexisting user" ) ;
+	
+	it( "PUT, then DELETE, then GET" ) ;
 } ) ;
 
 
@@ -1631,7 +1652,8 @@ describe( "Access" , function() {
 	var app , performer ,
 		authorizedId , authorizedPerformer ,
 		notEnoughAuthorizedId , notEnoughAuthorizedPerformer ,
-		unauthorizedId , unauthorizedPerformer ;
+		unauthorizedId , unauthorizedPerformer ,
+		groupOneId , groupTwoId ;
 	
 	// Create the users for the test
 	
@@ -1753,7 +1775,6 @@ describe( "Access" , function() {
 					callback() ;
 				} ) ;
 			} ,
-			/*
 			function( callback ) {
 				app.root.post( '/Groups' , {
 					name: "group one"
@@ -1761,11 +1782,21 @@ describe( "Access" , function() {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
-					authorizedId = response.id ;
+					groupOneId = response.id ;
 					callback() ;
 				} ) ;
 			} ,
-			//*/
+			function( callback ) {
+				app.root.post( '/Groups' , {
+					name: "group two"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					groupTwoId = response.id ;
+					callback() ;
+				} ) ;
+			}
 		] )
 		.exec( done ) ;
 	} ) ;
@@ -2374,7 +2405,7 @@ describe( "Access" , function() {
 				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.READ_CREATE ;	// Maximal right that does not pass
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: 'Inheritance: all' ,
+					title: 'Inheritance: min' ,
 					content: 'Blah blah blah...' ,
 					userAccess: userAccess ,
 					otherAccess: restQuery.accessLevel.READ_CREATE ,
@@ -2462,11 +2493,11 @@ describe( "Access" , function() {
 				userAccess[ notEnoughAuthorizedId ] = restQuery.accessLevel.READ_CREATE_MODIFY ;	// Maximal right that does not pass
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: 'Inheritance: all' ,
+					title: 'Inheritance: max' ,
 					content: 'Blah blah blah...' ,
 					userAccess: userAccess ,
 					otherAccess: restQuery.accessLevel.READ ,
-					inheritAccess: 'min'
+					inheritAccess: 'max'
 				} , { performer: authorizedPerformer } , function( error ) {
 					if ( error ) { callback( error ) ; return ; }
 					callback() ;
