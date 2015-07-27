@@ -1814,6 +1814,18 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Groups' , {
+					name: "unauthorized group",
+					users: [ notEnoughAuthorizedId , authorizedByGroupId ]
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					unauthorizedGroupId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Groups' , {
 					name: "authorized group",
 					users: [ authorizedByGroupId ]
 				} , { performer: performer } , function( error , response ) {
@@ -1821,18 +1833,6 @@ describe( "Access" , function() {
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					authorizedGroupId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.root.post( '/Groups' , {
-					name: "unauthorized group",
-					users: [ authorizedByGroupId ]
-				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
-					unauthorizedGroupId = response.id ;
 					callback() ;
 				} ) ;
 			}
@@ -2600,13 +2600,13 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "Groups" , function( done ) {
+	it( "Access by groups" , function( done ) {
 		
 		async.series( [
 			function( callback ) {
 				var userAccess = {} ;
 				userAccess[ authorizedId ] = restQuery.accessLevel.READ ;
-				userAccess[ authorizedByGroupId ] = restQuery.accessLevel.PASS_THROUGH ;
+				//userAccess[ authorizedByGroupId ] = restQuery.accessLevel.PASS_THROUGH ;
 				
 				var groupAccess = {} ;
 				groupAccess[ authorizedGroupId ] = restQuery.accessLevel.READ ;
@@ -2635,10 +2635,20 @@ describe( "Access" , function() {
 			function( callback ) {
 				// User authorized by its group
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedByGroupPerformer } , function( error , object ) {
-					if ( error ) { console.log( "#### Group: not OK" ) ; callback( error ) ; return ; }
+					if ( error ) { callback( error ) ; return ; }
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User listed, but with too low rights
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2662,16 +2672,6 @@ describe( "Access" , function() {
 					callback() ;
 				} ) ;
 			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error , object ) {
-					
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			}
 		] )
 		.exec( done ) ;
 	} ) ;
