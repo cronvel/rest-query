@@ -1651,9 +1651,10 @@ describe( "Access" , function() {
 	
 	var app , performer ,
 		authorizedId , authorizedPerformer ,
+		authorizedByGroupId , authorizedByGroupPerformer ,
 		notEnoughAuthorizedId , notEnoughAuthorizedPerformer ,
 		unauthorizedId , unauthorizedPerformer ,
-		groupOneId , groupTwoId ;
+		authorizedGroupId , unauthorizedGroupId ;
 	
 	// Create the users for the test
 	
@@ -1694,6 +1695,42 @@ describe( "Access" , function() {
 					expect( response.token.length ).to.be( 27 ) ;
 					
 					authorizedPerformer = app.createPerformer( {
+						by: "header" ,
+						userId: response.userId ,
+						token: response.token ,
+						agentId: "myAgent"
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Groupy",
+					lastName: "Groups",
+					email: "groupy@gmail.com",
+					password: "groupy"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					authorizedByGroupId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					by: "header" ,
+					login: "groupy@gmail.com" ,
+					password: "groupy",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					expect( response.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
+					expect( response.token.length ).to.be( 27 ) ;
+					
+					authorizedByGroupPerformer = app.createPerformer( {
 						by: "header" ,
 						userId: response.userId ,
 						token: response.token ,
@@ -1777,23 +1814,25 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Groups' , {
-					name: "group one"
+					name: "authorized group",
+					users: [ authorizedByGroupId ]
 				} , { performer: performer } , function( error , response ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
-					groupOneId = response.id ;
+					authorizedGroupId = response.id ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.post( '/Groups' , {
-					name: "group two"
+					name: "unauthorized group",
+					users: [ authorizedByGroupId ]
 				} , { performer: performer } , function( error , response ) {
 					if ( error ) { callback( error ) ; return ; }
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
-					groupTwoId = response.id ;
+					unauthorizedGroupId = response.id ;
 					callback() ;
 				} ) ;
 			}
@@ -2560,6 +2599,83 @@ describe( "Access" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	
+	it( "Groups" , function( done ) {
+		
+		async.series( [
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ authorizedId ] = restQuery.accessLevel.READ ;
+				userAccess[ authorizedByGroupId ] = restQuery.accessLevel.PASS_THROUGH ;
+				
+				var groupAccess = {} ;
+				groupAccess[ authorizedGroupId ] = restQuery.accessLevel.READ ;
+				
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 2!!!' ,
+					description: 'This is a supa blog! (x2)' ,
+					userAccess: userAccess ,
+					groupAccess: groupAccess ,
+					otherAccess: restQuery.accessLevel.NONE
+				} , { performer: authorizedPerformer } , function( error ) {
+					if ( error ) { callback( error ) ; return ; }
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
+					if ( error ) { callback( error ) ; return ; }
+					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
+					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User authorized by its group
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedByGroupPerformer } , function( error , object ) {
+					if ( error ) { console.log( "#### Group: not OK" ) ; callback( error ) ; return ; }
+					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
+					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Non-connected user
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'unauthorized' ) ;
+					expect( error.message ).to.be( 'Public access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User not listed in specific rights
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User listed, but with too low rights
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 } ) ;
 
 
