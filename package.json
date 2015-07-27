@@ -18,6 +18,7 @@
     "doormen": "^0.2.11",
     "error-status": "^1.1.1",
     "hash-kit": "^0.1.1",
+    "kung-fig": "^0.1.9",
     "minimist": "^1.1.1",
     "odm-kit": "^0.2.20",
     "server-kit": "^0.2.5",
