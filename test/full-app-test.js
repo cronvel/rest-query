@@ -307,7 +307,7 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: restQuery.accessLevel.READ,
+						otherAccess: 'read',
 						inheritAccess: 'none',
 						parent: {
 							collection: null,
@@ -388,7 +388,7 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: restQuery.accessLevel.READ,
+						otherAccess: 'read',
 						inheritAccess: 'none',
 						parent: {
 							collection: null,
@@ -418,7 +418,7 @@ describe( "Basics tests" , function() {
 			body: JSON.stringify( {
 				title: "My website!",
 				description: "... about my wonderful life",
-				otherAccess: restQuery.accessLevel.ALL
+				otherAccess: 'all'
 			} )
 		} ;
 		
@@ -481,7 +481,7 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: restQuery.accessLevel.ALL,
+						otherAccess: 'all',
 						inheritAccess: 'none',
 						parent: {
 							collection: null,
@@ -511,7 +511,7 @@ describe( "Basics tests" , function() {
 			body: JSON.stringify( {
 				title: "My website!",
 				description: "... about my wonderful life",
-				otherAccess: restQuery.accessLevel.ALL
+				otherAccess: 'all'
 			} )
 		} ;
 		
@@ -661,7 +661,7 @@ describe( "Basics tests on users" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: restQuery.accessLevel.READ,
+						otherAccess: 'read',
 						inheritAccess: 'none',
 						parent: {
 							collection: null,
@@ -693,7 +693,7 @@ describe( "Basics tests on users" , function() {
 				lastName: "Doe",
 				email: "john.doe@gmail.com",
 				password: "pw",
-				otherAccess: restQuery.accessLevel.ALL
+				otherAccess: 'all'
 			} )
 		} ;
 		
