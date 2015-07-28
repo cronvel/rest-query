@@ -47,8 +47,6 @@ var mongodb = require( 'mongodb' ) ;
 var expect = require( 'expect.js' ) ;
 var doormen = require( 'doormen' ) ;
 
-var config = require( './sample/app-config.js' ) ;
-
 
 
 
@@ -106,27 +104,15 @@ function clearCollection( collection , callback )
 
 function commonApp( callback )
 {
-	var app = restQuery.createApp() ;
+	var app = restQuery.createApp( __dirname + '/../sample/main.json' ) ;
 	var performer = app.createPerformer() ;
 	
-	var blogsNode = app.createCollectionNode( 'blogs' , config.descriptors.blogs ) ;
-	var postsNode = app.createCollectionNode( 'posts' , config.descriptors.posts ) ;
-	var commentsNode = app.createCollectionNode( 'comments' , config.descriptors.comments ) ;
-	var usersNode = app.createUsersCollectionNode( config.descriptors.users ) ;
-	var groupsNode = app.createGroupsCollectionNode( config.descriptors.groups ) ;
-	
-	app.root.contains( usersNode ) ;
-	app.root.contains( groupsNode ) ;
-	app.root.contains( blogsNode ) ;
-	blogsNode.contains( postsNode ) ;
-	postsNode.contains( commentsNode ) ;
-	
 	async.parallel( [
-		[ clearCollection , usersNode.collection ] ,
-		[ clearCollection , groupsNode.collection ] ,
-		[ clearCollection , blogsNode.collection ] ,
-		[ clearCollection , postsNode.collection ] ,
-		[ clearCollection , commentsNode.collection ]
+		[ clearCollection , app.collectionNodes.users.collection ] ,
+		[ clearCollection , app.collectionNodes.groups.collection ] ,
+		[ clearCollection , app.collectionNodes.blogs.collection ] ,
+		[ clearCollection , app.collectionNodes.posts.collection ] ,
+		[ clearCollection , app.collectionNodes.comments.collection ]
 	] )
 	.exec( function( error ) {
 		expect( error ).not.to.be.ok() ;
@@ -145,22 +131,12 @@ function commonApp( callback )
 
 
 
-// Force creating the collection
-/*
-before( function( done ) {
+describe( "App config" , function() {
 	
-	blogs = world.createCollection( 'blogs' , config.descriptors.blogs ) ;
-	expect( blogs ).to.be.a( odm.Collection ) ;
-	
-	posts = world.createCollection( 'posts' , config.descriptors.posts ) ;
-	expect( posts ).to.be.a( odm.Collection ) ;
-	
-	comments = world.createCollection( 'comments' , config.descriptors.comments ) ;
-	expect( comments ).to.be.a( odm.Collection ) ;
-	
-	done() ;
+	// Nothing special to test here: the whole test would fail if it wasn't working...
+	// Finer tests should be done later.
+	it( "Test loading a full config" , function() {} ) ;
 } ) ;
-*/
 
 
 
@@ -2676,13 +2652,6 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-} ) ;
-
-
-
-describe( "App config" , function() {
-	
-	it( "Test loading a JSON config" ) ;
 } ) ;
 
 

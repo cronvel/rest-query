@@ -1,0 +1,13 @@
+{
+	"restQueryType": "users" ,
+	"path": "/users" ,
+	"properties": {
+		"firstName": { "type": "string" } ,
+		"lastName": { "type": "string" } ,
+		"email": { "type": "email" }
+	} ,
+	"meta": {} ,
+	"indexes": [] ,
+	"hooks": "@users.hooks.js" ,
+	"useMemProxy": false
+}

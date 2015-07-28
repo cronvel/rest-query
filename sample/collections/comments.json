@@ -1,0 +1,10 @@
+{
+	"path": "/comments" ,
+	"properties": {
+		"content": { "type": "string" }
+	} ,
+	"meta": {} ,
+	"indexes": [] ,
+	"hooks": {} ,
+	"useMemProxy": false
+}

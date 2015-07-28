@@ -1,0 +1,11 @@
+{
+	"path": "/blogs" ,
+	"properties": {
+		"description": { "type": "string" },
+		"embedded": { "optional": true, "type": "strictObject" }
+	} ,
+	"meta": {} ,
+	"indexes": [] ,
+	"hooks": {} ,
+	"useMemProxy": false
+}

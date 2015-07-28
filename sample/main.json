@@ -1,0 +1,24 @@
+{
+	"collections": {
+		"users": "@collections/users.json" ,
+		"groups": "@collections/groups.json" ,
+		"blogs": "@collections/blogs.json" ,
+		"posts": "@collections/posts.json" ,
+		"comments": "@collections/comments.json"
+	} ,
+	"tree": {
+		"users": null ,
+		"groups": null ,
+		"blogs": {
+			"posts": {
+				"comments": null
+			}
+		}
+	} ,
+	"defaultDomain": "mongodb://localhost:27017/restQuery",
+	"passwords": {
+		"algo": "sha512",
+		"salt": "3113 n3 v3u+ p45 13 d123"
+	},
+	"config": "@config.local.json"
+}

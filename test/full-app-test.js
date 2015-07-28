@@ -36,8 +36,6 @@ var restQuery = cli['log-lib'] ?
 	smartPreprocessor.require( __dirname + '/../lib/restQuery.js' , { debug: true } ) :
 	require( '../lib/restQuery.js' ) ;
 
-var config = require( './sample/app-config.js' ) ;
-
 var expect = require( 'expect.js' ) ;
 
 var http = require( 'http' ) ;
@@ -126,7 +124,11 @@ function connect( callback )
 
 function runApp( maybeCallback )
 {
-	appProcess = childProcess.spawn( 'node' , [ __dirname + '/sample/app-server.js' , appPort ] ) ;
+	appProcess = childProcess.spawn( __dirname + '/../bin/restquery' , [
+		__dirname + '/../sample/main.json' ,
+		'--port' , appPort ,
+		'--buildIndexes'
+	] ) ;
 	
 	appProcess.stdout.on( 'data' , function( data ) {
 		//console.log( "[appProcess STDOUT] " , data.toString() ) ;
