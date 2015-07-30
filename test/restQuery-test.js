@@ -39,7 +39,7 @@ var restQuery = cli['log-lib'] ?
 var async = require( 'async-kit' ) ;
 var tree = require( 'tree-kit' ) ;
 var string = require( 'string-kit' ) ;
-var odm = require( 'odm-kit' ) ;
+var rootsDb = require( 'roots-db' ) ;
 
 var buffertools = require( 'buffertools' ) ;
 var mongodb = require( 'mongodb' ) ;
@@ -187,8 +187,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				id = blog.$._id ;
-				blog.save( callback ) ;
+				id = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//app.root.get( '/' , function( error , object ) {
@@ -231,7 +231,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (posted!)' ,
 					otherAccess: 'all'
 				} , { performer: performer } , function( error , rawDocument ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					id = rawDocument.id ;
 					//console.log( 'ID:' , id ) ;
@@ -245,7 +245,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -609,8 +609,8 @@ describe( "Basic queries of top-level collections" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				id1 = blog.$._id ;
-				blog.save( callback ) ;
+				id1 = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				blog = app.root.children.blogs.collection.createDocument( {
@@ -618,8 +618,8 @@ describe( "Basic queries of top-level collections" , function() {
 					description: 'Yet Another Blog' ,
 					otherAccess: 'all'
 				} ) ;
-				id2 = blog.$._id ;
-				blog.save( callback ) ;
+				id2 = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
@@ -716,8 +716,8 @@ describe( "Queries of nested object" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				blogId = blog.$._id ;
-				blog.save( callback ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -727,9 +727,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs', id: blogId } ,
 					otherAccess: 'all'
 				} ) ;
-				postId = post.$._id ;
+				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
@@ -767,8 +767,8 @@ describe( "Queries of nested object" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				blogId = blog.$._id ;
-				blog.save( callback ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
@@ -776,8 +776,8 @@ describe( "Queries of nested object" , function() {
 					description: 'Oh yeah' ,
 					otherAccess: 'all'
 				} ) ;
-				anotherBlogId = anotherBlog.$._id ;
-				anotherBlog.save( callback ) ;
+				anotherBlogId = anotherBlog._id ;
+				anotherBlog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -787,9 +787,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs' , id: blogId } ,
 					otherAccess: 'all'
 				} ) ;
-				postId = post.$._id ;
+				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
@@ -836,8 +836,8 @@ describe( "Queries of nested object" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				blogId = blog.$._id ;
-				blog.save( callback ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -847,9 +847,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs', id: blogId } ,
 					otherAccess: 'all'
 				} ) ;
-				postId = post.$._id ;
+				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -859,15 +859,15 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'posts', id: postId } ,
 					otherAccess: 'all'
 				} ) ;
-				commentId = comment.$._id ;
+				commentId = comment._id ;
 				//console.log( "commentId: " , commentId ) ;
-				comment.save( callback ) ;
+				comment.$.save( callback ) ;
 			} ,
 			/*
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
 				comment = app.root.children.blogs.children.posts.children.comments.collection.get( commentId , function( error , doc ) {
-					//console.log( string.inspect( { style: 'color' , proto: true } , doc.$ ) ) ;
+					//console.log( string.inspect( { style: 'color' , proto: true } , doc ) ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -910,8 +910,8 @@ describe( "Queries of nested object" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				blogId = blog.$._id ;
-				blog.save( callback ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
@@ -919,8 +919,8 @@ describe( "Queries of nested object" , function() {
 					description: 'Oh yeah' ,
 					otherAccess: 'all'
 				} ) ;
-				anotherBlogId = anotherBlog.$._id ;
-				anotherBlog.save( callback ) ;
+				anotherBlogId = anotherBlog._id ;
+				anotherBlog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -930,9 +930,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs', id: blogId } ,
 					otherAccess: 'all'
 				} ) ;
-				postId = post.$._id ;
+				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -942,9 +942,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs', id: blogId } ,
 					otherAccess: 'all'
 				} ) ;
-				anotherPostId = anotherPost.$._id ;
+				anotherPostId = anotherPost._id ;
 				//console.log( "postId: " , postId ) ;
-				anotherPost.save( callback ) ;
+				anotherPost.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -954,15 +954,15 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'posts', id: postId } ,
 					otherAccess: 'all'
 				} ) ;
-				commentId = comment.$._id ;
+				commentId = comment._id ;
 				//console.log( "commentId: " , commentId ) ;
-				comment.save( callback ) ;
+				comment.$.save( callback ) ;
 			} ,
 			/*
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
 				comment = app.root.children.blogs.children.posts.children.comments.collection.get( commentId , function( error , doc ) {
-					//console.log( string.inspect( { style: 'color' , proto: true } , doc.$ ) ) ;
+					//console.log( string.inspect( { style: 'color' , proto: true } , doc ) ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -1029,8 +1029,8 @@ describe( "Queries of nested object" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				blogId = blog.$._id ;
-				blog.save( callback ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
@@ -1038,8 +1038,8 @@ describe( "Queries of nested object" , function() {
 					description: 'Oh yeah' ,
 					otherAccess: 'all'
 				} ) ;
-				anotherBlogId = anotherBlog.$._id ;
-				anotherBlog.save( callback ) ;
+				anotherBlogId = anotherBlog._id ;
+				anotherBlog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -1049,9 +1049,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs', id: blogId } ,
 					otherAccess: 'all'
 				} ) ;
-				postId1 = post.$._id ;
+				postId1 = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -1061,9 +1061,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs', id: blogId } ,
 					otherAccess: 'all'
 				} ) ;
-				postId2 = post.$._id ;
+				postId2 = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -1073,9 +1073,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs', id: anotherBlogId } ,
 					otherAccess: 'all'
 				} ) ;
-				postIdAlt = post.$._id ;
+				postIdAlt = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -1085,9 +1085,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs', id: blogId } ,
 					otherAccess: 'all'
 				} ) ;
-				postId3 = post.$._id ;
+				postId3 = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts' , { performer: performer } , function( error , batch ) {
@@ -1147,8 +1147,8 @@ describe( "Queries of nested object" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				blogId = blog.$._id ;
-				blog.save( callback ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			/*
 			function( callback ) {
@@ -1158,9 +1158,9 @@ describe( "Queries of nested object" , function() {
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId }
 				} ) ;
-				postId = post.$._id ;
+				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			*/
 			function( callback ) {
@@ -1218,8 +1218,8 @@ describe( "Queries of nested object" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				blogId = blog.$._id ;
-				blog.save( callback ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			/*
 			function( callback ) {
@@ -1229,9 +1229,9 @@ describe( "Queries of nested object" , function() {
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId }
 				} ) ;
-				postId = post.$._id ;
+				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			*/
 			function( callback ) {
@@ -1320,8 +1320,8 @@ describe( "Queries of nested object" , function() {
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
 				} ) ;
-				blogId = blog.$._id ;
-				blog.save( callback ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
@@ -1329,8 +1329,8 @@ describe( "Queries of nested object" , function() {
 					description: 'Oh yeah' ,
 					otherAccess: 'all'
 				} ) ;
-				anotherBlogId = anotherBlog.$._id ;
-				anotherBlog.save( callback ) ;
+				anotherBlogId = anotherBlog._id ;
+				anotherBlog.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
@@ -1340,9 +1340,9 @@ describe( "Queries of nested object" , function() {
 					parent: { collection: 'blogs', id: blogId } ,
 					otherAccess: 'all'
 				} ) ;
-				postId = post.$._id ;
+				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
-				post.save( callback ) ;
+				post.$.save( callback ) ;
 			} ,
 			// Ancestry mismatch
 			function( callback ) {
