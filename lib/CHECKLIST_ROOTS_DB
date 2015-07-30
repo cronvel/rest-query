@@ -1,5 +1,0 @@
-
-* no more raw mode?
-* document = self.collection.createDocument( rawDocument ) ;  -->  deprecated
-* PATCH should use patch() / stage() and commit()
-

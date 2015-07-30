@@ -196,7 +196,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -280,7 +280,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					otherAccess: 'all'
 				} , { performer: performer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -291,7 +291,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -354,7 +354,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (x3)' ,
 					otherAccess: 'all'
 				} , { performer: performer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -365,7 +365,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! Now overwritten!' ,
 					otherAccess: 'all'
 				} , { performer: performer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -376,7 +376,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -441,7 +441,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					embedded: { a: 'a' , b: 'b' } ,
 					otherAccess: 'all'
 				} , { performer: performer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -453,7 +453,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					parent: "should not overwrite" ,
 					otherAccess: 'all'
 				} , { performer: performer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -464,7 +464,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -527,14 +527,14 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					otherAccess: 'all'
 				} , { performer: performer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -578,7 +578,7 @@ describe( "Basic queries of top-level collections" , function() {
 			function( callback ) {
 				
 				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					debug( batch ) ;
 					debug( JSON.stringify( batch ) ) ;
@@ -623,7 +623,7 @@ describe( "Basic queries of top-level collections" , function() {
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					debug( batch ) ;
 					debug( JSON.stringify( batch ) ) ;
@@ -633,7 +633,7 @@ describe( "Basic queries of top-level collections" , function() {
 							title: 'My wonderful life',
 							description: 'This is a supa blog!',
 							_id: id1,
-							embedded: undefined,
+							//embedded: undefined,
 							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
@@ -645,7 +645,7 @@ describe( "Basic queries of top-level collections" , function() {
 							title: 'YAB' ,
 							description: 'Yet Another Blog' ,
 							_id: id2,
-							embedded: undefined,
+							//embedded: undefined,
 							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
@@ -733,7 +733,7 @@ describe( "Queries of nested object" , function() {
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -793,7 +793,7 @@ describe( "Queries of nested object" , function() {
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -874,7 +874,7 @@ describe( "Queries of nested object" , function() {
 			//*/
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -969,7 +969,7 @@ describe( "Queries of nested object" , function() {
 			//*/
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -1094,7 +1094,7 @@ describe( "Queries of nested object" , function() {
 					
 					var i ;
 					
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -1174,7 +1174,7 @@ describe( "Queries of nested object" , function() {
 					} ,
 					{ performer: performer } ,
 					function( error , rawDocument ) {
-						if ( error ) { callback( error ) ; return ; }
+						expect( error ).not.to.be.ok() ;
 						postId = rawDocument.id ;
 						callback() ;
 					}
@@ -1245,7 +1245,7 @@ describe( "Queries of nested object" , function() {
 					} ,
 					{ performer: performer } ,
 					function( error , object ) {
-						if ( error ) { callback( error ) ; return ; }
+						expect( error ).not.to.be.ok() ;
 						callback() ;
 					}
 				) ;
@@ -1277,7 +1277,7 @@ describe( "Queries of nested object" , function() {
 					} ,
 					{ performer: performer } ,
 					function( error , object ) {
-						if ( error ) { callback( error ) ; return ; }
+						expect( error ).not.to.be.ok() ;
 						callback() ;
 					}
 				) ;
@@ -1416,7 +1416,7 @@ describe( "Users" , function() {
 					email: "joe.doe@gmail.com",
 					password: "pw"
 				} , { performer: performer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -1427,7 +1427,7 @@ describe( "Users" , function() {
 				//app.root.get( '/Posts/' , function( error , object ) {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -1508,7 +1508,7 @@ describe( "Token creation" , function() {
 					email: "bobby.fisher@gmail.com",
 					password: "pw"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					id = response.id ;
@@ -1522,7 +1522,7 @@ describe( "Token creation" , function() {
 					password: "pw",
 					agentId: "myAgent"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( id.toString() ) ;
 					expect( response.token.length ).to.be( 27 ) ;
@@ -1552,7 +1552,7 @@ describe( "Token creation" , function() {
 					email: "bobby.fisher@gmail.com",
 					password: "pw"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					id = response.id ;
@@ -1595,7 +1595,7 @@ describe( "Token creation" , function() {
 					email: "bobby.fisher@gmail.com",
 					password: "pw"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					id = response.id ;
@@ -1651,7 +1651,7 @@ describe( "Access" , function() {
 					email: "bobby.fisher@gmail.com",
 					password: "pw"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					authorizedId = response.id ;
@@ -1665,7 +1665,7 @@ describe( "Access" , function() {
 					password: "pw",
 					agentId: "myAgent"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
 					expect( response.token.length ).to.be( 27 ) ;
@@ -1687,7 +1687,7 @@ describe( "Access" , function() {
 					email: "groupy@gmail.com",
 					password: "groupy"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					authorizedByGroupId = response.id ;
@@ -1701,7 +1701,7 @@ describe( "Access" , function() {
 					password: "groupy",
 					agentId: "myAgent"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
 					expect( response.token.length ).to.be( 27 ) ;
@@ -1723,7 +1723,7 @@ describe( "Access" , function() {
 					email: "not-enough@gmail.com",
 					password: "notenough"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					notEnoughAuthorizedId = response.id ;
@@ -1737,7 +1737,7 @@ describe( "Access" , function() {
 					password: "notenough",
 					agentId: "myAgent"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
 					expect( response.token.length ).to.be( 27 ) ;
@@ -1759,7 +1759,7 @@ describe( "Access" , function() {
 					email: "peon@gmail.com",
 					password: "peon"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					unauthorizedId = response.id ;
@@ -1773,7 +1773,7 @@ describe( "Access" , function() {
 					password: "peon",
 					agentId: "myAgent"
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( unauthorizedId.toString() ) ;
 					expect( response.token.length ).to.be( 27 ) ;
@@ -1793,7 +1793,7 @@ describe( "Access" , function() {
 					name: "unauthorized group",
 					users: [ notEnoughAuthorizedId , authorizedByGroupId ]
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					unauthorizedGroupId = response.id ;
@@ -1805,7 +1805,7 @@ describe( "Access" , function() {
 					name: "authorized group",
 					users: [ authorizedByGroupId ]
 				} , { performer: performer } , function( error , response ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'restQuery.id' } , response.id ) ;
 					authorizedGroupId = response.id ;
@@ -1830,14 +1830,14 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
 					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
 					//delete object[''] ;
@@ -1893,7 +1893,7 @@ describe( "Access" , function() {
 					description: 'This is public' ,
 					otherAccess: 'read'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -1909,7 +1909,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -1925,7 +1925,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -1933,7 +1933,7 @@ describe( "Access" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' , { performer: authorizedPerformer } , function( error , batch ) {
 					
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					//console.log( batch ) ;
 					expect( batch.length ).to.be( 3 ) ;
 					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
@@ -1946,7 +1946,7 @@ describe( "Access" , function() {
 				// Non-connected user
 				app.root.get( '/Blogs/' , { performer: performer } , function( error , batch ) {
 					
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					expect( batch.length ).to.be( 1 ) ;
 					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
 					callback() ;
@@ -1989,7 +1989,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -2005,7 +2005,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2063,7 +2063,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -2072,7 +2072,7 @@ describe( "Access" , function() {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I've changed my mind!"
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2127,7 +2127,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -2161,7 +2161,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			}
@@ -2183,7 +2183,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -2194,7 +2194,7 @@ describe( "Access" , function() {
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2255,7 +2255,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -2266,7 +2266,7 @@ describe( "Access" , function() {
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2327,7 +2327,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'passThrough'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -2338,7 +2338,7 @@ describe( "Access" , function() {
 					content: 'Blah blah blah...' ,
 					inheritAccess: 'all'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2346,7 +2346,7 @@ describe( "Access" , function() {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2354,7 +2354,7 @@ describe( "Access" , function() {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2409,7 +2409,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'readCreateModify'	// will be lowered in the child
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -2426,7 +2426,7 @@ describe( "Access" , function() {
 					otherAccess: 'readCreate' ,
 					inheritAccess: 'min'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2434,7 +2434,7 @@ describe( "Access" , function() {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2442,7 +2442,7 @@ describe( "Access" , function() {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2497,7 +2497,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'passThrough'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
@@ -2514,7 +2514,7 @@ describe( "Access" , function() {
 					otherAccess: 'read' ,
 					inheritAccess: 'max'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2522,7 +2522,7 @@ describe( "Access" , function() {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2594,14 +2594,14 @@ describe( "Access" , function() {
 					groupAccess: groupAccess ,
 					otherAccess: 'none'
 				} , { performer: authorizedPerformer } , function( error ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -2611,7 +2611,7 @@ describe( "Access" , function() {
 			function( callback ) {
 				// User authorized by its group
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedByGroupPerformer } , function( error , object ) {
-					if ( error ) { callback( error ) ; return ; }
+					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
