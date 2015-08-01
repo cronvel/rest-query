@@ -20,7 +20,7 @@
     "hash-kit": "^0.1.1",
     "kung-fig": "^0.1.9",
     "minimist": "^1.1.1",
-    "roots-db": "^0.1.5",
+    "roots-db": "^0.1.6",
     "server-kit": "^0.2.5",
     "string-kit": "^0.1.12",
     "tree-kit": "^0.5.5"
