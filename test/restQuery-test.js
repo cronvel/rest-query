@@ -1936,9 +1936,12 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					//console.log( batch ) ;
 					expect( batch.length ).to.be( 3 ) ;
-					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
-					expect( batch[ 1 ].title ).to.be( 'Selective' ) ;
-					expect( batch[ 2 ].title ).to.be( 'Closed' ) ;
+					
+					var titles = [ batch[ 0 ].title , batch[ 1 ].title , batch[ 2 ].title ] ;
+					
+					expect( titles ).to.contain( 'Public' ) ;
+					expect( titles ).to.contain( 'Selective' ) ;
+					expect( titles ).to.contain( 'Closed' ) ;
 					callback() ;
 				} ) ;
 			} ,
