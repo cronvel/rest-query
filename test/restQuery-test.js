@@ -1619,7 +1619,7 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "using domain-restricted users: POST /Blogs/Users/CreateToken" , function( done ) {
+	it( "using domain-restricted users: POST /Blogs/id/Users/CreateToken" , function( done ) {
 		
 		var app , performer , blogId , id ;
 		
@@ -1644,7 +1644,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs/Users' , {
+				app.root.post( '/Blogs/' + blogId + '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -1658,7 +1658,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs/Users/CreateToken' , {
+				app.root.post( '/Blogs/' + blogId + '/Users/CreateToken' , {
 					by: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -1668,6 +1668,18 @@ describe( "Token creation" , function() {
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( id.toString() ) ;
 					expect( response.token.length ).to.be( 27 ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Should not works globally!
+				app.root.post( '/Users/CreateToken' , {
+					by: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).to.be.ok() ;
 					callback() ;
 				} ) ;
 			}
