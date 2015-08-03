@@ -657,6 +657,7 @@ describe( "Basics tests on users" , function() {
 						lastName: "Doe2",
 						email: "joe.doe2@gmail.com",
 						login: "joe.doe2@gmail.com",
+						isApiKey: false,
 						token: {},
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
