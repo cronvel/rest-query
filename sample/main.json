@@ -10,6 +10,7 @@
 		"users": null ,
 		"groups": null ,
 		"blogs": {
+			"users": null ,
 			"posts": {
 				"comments": null
 			}

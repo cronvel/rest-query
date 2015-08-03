@@ -1576,7 +1576,7 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "token creation using a bad login should fail" , function( done ) {
+	it( "token creation using a bad password should fail" , function( done ) {
 		
 		var app , performer , id ;
 		
@@ -1619,6 +1619,61 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "using domain-restricted users: POST /Blogs/Users/CreateToken" , function( done ) {
+		
+		var app , performer , blogId , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Blogs' , {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!' ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					blogId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Blogs/Users' , {
+					firstName: "Bobby",
+					lastName: "Fisher",
+					email: "bobby.fisher@gmail.com",
+					password: "pw"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					id = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Blogs/Users/CreateToken' , {
+					by: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					expect( response.userId.toString() ).to.be( id.toString() ) ;
+					expect( response.token.length ).to.be( 27 ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
 } ) ;
 
 

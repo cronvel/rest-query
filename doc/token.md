@@ -3,7 +3,7 @@ Token storage
 =============
 
 User: {
-	ApiKey: if defined, it can replaces a token
+	isApiKey: if true, the 'login' field is an API key and it can replaces a token
 	login: 
 	passwordHash: 
 	token: {
