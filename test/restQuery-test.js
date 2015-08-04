@@ -1525,7 +1525,7 @@ describe( "Token creation" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( id.toString() ) ;
-					expect( response.token.length ).to.be( 27 ) ;
+					expect( response.token.length ).to.be( 20 ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1667,7 +1667,7 @@ describe( "Token creation" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( id.toString() ) ;
-					expect( response.token.length ).to.be( 27 ) ;
+					expect( response.token.length ).to.be( 20 ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -1735,7 +1735,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 27 ) ;
+					expect( response.token.length ).to.be( 20 ) ;
 					
 					authorizedPerformer = app.createPerformer( {
 						by: "header" ,
@@ -1771,7 +1771,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
-					expect( response.token.length ).to.be( 27 ) ;
+					expect( response.token.length ).to.be( 20 ) ;
 					
 					authorizedByGroupPerformer = app.createPerformer( {
 						by: "header" ,
@@ -1807,7 +1807,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 27 ) ;
+					expect( response.token.length ).to.be( 20 ) ;
 					
 					notEnoughAuthorizedPerformer = app.createPerformer( {
 						by: "header" ,
@@ -1843,7 +1843,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( unauthorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 27 ) ;
+					expect( response.token.length ).to.be( 20 ) ;
 					
 					unauthorizedPerformer = app.createPerformer( {
 						by: "header" ,

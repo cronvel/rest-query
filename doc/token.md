@@ -1,4 +1,11 @@
 
+Token string structure
+======================
+
+<unique-random-id>-<token-duration>-<token-creation-timestamp>
+
+
+
 Token storage
 =============
 
