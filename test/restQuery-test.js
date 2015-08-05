@@ -1517,7 +1517,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Users/CreateToken' , {
-					by: "header" ,
+					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "myAgent"
@@ -1561,7 +1561,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Users/CreateToken' , {
-					by: "header" ,
+					type: "header" ,
 					login: "wrong@gmail.com" ,
 					password: "pw",
 					agentId: "myAgent"
@@ -1604,7 +1604,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Users/CreateToken' , {
-					by: "header" ,
+					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "bad pw",
 					agentId: "myAgent"
@@ -1659,7 +1659,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Blogs/' + blogId + '/Users/CreateToken' , {
-					by: "header" ,
+					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "myAgent"
@@ -1674,7 +1674,7 @@ describe( "Token creation" , function() {
 			function( callback ) {
 				// Should not works globally!
 				app.root.post( '/Users/CreateToken' , {
-					by: "header" ,
+					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "myAgent"
@@ -1727,7 +1727,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Users/CreateToken' , {
-					by: "header" ,
+					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "myAgent"
@@ -1738,7 +1738,7 @@ describe( "Access" , function() {
 					expect( response.token.length ).to.be( 20 ) ;
 					
 					authorizedPerformer = app.createPerformer( {
-						by: "header" ,
+						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
 						agentId: "myAgent"
@@ -1763,7 +1763,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Users/CreateToken' , {
-					by: "header" ,
+					type: "header" ,
 					login: "groupy@gmail.com" ,
 					password: "groupy",
 					agentId: "myAgent"
@@ -1774,7 +1774,7 @@ describe( "Access" , function() {
 					expect( response.token.length ).to.be( 20 ) ;
 					
 					authorizedByGroupPerformer = app.createPerformer( {
-						by: "header" ,
+						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
 						agentId: "myAgent"
@@ -1799,7 +1799,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Users/CreateToken' , {
-					by: "header" ,
+					type: "header" ,
 					login: "not-enough@gmail.com" ,
 					password: "notenough",
 					agentId: "myAgent"
@@ -1810,7 +1810,7 @@ describe( "Access" , function() {
 					expect( response.token.length ).to.be( 20 ) ;
 					
 					notEnoughAuthorizedPerformer = app.createPerformer( {
-						by: "header" ,
+						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
 						agentId: "myAgent"
@@ -1835,7 +1835,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				app.root.post( '/Users/CreateToken' , {
-					by: "header" ,
+					type: "header" ,
 					login: "peon@gmail.com" ,
 					password: "peon",
 					agentId: "myAgent"
@@ -1846,7 +1846,7 @@ describe( "Access" , function() {
 					expect( response.token.length ).to.be( 20 ) ;
 					
 					unauthorizedPerformer = app.createPerformer( {
-						by: "header" ,
+						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
 						agentId: "myAgent"
