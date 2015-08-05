@@ -1704,6 +1704,9 @@ describe( "Token creation" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	
+	it( "POST /Users/CreateToken without login/password but with auth should generate a new token" ) ;
+	it( "POST /Users/CreateToken action should cleanup outdated token" ) ;
 } ) ;
 
 
