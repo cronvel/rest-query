@@ -1774,6 +1774,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
+				// Should be there
 				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
@@ -1818,6 +1819,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
+				// Should still be there
 				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
@@ -1865,6 +1867,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
+				// Should have been garbage collected
 				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
