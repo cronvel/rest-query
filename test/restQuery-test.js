@@ -1524,8 +1524,26 @@ describe( "Token creation" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					expect( response.userId.toString() ).to.be( id.toString() ) ;
+					expect( response ).to.eql( {
+						userId: id ,
+						token: response.token ,	// unpredictable
+						type: "header" ,
+						agentId: "myAgent" ,
+						creationTime: response.creationTime ,	// not predictable at all
+						duration: 900
+					} ) ;
 					expect( response.token.length ).to.be( 20 ) ;
+					
+					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+					
+					expect( tokenData ).to.eql( {
+						type: "header" ,
+						creationTime: response.creationTime ,
+						duration: 900 ,
+						increment: tokenData.increment ,	// unpredictable
+						random: tokenData.random	// unpredictable
+					} ) ;
+					
 					callback() ;
 				} ) ;
 			}
@@ -1944,6 +1962,78 @@ describe( "Access" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "GET a restricted resource performed by a token that has already expired should fail" , function( done ) {
+		
+		var expiredTokenPerformer ;
+		
+		async.series( [
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					type: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent",
+					duration: 0
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
+					expect( response.token.length ).to.be( 20 ) ;
+					
+					expiredTokenPerformer = app.createPerformer( {
+						type: "header" ,
+						userId: response.userId ,
+						token: response.token ,
+						agentId: "myAgent"
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass
+				
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 2!!!' ,
+					description: 'This is a supa blog! (x2)' ,
+					userAccess: userAccess ,
+					otherAccess: 'none'
+				} , { performer: authorizedPerformer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
+					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Expired token
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: expiredTokenPerformer } , function( error , object ) {
+					
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'unauthorized' ) ;
+					expect( error.message ).to.be( 'This token has already expired.' ) ;
 					callback() ;
 				} ) ;
 			}
