@@ -1879,7 +1879,130 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "POST /Users/CreateToken without login/password but with auth should generate a new token" ) ;
+	it( "POST /Users/RegenerateToken should generate a new token using an existing one that will be deleted" , function( done ) {
+		
+		var app , performer , oldTokenPerformer , id , oldToken , newToken ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Bobby",
+					lastName: "Fisher",
+					email: "bobby.fisher@gmail.com",
+					password: "pw",
+					otherAccess: 'all'
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					id = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					type: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					
+					//console.log( response ) ;
+					expect( response ).to.eql( {
+						userId: id ,
+						token: response.token ,	// unpredictable
+						type: "header" ,
+						agentId: "myAgent" ,
+						creationTime: response.creationTime ,	// not predictable at all
+						duration: 900
+					} ) ;
+					expect( response.token.length ).to.be( 20 ) ;
+					
+					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+					
+					expect( tokenData ).to.eql( {
+						type: "header" ,
+						creationTime: response.creationTime ,
+						duration: 900 ,
+						increment: tokenData.increment ,	// unpredictable
+						random: tokenData.random	// unpredictable
+					} ) ;
+					
+					oldToken = response.token ;
+					
+					oldTokenPerformer = app.createPerformer( {
+						type: "header" ,
+						userId: response.userId ,
+						token: response.token ,
+						agentId: "myAgent"
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Should have been garbage collected
+				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( response ) ;
+					expect( response.token[ oldToken ] ).to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/RegenerateToken' , {} , { performer: oldTokenPerformer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					
+					//console.log( response ) ;
+					expect( response ).to.eql( {
+						userId: id ,
+						token: response.token ,	// unpredictable
+						type: "header" ,
+						agentId: "myAgent" ,
+						creationTime: response.creationTime ,	// not predictable at all
+						duration: 900
+					} ) ;
+					expect( response.token.length ).to.be( 20 ) ;
+					
+					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+					
+					expect( tokenData ).to.eql( {
+						type: "header" ,
+						creationTime: response.creationTime ,
+						duration: 900 ,
+						increment: tokenData.increment ,	// unpredictable
+						random: tokenData.random	// unpredictable
+					} ) ;
+					
+					newToken = response.token ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Should have been garbage collected
+				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( response ) ;
+					expect( response.token[ oldToken ] ).not.to.be.ok() ;
+					expect( response.token[ newToken ] ).to.be.ok() ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 	it( "'Too many tokens'" ) ;
 } ) ;
 
