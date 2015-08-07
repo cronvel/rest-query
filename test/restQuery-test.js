@@ -1491,7 +1491,7 @@ describe( "Token creation" , function() {
 	
 	it( "login, a.k.a. token creation using POST /Users/CreateToken" , function( done ) {
 		
-		var app , performer , id ;
+		var app , performer , id , token ;
 		
 		async.series( [
 			function( callback ) {
@@ -1506,7 +1506,8 @@ describe( "Token creation" , function() {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
-					password: "pw"
+					password: "pw",
+					otherAccess: 'all'
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -1544,6 +1545,16 @@ describe( "Token creation" , function() {
 						random: tokenData.random	// unpredictable
 					} ) ;
 					
+					token = response.token ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Should found the token in the user document 
+				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					expect( response.token[ token ] ).to.be.ok() ;
 					callback() ;
 				} ) ;
 			}
@@ -1950,7 +1961,6 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				// Should have been garbage collected
 				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
@@ -1990,12 +2000,284 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				// Should have been garbage collected
+				// the old token should have been garbage collected
 				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
 					expect( response.token[ oldToken ] ).not.to.be.ok() ;
 					expect( response.token[ newToken ] ).to.be.ok() ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "POST /Users/RevokeToken should revoke the current token, i.e. remove it from the user document" , function( done ) {
+		
+		var app , performer , tokenPerformer , tokenPerformerArg , id , token ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Bobby",
+					lastName: "Fisher",
+					email: "bobby.fisher@gmail.com",
+					password: "pw",
+					otherAccess: 'all'
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					id = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					type: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					
+					//console.log( response ) ;
+					expect( response ).to.eql( {
+						userId: id ,
+						token: response.token ,	// unpredictable
+						type: "header" ,
+						agentId: "myAgent" ,
+						creationTime: response.creationTime ,	// not predictable at all
+						duration: 900
+					} ) ;
+					expect( response.token.length ).to.be( 20 ) ;
+					
+					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+					
+					expect( tokenData ).to.eql( {
+						type: "header" ,
+						creationTime: response.creationTime ,
+						duration: 900 ,
+						increment: tokenData.increment ,	// unpredictable
+						random: tokenData.random	// unpredictable
+					} ) ;
+					
+					token = response.token ;
+					
+					tokenPerformerArg = {
+						type: "header" ,
+						userId: response.userId ,
+						token: response.token ,
+						agentId: "myAgent"
+					} ;
+					
+					tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( response ) ;
+					expect( response.token[ token ] ).to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/RevokeToken' , {} , { performer: tokenPerformer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( response ) ;
+					expect( response.token[ token ] ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// We recreate a new performer, or the test will fail: it will use a cached user.
+				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
+				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
+				
+				app.root.post( '/Users/RevokeToken' , {} , { performer: tokenPerformer } , function( error , response ) {
+					expect( error ).to.be.ok() ;
+					expect( error.message ).to.be( 'Token not found.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "POST /Users/RevokeAllTokens should revoke the all tokens, i.e. remove them from the user document" , function( done ) {
+		
+		var app , id , performer , tokenPerformer , tokenPerformerArg , token , tokenPerformer2 , token2 ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Bobby",
+					lastName: "Fisher",
+					email: "bobby.fisher@gmail.com",
+					password: "pw",
+					otherAccess: 'all'
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					doormen( { type: 'restQuery.id' } , response.id ) ;
+					id = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					type: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					
+					//console.log( response ) ;
+					expect( response ).to.eql( {
+						userId: id ,
+						token: response.token ,	// unpredictable
+						type: "header" ,
+						agentId: "myAgent" ,
+						creationTime: response.creationTime ,	// not predictable at all
+						duration: 900
+					} ) ;
+					expect( response.token.length ).to.be( 20 ) ;
+					
+					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+					
+					expect( tokenData ).to.eql( {
+						type: "header" ,
+						creationTime: response.creationTime ,
+						duration: 900 ,
+						increment: tokenData.increment ,	// unpredictable
+						random: tokenData.random	// unpredictable
+					} ) ;
+					
+					token = response.token ;
+					
+					tokenPerformerArg = {
+						type: "header" ,
+						userId: response.userId ,
+						token: response.token ,
+						agentId: "myAgent"
+					} ;
+					
+					tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/CreateToken' , {
+					type: "header" ,
+					login: "bobby.fisher@gmail.com" ,
+					password: "pw",
+					agentId: "myAgent"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					
+					//console.log( response ) ;
+					expect( response ).to.eql( {
+						userId: id ,
+						token: response.token ,	// unpredictable
+						type: "header" ,
+						agentId: "myAgent" ,
+						creationTime: response.creationTime ,	// not predictable at all
+						duration: 900
+					} ) ;
+					expect( response.token.length ).to.be( 20 ) ;
+					
+					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+					
+					expect( tokenData ).to.eql( {
+						type: "header" ,
+						creationTime: response.creationTime ,
+						duration: 900 ,
+						increment: tokenData.increment ,	// unpredictable
+						random: tokenData.random	// unpredictable
+					} ) ;
+					
+					token2 = response.token ;
+					
+					tokenPerformer2 = app.createPerformer( {
+						type: "header" ,
+						userId: response.userId ,
+						token: response.token ,
+						agentId: "myAgent"
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( response ) ;
+					expect( response.token[ token ] ).to.be.ok() ;
+					expect( response.token[ token2 ] ).to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/RevokeAllTokens' , {} , { performer: tokenPerformer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( response ) ;
+					expect( response.token[ token ] ).not.to.be.ok() ;
+					expect( response.token[ token2 ] ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// We recreate a new performer, or the test will fail: it will use a cached user.
+				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
+				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
+				
+				app.root.post( '/Users/RevokeToken' , {} , { performer: tokenPerformer } , function( error , response ) {
+					expect( error ).to.be.ok() ;
+					expect( error.message ).to.be( 'Token not found.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/RevokeToken' , {} , { performer: tokenPerformer2 } , function( error , response ) {
+					expect( error ).to.be.ok() ;
+					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
 				} ) ;
 			}
