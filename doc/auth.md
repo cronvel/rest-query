@@ -22,13 +22,13 @@ Users restricted to a container belong to it:
 Authorization's levels
 ======================
 
-0: no access
-1: access/pass-through (give access to the children but not on data of the current resource)
-2: partial-read (some parts of the data is hidden)
-3: read
-4: read, create
-5: read, create, modify
-6: read, create, modify, delete, move (if 'create' allowed on target)
+"none": no access
+"passThrough": access/pass-through (give access to the children but not on data of the current resource)
+"partialRead": partial-read (some parts of the data is hidden)
+"read": read
+"readCreate": read, create
+"readCreateModify": read, create, modify
+"all": read, create, modify, delete, move (if 'create' allowed on target)
 
 ? read, create, modify, modify access ?
 
@@ -43,6 +43,7 @@ Resource's schema: {
 
 Resource: {
 	inheritAccess: none|all|max|min,
+	
 	userAccess: {
 		ID1: level,
 		ID2: level,
@@ -53,7 +54,35 @@ Resource: {
 		ID2: level,
 		...
 	},
-	otherAccess: level
+	otherAccess: level,
+	
+	childCollectionAccess: {
+		<collectionId1>: {
+			userAccess: {
+				ID1: level,
+				ID2: level,
+				...
+			},
+			groupAccess: {
+				ID1: level,
+				ID2: level,
+				...
+			},
+			otherAccess: level,
+		
+		<collectionId2>: {
+			userAccess: {
+				ID1: level,
+				ID2: level,
+				...
+			},
+			groupAccess: {
+				ID1: level,
+				ID2: level,
+				...
+			},
+			otherAccess: level,
+	}
 }
 
 

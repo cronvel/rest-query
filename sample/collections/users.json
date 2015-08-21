@@ -8,6 +8,6 @@
 	} ,
 	"meta": {} ,
 	"indexes": [] ,
-	"hooks": "@users.hooks.js" ,
+	"@hooks": "users.hooks.js" ,
 	"useMemProxy": false
 }
