@@ -1521,7 +1521,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -1529,20 +1529,22 @@ describe( "Token creation" , function() {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
-						agentId: "myAgent" ,
+						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
+						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: 900
 					} ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
 						type: "header" ,
-						creationTime: response.creationTime ,
-						duration: 900 ,
-						increment: tokenData.increment ,	// unpredictable
-						random: tokenData.random	// unpredictable
+						userId: id.toString() ,
+						agentId: "0123456789" ,
+						expirationTime: response.expirationTime ,
+						increment: tokenData.increment	// unpredictable
+						//random: tokenData.random	// unpredictable
 					} ) ;
 					
 					token = response.token ;
@@ -1593,7 +1595,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "wrong@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
@@ -1636,7 +1638,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "bad pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
@@ -1691,12 +1693,12 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( id.toString() ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -1706,7 +1708,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					callback() ;
@@ -1754,7 +1756,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent",
+					agentId: "0123456789",
 					duration: duration
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -1763,20 +1765,22 @@ describe( "Token creation" , function() {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
-						agentId: "myAgent" ,
+						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
+						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: duration
 					} ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
 						type: "header" ,
-						creationTime: response.creationTime ,
-						duration: duration ,
-						increment: tokenData.increment ,	// unpredictable
-						random: tokenData.random	// unpredictable
+						userId: id.toString() ,
+						agentId: "0123456789" ,
+						expirationTime: response.expirationTime ,
+						increment: tokenData.increment	// unpredictable
+						//random: tokenData.random	// unpredictable
 					} ) ;
 					
 					token = response.token ;
@@ -1801,7 +1805,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent",
+					agentId: "0123456789",
 					duration: duration
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -1810,20 +1814,22 @@ describe( "Token creation" , function() {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
-						agentId: "myAgent" ,
+						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
+						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: duration
 					} ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
 						type: "header" ,
-						creationTime: response.creationTime ,
-						duration: duration ,
-						increment: tokenData.increment ,	// unpredictable
-						random: tokenData.random	// unpredictable
+						userId: id.toString() ,
+						agentId: "0123456789" ,
+						expirationTime: response.expirationTime ,
+						increment: tokenData.increment	// unpredictable
+						//random: tokenData.random	// unpredictable
 					} ) ;
 					
 					callback() ;
@@ -1849,7 +1855,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent",
+					agentId: "0123456789",
 					duration: duration
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -1858,20 +1864,22 @@ describe( "Token creation" , function() {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
-						agentId: "myAgent" ,
+						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
+						expirationTime: response.expirationTime ,
 						duration: duration
 					} ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
 						type: "header" ,
-						creationTime: response.creationTime ,
-						duration: duration ,
-						increment: tokenData.increment ,	// unpredictable
-						random: tokenData.random	// unpredictable
+						userId: id.toString() ,
+						agentId: "0123456789" ,
+						expirationTime: response.expirationTime ,
+						increment: tokenData.increment	// unpredictable
+						//random: tokenData.random	// unpredictable
 					} ) ;
 					
 					callback() ;
@@ -1890,9 +1898,9 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "POST /Users/RegenerateToken should generate a new token using an existing one that will be deleted" , function( done ) {
+	it( "POST /Users/RegenerateToken should generate a new token using an existing one that will have its TTL shortened" , function( done ) {
 		
-		var app , performer , oldTokenPerformer , id , oldToken , newToken ;
+		var app , performer , oldTokenPerformer , id , oldToken , newToken , oldTokenOldExpirationTime ;
 		
 		async.series( [
 			function( callback ) {
@@ -1922,7 +1930,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -1932,29 +1940,32 @@ describe( "Token creation" , function() {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
-						agentId: "myAgent" ,
+						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
+						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: 900
 					} ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
 						type: "header" ,
-						creationTime: response.creationTime ,
-						duration: 900 ,
-						increment: tokenData.increment ,	// unpredictable
-						random: tokenData.random	// unpredictable
+						userId: id.toString() ,
+						agentId: "0123456789" ,
+						expirationTime: response.expirationTime ,
+						increment: tokenData.increment	// unpredictable
+						//random: tokenData.random	// unpredictable
 					} ) ;
 					
+					oldTokenOldExpirationTime = response.expirationTime ;
 					oldToken = response.token ;
 					
 					oldTokenPerformer = app.createPerformer( {
 						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
-						agentId: "myAgent"
+						agentId: "0123456789"
 					} ) ;
 					
 					callback() ;
@@ -1978,20 +1989,23 @@ describe( "Token creation" , function() {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
-						agentId: "myAgent" ,
+						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
+						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: 900
 					} ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
+					oldTokenNewExpirationTime = response.creationTime + 10 ;
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
 						type: "header" ,
-						creationTime: response.creationTime ,
-						duration: 900 ,
-						increment: tokenData.increment ,	// unpredictable
-						random: tokenData.random	// unpredictable
+						userId: id.toString() ,
+						agentId: "0123456789" ,
+						expirationTime: response.expirationTime ,
+						increment: tokenData.increment	// unpredictable
+						//random: tokenData.random	// unpredictable
 					} ) ;
 					
 					newToken = response.token ;
@@ -2004,7 +2018,9 @@ describe( "Token creation" , function() {
 				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
-					expect( response.token[ oldToken ] ).not.to.be.ok() ;
+					expect( response.token[ oldToken ] ).to.be.ok() ;
+					expect( response.token[ oldToken ].expirationTime ).not.to.be( oldTokenOldExpirationTime ) ;
+					expect( response.token[ oldToken ].expirationTime ).to.be( oldTokenNewExpirationTime ) ;
 					expect( response.token[ newToken ] ).to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -2045,7 +2061,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -2055,20 +2071,22 @@ describe( "Token creation" , function() {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
-						agentId: "myAgent" ,
+						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
+						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: 900
 					} ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
 						type: "header" ,
-						creationTime: response.creationTime ,
-						duration: 900 ,
-						increment: tokenData.increment ,	// unpredictable
-						random: tokenData.random	// unpredictable
+						userId: id.toString() ,
+						agentId: "0123456789" ,
+						expirationTime: response.expirationTime ,
+						increment: tokenData.increment	// unpredictable
+						//random: tokenData.random	// unpredictable
 					} ) ;
 					
 					token = response.token ;
@@ -2077,7 +2095,7 @@ describe( "Token creation" , function() {
 						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
-						agentId: "myAgent"
+						agentId: "0123456789"
 					} ;
 					
 					tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
@@ -2155,7 +2173,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -2165,20 +2183,22 @@ describe( "Token creation" , function() {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
-						agentId: "myAgent" ,
+						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
+						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: 900
 					} ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
 						type: "header" ,
-						creationTime: response.creationTime ,
-						duration: 900 ,
-						increment: tokenData.increment ,	// unpredictable
-						random: tokenData.random	// unpredictable
+						userId: id.toString() ,
+						agentId: "0123456789" ,
+						expirationTime: response.expirationTime ,
+						increment: tokenData.increment	// unpredictable
+						//random: tokenData.random	// unpredictable
 					} ) ;
 					
 					token = response.token ;
@@ -2187,7 +2207,7 @@ describe( "Token creation" , function() {
 						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
-						agentId: "myAgent"
+						agentId: "0123456789"
 					} ;
 					
 					tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
@@ -2200,7 +2220,7 @@ describe( "Token creation" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
@@ -2210,20 +2230,22 @@ describe( "Token creation" , function() {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
-						agentId: "myAgent" ,
+						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
+						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: 900
 					} ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
 						type: "header" ,
-						creationTime: response.creationTime ,
-						duration: 900 ,
-						increment: tokenData.increment ,	// unpredictable
-						random: tokenData.random	// unpredictable
+						userId: id.toString() ,
+						agentId: "0123456789" ,
+						expirationTime: response.expirationTime ,
+						increment: tokenData.increment	// unpredictable
+						//random: tokenData.random	// unpredictable
 					} ) ;
 					
 					token2 = response.token ;
@@ -2232,7 +2254,7 @@ describe( "Token creation" , function() {
 						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
-						agentId: "myAgent"
+						agentId: "0123456789"
 					} ) ;
 					
 					callback() ;
@@ -2330,18 +2352,18 @@ describe( "Access" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					authorizedPerformer = app.createPerformer( {
 						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
-						agentId: "myAgent"
+						agentId: "0123456789"
 					} ) ;
 					
 					callback() ;
@@ -2366,18 +2388,18 @@ describe( "Access" , function() {
 					type: "header" ,
 					login: "groupy@gmail.com" ,
 					password: "groupy",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					authorizedByGroupPerformer = app.createPerformer( {
 						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
-						agentId: "myAgent"
+						agentId: "0123456789"
 					} ) ;
 					
 					callback() ;
@@ -2402,18 +2424,18 @@ describe( "Access" , function() {
 					type: "header" ,
 					login: "not-enough@gmail.com" ,
 					password: "notenough",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					notEnoughAuthorizedPerformer = app.createPerformer( {
 						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
-						agentId: "myAgent"
+						agentId: "0123456789"
 					} ) ;
 					
 					callback() ;
@@ -2438,18 +2460,18 @@ describe( "Access" , function() {
 					type: "header" ,
 					login: "peon@gmail.com" ,
 					password: "peon",
-					agentId: "myAgent"
+					agentId: "0123456789"
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( unauthorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					unauthorizedPerformer = app.createPerformer( {
 						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
-						agentId: "myAgent"
+						agentId: "0123456789"
 					} ) ;
 					
 					callback() ;
@@ -2561,19 +2583,19 @@ describe( "Access" , function() {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
-					agentId: "myAgent",
+					agentId: "0123456789",
 					duration: 0
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 20 ) ;
+					expect( response.token.length ).to.be( 32 ) ;
 					
 					expiredTokenPerformer = app.createPerformer( {
 						type: "header" ,
 						userId: response.userId ,
 						token: response.token ,
-						agentId: "myAgent"
+						agentId: "0123456789"
 					} ) ;
 					
 					callback() ;
