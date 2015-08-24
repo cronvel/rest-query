@@ -1532,9 +1532,9 @@ describe( "Token creation" , function() {
 						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
 						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900
+						duration: 900000
 					} ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
@@ -1543,8 +1543,8 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment	// unpredictable
-						//random: tokenData.random	// unpredictable
+						increment: tokenData.increment ,	// unpredictable
+						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
 					token = response.token ;
@@ -1698,7 +1698,7 @@ describe( "Token creation" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( id.toString() ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -1719,9 +1719,6 @@ describe( "Token creation" , function() {
 	} ) ;
 	
 	it( "POST /Users/CreateToken action should cleanup outdated tokens" , function( done ) {
-		
-		// Raise the timeout limit
-		this.timeout( 2000 ) ;
 		
 		var app , performer , id , token ;
 		
@@ -1750,7 +1747,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				
-				duration = 1 ;
+				duration = 300 ;
 				
 				app.root.post( '/Users/CreateToken' , {
 					type: "header" ,
@@ -1770,7 +1767,7 @@ describe( "Token creation" , function() {
 						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: duration
 					} ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
@@ -1779,8 +1776,8 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment	// unpredictable
-						//random: tokenData.random	// unpredictable
+						increment: tokenData.increment ,	// unpredictable
+						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
 					token = response.token ;
@@ -1799,7 +1796,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				
-				duration = 100 ;
+				duration = 100000 ;
 				
 				app.root.post( '/Users/CreateToken' , {
 					type: "header" ,
@@ -1819,7 +1816,7 @@ describe( "Token creation" , function() {
 						expirationTime: response.expirationTime ,	// not predictable at all
 						duration: duration
 					} ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
@@ -1828,8 +1825,8 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment	// unpredictable
-						//random: tokenData.random	// unpredictable
+						increment: tokenData.increment ,	// unpredictable
+						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
 					callback() ;
@@ -1839,17 +1836,17 @@ describe( "Token creation" , function() {
 				// Should still be there
 				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					//console.log( response ) ;
+					//console.log( token , response ) ;
 					expect( response.token[ token ] ).to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				setTimeout( callback , 1100 ) ;
+				setTimeout( callback , 310 ) ;
 			} ,
 			function( callback ) {
 				
-				duration = 100 ;
+				duration = 100000 ;
 				
 				app.root.post( '/Users/CreateToken' , {
 					type: "header" ,
@@ -1869,7 +1866,7 @@ describe( "Token creation" , function() {
 						expirationTime: response.expirationTime ,
 						duration: duration
 					} ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
@@ -1878,8 +1875,8 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment	// unpredictable
-						//random: tokenData.random	// unpredictable
+						increment: tokenData.increment ,	// unpredictable
+						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
 					callback() ;
@@ -1943,9 +1940,9 @@ describe( "Token creation" , function() {
 						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
 						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900
+						duration: 900000
 					} ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
@@ -1954,8 +1951,8 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment	// unpredictable
-						//random: tokenData.random	// unpredictable
+						increment: tokenData.increment ,	// unpredictable
+						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
 					oldTokenOldExpirationTime = response.expirationTime ;
@@ -1992,11 +1989,11 @@ describe( "Token creation" , function() {
 						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
 						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900
+						duration: 900000
 					} ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
-					oldTokenNewExpirationTime = response.creationTime + 10 ;
+					oldTokenNewExpirationTime = response.creationTime + 10000 ;
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
 					expect( tokenData ).to.eql( {
@@ -2004,8 +2001,8 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment	// unpredictable
-						//random: tokenData.random	// unpredictable
+						increment: tokenData.increment ,	// unpredictable
+						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
 					newToken = response.token ;
@@ -2020,7 +2017,7 @@ describe( "Token creation" , function() {
 					//console.log( response ) ;
 					expect( response.token[ oldToken ] ).to.be.ok() ;
 					expect( response.token[ oldToken ].expirationTime ).not.to.be( oldTokenOldExpirationTime ) ;
-					expect( response.token[ oldToken ].expirationTime ).to.be( oldTokenNewExpirationTime ) ;
+					expect( response.token[ oldToken ].expirationTime ).to.be.within( oldTokenNewExpirationTime - 200 , oldTokenNewExpirationTime + 200 ) ;
 					expect( response.token[ newToken ] ).to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -2074,9 +2071,9 @@ describe( "Token creation" , function() {
 						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
 						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900
+						duration: 900000
 					} ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
@@ -2085,8 +2082,8 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment	// unpredictable
-						//random: tokenData.random	// unpredictable
+						increment: tokenData.increment ,	// unpredictable
+						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
 					token = response.token ;
@@ -2186,9 +2183,9 @@ describe( "Token creation" , function() {
 						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
 						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900
+						duration: 900000
 					} ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
@@ -2197,8 +2194,8 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment	// unpredictable
-						//random: tokenData.random	// unpredictable
+						increment: tokenData.increment ,	// unpredictable
+						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
 					token = response.token ;
@@ -2233,9 +2230,9 @@ describe( "Token creation" , function() {
 						agentId: "0123456789" ,
 						creationTime: response.creationTime ,	// not predictable at all
 						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900
+						duration: 900000
 					} ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
@@ -2244,8 +2241,8 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment	// unpredictable
-						//random: tokenData.random	// unpredictable
+						increment: tokenData.increment ,	// unpredictable
+						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
 					token2 = response.token ;
@@ -2357,7 +2354,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					authorizedPerformer = app.createPerformer( {
 						type: "header" ,
@@ -2393,7 +2390,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					authorizedByGroupPerformer = app.createPerformer( {
 						type: "header" ,
@@ -2429,7 +2426,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					notEnoughAuthorizedPerformer = app.createPerformer( {
 						type: "header" ,
@@ -2465,7 +2462,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( unauthorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					unauthorizedPerformer = app.createPerformer( {
 						type: "header" ,
@@ -2589,7 +2586,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 32 ) ;
+					expect( response.token.length ).to.be( 44 ) ;
 					
 					expiredTokenPerformer = app.createPerformer( {
 						type: "header" ,
