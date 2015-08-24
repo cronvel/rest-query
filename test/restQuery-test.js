@@ -1543,7 +1543,7 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment ,	// unpredictable
+						//increment: tokenData.increment ,	// unpredictable
 						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
@@ -1776,7 +1776,7 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment ,	// unpredictable
+						//increment: tokenData.increment ,	// unpredictable
 						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
@@ -1825,7 +1825,7 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment ,	// unpredictable
+						//increment: tokenData.increment ,	// unpredictable
 						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
@@ -1875,7 +1875,7 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment ,	// unpredictable
+						//increment: tokenData.increment ,	// unpredictable
 						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
@@ -1951,7 +1951,7 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment ,	// unpredictable
+						//increment: tokenData.increment ,	// unpredictable
 						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
@@ -2001,7 +2001,7 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment ,	// unpredictable
+						//increment: tokenData.increment ,	// unpredictable
 						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
@@ -2082,7 +2082,7 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment ,	// unpredictable
+						//increment: tokenData.increment ,	// unpredictable
 						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
@@ -2194,7 +2194,7 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment ,	// unpredictable
+						//increment: tokenData.increment ,	// unpredictable
 						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
@@ -2241,7 +2241,7 @@ describe( "Token creation" , function() {
 						userId: id.toString() ,
 						agentId: "0123456789" ,
 						expirationTime: response.expirationTime ,
-						increment: tokenData.increment ,	// unpredictable
+						//increment: tokenData.increment ,	// unpredictable
 						securityCode: tokenData.securityCode	// unpredictable
 					} ) ;
 					
