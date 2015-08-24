@@ -15,9 +15,10 @@ User: {
 	passwordHash: 
 	token: {
 		14ef5ab98c41: {
-			by: header|cookie|queryString|urlAuth|basicAuth
+			type: header|cookie|queryString|urlAuth|basicAuth
 			creationTime:
-			lastUseTime:
+			expirationTime:
+			lastUseTime?
 			agentId:
 		}
 	}
@@ -30,7 +31,7 @@ Token creation
 
 POST /Users/CreateToken
 {
-	by: header|cookie|queryString|urlAuth|basicAuth
+	type: header|cookie|queryString|urlAuth|basicAuth
 	login: 
 	password: 
 	agentId: 
@@ -50,7 +51,6 @@ Token usage
 Header
 ------
 
-X-User-Id: 2354a43b5f
 X-Token: 861cd6fe1
 
 
@@ -58,7 +58,6 @@ X-Token: 861cd6fe1
 Cookie
 ------
 
-userId: 2354a43b5f
 token: 861cd6fe1
 
 
@@ -66,14 +65,14 @@ token: 861cd6fe1
 Query string
 ------------
 
-https://api.example.com/path/to/resource?userId=2354a43b5f&token=861cd6fe1
+https://api.example.com/path/to/resource?token=861cd6fe1
 
 
 
 URL Auth
 --------
 
-https://2354a43b5f:861cd6fe1@api.example.com/path/to/resource?userId=2354a43b5f&token=861cd6fe1
+https://2354a43b5f@api.example.com/path/to/resource
 
 
 

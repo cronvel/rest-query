@@ -13,16 +13,17 @@
     "restquery": "./bin/restquery"
   },
   "dependencies": {
-    "async-kit": "^0.5.9",
+    "async-kit": "^0.5.10",
     "buffertools": "^2.1.2",
     "doormen": "^0.2.16",
     "error-status": "^1.1.1",
-    "hash-kit": "^0.1.3",
+    "hash-kit": "^0.2.0",
     "kung-fig": "^0.3.4",
     "minimist": "^1.1.1",
-    "roots-db": "^0.1.6",
+    "roots-db": "^0.1.7",
     "server-kit": "^0.2.5",
     "string-kit": "^0.1.12",
+    "token-kit": "^0.1.2",
     "tree-kit": "^0.5.5"
   },
   "devDependencies": {
