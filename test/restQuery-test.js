@@ -1487,9 +1487,9 @@ describe( "Groups" , function() {
 
 
 
-describe( "Automatic slug generation" , function() {
+describe( "Slug usage" , function() {
 	
-	it( "when the collection schema has 'slugGenerationProperty' set to an existing property, it should generate a slug from that property's value" , function( done ) {
+	it( "when 'slugGenerationProperty' is set on the schema (to an existing property), it should generate a slug from that property's value" , function( done ) {
 		
 		var app , performer , blog , id ;
 		
@@ -1513,10 +1513,6 @@ describe( "Automatic slug generation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					debug( 'result of get:' ) ;
@@ -1535,7 +1531,7 @@ describe( "Automatic slug generation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "when the collection schema has 'slugGenerationProperty' set to an existing property, it should generate a slug from that property's value" , function( done ) {
+	it( "when a document will generate the same slugId, it should fail with a 409 - Conflict" , function( done ) {
 		
 		var app , performer , blog , id ;
 		
@@ -1548,7 +1544,7 @@ describe( "Automatic slug generation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.root.post( '/Blogs' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
@@ -1558,7 +1554,7 @@ describe( "Automatic slug generation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d9' , {
+				app.root.post( '/Blogs' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog 2!' ,
 					otherAccess: 'all'
@@ -1573,8 +1569,148 @@ describe( "Automatic slug generation" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
-} ) ;
 	
+	it( "the request URL should support slugId instead of ID" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Blogs' , {
+					title: 'My wonderful life!!!' ,
+					description: 'This is a supa blog!' ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
+					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					id = object.$.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/my-wonderful-life' , {
+					title: 'New title!' ,
+					description: 'New description!' ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					//console.log( object ) ;
+					expect( object.title ).to.be( 'New title!' ) ;
+					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// It should not change its slug
+				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'New title!' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.patch( '/Blogs/my-wonderful-life' , {
+					title: 'A brand new title!'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					//console.log( object ) ;
+					expect( object.title ).to.be( 'A brand new title!' ) ;
+					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// It should not change its slug
+				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'A brand new title!' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.delete( '/Blogs/my-wonderful-life' , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					//console.log( object ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// It should not change its slug
+				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "In progress: shortcut collection" ) ;
+} ) ;
+
 
 
 describe( "Token creation" , function() {
