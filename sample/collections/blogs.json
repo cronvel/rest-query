@@ -1,11 +1,12 @@
 {
 	"path": "/blogs" ,
 	"properties": {
+		"title": { "type": "string" },
 		"description": { "type": "string" },
 		"embedded": { "optional": true, "type": "strictObject" }
 	} ,
 	"meta": {} ,
 	"indexes": [] ,
 	"hooks": {} ,
-	"useMemProxy": false
+	"slugGenerationProperty": "title"
 }

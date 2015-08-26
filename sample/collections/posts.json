@@ -1,10 +1,10 @@
 {
 	"path": "/posts" ,
 	"properties": {
+		"title": { "type": "string" },
 		"content": { "type": "string" }
 	} ,
 	"meta": {} ,
 	"indexes": [] ,
-	"hooks": {} ,
-	"useMemProxy": false
+	"hooks": {}
 }

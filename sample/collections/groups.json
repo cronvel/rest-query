@@ -4,6 +4,5 @@
 	"properties": {} ,
 	"meta": {} ,
 	"indexes": [] ,
-	"hooks": {} ,
-	"useMemProxy": false
+	"hooks": {}
 }

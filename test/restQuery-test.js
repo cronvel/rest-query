@@ -1487,6 +1487,96 @@ describe( "Groups" , function() {
 
 
 
+describe( "Automatic slug generation" , function() {
+	
+	it( "when the collection schema has 'slugGenerationProperty' set to an existing property, it should generate a slug from that property's value" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life!!!' ,
+					description: 'This is a supa blog!' ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
+				//app.root.get( '/Posts/' , function( error , object ) {
+				//app.root.get( '/Blogs/' , function( error , object ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
+					//delete object[''] ;
+					//delete object._id ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
+					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "when the collection schema has 'slugGenerationProperty' set to an existing property, it should generate a slug from that property's value" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life!!!' ,
+					description: 'This is a supa blog!' ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d9' , {
+					title: 'My wonderful life!!!' ,
+					description: 'This is a supa blog 2!' ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'conflict' ) ;
+					expect( error.code ).to.be( 'duplicateKey' ) ;
+					expect( error.httpStatus ).to.be( 409 ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+} ) ;
+	
+
+
 describe( "Token creation" , function() {
 	
 	it( "login, a.k.a. token creation using POST /Users/CreateToken" , function( done ) {
