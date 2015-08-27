@@ -1570,7 +1570,7 @@ describe( "Slug usage" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "the request URL should support slugId instead of ID" , function( done ) {
+	it( "the request URL should support slugId instead of ID (GET, PUT, PATCH, DELETE)" , function( done ) {
 		
 		var app , performer , blog , id ;
 		
@@ -1708,7 +1708,203 @@ describe( "Slug usage" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "In progress: shortcut collection" ) ;
+} ) ;
+
+
+
+describe( "Shortcut collection" , function() {
+	
+	it( "Root shortcut collection" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life!!!' ,
+					description: 'This is a supa blog!' ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
+					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
+					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/my-wonderful-life' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
+					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "Collection's shortcut collection" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life!!!' ,
+					description: 'This is a supa blog!' ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , {
+					title: 'You know what?' ,
+					content: "I'm happy!" ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'You know what?' ) ;
+					expect( object.slugId ).to.be( 'you-know-what' ) ;
+					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'You know what?' ) ;
+					expect( object.slugId ).to.be( 'you-know-what' ) ;
+					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'You know what?' ) ;
+					expect( object.slugId ).to.be( 'you-know-what' ) ;
+					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'You know what?' ) ;
+					expect( object.slugId ).to.be( 'you-know-what' ) ;
+					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/my-wonderful-life/you-know-what' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'You know what?' ) ;
+					expect( object.slugId ).to.be( 'you-know-what' ) ;
+					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/my-wonderful-life/Posts/you-know-what' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'You know what?' ) ;
+					expect( object.slugId ).to.be( 'you-know-what' ) ;
+					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/my-wonderful-life/you-know-what' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'You know what?' ) ;
+					expect( object.slugId ).to.be( 'you-know-what' ) ;
+					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
+					expect( object.parent.collection ).to.be( 'blogs' ) ;
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
 } ) ;
 
 
@@ -3653,6 +3849,7 @@ describe( "Indexes" , function() {
 describe( "Misc" , function() {
 	
 	it( "Test CORS" ) ;
+	it( "Test rootObject" ) ;
 } ) ;
 		
 

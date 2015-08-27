@@ -8,5 +8,6 @@
 	"meta": {} ,
 	"indexes": [] ,
 	"hooks": {} ,
-	"slugGenerationProperty": "title"
+	"slugGenerationProperty": "title" ,
+	"shortcutCollection": "posts"
 }

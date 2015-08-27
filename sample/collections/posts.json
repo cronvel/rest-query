@@ -6,5 +6,6 @@
 	} ,
 	"meta": {} ,
 	"indexes": [] ,
-	"hooks": {}
+	"hooks": {} ,
+	"slugGenerationProperty": "title"
 }
