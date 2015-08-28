@@ -1712,9 +1712,9 @@ describe( "Slug usage" , function() {
 
 
 
-describe( "Shortcut collection" , function() {
+describe( "Auto collection" , function() {
 	
-	it( "Root shortcut collection" , function( done ) {
+	it( "Root auto collection" , function( done ) {
 		
 		var app , performer , blog , id ;
 		
@@ -1777,7 +1777,7 @@ describe( "Shortcut collection" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "Collection's shortcut collection" , function( done ) {
+	it( "Collection's auto collection" , function( done ) {
 		
 		var app , performer , blog , id ;
 		

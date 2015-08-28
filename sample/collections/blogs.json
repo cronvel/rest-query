@@ -9,5 +9,5 @@
 	"indexes": [] ,
 	"hooks": {} ,
 	"slugGenerationProperty": "title" ,
-	"shortcutCollection": "posts"
+	"autoCollection": "posts"
 }

@@ -22,6 +22,6 @@
 		"salt": "3113 n3 v3u+ p45 13 d123"
 	} ,
 	"@rootObject": "rootObject.json" ,
-	"rootShortcutCollection": "blogs" ,
+	"rootAutoCollection": "blogs" ,
 	"?@*>": "config.local.json"
 }
