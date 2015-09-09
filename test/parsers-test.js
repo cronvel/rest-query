@@ -117,6 +117,7 @@ describe( "Path's node parsing" , function() {
 	
 	it( "should parse a valid ID node as an ID" , function() {
 		expect( restQuery.Node.parsePathNode( '51d18492541d2e3614ca2a80' ) ).to.be.eql( { type: 'ID' , identifier: '51d18492541d2e3614ca2a80' } ) ;
+		expect( restQuery.Node.parsePathNode( '51d18492541d2e3614ca2a80.prop' ) ).to.be.eql( { type: 'ID' , identifier: '51d18492541d2e3614ca2a80' , property: 'prop' } ) ;
 		expect( restQuery.Node.parsePathNode( 'a1d18492541d2e3614ca2a80' ) ).to.be.eql( { type: 'ID' , identifier: 'a1d18492541d2e3614ca2a80' } ) ;
 		expect( restQuery.Node.parsePathNode( 'aaaaaaaaaaaaaaaaaaaaaaaa' ) ).to.be.eql( { type: 'ID' , identifier: 'aaaaaaaaaaaaaaaaaaaaaaaa' } ) ;
 		expect( restQuery.Node.parsePathNode( '111111111111111111111111' ) ).to.be.eql( { type: 'ID' , identifier: '111111111111111111111111' } ) ;
@@ -130,6 +131,7 @@ describe( "Path's node parsing" , function() {
 	it( "should parse a valid slugId node as a slugId" , function() {
 		expect( restQuery.Node.parsePathNode( 'abc' ) ).to.be.eql( { type: 'slugId' , identifier: 'abc' } ) ;
 		expect( restQuery.Node.parsePathNode( 'cronvel' ) ).to.be.eql( { type: 'slugId' , identifier: 'cronvel' } ) ;
+		expect( restQuery.Node.parsePathNode( 'cronvel.avatar' ) ).to.be.eql( { type: 'slugId' , identifier: 'cronvel' , property: 'avatar' } ) ;
 		expect( restQuery.Node.parsePathNode( 'c20nv31' ) ).to.be.eql( { type: 'slugId' , identifier: 'c20nv31' } ) ;
 		expect( restQuery.Node.parsePathNode( 'my-blog-entry' ) ).to.be.eql( { type: 'slugId' , identifier: 'my-blog-entry' } ) ;
 		expect( restQuery.Node.parsePathNode( 'a-24-characters-long-sid' ) ).to.be.eql( { type: 'slugId' , identifier: 'a-24-characters-long-sid' } ) ;
@@ -143,11 +145,6 @@ describe( "Path's node parsing" , function() {
 		expect( restQuery.Node.parsePathNode( 'my-Blog-entry' ) ).to.be.an( Error ) ;
 		expect( restQuery.Node.parsePathNode( 'My-blog-entry' ) ).to.be.an( Error ) ;
 		expect( restQuery.Node.parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfgaz' ) ).to.be.an( Error ) ;
-	} ) ;
-	
-	it( "should handle edge cases correctly" , function() {
-		expect( restQuery.Node.parsePathNode( '' ) ).to.be.an( Error ) ;
-		expect( restQuery.Node.parsePathNode() ).to.be.an( Error ) ;
 	} ) ;
 	
 } ) ;
@@ -165,7 +162,7 @@ describe( "Parse HTTP request" , function() {
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
 				path: '/' ,
-				type: 'json' ,
+				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'get' ,
 				params: {}
@@ -183,8 +180,9 @@ describe( "Parse HTTP request" , function() {
 			
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
-				path: '/path/to' ,
-				type: 'json' ,
+				path: '/path/to.json' ,
+				//path: '/path/to' ,
+				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'get' ,
 				params: { filter: 'on', id: '123' }
@@ -203,7 +201,7 @@ describe( "Parse HTTP request" , function() {
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
 				path: '/' ,
-				type: 'json' ,
+				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'post' ,
 				params: {} ,
