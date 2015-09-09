@@ -5,11 +5,11 @@ User scope
 ==========
 
 Login of users of the user-centric model:
-POST /Users/CreateToken
+POST /Users/CREATE-TOKEN
 
 Login of users of the company-centric model:
-POST /Boards/Users/CreateToken
-POST /Whatever/Users/CreateToken
+POST /Boards/Users/CREATE-TOKEN
+POST /Whatever/Users/CREATE-TOKEN
 
 Typically, a user belong to a parent.
 Global users belong to root (i.e. '/').

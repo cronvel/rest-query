@@ -89,8 +89,17 @@ function fakeHttpRequest( r , body )
 
 describe( "Path's node parsing" , function() {
 	
-	it( "should parse a valid property node as an property of the current object" , function() {
-		expect( restQuery.Node.parsePathNode( 'Users' ) ).to.be.eql( { type: 'member' , identifier: 'users' } ) ;
+	it( "should parse a valid collection node as an collection's child of the current object" , function() {
+		expect( restQuery.Node.parsePathNode( 'Users' ) ).to.be.eql( { type: 'collection' , identifier: 'users' } ) ;
+		
+		// Invalid entries
+		expect( restQuery.Node.parsePathNode( 'U' ) ).to.be.an( Error ) ;
+		expect( restQuery.Node.parsePathNode( 'U-' ) ).to.be.an( Error ) ;
+	} ) ;
+	
+	it( "should parse a valid method node as a method" , function() {
+		expect( restQuery.Node.parsePathNode( 'REGENERATE-TOKEN' ) ).to.be.eql( { type: 'method' , identifier: 'regenerateToken' } ) ;
+		expect( restQuery.Node.parsePathNode( 'FILE' ) ).to.be.eql( { type: 'method' , identifier: 'file' } ) ;
 		
 		// Invalid entries
 		expect( restQuery.Node.parsePathNode( 'U-' ) ).to.be.an( Error ) ;

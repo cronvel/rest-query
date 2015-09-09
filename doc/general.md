@@ -5,15 +5,13 @@
 
 * GET: *retrieve* an object or a collection of objects
 * PUT: *create* or *update* (overwrite) an object in the collection, the object is placed at the exact place
-  in the provided URI, with the exact MongoID provided, except if it violate uniqness, if an object exists, 
-  it is replaced entirely by the new object. Also some PUT method can be rejected if the object already exists,
-  thus favorising the usage of PATCH
+  in the provided URI, with the exact ID provided, except if it violate uniqueness, if an object exists, 
+  it is replaced entirely by the new object.
 * PATCH: *update* partially, update only parts of the object present in the patch body
 * DELETE: *delete* the object (or the collection, if possible)
 * POST:
 	* *create* an object on the collection 
-	* execute a methods of an entity, e.g. `POST /Users/{ID}/Auth` will authenticate the user with {ID} as ID,
-	  here `Auth` is not an object or a property, it's a method of the user's object
+	* execute a method of an entity, e.g. `POST /Users/{ID}/CREATE-TOKEN` will authenticate the user with {ID} as ID
 	* POST always indicate something that cannot be done offline.
 
 Maybe:
@@ -26,10 +24,13 @@ Maybe:
 # URL parsing
 
 Each parts of the URL's path can be one the following:
-* if it starts with an uppercased letter, it is a property of the parent object (it converts to the regular camelCase property name)
-* if it is a 24 characters string of hexadecimal, it is a MongoID
-* if it contains only decimal, it is an *offset* (the index of the element into the collection)
+* if it starts with an uppercased letter followed by a lowercased letter, it is a child collection of the parent object
+  (it converts to the regular camelCase collection name), following this scheme: [A-Z][a-z][a-zA-Z0-9]*
+* if it starts with two uppercased letters, it is method the parent object (it converts to the regular camelCase method name),
+  following this scheme: [A-Z][A-Z][A-Z0-9-]*
+* if it is a 24 characters string of hexadecimal (using lowercased letter), it is an ID
 * if it is a string containing only character of the class `[0-9a-z-]`, it is a SID
+* if it contains only decimal, it is an *offset* (the index of the element into the collection)
 * anything else is an error
 
 
@@ -40,10 +41,10 @@ This is a human-readable ID, both intended to make user-friendly and SEO-friendl
 Also, a user's account identifier is a SID (rather than an email), this is consistent with Twitter @ syntaxe.
 
 Requirement
-* a SID is a string, and should at least contains 3 characters, and at most 72 characters
+* a SID is a string, and should at least contains 1 characters, and at most 72 characters
 * allowed character are lowcase ascii alpha (a-z), digits (0-9) and hyphen (-)
-* if the string happens to be a valid MongoID hexadecimal representation or a valid decimal arbitrary number, 
-  then either an hyphen `-` is appended to transform it, or the SID creation is simply rejected
+* if the string happens to be a valid ID or a valid decimal arbitrary number, then either an hyphen `-` is appended to transform it,
+  or the SID creation is simply rejected
 
 
 

@@ -1911,7 +1911,7 @@ describe( "Auto collection" , function() {
 
 describe( "Token creation" , function() {
 	
-	it( "login, a.k.a. token creation using POST /Users/CreateToken" , function( done ) {
+	it( "login, a.k.a. token creation using POST /Users/CREATE-TOKEN" , function( done ) {
 		
 		var app , performer , id , token ;
 		
@@ -1939,7 +1939,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2013,7 +2013,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "wrong@gmail.com" ,
 					password: "pw",
@@ -2056,7 +2056,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "bad pw",
@@ -2072,7 +2072,7 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "using domain-restricted users: POST /Blogs/id/Users/CreateToken" , function( done ) {
+	it( "using domain-restricted users: POST /Blogs/id/Users/CREATE-TOKEN" , function( done ) {
 		
 		var app , performer , blogId , id ;
 		
@@ -2111,7 +2111,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs/' + blogId + '/Users/CreateToken' , {
+				app.root.post( '/Blogs/' + blogId + '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2126,7 +2126,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				// Should not works globally!
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2140,7 +2140,7 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "POST /Users/CreateToken action should cleanup outdated tokens" , function( done ) {
+	it( "POST /Users/CREATE-TOKEN action should cleanup outdated tokens" , function( done ) {
 		
 		var app , performer , id , token ;
 		
@@ -2171,7 +2171,7 @@ describe( "Token creation" , function() {
 				
 				duration = 300 ;
 				
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2220,7 +2220,7 @@ describe( "Token creation" , function() {
 				
 				duration = 100000 ;
 				
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2270,7 +2270,7 @@ describe( "Token creation" , function() {
 				
 				duration = 100000 ;
 				
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2317,7 +2317,7 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "POST /Users/RegenerateToken should generate a new token using an existing one that will have its TTL shortened" , function( done ) {
+	it( "POST /Users/REGENERATE-TOKEN should generate a new token using an existing one that will have its TTL shortened" , function( done ) {
 		
 		var app , performer , oldTokenPerformer , id , oldToken , newToken , oldTokenOldExpirationTime ;
 		
@@ -2345,7 +2345,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2399,7 +2399,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/RegenerateToken' , {} , { performer: oldTokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REGENERATE-TOKEN' , {} , { performer: oldTokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
@@ -2448,7 +2448,7 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "POST /Users/RevokeToken should revoke the current token, i.e. remove it from the user document" , function( done ) {
+	it( "POST /Users/REVOKE-TOKEN should revoke the current token, i.e. remove it from the user document" , function( done ) {
 		
 		var app , performer , tokenPerformer , tokenPerformerArg , id , token ;
 		
@@ -2476,7 +2476,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2531,7 +2531,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/RevokeToken' , {} , { performer: tokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-TOKEN' , {} , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -2550,7 +2550,7 @@ describe( "Token creation" , function() {
 				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
 				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 				
-				app.root.post( '/Users/RevokeToken' , {} , { performer: tokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-TOKEN' , {} , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
@@ -2560,7 +2560,7 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "POST /Users/RevokeAllTokens should revoke the all tokens, i.e. remove them from the user document" , function( done ) {
+	it( "POST /Users/REVOKE-ALL-TOKENS should revoke the all tokens, i.e. remove them from the user document" , function( done ) {
 		
 		var app , id , performer , tokenPerformer , tokenPerformerArg , token , tokenPerformer2 , token2 ;
 		
@@ -2588,7 +2588,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2635,7 +2635,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2689,7 +2689,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/RevokeAllTokens' , {} , { performer: tokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-ALL-TOKENS' , {} , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -2709,14 +2709,14 @@ describe( "Token creation" , function() {
 				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
 				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 				
-				app.root.post( '/Users/RevokeToken' , {} , { performer: tokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-TOKEN' , {} , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/RevokeToken' , {} , { performer: tokenPerformer2 } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-TOKEN' , {} , { performer: tokenPerformer2 } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
@@ -2767,7 +2767,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2803,7 +2803,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "groupy@gmail.com" ,
 					password: "groupy",
@@ -2839,7 +2839,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "not-enough@gmail.com" ,
 					password: "notenough",
@@ -2875,7 +2875,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "peon@gmail.com" ,
 					password: "peon",
@@ -2998,7 +2998,7 @@ describe( "Access" , function() {
 		
 		async.series( [
 			function( callback ) {
-				app.root.post( '/Users/CreateToken' , {
+				app.root.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
