@@ -212,6 +212,49 @@ describe( "Basic queries of object of a top-level collection" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "GET on a property of a regular item" , function( done ) {
+		
+		var app , performer , blog , id , randomId = new mongodb.ObjectID() ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				var userAccess = {} ;
+				userAccess[ randomId ] = 'read' ;	// Random unexistant ID
+				
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!' ,
+					otherAccess: 'all' ,
+					userAccess: userAccess
+				} ) ;
+				id = blog._id ;
+				blog.$.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + id + '/.title' , { performer: performer } , function( error , title ) {
+					expect( error ).not.to.be.ok() ;
+					expect( title ).to.be( 'My wonderful life' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/' + id + '/.userAccess.' + randomId , { performer: performer } , function( error , access ) {
+					expect( error ).not.to.be.ok() ;
+					expect( access ).to.be( 'read' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 	it( "POST then GET" , function( done ) {
 		
 		var app , performer , blog , id ;
@@ -482,6 +525,100 @@ describe( "Basic queries of object of a top-level collection" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "PUT, then PATCH on a property, then GET (featuring embedded data)" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 3!!!' ,
+					description: 'This is a supa blog! (x3)' ,
+					embedded: { a: 'a' , b: 'b' } ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/.embedded' , { a: 'omg' } , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
+					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
+					expect( object.embedded ).to.eql( { a: 'omg' , b: 'b' } ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "PUT, then PUT (overwrite) on a property, then GET" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 3!!!' ,
+					description: 'This is a supa blog! (x3)' ,
+					otherAccess: 'all'
+				} , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/.title' , "Change dat title." , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					debug( 'result of get:' ) ;
+					debug( object ) ;
+					debug( JSON.stringify( object ) ) ;
+					expect( object.title ).to.be( 'Change dat title.' ) ;
+					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 	it( "DELETE on an unexisting item" , function( done ) {
 		
 		var app , performer , blog , id ;
@@ -557,6 +694,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "DELETE on a property of an object" ) ;
 } ) ;
 
 
