@@ -158,6 +158,7 @@ describe( "Path's node parsing" , function() {
 	} ) ;
 	
 	it( "should parse a valid property node as a property of the current object" , function() {
+		expect( parsePathNode( '.bob' ) ).to.eql( { type: 'property' , identifier: 'bob' } ) ;
 		expect( parsePathNode( '.name' ) ).to.eql( { type: 'property' , identifier: 'name' } ) ;
 		expect( parsePathNode( '.n' ) ).to.eql( { type: 'property' , identifier: 'n' } ) ;
 		expect( parsePathNode( '.embedded.data' ) ).to.eql( { type: 'property' , identifier: 'embedded.data' } ) ;
