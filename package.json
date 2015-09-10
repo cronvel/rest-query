@@ -22,7 +22,7 @@
     "minimist": "^1.1.1",
     "roots-db": "^0.2.4",
     "server-kit": "^0.2.5",
-    "string-kit": "^0.1.16",
+    "string-kit": "^0.1.17",
     "token-kit": "^0.1.3",
     "tree-kit": "^0.5.5"
   },

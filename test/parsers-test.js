@@ -89,64 +89,109 @@ function fakeHttpRequest( r , body )
 
 describe( "Path's node parsing" , function() {
 	
-	it( "should parse a valid collection node as an collection's child of the current object" , function() {
-		expect( restQuery.Node.parsePathNode( 'Users' ) ).to.be.eql( { type: 'collection' , identifier: 'users' } ) ;
+	var parsePathNode = function parsePathNode( str ) {
 		
-		// Invalid entries
-		expect( restQuery.Node.parsePathNode( 'U' ) ).to.be.an( Error ) ;
-		expect( restQuery.Node.parsePathNode( 'U-' ) ).to.be.an( Error ) ;
+		try {
+			return restQuery.Node.parsePathNode( str ) ;
+		}
+		catch ( error ) {
+			return error ;
+		}
+	} ;
+	
+	it( "should parse a valid collection node as an collection's child of the current object" , function() {
+		expect( parsePathNode( 'Users' ) ).to.eql( { type: 'collection' , identifier: 'users' } ) ;
+		expect( parsePathNode( 'U' ) ).to.eql( { type: 'collection' , identifier: 'u' } ) ;
 	} ) ;
 	
 	it( "should parse a valid method node as a method" , function() {
-		expect( restQuery.Node.parsePathNode( 'REGENERATE-TOKEN' ) ).to.be.eql( { type: 'method' , identifier: 'regenerateToken' } ) ;
-		expect( restQuery.Node.parsePathNode( 'FILE' ) ).to.be.eql( { type: 'method' , identifier: 'file' } ) ;
-		
-		// Invalid entries
-		expect( restQuery.Node.parsePathNode( 'U-' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( 'REGENERATE-TOKEN' ) ).to.eql( { type: 'method' , identifier: 'regenerateToken' } ) ;
+		expect( parsePathNode( 'FILE' ) ).to.eql( { type: 'method' , identifier: 'file' } ) ;
 	} ) ;
 	
 	it( "should parse a valid offset node as an offset" , function() {
-		expect( restQuery.Node.parsePathNode( '1258' ) ).to.be.eql( { type: 'offset' , identifier: 1258 } ) ;
-		expect( restQuery.Node.parsePathNode( '01258' ) ).to.be.eql( { type: 'offset' , identifier: 1258 } ) ;
-		expect( restQuery.Node.parsePathNode( '0' ) ).to.be.eql( { type: 'offset' , identifier: 0 } ) ;
-		expect( restQuery.Node.parsePathNode( '000' ) ).to.be.eql( { type: 'offset' , identifier: 0 } ) ;
+		expect( parsePathNode( '1258' ) ).to.eql( { type: 'offset' , identifier: 1258 } ) ;
+		expect( parsePathNode( '01258' ) ).to.eql( { type: 'offset' , identifier: 1258 } ) ;
+		expect( parsePathNode( '0' ) ).to.eql( { type: 'offset' , identifier: 0 } ) ;
+		expect( parsePathNode( '000' ) ).to.eql( { type: 'offset' , identifier: 0 } ) ;
 		
 		// Invalid entries
-		expect( restQuery.Node.parsePathNode( '000b' ).type ).not.to.be.equal( 'offset' ) ;
+		expect( parsePathNode( '000b' ).type ).not.to.be.equal( 'offset' ) ;
+	} ) ;
+	
+	it( "should parse a valid range node as a range" , function() {
+		expect( parsePathNode( '0-100' ) ).to.eql( { type: 'range' , min: 0 , max: 100 } ) ;
+		expect( parsePathNode( '156-345' ) ).to.eql( { type: 'range' , min: 156 , max: 345 } ) ;
+		
+		// Invalid entries
+		expect( parsePathNode( '12-13-15' ).type ).not.to.be.equal( 'range' ) ;
 	} ) ;
 	
 	it( "should parse a valid ID node as an ID" , function() {
-		expect( restQuery.Node.parsePathNode( '51d18492541d2e3614ca2a80' ) ).to.be.eql( { type: 'ID' , identifier: '51d18492541d2e3614ca2a80' } ) ;
-		expect( restQuery.Node.parsePathNode( '51d18492541d2e3614ca2a80.prop' ) ).to.be.eql( { type: 'ID' , identifier: '51d18492541d2e3614ca2a80' , property: 'prop' } ) ;
-		expect( restQuery.Node.parsePathNode( 'a1d18492541d2e3614ca2a80' ) ).to.be.eql( { type: 'ID' , identifier: 'a1d18492541d2e3614ca2a80' } ) ;
-		expect( restQuery.Node.parsePathNode( 'aaaaaaaaaaaaaaaaaaaaaaaa' ) ).to.be.eql( { type: 'ID' , identifier: 'aaaaaaaaaaaaaaaaaaaaaaaa' } ) ;
-		expect( restQuery.Node.parsePathNode( '111111111111111111111111' ) ).to.be.eql( { type: 'ID' , identifier: '111111111111111111111111' } ) ;
+		expect( parsePathNode( '51d18492541d2e3614ca2a80' ) ).to.eql( { type: 'id' , identifier: '51d18492541d2e3614ca2a80' } ) ;
+		expect( parsePathNode( 'a1d18492541d2e3614ca2a80' ) ).to.eql( { type: 'id' , identifier: 'a1d18492541d2e3614ca2a80' } ) ;
+		expect( parsePathNode( 'aaaaaaaaaaaaaaaaaaaaaaaa' ) ).to.eql( { type: 'id' , identifier: 'aaaaaaaaaaaaaaaaaaaaaaaa' } ) ;
+		expect( parsePathNode( '111111111111111111111111' ) ).to.eql( { type: 'id' , identifier: '111111111111111111111111' } ) ;
 		
 		// Invalid entries
-		expect( restQuery.Node.parsePathNode( '51d18492541d2e3614ca2a8' ).type ).not.to.be.equal( 'ID' ) ;
-		expect( restQuery.Node.parsePathNode( '51d18492541d2e3614ca2a80a' ).type ).not.to.be.equal( 'ID' ) ;
-		expect( restQuery.Node.parsePathNode( '51d18492541h2e3614ca2a80' ).type ).not.to.be.equal( 'ID' ) ;
+		expect( parsePathNode( '51d18492541d2e3614ca2a8' ).type ).not.to.be.equal( 'id' ) ;
+		expect( parsePathNode( '51d18492541d2e3614ca2a80a' ).type ).not.to.be.equal( 'id' ) ;
+		expect( parsePathNode( '51d18492541h2e3614ca2a80' ).type ).not.to.be.equal( 'id' ) ;
 	} ) ;
 	
 	it( "should parse a valid slugId node as a slugId" , function() {
-		expect( restQuery.Node.parsePathNode( 'abc' ) ).to.be.eql( { type: 'slugId' , identifier: 'abc' } ) ;
-		expect( restQuery.Node.parsePathNode( 'cronvel' ) ).to.be.eql( { type: 'slugId' , identifier: 'cronvel' } ) ;
-		expect( restQuery.Node.parsePathNode( 'cronvel.avatar' ) ).to.be.eql( { type: 'slugId' , identifier: 'cronvel' , property: 'avatar' } ) ;
-		expect( restQuery.Node.parsePathNode( 'c20nv31' ) ).to.be.eql( { type: 'slugId' , identifier: 'c20nv31' } ) ;
-		expect( restQuery.Node.parsePathNode( 'my-blog-entry' ) ).to.be.eql( { type: 'slugId' , identifier: 'my-blog-entry' } ) ;
-		expect( restQuery.Node.parsePathNode( 'a-24-characters-long-sid' ) ).to.be.eql( { type: 'slugId' , identifier: 'a-24-characters-long-sid' } ) ;
-		expect( restQuery.Node.parsePathNode( 'agaaaaaaaaaaaaaaaaaaaaaa' ) ).to.be.eql( { type: 'slugId' , identifier: 'agaaaaaaaaaaaaaaaaaaaaaa' } ) ;
-		expect( restQuery.Node.parsePathNode( '01b' ) ).to.be.eql( { type: 'slugId' , identifier: '01b' } ) ;
-		expect( restQuery.Node.parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' ) ).to.be.eql( { type: 'slugId' , identifier: 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' } ) ;
+		expect( parsePathNode( 'abc' ) ).to.eql( { type: 'slugId' , identifier: 'abc' } ) ;
+		expect( parsePathNode( 'cronvel' ) ).to.eql( { type: 'slugId' , identifier: 'cronvel' } ) ;
+		expect( parsePathNode( 'c20nv31' ) ).to.eql( { type: 'slugId' , identifier: 'c20nv31' } ) ;
+		expect( parsePathNode( 'my-blog-entry' ) ).to.eql( { type: 'slugId' , identifier: 'my-blog-entry' } ) ;
+		expect( parsePathNode( 'a-24-characters-long-sid' ) ).to.eql( { type: 'slugId' , identifier: 'a-24-characters-long-sid' } ) ;
+		expect( parsePathNode( 'agaaaaaaaaaaaaaaaaaaaaaa' ) ).to.eql( { type: 'slugId' , identifier: 'agaaaaaaaaaaaaaaaaaaaaaa' } ) ;
+		expect( parsePathNode( '01b' ) ).to.eql( { type: 'slugId' , identifier: '01b' } ) ;
+		expect( parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' ) ).to.eql( { type: 'slugId' , identifier: 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' } ) ;
+		expect( parsePathNode( 'a' ) ).to.eql( { type: 'slugId' , identifier: 'a' } ) ;
 		
 		// Invalid entries
-		expect( restQuery.Node.parsePathNode( 'a' ) ).to.be.an( Error ) ;
-		expect( restQuery.Node.parsePathNode( 'afaaaaaaaaaaaaaaaaaaaaaa' ).type ).not.to.be.equal( 'slugId' ) ;
-		expect( restQuery.Node.parsePathNode( 'my-Blog-entry' ) ).to.be.an( Error ) ;
-		expect( restQuery.Node.parsePathNode( 'My-blog-entry' ) ).to.be.an( Error ) ;
-		expect( restQuery.Node.parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfgaz' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( 'afaaaaaaaaaaaaaaaaaaaaaa' ).type ).not.to.be.equal( 'slugId' ) ;
+		expect( parsePathNode( 'my-Blog-entry' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( 'My-blog-entry' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfgaz' ) ).to.be.an( Error ) ;
 	} ) ;
 	
+	it( "should parse a valid property node as a property of the current object" , function() {
+		expect( parsePathNode( '.name' ) ).to.eql( { type: 'property' , identifier: 'name' } ) ;
+		expect( parsePathNode( '.n' ) ).to.eql( { type: 'property' , identifier: 'n' } ) ;
+		expect( parsePathNode( '.embedded.data' ) ).to.eql( { type: 'property' , identifier: 'embedded.data' } ) ;
+		
+		// Invalid entries
+		expect( parsePathNode( '.' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '.embedded..data' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '.name.' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '.name..' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '..name' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '.embedded.data.' ) ).to.be.an( Error ) ;
+	} ) ;
+	
+	it( "should parse a valid link property node as a link property of the current object" , function() {
+		expect( parsePathNode( '~name' ) ).to.eql( { type: 'linkProperty' , identifier: 'name' } ) ;
+		expect( parsePathNode( '~n' ) ).to.eql( { type: 'linkProperty' , identifier: 'n' } ) ;
+		expect( parsePathNode( '~embedded.data' ) ).to.eql( { type: 'linkProperty' , identifier: 'embedded.data' } ) ;
+		
+		// Invalid entries
+		expect( parsePathNode( '~' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '~.' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '~embedded..data' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '~name.' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '~name..' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '~.name' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '~~name' ) ).to.be.an( Error ) ;
+		expect( parsePathNode( '~embedded.data.' ) ).to.be.an( Error ) ;
+	} ) ;
+	
+	it( "edge cases" , function() {	
+		expect( parsePathNode( 'U-' ) ).to.eql( { type: 'method' , identifier: 'u' } ) ;
+		expect( parsePathNode( 'U---' ) ).to.eql( { type: 'method' , identifier: 'u' } ) ;
+		expect( parsePathNode( '-U' ) ).to.be.an( Error ) ;
+	} ) ;
 } ) ;
 
 
