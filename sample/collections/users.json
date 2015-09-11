@@ -4,7 +4,8 @@
 	"properties": {
 		"firstName": { "type": "string" } ,
 		"lastName": { "type": "string" } ,
-		"email": { "type": "email" }
+		"email": { "type": "email" } ,
+		"godfather": { "type": "rootsDb.link" , "collection": "users" , "optional": true }
 	} ,
 	"meta": {} ,
 	"indexes": [] ,
