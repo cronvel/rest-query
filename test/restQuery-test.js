@@ -1529,7 +1529,7 @@ describe( "Queries of nested object" , function() {
 
 describe( "Links" , function() {
 	
-	it( "GET on a links" , function( done ) {
+	it( "GET on a link" , function( done ) {
 		
 		var app , performer , blog , id , userId , godfatherId ;
 		
@@ -1601,8 +1601,161 @@ describe( "Links" , function() {
 	
 	it( "POST on a link" ) ;
 	it( "PUT on a link" ) ;
-	it( "PATCH on a link" ) ;
-	it( "DELETE on a link" ) ;
+	
+	it( "PATCH on a link" , function( done ) {
+		
+		var app , performer , blog , id , userId , godfatherId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "THE",
+					lastName: "GODFATHER",
+					email: "godfather@gmail.com",
+					password: "pw",
+					otherAccess: "all"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					godfatherId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					otherAccess: "all",
+					godfather: godfatherId
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					userId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( object.firstName ).to.be( 'Joe' ) ;
+					expect( object.lastName ).to.be( 'Doe' ) ;
+					expect( object.slugId ).to.be( 'joe-doe' ) ;
+					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
+					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.patch( '/Users/' + userId + '/~godfather' , { firstName: 'Da' } , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( object.firstName ).to.be( 'Da' ) ;
+					expect( object.lastName ).to.be( 'GODFATHER' ) ;
+					expect( object.slugId ).to.be( 'the-godfather' ) ;
+					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "DELETE on a link" , function( done ) {
+		
+		var app , performer , blog , id , userId , godfatherId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "THE",
+					lastName: "GODFATHER",
+					email: "godfather@gmail.com",
+					password: "pw",
+					otherAccess: "all"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					godfatherId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					otherAccess: "all",
+					godfather: godfatherId
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					userId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( object.firstName ).to.be( 'Joe' ) ;
+					expect( object.lastName ).to.be( 'Doe' ) ;
+					expect( object.slugId ).to.be( 'joe-doe' ) ;
+					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
+					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.delete( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + godfatherId , { performer: performer } , function( error , object ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 } ) ;
 
 
