@@ -1601,7 +1601,74 @@ describe( "Links" , function() {
 	
 	it( "POST on a link (does it make sense?)" ) ;
 	
-	it( "PUT (create) on a link" ) ;
+	it( "PUT (create) on a link" , function( done ) {
+		
+		var app , performer , blog , id , userId , godfatherId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					otherAccess: "all"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					userId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Users/' + userId + '/~godfather' , {
+						firstName: "DAT",
+						lastName: "GODFATHER!",
+						email: "godfather@gmail.com",
+						password: "pw",
+						otherAccess: "all"
+					} ,
+					{ performer: performer } ,
+					function( error , response ) {
+						expect( error ).not.to.be.ok() ;
+						godfatherId = response.id ;
+						callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( object.firstName ).to.be( 'DAT' ) ;
+					expect( object.lastName ).to.be( 'GODFATHER!' ) ;
+					expect( object.slugId ).to.be( 'dat-godfather' ) ;
+					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + godfatherId , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( object.firstName ).to.be( 'DAT' ) ;
+					expect( object.lastName ).to.be( 'GODFATHER!' ) ;
+					expect( object.slugId ).to.be( 'dat-godfather' ) ;
+					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
 	
 	it( "PUT (overwrite) on a link" , function( done ) {
 		
