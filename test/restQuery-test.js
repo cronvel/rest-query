@@ -1639,6 +1639,7 @@ describe( "Links" , function() {
 					function( error , response ) {
 						expect( error ).not.to.be.ok() ;
 						godfatherId = response.id ;
+						console.error( "response.id:" , response.id ) ;
 						callback() ;
 				} ) ;
 			} ,
@@ -2456,7 +2457,7 @@ describe( "Token creation" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
 				} ) ;
@@ -2530,7 +2531,7 @@ describe( "Token creation" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
 				} ) ;
@@ -2573,7 +2574,7 @@ describe( "Token creation" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
 				} ) ;
@@ -2614,7 +2615,7 @@ describe( "Token creation" , function() {
 					otherAccess: 'all'
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					blogId = response.id ;
 					callback() ;
 				} ) ;
@@ -2628,7 +2629,7 @@ describe( "Token creation" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
 				} ) ;
@@ -2685,7 +2686,7 @@ describe( "Token creation" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
 				} ) ;
@@ -2862,7 +2863,7 @@ describe( "Token creation" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
 				} ) ;
@@ -2993,7 +2994,7 @@ describe( "Token creation" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
 				} ) ;
@@ -3105,7 +3106,7 @@ describe( "Token creation" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
 				} ) ;
@@ -3284,7 +3285,7 @@ describe( "Access" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					authorizedId = response.id ;
 					callback() ;
 				} ) ;
@@ -3320,7 +3321,7 @@ describe( "Access" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					authorizedByGroupId = response.id ;
 					callback() ;
 				} ) ;
@@ -3356,7 +3357,7 @@ describe( "Access" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					notEnoughAuthorizedId = response.id ;
 					callback() ;
 				} ) ;
@@ -3392,7 +3393,7 @@ describe( "Access" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					unauthorizedId = response.id ;
 					callback() ;
 				} ) ;
@@ -3426,7 +3427,7 @@ describe( "Access" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					unauthorizedGroupId = response.id ;
 					callback() ;
 				} ) ;
@@ -3438,7 +3439,7 @@ describe( "Access" , function() {
 				} , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
-					doormen( { type: 'restQuery.id' } , response.id ) ;
+					doormen( { type: 'objectId' } , response.id ) ;
 					authorizedGroupId = response.id ;
 					callback() ;
 				} ) ;

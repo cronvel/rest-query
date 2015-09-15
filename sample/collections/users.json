@@ -5,7 +5,7 @@
 		"firstName": { "type": "string" } ,
 		"lastName": { "type": "string" } ,
 		"email": { "type": "email" } ,
-		"godfather": { "type": "rootsDb.link" , "collection": "users" , "optional": true }
+		"godfather": { "type": "link" , "collection": "users" , "optional": true }
 	} ,
 	"meta": {} ,
 	"indexes": [] ,
