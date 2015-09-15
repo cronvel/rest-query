@@ -1599,8 +1599,6 @@ describe( "Links" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "POST on a link (does it make sense?)" ) ;
-	
 	it( "PUT (create) on a link" , function( done ) {
 		
 		var app , performer , blog , id , userId , godfatherId ;
@@ -1639,7 +1637,6 @@ describe( "Links" , function() {
 					function( error , response ) {
 						expect( error ).not.to.be.ok() ;
 						godfatherId = response.id ;
-						console.error( "response.id:" , response.id ) ;
 						callback() ;
 				} ) ;
 			} ,
@@ -1905,6 +1902,88 @@ describe( "Links" , function() {
 					callback() ;
 				} ) ;
 			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "POST on a link should fail (it doesn't make sense)" , function( done ) {
+		
+		var app , performer , blog , id , userId , godfatherId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					otherAccess: "all"
+				} , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					userId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			
+			// POST when the link does not exist
+			function( callback ) {
+				app.root.post( '/Users/' + userId + '/~godfather' , {
+						firstName: "DAT",
+						lastName: "GODFATHER!",
+						email: "godfather@gmail.com",
+						password: "pw",
+						otherAccess: "all"
+					} ,
+					{ performer: performer } ,
+					function( error , response ) {
+						expect( error ).to.be.ok() ;
+						expect( error.type ).to.be( 'notFound' ) ;
+						callback() ;
+				} ) ;
+			} ,
+			
+			
+			function( callback ) {
+				app.root.put( '/Users/' + userId + '/~godfather' , {
+						firstName: "DAT",
+						lastName: "GODFATHER!",
+						email: "godfather@gmail.com",
+						password: "pw",
+						otherAccess: "all"
+					} ,
+					{ performer: performer } ,
+					function( error , response ) {
+						expect( error ).not.to.be.ok() ;
+						godfatherId = response.id ;
+						callback() ;
+				} ) ;
+			} ,
+			
+			
+			// POST when the link exist
+			function( callback ) {
+				app.root.post( '/Users/' + userId + '/~godfather' , {
+						firstName: "DAT",
+						lastName: "GODFATHER!",
+						email: "godfather@gmail.com",
+						password: "pw",
+						otherAccess: "all"
+					} ,
+					{ performer: performer } ,
+					function( error , response ) {
+						expect( error ).to.be.ok() ;
+						expect( error.type ).to.be( 'badRequest' ) ;
+						callback() ;
+				} ) ;
+			} ,
 		] )
 		.exec( done ) ;
 	} ) ;
