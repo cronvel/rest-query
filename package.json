@@ -21,7 +21,7 @@
     "kung-fig": "^0.3.4",
     "minimist": "^1.1.1",
     "roots-db": "^0.3.2",
-    "server-kit": "^0.2.5",
+    "server-kit": "^0.2.7",
     "string-kit": "^0.1.17",
     "token-kit": "^0.1.3",
     "tree-kit": "^0.5.5"
