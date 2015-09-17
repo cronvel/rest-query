@@ -58,13 +58,14 @@ function fakeHttpRequest( r , body )
 		url: "/" ,
 		httpVersion: "1.1" ,
 		headers: {
-			'user-agent': "Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/20100101 Firefox/32.0" ,
-			'accept-language': "en-US,en;q=0.5" ,
-			'connection': "keep-alive" ,
-			'accept-encoding': "gzip, deflate" ,
-			'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" ,
-			'host': "localhost" ,
-			'cache-control': "max-age=0"
+			"user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/20100101 Firefox/32.0" ,
+			"accept-language": "en-US,en;q=0.5" ,
+			"connection": "keep-alive" ,
+			"accept-encoding": "gzip, deflate" ,
+			"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" ,
+			"content-type": "application/json" ,
+			"host": "localhost" ,
+			"cache-control": "max-age=0"
 		}
 	} , r ) ;
 	
