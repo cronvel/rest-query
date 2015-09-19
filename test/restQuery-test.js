@@ -273,7 +273,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life posted!!!' ,
 					description: 'This is a supa blog! (posted!)' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error , rawDocument ) {
+				} , null , { performer: performer } , function( error , rawDocument ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					id = rawDocument.id ;
@@ -1310,6 +1310,7 @@ describe( "Queries of nested object" , function() {
 						parent: 'should not overwrite' ,
 						otherAccess: 'all'
 					} ,
+					null ,
 					{ performer: performer } ,
 					function( error , rawDocument ) {
 						expect( error ).not.to.be.ok() ;
@@ -1548,7 +1549,7 @@ describe( "Links" , function() {
 					email: "godfather@gmail.com",
 					password: "pw",
 					otherAccess: "all"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					godfatherId = response.id ;
@@ -1563,7 +1564,7 @@ describe( "Links" , function() {
 					password: "pw",
 					otherAccess: "all",
 					godfather: godfatherId
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
@@ -1618,7 +1619,7 @@ describe( "Links" , function() {
 					email: "joe.doe@gmail.com",
 					password: "pw",
 					otherAccess: "all"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
@@ -1687,7 +1688,7 @@ describe( "Links" , function() {
 					email: "godfather@gmail.com",
 					password: "pw",
 					otherAccess: "all"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					godfatherId = response.id ;
@@ -1702,7 +1703,7 @@ describe( "Links" , function() {
 					password: "pw",
 					otherAccess: "all",
 					godfather: godfatherId
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
@@ -1771,7 +1772,7 @@ describe( "Links" , function() {
 					email: "godfather@gmail.com",
 					password: "pw",
 					otherAccess: "all"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					godfatherId = response.id ;
@@ -1786,7 +1787,7 @@ describe( "Links" , function() {
 					password: "pw",
 					otherAccess: "all",
 					godfather: godfatherId
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
@@ -1847,7 +1848,7 @@ describe( "Links" , function() {
 					email: "godfather@gmail.com",
 					password: "pw",
 					otherAccess: "all"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					godfatherId = response.id ;
@@ -1862,7 +1863,7 @@ describe( "Links" , function() {
 					password: "pw",
 					otherAccess: "all",
 					godfather: godfatherId
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
@@ -1925,7 +1926,7 @@ describe( "Links" , function() {
 					email: "joe.doe@gmail.com",
 					password: "pw",
 					otherAccess: "all"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
@@ -1942,6 +1943,7 @@ describe( "Links" , function() {
 						password: "pw",
 						otherAccess: "all"
 					} ,
+					null ,
 					{ performer: performer } ,
 					function( error , response ) {
 						expect( error ).to.be.ok() ;
@@ -1977,6 +1979,7 @@ describe( "Links" , function() {
 						password: "pw",
 						otherAccess: "all"
 					} ,
+					null ,
 					{ performer: performer } ,
 					function( error , response ) {
 						expect( error ).to.be.ok() ;
@@ -2151,7 +2154,7 @@ describe( "Slug usage" , function() {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -2161,7 +2164,7 @@ describe( "Slug usage" , function() {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog 2!' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'conflict' ) ;
 					expect( error.code ).to.be( 'duplicateKey' ) ;
@@ -2190,7 +2193,7 @@ describe( "Slug usage" , function() {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -2533,7 +2536,7 @@ describe( "Token creation" , function() {
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
 					otherAccess: 'all'
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2547,7 +2550,7 @@ describe( "Token creation" , function() {
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response ).to.eql( {
@@ -2607,7 +2610,7 @@ describe( "Token creation" , function() {
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
 					password: "pw"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2621,7 +2624,7 @@ describe( "Token creation" , function() {
 					login: "wrong@gmail.com" ,
 					password: "pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.httpStatus ).to.be( 401 ) ;
@@ -2650,7 +2653,7 @@ describe( "Token creation" , function() {
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
 					password: "pw"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2664,7 +2667,7 @@ describe( "Token creation" , function() {
 					login: "bobby.fisher@gmail.com" ,
 					password: "bad pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.httpStatus ).to.be( 401 ) ;
@@ -2692,7 +2695,7 @@ describe( "Token creation" , function() {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					blogId = response.id ;
@@ -2705,7 +2708,7 @@ describe( "Token creation" , function() {
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
 					password: "pw"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2719,7 +2722,7 @@ describe( "Token creation" , function() {
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( id.toString() ) ;
@@ -2734,7 +2737,7 @@ describe( "Token creation" , function() {
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -2762,7 +2765,7 @@ describe( "Token creation" , function() {
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
 					otherAccess: 'all'
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2780,7 +2783,7 @@ describe( "Token creation" , function() {
 					password: "pw",
 					agentId: "0123456789",
 					duration: duration
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response ).to.eql( {
@@ -2829,7 +2832,7 @@ describe( "Token creation" , function() {
 					password: "pw",
 					agentId: "0123456789",
 					duration: duration
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response ).to.eql( {
@@ -2879,7 +2882,7 @@ describe( "Token creation" , function() {
 					password: "pw",
 					agentId: "0123456789",
 					duration: duration
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response ).to.eql( {
@@ -2939,7 +2942,7 @@ describe( "Token creation" , function() {
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
 					otherAccess: 'all'
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2953,7 +2956,7 @@ describe( "Token creation" , function() {
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
@@ -3002,7 +3005,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/REGENERATE-TOKEN' , {} , { performer: oldTokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REGENERATE-TOKEN' , {} , null , { performer: oldTokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
@@ -3070,7 +3073,7 @@ describe( "Token creation" , function() {
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
 					otherAccess: 'all'
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3084,7 +3087,7 @@ describe( "Token creation" , function() {
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
@@ -3134,7 +3137,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/REVOKE-TOKEN' , {} , { performer: tokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3153,7 +3156,7 @@ describe( "Token creation" , function() {
 				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
 				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 				
-				app.root.post( '/Users/REVOKE-TOKEN' , {} , { performer: tokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
@@ -3182,7 +3185,7 @@ describe( "Token creation" , function() {
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
 					otherAccess: 'all'
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3196,7 +3199,7 @@ describe( "Token creation" , function() {
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
@@ -3243,7 +3246,7 @@ describe( "Token creation" , function() {
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
@@ -3292,7 +3295,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/REVOKE-ALL-TOKENS' , {} , { performer: tokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-ALL-TOKENS' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3312,14 +3315,14 @@ describe( "Token creation" , function() {
 				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
 				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 				
-				app.root.post( '/Users/REVOKE-TOKEN' , {} , { performer: tokenPerformer } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/REVOKE-TOKEN' , {} , { performer: tokenPerformer2 } , function( error , response ) {
+				app.root.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer2 } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
@@ -3361,7 +3364,7 @@ describe( "Access" , function() {
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
 					password: "pw"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3375,7 +3378,7 @@ describe( "Access" , function() {
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
@@ -3397,7 +3400,7 @@ describe( "Access" , function() {
 					lastName: "Groups",
 					email: "groupy@gmail.com",
 					password: "groupy"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3411,7 +3414,7 @@ describe( "Access" , function() {
 					login: "groupy@gmail.com" ,
 					password: "groupy",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
@@ -3433,7 +3436,7 @@ describe( "Access" , function() {
 					lastName: "enough",
 					email: "not-enough@gmail.com",
 					password: "notenough"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3447,7 +3450,7 @@ describe( "Access" , function() {
 					login: "not-enough@gmail.com" ,
 					password: "notenough",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
@@ -3469,7 +3472,7 @@ describe( "Access" , function() {
 					lastName: "Peon",
 					email: "peon@gmail.com",
 					password: "peon"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3483,7 +3486,7 @@ describe( "Access" , function() {
 					login: "peon@gmail.com" ,
 					password: "peon",
 					agentId: "0123456789"
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( unauthorizedId.toString() ) ;
@@ -3503,7 +3506,7 @@ describe( "Access" , function() {
 				app.root.post( '/Groups' , {
 					name: "unauthorized group",
 					users: [ notEnoughAuthorizedId , authorizedByGroupId ]
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3515,7 +3518,7 @@ describe( "Access" , function() {
 				app.root.post( '/Groups' , {
 					name: "authorized group",
 					users: [ authorizedByGroupId ]
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3607,7 +3610,7 @@ describe( "Access" , function() {
 					password: "pw",
 					agentId: "0123456789",
 					duration: 0
-				} , { performer: performer } , function( error , response ) {
+				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
@@ -3675,7 +3678,7 @@ describe( "Access" , function() {
 					title: 'Public' ,
 					description: 'This is public' ,
 					otherAccess: 'read'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3691,7 +3694,7 @@ describe( "Access" , function() {
 					description: 'This is selective' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3707,7 +3710,7 @@ describe( "Access" , function() {
 					description: 'This is closed' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -4051,7 +4054,7 @@ describe( "Access" , function() {
 					title: 'Post one' ,
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4062,7 +4065,7 @@ describe( "Access" , function() {
 					title: 'Post two' ,
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4075,7 +4078,7 @@ describe( "Access" , function() {
 					title: 'Post three' ,
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
-				} , { performer: unauthorizedPerformer } , function( error ) {
+				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4088,7 +4091,7 @@ describe( "Access" , function() {
 					title: 'Post four' ,
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
-				} , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
