@@ -1,11 +1,13 @@
 {
 	"restQueryType": "users" ,
 	"path": "/users" ,
+	"attachmentUrl": "/tmp/restquery" ,
 	"properties": {
 		"firstName": { "type": "string" } ,
 		"lastName": { "type": "string" } ,
 		"email": { "type": "email" } ,
 		"avatar": { "type": "attachment" , "optional": true } ,
+		"bigAvatar": { "type": "attachment" , "optional": true } ,
 		"godfather": { "type": "link" , "collection": "users" , "optional": true }
 	} ,
 	"meta": {} ,
