@@ -322,7 +322,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -396,7 +396,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -407,7 +407,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! Now overwritten!' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -451,7 +451,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			function( callback ) {
 				app.root.patch( '/Blogs/111111111111111111111111' , {
 					description: 'Oh yeah!'
-				} , { performer: performer } , function( error , object ) {
+				} , null , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -483,7 +483,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (x3)' ,
 					embedded: { a: 'a' , b: 'b' } ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -495,7 +495,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					"embedded.a": 'A' ,
 					parent: "should not overwrite" ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -543,14 +543,14 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! (x3)' ,
 					embedded: { a: 'a' , b: 'b' } ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/.embedded' , { a: 'omg' } , { performer: performer } , function( error ) {
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/.embedded' , { a: 'omg' } , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -590,14 +590,14 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/.title' , "Change dat title." , { performer: performer } , function( error ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/.title' , "Change dat title." , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -663,7 +663,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -1382,7 +1382,7 @@ describe( "Queries of nested object" , function() {
 						parent: 'should not overwrite' ,
 						otherAccess: 'all'
 					} ,
-					{ performer: performer } ,
+					null , { performer: performer } ,
 					function( error , object ) {
 						expect( error ).not.to.be.ok() ;
 						callback() ;
@@ -1414,7 +1414,7 @@ describe( "Queries of nested object" , function() {
 						parent: 'should not overwrite' ,
 						otherAccess: 'all'
 					} ,
-					{ performer: performer } ,
+					null , { performer: performer } ,
 					function( error , object ) {
 						expect( error ).not.to.be.ok() ;
 						callback() ;
@@ -1492,7 +1492,7 @@ describe( "Queries of nested object" , function() {
 						content: 'Plop.' ,
 						otherAccess: 'all'
 					} ,
-					{ performer: performer } ,
+					null , { performer: performer } ,
 					function( error , object ) {
 						expect( error ).to.be.ok() ;
 						expect( error.type ).to.be( 'badRequest' ) ;
@@ -1634,7 +1634,7 @@ describe( "Links" , function() {
 						password: "pw",
 						otherAccess: "all"
 					} ,
-					{ performer: performer } ,
+					null , { performer: performer } ,
 					function( error , response ) {
 						expect( error ).not.to.be.ok() ;
 						godfatherId = response.id ;
@@ -1731,7 +1731,7 @@ describe( "Links" , function() {
 						password: "pw",
 						otherAccess: "all"
 					} ,
-					{ performer: performer } ,
+					null , { performer: performer } ,
 					function( error , object ) {
 						expect( error ).not.to.be.ok() ;
 						callback() ;
@@ -1808,7 +1808,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( '/Users/' + userId + '/~godfather' , { firstName: 'Da' } , { performer: performer } , function( error , object ) {
+				app.root.patch( '/Users/' + userId + '/~godfather' , { firstName: 'Da' } , null , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -1961,7 +1961,7 @@ describe( "Links" , function() {
 						password: "pw",
 						otherAccess: "all"
 					} ,
-					{ performer: performer } ,
+					null , { performer: performer } ,
 					function( error , response ) {
 						expect( error ).not.to.be.ok() ;
 						godfatherId = response.id ;
@@ -2021,7 +2021,7 @@ describe( "Users" , function() {
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
 					password: "pw"
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -2112,7 +2112,7 @@ describe( "Slug usage" , function() {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -2220,7 +2220,7 @@ describe( "Slug usage" , function() {
 					title: 'New title!' ,
 					description: 'New description!' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -2252,7 +2252,7 @@ describe( "Slug usage" , function() {
 			function( callback ) {
 				app.root.patch( '/Blogs/my-wonderful-life' , {
 					title: 'A brand new title!'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -2337,7 +2337,7 @@ describe( "Auto collection" , function() {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -2400,7 +2400,7 @@ describe( "Auto collection" , function() {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -2411,7 +2411,7 @@ describe( "Auto collection" , function() {
 					title: 'You know what?' ,
 					content: "I'm happy!" ,
 					otherAccess: 'all'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3543,7 +3543,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3635,7 +3635,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3777,7 +3777,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3793,7 +3793,7 @@ describe( "Access" , function() {
 					description: 'Seriously!' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -3803,7 +3803,7 @@ describe( "Access" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!" ,
 					description: 'Seriously!'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -3815,7 +3815,7 @@ describe( "Access" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!" ,
 					description: 'Seriously!'
-				} , { performer: unauthorizedPerformer } , function( error ) {
+				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -3827,7 +3827,7 @@ describe( "Access" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!" ,
 					description: 'Seriously!'
-				} , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -3851,7 +3851,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3860,7 +3860,7 @@ describe( "Access" , function() {
 			function( callback ) {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I've changed my mind!"
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -3869,7 +3869,7 @@ describe( "Access" , function() {
 				// Non-connected user
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!"
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -3880,7 +3880,7 @@ describe( "Access" , function() {
 				// User not listed in specific rights
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!"
-				} , { performer: unauthorizedPerformer } , function( error ) {
+				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -3891,7 +3891,7 @@ describe( "Access" , function() {
 				// User listed, but with too low rights
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!"
-				} , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -3915,7 +3915,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3971,7 +3971,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -3982,7 +3982,7 @@ describe( "Access" , function() {
 					title: 'Put one' ,
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -3993,7 +3993,7 @@ describe( "Access" , function() {
 					title: 'Put two' ,
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4006,7 +4006,7 @@ describe( "Access" , function() {
 					title: 'Put three' ,
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
-				} , { performer: unauthorizedPerformer } , function( error ) {
+				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4019,7 +4019,7 @@ describe( "Access" , function() {
 					title: 'Put four' ,
 					content: 'Blah blah blah...' ,
 					otherAccess: 'read'
-				} , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4043,7 +4043,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -4115,7 +4115,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'passThrough'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -4126,7 +4126,7 @@ describe( "Access" , function() {
 					title: 'Inheritance: all' ,
 					content: 'Blah blah blah...' ,
 					inheritAccess: 'all'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4134,7 +4134,7 @@ describe( "Access" , function() {
 			function( callback ) {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4142,7 +4142,7 @@ describe( "Access" , function() {
 			function( callback ) {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4151,7 +4151,7 @@ describe( "Access" , function() {
 				// Non-connected user
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4162,7 +4162,7 @@ describe( "Access" , function() {
 				// User not listed in specific rights
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
-				} , { performer: unauthorizedPerformer } , function( error ) {
+				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4173,7 +4173,7 @@ describe( "Access" , function() {
 				// User listed, but with too low rights
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
-				} , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4197,7 +4197,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'readCreateModify'	// will be lowered in the child
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -4214,7 +4214,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'readCreate' ,
 					inheritAccess: 'min'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4222,7 +4222,7 @@ describe( "Access" , function() {
 			function( callback ) {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4230,7 +4230,7 @@ describe( "Access" , function() {
 			function( callback ) {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4239,7 +4239,7 @@ describe( "Access" , function() {
 				// Non-connected user
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4250,7 +4250,7 @@ describe( "Access" , function() {
 				// User not listed in specific rights
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
-				} , { performer: unauthorizedPerformer } , function( error ) {
+				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4261,7 +4261,7 @@ describe( "Access" , function() {
 				// User listed, but with too low rights
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
-				} , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4285,7 +4285,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					otherAccess: 'passThrough'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
@@ -4302,7 +4302,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					otherAccess: 'read' ,
 					inheritAccess: 'max'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4310,7 +4310,7 @@ describe( "Access" , function() {
 			function( callback ) {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4326,7 +4326,7 @@ describe( "Access" , function() {
 				// Non-connected user
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
-				} , { performer: performer } , function( error ) {
+				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4337,7 +4337,7 @@ describe( "Access" , function() {
 				// User not listed in specific rights
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
-				} , { performer: unauthorizedPerformer } , function( error ) {
+				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4348,7 +4348,7 @@ describe( "Access" , function() {
 				// User listed, but with too low rights
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "Yeah! I can change that!"
-				} , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4382,7 +4382,7 @@ describe( "Access" , function() {
 					userAccess: userAccess ,
 					groupAccess: groupAccess ,
 					otherAccess: 'none'
-				} , { performer: authorizedPerformer } , function( error ) {
+				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
