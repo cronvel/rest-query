@@ -1,7 +1,7 @@
 {
 	"restQueryType": "users" ,
 	"path": "/users" ,
-	"attachmentUrl": "/tmp/restquery" ,
+	"attachmentPath": "/users" ,
 	"properties": {
 		"firstName": { "type": "string" } ,
 		"lastName": { "type": "string" } ,
