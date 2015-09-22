@@ -208,7 +208,8 @@ describe( "Parse HTTP request" , function() {
 			
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
-				path: '/' ,
+				//path: '/' ,
+				path: [] ,
 				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'get' ,
@@ -221,14 +222,27 @@ describe( "Parse HTTP request" , function() {
 	
 	it( "should parse a fake GET with path and query string" , function( done ) {
 		
-		var req = fakeHttpRequest( { url: "/path/to.json?filter=on&id=123" } ) ;
+		var req = fakeHttpRequest( { url: "/path/to/json?filter=on&id=123" } ) ;
 		
 		restQuery.httpModule.parseRequest( req , function( error , message ) {
 			
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
-				path: '/path/to.json' ,
-				//path: '/path/to' ,
+				//path: '/path/to/json' ,
+				path: [
+					{
+						identifier: "path" ,
+						type: "slugId"
+					} ,
+					{
+						identifier: "to" ,
+						type: "slugId"
+					} ,
+					{
+						identifier: "json" ,
+						type: "slugId"
+					}
+				] ,
 				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'get' ,
@@ -247,7 +261,8 @@ describe( "Parse HTTP request" , function() {
 			
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.eql( {
-				path: '/' ,
+				//path: '/' ,
+				path: [] ,
 				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'post' ,

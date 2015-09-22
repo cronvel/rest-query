@@ -47,6 +47,8 @@ var mongodb = require( 'mongodb' ) ;
 var expect = require( 'expect.js' ) ;
 var doormen = require( 'doormen' ) ;
 
+var fsKit = require( 'fs-kit' ) ;
+
 
 
 
@@ -96,7 +98,11 @@ function clearCollection( collection , callback )
 {
 	collection.driver.rawInit( function( error ) {
 		if ( error ) { callback( error ) ; return ; }
-		collection.driver.raw.remove( callback ) ;
+		collection.driver.raw.remove( function( error ) {
+			if ( ! collection.attachmentUrl ) { callback( error ) ; return ; }
+			
+			fsKit.deltree( collection.attachmentUrl , callback ) ;
+		} ) ;
 	} ) ;
 }
 

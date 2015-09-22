@@ -45,6 +45,7 @@ var mongodb = require( 'mongodb' ) ;
 
 var async = require( 'async-kit' ) ;
 var tree = require( 'tree-kit' ) ;
+var fsKit = require( 'fs-kit' ) ;
 
 var appProto = 'http' ;
 var appPort = 1234 ;
@@ -107,6 +108,11 @@ function clearCollection( collectionName , callback )
 {
 	var collection = db.collection( collectionName ) ;
 	collection.remove( callback ) ;
+	collection.remove( function( error ) {
+		if ( ! collection.attachmentUrl ) { callback( error ) ; return ; }
+		
+		fsKit.deltree( collection.attachmentUrl , callback ) ;
+	} ) ;
 }
 
 
