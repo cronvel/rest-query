@@ -213,7 +213,7 @@ describe( "Parse HTTP request" , function() {
 				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'get' ,
-				params: {}
+				query: {}
 			} ) ;
 			
 			done() ;
@@ -222,7 +222,7 @@ describe( "Parse HTTP request" , function() {
 	
 	it( "should parse a fake GET with path and query string" , function( done ) {
 		
-		var req = fakeHttpRequest( { url: "/path/to/json?filter=on&id=123" } ) ;
+		var req = fakeHttpRequest( { url: "/path/to/json?populate=group" } ) ;
 		
 		restQuery.httpModule.parseRequest( req , function( error , message ) {
 			
@@ -246,7 +246,7 @@ describe( "Parse HTTP request" , function() {
 				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'get' ,
-				params: { filter: 'on', id: '123' }
+				query: { populate: 'group' }
 			} ) ;
 			
 			done() ;
@@ -266,7 +266,7 @@ describe( "Parse HTTP request" , function() {
 				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'post' ,
-				params: {} ,
+				query: {} ,
 				data: { a: 'simple', json: 'file' }
 			} ) ;
 			
