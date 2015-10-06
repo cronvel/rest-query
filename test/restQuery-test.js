@@ -1997,6 +1997,94 @@ describe( "Links" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "GET + populate links" , function( done ) {
+		
+		var app , performer , blog , id , userId , fatherId , godfatherId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Big Joe",
+					lastName: "Doe",
+					email: "big-joe@gmail.com",
+					password: "pw",
+					otherAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					fatherId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "THE",
+					lastName: "GODFATHER",
+					email: "godfather@gmail.com",
+					password: "pw",
+					otherAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					godfatherId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					otherAccess: "all",
+					father: fatherId ,
+					godfather: godfatherId
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
+					userId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				var context = {
+					performer: performer ,
+					query: {
+						populate: [ 'father' , 'godfather' ]
+					}
+				} ;
+				
+				app.root.get( '/Users/' + userId , context , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( object.firstName ).to.be( 'Joe' ) ;
+					expect( object.lastName ).to.be( 'Doe' ) ;
+					expect( object.slugId ).to.be( 'joe-doe' ) ;
+					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					
+					expect( object.father.firstName ).to.be( 'Big Joe' ) ;
+					expect( object.father.lastName ).to.be( 'Doe' ) ;
+					expect( object.father.email ).to.be( 'big-joe@gmail.com' ) ;
+					
+					expect( object.godfather.firstName ).to.be( 'THE' ) ;
+					expect( object.godfather.lastName ).to.be( 'GODFATHER' ) ;
+					expect( object.godfather.email ).to.be( 'godfather@gmail.com' ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 } ) ;
 
 

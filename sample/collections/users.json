@@ -8,6 +8,7 @@
 		"email": { "type": "email" } ,
 		"avatar": { "type": "attachment" , "optional": true } ,
 		"bigAvatar": { "type": "attachment" , "optional": true } ,
+		"father": { "type": "link" , "collection": "users" , "optional": true } ,
 		"godfather": { "type": "link" , "collection": "users" , "optional": true }
 	} ,
 	"meta": {} ,

@@ -760,3 +760,310 @@ describe( "Basics tests on users" , function() {
 	} ) ;
 	
 } ) ;
+
+
+
+describe( "Links population" , function() {
+	
+	it( "GET + populate links" , function( done ) {
+		
+		var u1 , u2 , u3 ;
+		
+		var postQuery1 = {
+			method: 'POST' ,
+			path: '/Users' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				firstName: "Big Joe",
+				lastName: "Doe",
+				email: "big.joe.doe@gmail.com",
+				password: "pw"
+			} )
+		} ;
+		
+		var postQuery2 = {
+			method: 'POST' ,
+			path: '/Users' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				firstName: "THE",
+				lastName: "GODFATHER",
+				email: "godfather@gmail.com",
+				password: "pw"
+			} )
+		} ;
+		
+		var postQuery3 , getQuery ;
+		
+		
+		async.series( [
+			function( callback ) {
+				requester( postQuery1 , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					u1 = JSON.parse( response.body ).id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( postQuery2 , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					u2 = JSON.parse( response.body ).id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				
+				postQuery3 = {
+					method: 'POST' ,
+					path: '/Users' ,
+					headers: {
+						Host: 'localhost' ,
+						"Content-Type": 'application/json'
+					} ,
+					body: JSON.stringify( {
+						firstName: "Joe",
+						lastName: "Doe",
+						email: "joe.doe@gmail.com",
+						password: "pw",
+						father: u1,
+						godfather: u2
+					} )
+				} ;
+				
+				requester( postQuery3 , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					u3 = JSON.parse( response.body ).id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				getQuery = {
+					method: 'GET' ,
+					path: '/Users/' + u3 + '?populate=[father,godfather]' ,
+					headers: {
+						Host: 'localhost'
+					}
+				} ;
+				
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data.password ).to.be.an( 'object' ) ;
+					expect( data.password.algo ).to.be.a( 'string' ) ;
+					expect( data.password.salt ).to.be.a( 'string' ) ;
+					expect( data.password.hash ).to.be.a( 'string' ) ;
+					//console.log( data.password ) ;
+					delete data.password ;
+					delete data.father.password ;
+					delete data.godfather.password ;
+					
+					expect( data ).to.be.eql( {
+						_id: data._id,
+						firstName: "Joe",
+						lastName: "Doe",
+						email: "joe.doe@gmail.com",
+						login: "joe.doe@gmail.com",
+						isApiKey: false,
+						slugId: data.slugId,	// Cannot be predicted
+						token: {},
+						userAccess: {},
+						groupAccess: {},
+						otherAccess: 'read',
+						inheritAccess: 'none',
+						parent: {
+							collection: null,
+							id: '/'
+						},
+						father: {
+							_id: data.father._id,
+							firstName: "Big Joe",
+							lastName: "Doe",
+							email: "big.joe.doe@gmail.com",
+							login: "big.joe.doe@gmail.com",
+							isApiKey: false,
+							slugId: data.father.slugId,
+							token: {},
+							userAccess: {},
+							groupAccess: {},
+							otherAccess: 'read',
+							inheritAccess: 'none',
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						},
+						godfather: {
+							_id: data.godfather._id,
+							firstName: "THE",
+							lastName: "GODFATHER",
+							email: "godfather@gmail.com",
+							login: "godfather@gmail.com",
+							isApiKey: false,
+							slugId: data.godfather.slugId,
+							token: {},
+							userAccess: {},
+							groupAccess: {},
+							otherAccess: 'read',
+							inheritAccess: 'none',
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						}
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				getQuery = {
+					method: 'GET' ,
+					path: '/Users?populate=[father,godfather]' ,
+					headers: {
+						Host: 'localhost'
+					}
+				} ;
+				
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					data.sort( function( a , b ) {
+						return a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ;
+					} ) ;
+					
+					delete data[ 0 ].password ;
+					delete data[ 1 ].password ;
+					delete data[ 1 ].father.password ;
+					delete data[ 1 ].godfather.password ;
+					delete data[ 2 ].password ;
+					
+					expect( data ).to.be.eql( [
+						{
+							_id: data[ 0 ]._id,
+							firstName: "Big Joe",
+							lastName: "Doe",
+							email: "big.joe.doe@gmail.com",
+							login: "big.joe.doe@gmail.com",
+							isApiKey: false,
+							slugId: data[ 0 ].slugId,
+							father: null,
+							godfather: null,
+							token: {},
+							userAccess: {},
+							groupAccess: {},
+							otherAccess: 'read',
+							inheritAccess: 'none',
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						},
+						{
+							_id: data[ 1 ]._id,
+							firstName: "Joe",
+							lastName: "Doe",
+							email: "joe.doe@gmail.com",
+							login: "joe.doe@gmail.com",
+							isApiKey: false,
+							slugId: data[ 1 ].slugId,	// Cannot be predicted
+							token: {},
+							userAccess: {},
+							groupAccess: {},
+							otherAccess: 'read',
+							inheritAccess: 'none',
+							parent: {
+								collection: null,
+								id: '/'
+							},
+							father: {
+								_id: data[ 0 ]._id,
+								firstName: "Big Joe",
+								lastName: "Doe",
+								email: "big.joe.doe@gmail.com",
+								login: "big.joe.doe@gmail.com",
+								isApiKey: false,
+								slugId: data[ 0 ].slugId,
+								token: {},
+								userAccess: {},
+								groupAccess: {},
+								otherAccess: 'read',
+								inheritAccess: 'none',
+								parent: {
+									collection: null,
+									id: "/"
+								},
+							},
+							godfather: {
+								_id: data[ 2 ]._id,
+								firstName: "THE",
+								lastName: "GODFATHER",
+								email: "godfather@gmail.com",
+								login: "godfather@gmail.com",
+								isApiKey: false,
+								slugId: data[ 2 ].slugId,
+								token: {},
+								userAccess: {},
+								groupAccess: {},
+								otherAccess: 'read',
+								inheritAccess: 'none',
+								parent: {
+									collection: null,
+									id: "/"
+								},
+							}
+						},
+						{
+							_id: data[ 2 ]._id,
+							firstName: "THE",
+							lastName: "GODFATHER",
+							email: "godfather@gmail.com",
+							login: "godfather@gmail.com",
+							isApiKey: false,
+							slugId: data[ 2 ].slugId,
+							father: null,
+							godfather: null,
+							token: {},
+							userAccess: {},
+							groupAccess: {},
+							otherAccess: 'read',
+							inheritAccess: 'none',
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						}
+					] ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+		
+	} ) ;
+} ) ;
+	
