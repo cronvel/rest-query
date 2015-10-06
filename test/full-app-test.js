@@ -765,7 +765,7 @@ describe( "Basics tests on users" , function() {
 
 describe( "Links population" , function() {
 	
-	it( "GET + populate links" , function( done ) {
+	it( "GET on document and collection + populate links" , function( done ) {
 		
 		var u1 , u2 , u3 ;
 		
