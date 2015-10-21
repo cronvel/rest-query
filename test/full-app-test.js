@@ -763,6 +763,14 @@ describe( "Basics tests on users" , function() {
 
 
 
+describe( "Attachment" , function() {
+	
+	it( "Attachment tests..." ) ;
+	
+} ) ;
+
+
+
 describe( "Links population" , function() {
 	
 	it( "GET on document and collection + populate links" , function( done ) {
