@@ -24,5 +24,11 @@
 	} ,
 	"@rootObject": "rootObject.json" ,
 	"rootAutoCollection": "blogs" ,
+	"log": {
+		"minLevel": 3 ,
+		"transports": [
+			{ "type": "console" , "color": true }
+		]
+	} ,
 	"?@*>": "config.local.json"
 }
