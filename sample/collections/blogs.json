@@ -7,7 +7,7 @@
 	} ,
 	"meta": {} ,
 	"indexes": [] ,
-	"hooks": {} ,
+	"@hooks": "blogs.hooks.js" ,
 	"slugGenerationProperty": "title" ,
 	"autoCollection": "posts"
 }
