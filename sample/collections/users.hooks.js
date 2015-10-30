@@ -1,17 +1,17 @@
 
 
 var restQuery = require( '../../lib/restQuery.js' ) ;
-var logger = require( 'logger-kit' ).global.use( 'users-hooks' ) ;
+var log = require( 'logfella' ).global.use( 'users-hooks' ) ;
 
 
 
 module.exports = {
 	
 	beforeCreate: function( incomingDocument , attachmentStreams , context , callback ) {
-		logger.info( '>>>>>>>>>> beforeCreate!!!' ) ;
+		log.info( '>>>>>>>>>> beforeCreate!!!' ) ;
 		
 		context.performer.getUser( function( error , user ) {
-			logger.info( '>>>>>>>>>> beforeCreate: %I' , user ) ;
+			log.info( '>>>>>>>>>> beforeCreate: %I' , user ) ;
 			callback() ;
 		} ) ;
 	} ,
