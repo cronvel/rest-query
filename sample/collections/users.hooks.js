@@ -7,11 +7,11 @@ var log = require( 'logfella' ).global.use( 'users-hooks' ) ;
 
 module.exports = {
 	
-	beforeCreate: function( incomingDocument , attachmentStreams , context , callback ) {
-		log.info( '>>>>>>>>>> beforeCreate!!!' ) ;
+	beforeCreate: function( context , callback ) {
+		//log.info( '>>>>>>>>>> beforeCreate, context: %I' , context ) ;
 		
 		context.performer.getUser( function( error , user ) {
-			log.info( '>>>>>>>>>> beforeCreate: %I' , user ) ;
+			//log.info( '>>>>>>>>>> beforeCreate: %I' , user ) ;
 			callback() ;
 		} ) ;
 	} ,

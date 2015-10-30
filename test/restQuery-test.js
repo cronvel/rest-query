@@ -29,12 +29,23 @@
 
 
 
-var cli = getCliOptions() ;
+var cliOptions = getCliOptions() ;
 
+
+
+// Useless now?
+/*
 var smartPreprocessor = require( 'smart-preprocessor' ) ;
 var restQuery = cli['log-lib'] ?
 	smartPreprocessor.require( __dirname + '/../lib/restQuery.js' , { debug: true } ) :
 	require( '../lib/restQuery.js' ) ;
+*/
+
+var restQuery = require( '../lib/restQuery.js' ) ;
+
+var Logfella = require( 'logfella' ) ;
+Logfella.global.setGlobalConfig( cliOptions.log || { minLevel: 3 } ) ;
+var log = Logfella.global.use( 'mocha' ) ;
 
 var async = require( 'async-kit' ) ;
 var tree = require( 'tree-kit' ) ;
@@ -87,13 +98,6 @@ function getCliOptions()
 
 
 
-function debug()
-{
-	if ( cli.log ) { console.log.apply( console , arguments ) ; }
-}
-
-
-
 function clearCollection( collection , callback )
 {
 	collection.driver.rawInit( function( error ) {
@@ -110,7 +114,7 @@ function clearCollection( collection , callback )
 
 function commonApp( callback )
 {
-	var app = restQuery.createApp( __dirname + '/../sample/main.json' ) ;
+	var app = restQuery.createApp( __dirname + '/../sample/main.json' , cliOptions ) ;
 	var performer = app.createPerformer() ;
 	
 	async.parallel( [
@@ -166,8 +170,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					debug( error ) ;
-					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -203,12 +205,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life' ) ;
 					expect( object.description ).to.be( 'This is a supa blog!' ) ;
 					callback() ;
@@ -281,7 +277,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error , rawDocument ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					id = rawDocument.id ;
 					//console.log( 'ID:' , id ) ;
 					callback() ;
@@ -295,12 +290,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life posted!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (posted!)' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -330,7 +319,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -341,12 +329,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -376,8 +358,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					debug( error ) ;
-					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -404,7 +384,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -415,7 +394,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -426,12 +404,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now overwritten!' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -462,8 +434,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					debug( error ) ;
-					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -491,7 +461,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -503,7 +472,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -514,12 +482,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
 					expect( object.embedded ).to.eql( { a: 'A' , b: 'b' } ) ;
@@ -551,23 +513,18 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/.embedded' , { a: 'omg' } , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
 					expect( object.embedded ).to.eql( { a: 'omg' , b: 'b' } ) ;
@@ -598,23 +555,18 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/.title' , "Change dat title." , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'Change dat title.' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -643,8 +595,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					debug( error ) ;
-					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -671,14 +621,12 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -691,8 +639,6 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
-					debug( error ) ;
-					debug( object ) ;
 					callback() ;
 				} ) ;
 			}
@@ -723,9 +669,6 @@ describe( "Basic queries of top-level collections" , function() {
 				
 				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( batch ) ;
-					debug( JSON.stringify( batch ) ) ;
 					
 					expect( batch ).to.be.eql( [] ) ;
 					callback() ;
@@ -768,9 +711,6 @@ describe( "Basic queries of top-level collections" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( batch ) ;
-					debug( JSON.stringify( batch ) ) ;
 					
 					expect( batch ).to.be.eql( [
 						{
@@ -832,8 +772,6 @@ describe( "Queries of nested object" , function() {
 						expect( error ).to.be.ok() ;
 						expect( error.type ).to.be( 'notFound' ) ;
 						expect( error.httpStatus ).to.be( 404 ) ;
-						debug( error ) ;
-						debug( object ) ;
 						callback() ;
 					}
 				) ;
@@ -878,12 +816,6 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My first post!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah.' ) ;
 					callback() ;
@@ -938,12 +870,6 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My second post!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah.' ) ;
 					callback() ;
@@ -1019,12 +945,6 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'nope!' ) ;
 					expect( object.content ).to.be( 'First!' ) ;
 					callback() ;
@@ -1114,12 +1034,6 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'nope!' ) ;
 					expect( object.content ).to.be( 'First!' ) ;
 					callback() ;
@@ -1239,12 +1153,6 @@ describe( "Queries of nested object" , function() {
 					var i ;
 					
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( batch ) ;
-					debug( JSON.stringify( batch ) ) ;
 					
 					// MongoID and expect() do not coop well together... -_-'
 					// We have to check properties one by one...
@@ -1328,12 +1236,6 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My first post!!!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah...' ) ;
 					expect( object.parent.collection ).to.be( 'blogs' ) ;
@@ -1398,12 +1300,6 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My first post!!!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah...' ) ;
 					expect( object.parent.collection ).to.be( 'blogs' ) ;
@@ -1430,12 +1326,6 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My first post???' ) ;
 					expect( object.content ).to.be( 'Blah?' ) ;
 					expect( object.parent.collection ).to.be( 'blogs' ) ;
@@ -1513,12 +1403,6 @@ describe( "Queries of nested object" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My second post!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah.' ) ;
 					expect( object.parent.collection ).to.be( 'blogs' ) ;
@@ -1557,7 +1441,6 @@ describe( "Links" , function() {
 					otherAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					godfatherId = response.id ;
 					callback() ;
 				} ) ;
@@ -1572,7 +1455,6 @@ describe( "Links" , function() {
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
 					callback() ;
 				} ) ;
@@ -1627,7 +1509,6 @@ describe( "Links" , function() {
 					otherAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
 					callback() ;
 				} ) ;
@@ -1696,7 +1577,6 @@ describe( "Links" , function() {
 					otherAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					godfatherId = response.id ;
 					callback() ;
 				} ) ;
@@ -1711,7 +1591,6 @@ describe( "Links" , function() {
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
 					callback() ;
 				} ) ;
@@ -1780,7 +1659,6 @@ describe( "Links" , function() {
 					otherAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					godfatherId = response.id ;
 					callback() ;
 				} ) ;
@@ -1795,7 +1673,6 @@ describe( "Links" , function() {
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
 					callback() ;
 				} ) ;
@@ -1856,7 +1733,6 @@ describe( "Links" , function() {
 					otherAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					godfatherId = response.id ;
 					callback() ;
 				} ) ;
@@ -1871,7 +1747,6 @@ describe( "Links" , function() {
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
 					callback() ;
 				} ) ;
@@ -1934,7 +1809,6 @@ describe( "Links" , function() {
 					otherAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
 					callback() ;
 				} ) ;
@@ -2018,7 +1892,6 @@ describe( "Links" , function() {
 					otherAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					fatherId = response.id ;
 					callback() ;
 				} ) ;
@@ -2032,7 +1905,6 @@ describe( "Links" , function() {
 					otherAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					godfatherId = response.id ;
 					callback() ;
 				} ) ;
@@ -2048,7 +1920,6 @@ describe( "Links" , function() {
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					userId = response.id ;
 					callback() ;
 				} ) ;
@@ -2117,7 +1988,6 @@ describe( "Users" , function() {
 					password: "pw"
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2128,12 +1998,6 @@ describe( "Users" , function() {
 				//app.root.get( '/Blogs/' , function( error , object ) {
 				app.root.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.firstName ).to.be( 'Joe' ) ;
 					expect( object.lastName ).to.be( 'Doe' ) ;
 					expect( object.slugId ).to.be( 'joe-doe' ) ;
@@ -2208,19 +2072,12 @@ describe( "Slug usage" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -2289,19 +2146,12 @@ describe( "Slug usage" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -2316,17 +2166,12 @@ describe( "Slug usage" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
-					//console.log( object ) ;
 					expect( object.title ).to.be( 'New title!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
 					callback() ;
@@ -2336,9 +2181,6 @@ describe( "Slug usage" , function() {
 				// It should not change its slug
 				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'New title!' ) ;
 					callback() ;
 				} ) ;
@@ -2348,17 +2190,12 @@ describe( "Slug usage" , function() {
 					title: 'A brand new title!'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
-					//console.log( object ) ;
 					expect( object.title ).to.be( 'A brand new title!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
 					callback() ;
@@ -2368,9 +2205,6 @@ describe( "Slug usage" , function() {
 				// It should not change its slug
 				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'A brand new title!' ) ;
 					callback() ;
 				} ) ;
@@ -2378,7 +2212,6 @@ describe( "Slug usage" , function() {
 			function( callback ) {
 				app.root.delete( '/Blogs/my-wonderful-life' , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2386,10 +2219,6 @@ describe( "Slug usage" , function() {
 				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
-					//console.log( object ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2398,9 +2227,6 @@ describe( "Slug usage" , function() {
 				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2433,16 +2259,12 @@ describe( "Auto collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -2452,9 +2274,6 @@ describe( "Auto collection" , function() {
 			function( callback ) {
 				app.root.get( '/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -2464,9 +2283,6 @@ describe( "Auto collection" , function() {
 			function( callback ) {
 				app.root.get( '/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -2496,7 +2312,6 @@ describe( "Auto collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2507,16 +2322,12 @@ describe( "Auto collection" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
 					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
@@ -2527,9 +2338,6 @@ describe( "Auto collection" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
 					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
@@ -2540,9 +2348,6 @@ describe( "Auto collection" , function() {
 			function( callback ) {
 				app.root.get( '/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
 					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
@@ -2553,9 +2358,6 @@ describe( "Auto collection" , function() {
 			function( callback ) {
 				app.root.get( '/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
 					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
@@ -2566,9 +2368,6 @@ describe( "Auto collection" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/my-wonderful-life/you-know-what' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
 					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
@@ -2579,9 +2378,6 @@ describe( "Auto collection" , function() {
 			function( callback ) {
 				app.root.get( '/my-wonderful-life/Posts/you-know-what' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
 					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
@@ -2592,9 +2388,6 @@ describe( "Auto collection" , function() {
 			function( callback ) {
 				app.root.get( '/my-wonderful-life/you-know-what' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
 					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
@@ -2632,7 +2425,6 @@ describe( "Token creation" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
@@ -2646,7 +2438,6 @@ describe( "Token creation" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response ).to.eql( {
 						userId: id ,
 						token: response.token ,	// unpredictable
@@ -2706,7 +2497,6 @@ describe( "Token creation" , function() {
 					password: "pw"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
@@ -2749,7 +2539,6 @@ describe( "Token creation" , function() {
 					password: "pw"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
@@ -2804,7 +2593,6 @@ describe( "Token creation" , function() {
 					password: "pw"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
@@ -2818,7 +2606,6 @@ describe( "Token creation" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( id.toString() ) ;
 					expect( response.token.length ).to.be( 44 ) ;
 					callback() ;
@@ -2861,7 +2648,6 @@ describe( "Token creation" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
@@ -2879,7 +2665,6 @@ describe( "Token creation" , function() {
 					duration: duration
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response ).to.eql( {
 						userId: id ,
 						token: response.token ,	// unpredictable
@@ -2928,7 +2713,6 @@ describe( "Token creation" , function() {
 					duration: duration
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response ).to.eql( {
 						userId: id ,
 						token: response.token ,	// unpredictable
@@ -2978,7 +2762,6 @@ describe( "Token creation" , function() {
 					duration: duration
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response ).to.eql( {
 						userId: id ,
 						token: response.token ,	// unpredictable
@@ -3038,7 +2821,6 @@ describe( "Token creation" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
@@ -3052,7 +2834,6 @@ describe( "Token creation" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
 					//console.log( response ) ;
 					expect( response ).to.eql( {
@@ -3101,7 +2882,6 @@ describe( "Token creation" , function() {
 			function( callback ) {
 				app.root.post( '/Users/REGENERATE-TOKEN' , {} , null , { performer: oldTokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
 					//console.log( response ) ;
 					expect( response ).to.eql( {
@@ -3169,7 +2949,6 @@ describe( "Token creation" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
@@ -3183,7 +2962,6 @@ describe( "Token creation" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
 					//console.log( response ) ;
 					expect( response ).to.eql( {
@@ -3233,7 +3011,6 @@ describe( "Token creation" , function() {
 			function( callback ) {
 				app.root.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -3281,7 +3058,6 @@ describe( "Token creation" , function() {
 					otherAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					id = response.id ;
 					callback() ;
@@ -3295,7 +3071,6 @@ describe( "Token creation" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
 					//console.log( response ) ;
 					expect( response ).to.eql( {
@@ -3342,7 +3117,6 @@ describe( "Token creation" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					
 					//console.log( response ) ;
 					expect( response ).to.eql( {
@@ -3391,7 +3165,6 @@ describe( "Token creation" , function() {
 			function( callback ) {
 				app.root.post( '/Users/REVOKE-ALL-TOKENS' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -3460,7 +3233,6 @@ describe( "Access" , function() {
 					password: "pw"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					authorizedId = response.id ;
 					callback() ;
@@ -3474,7 +3246,6 @@ describe( "Access" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
 					expect( response.token.length ).to.be( 44 ) ;
 					
@@ -3496,7 +3267,6 @@ describe( "Access" , function() {
 					password: "groupy"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					authorizedByGroupId = response.id ;
 					callback() ;
@@ -3510,7 +3280,6 @@ describe( "Access" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
 					expect( response.token.length ).to.be( 44 ) ;
 					
@@ -3532,7 +3301,6 @@ describe( "Access" , function() {
 					password: "notenough"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					notEnoughAuthorizedId = response.id ;
 					callback() ;
@@ -3546,7 +3314,6 @@ describe( "Access" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
 					expect( response.token.length ).to.be( 44 ) ;
 					
@@ -3568,7 +3335,6 @@ describe( "Access" , function() {
 					password: "peon"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					unauthorizedId = response.id ;
 					callback() ;
@@ -3582,7 +3348,6 @@ describe( "Access" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( unauthorizedId.toString() ) ;
 					expect( response.token.length ).to.be( 44 ) ;
 					
@@ -3602,7 +3367,6 @@ describe( "Access" , function() {
 					users: [ notEnoughAuthorizedId , authorizedByGroupId ]
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					unauthorizedGroupId = response.id ;
 					callback() ;
@@ -3614,7 +3378,6 @@ describe( "Access" , function() {
 					users: [ authorizedByGroupId ]
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					doormen( { type: 'objectId' } , response.id ) ;
 					authorizedGroupId = response.id ;
 					callback() ;
@@ -3639,19 +3402,12 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -3706,7 +3462,6 @@ describe( "Access" , function() {
 					duration: 0
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
 					expect( response.token.length ).to.be( 44 ) ;
 					
@@ -3731,19 +3486,12 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					debug( 'result of get:' ) ;
-					//debug( string.inspect( { style: 'color' , proto: true } , object ) ) ;
-					//delete object[''] ;
-					//delete object._id ;
-					debug( object ) ;
-					debug( JSON.stringify( object ) ) ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
@@ -3774,7 +3522,6 @@ describe( "Access" , function() {
 					otherAccess: 'read'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -3790,7 +3537,6 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -3806,7 +3552,6 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -3873,7 +3618,6 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -3947,7 +3691,6 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4011,7 +3754,6 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4067,7 +3809,6 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4139,7 +3880,6 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4211,7 +3951,6 @@ describe( "Access" , function() {
 					otherAccess: 'passThrough'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4293,7 +4032,6 @@ describe( "Access" , function() {
 					otherAccess: 'readCreateModify'	// will be lowered in the child
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4381,7 +4119,6 @@ describe( "Access" , function() {
 					otherAccess: 'passThrough'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4478,7 +4215,6 @@ describe( "Access" , function() {
 					otherAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
-					debug( '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ) ;
 					callback() ;
 				} ) ;
 			} ,
