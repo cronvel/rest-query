@@ -15,7 +15,7 @@
   "dependencies": {
     "async-kit": "^0.6.5",
     "buffertools": "^2.1.2",
-    "doormen": "^0.4.0",
+    "doormen": "^0.4.1",
     "error-status": "^1.2.0",
     "fs-kit": "^0.0.3",
     "hash-kit": "^0.2.0",
