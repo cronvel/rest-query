@@ -26,6 +26,7 @@
 	"rootAutoCollection": "blogs" ,
 	"log": {
 		"minLevel": 3 ,
+		"overrideConsole": false ,
 		"transports": [
 			{ "type": "console" , "color": true }
 		]

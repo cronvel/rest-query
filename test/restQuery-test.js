@@ -44,7 +44,9 @@ var restQuery = cli['log-lib'] ?
 var restQuery = require( '../lib/restQuery.js' ) ;
 
 var Logfella = require( 'logfella' ) ;
-Logfella.global.setGlobalConfig( cliOptions.log || { minLevel: 3 } ) ;
+
+if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
+Logfella.global.setGlobalConfig( cliOptions.log || { minLevel: 3 , overrideConsole: false } ) ;
 var log = Logfella.global.use( 'mocha' ) ;
 
 var async = require( 'async-kit' ) ;
