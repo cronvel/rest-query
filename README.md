@@ -4,7 +4,7 @@
 
 Work in progress, early alpha.
 
-**/!\ **This documentation is a work in progress! /!\\**
+**/!\ This documentation is a work in progress! /!\\**
 
 
 
