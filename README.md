@@ -26,6 +26,8 @@ Whatever the hook, they are always functions of the form: `function( hookContext
 * hookContext `Object` an object containing various information on the current request to be processed, usually having those
 	common properties:
 	
+	* app `Object` instance of `restQuery.App`
+	* collectionNode `Object` instance of `restQuery.collectionNode` of the context of this hook
 	* method `string` the method of the restQuery request, most of time this is the HTTP method used, but sometime restQuery
 		can exchange it internally to an equivalent (e.g.: a PUT on a subpart of the document is replaced by a PATCH on the
 		whole document).
