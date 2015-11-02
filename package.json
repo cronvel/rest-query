@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.10.47",
+  "version": "0.10.48",
   "engines": {
     "node": ">=4.0.0"
   },
@@ -20,7 +20,7 @@
     "fs-kit": "^0.0.3",
     "hash-kit": "^0.2.0",
     "kung-fig": "^0.3.4",
-    "logfella": "^0.1.24",
+    "logfella": "^0.1.25",
     "minimist": "^1.1.1",
     "qs-kit": "^0.2.0",
     "roots-db": "^0.5.16",
