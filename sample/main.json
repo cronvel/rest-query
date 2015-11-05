@@ -27,8 +27,9 @@
 	"log": {
 		"minLevel": 3 ,
 		"overrideConsole": false ,
+		"monPeriod": 1000 ,
 		"transports": [
-			{ "type": "console" , "color": true }
+			{ "type": "console" , "color": true } 
 		]
 	} ,
 	"?@*>": "config.local.json"
