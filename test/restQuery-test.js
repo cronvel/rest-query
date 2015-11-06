@@ -114,10 +114,16 @@ function clearCollection( collection , callback )
 
 
 
+var currentApp ;
+
 function commonApp( callback )
 {
+	if ( currentApp ) { currentApp.shutdown() ; }
+	
 	var app = restQuery.createApp( __dirname + '/../sample/main.json' , cliOptions ) ;
 	var performer = app.createPerformer() ;
+	
+	currentApp = app ;
 	
 	async.parallel( [
 		[ clearCollection , app.collectionNodes.users.collection ] ,
