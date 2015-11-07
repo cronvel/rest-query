@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.10.58",
+  "version": "0.10.59",
   "engines": {
     "node": ">=4.0.0"
   },
