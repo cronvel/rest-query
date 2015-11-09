@@ -46,7 +46,8 @@ var restQuery = require( '../lib/restQuery.js' ) ;
 var Logfella = require( 'logfella' ) ;
 
 if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
-Logfella.global.setGlobalConfig( cliOptions.log || { minLevel: 3 , overrideConsole: false } ) ;
+if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
+//Logfella.global.setGlobalConfig( cliOptions.log || { minLevel: 4 , overrideConsole: false } ) ;
 var log = Logfella.global.use( 'mocha' ) ;
 
 var async = require( 'async-kit' ) ;
