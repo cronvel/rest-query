@@ -47,7 +47,6 @@ var Logfella = require( 'logfella' ) ;
 
 if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
 if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
-//Logfella.global.setGlobalConfig( cliOptions.log || { minLevel: 4 , overrideConsole: false } ) ;
 var log = Logfella.global.use( 'mocha' ) ;
 
 var async = require( 'async-kit' ) ;

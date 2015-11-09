@@ -23,7 +23,7 @@
     "logfella": "^0.3.8",
     "minimist": "^1.1.1",
     "qs-kit": "^0.2.0",
-    "roots-db": "^0.5.23",
+    "roots-db": "^0.5.24",
     "server-kit": "^0.2.19",
     "string-kit": "^0.2.10",
     "token-kit": "^0.1.3",
