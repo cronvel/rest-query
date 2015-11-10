@@ -54,7 +54,6 @@ var tree = require( 'tree-kit' ) ;
 var string = require( 'string-kit' ) ;
 var rootsDb = require( 'roots-db' ) ;
 
-var buffertools = require( 'buffertools' ) ;
 var mongodb = require( 'mongodb' ) ;
 
 var expect = require( 'expect.js' ) ;
