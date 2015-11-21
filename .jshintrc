@@ -1,6 +1,7 @@
 {
 	// Generic options
 	"maxerr" : 20,
+	"esnext": true, // ES6
 	
 	// Predefined globals (node.js, browser, etc...)
 	"node" : true,
