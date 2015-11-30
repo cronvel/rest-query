@@ -29,7 +29,7 @@
 		"overrideConsole": false ,
 		"monPeriod": 1000 ,
 		"transports": [
-			{ "type": "console" , "color": true } ,
+			{ "type": "console" , "timeFormatter": "time" , "color": true } ,
 			{ "type": "netServer" , "role": "mon" , "listen": 4321 }
 		]
 	} ,
