@@ -2,6 +2,7 @@
 	"collections": {
 		"@users": "collections/users.json" ,
 		"@groups": "collections/groups.json" ,
+		"@scheduledTasks": "collections/scheduledTasks.json" ,
 		"@blogs": "collections/blogs.json" ,
 		"@posts": "collections/posts.json" ,
 		"@comments": "collections/comments.json"
@@ -9,6 +10,7 @@
 	"tree": {
 		"users": null ,
 		"groups": null ,
+		"scheduledTasks": null ,
 		"blogs": {
 			"users": null ,
 			"posts": {
@@ -24,6 +26,11 @@
 	} ,
 	"@rootObject": "rootObject.json" ,
 	"rootAutoCollection": "blogs" ,
+	"scheduler": {
+		"active": true ,
+		"period": 1000 ,
+		"tasks": [ "task" ]
+	} ,
 	"log": {
 		"minLevel": 3 ,
 		"overrideConsole": false ,
