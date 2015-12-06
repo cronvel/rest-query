@@ -40,5 +40,7 @@
 			{ "type": "netServer" , "role": "mon" , "listen": 4321 }
 		]
 	} ,
+	"@hooks": "app.hooks.js" ,
+	"@workers": "workers.js" ,
 	"?@*>": "config.local.json"
 }

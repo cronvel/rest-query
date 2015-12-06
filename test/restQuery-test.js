@@ -4286,7 +4286,22 @@ describe( "Indexes" , function() {
 	
 	it( "Test indexes" ) ;
 } ) ;
-		
+
+
+
+describe( "Hooks" , function() {
+	
+	it( "Test app's hooks" ) ;
+	it( "Test collection's hooks" ) ;
+} ) ;
+
+
+
+describe( "Scheduler" , function() {
+	
+	it( "Test the scheduler" ) ;
+} ) ;
+
 
 
 describe( "Misc" , function() {
@@ -4294,7 +4309,7 @@ describe( "Misc" , function() {
 	it( "Test CORS" ) ;
 	it( "Test rootObject" ) ;
 } ) ;
-		
+
 
 
 
