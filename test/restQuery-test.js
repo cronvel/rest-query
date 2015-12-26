@@ -4304,6 +4304,13 @@ describe( "Scheduler" , function() {
 
 
 
+describe( "Client error management" , function() {
+	
+	it( "Test client error management" ) ;
+} ) ;
+
+
+
 describe( "Misc" , function() {
 	
 	it( "Test CORS" ) ;
