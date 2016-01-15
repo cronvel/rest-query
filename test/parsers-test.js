@@ -93,7 +93,7 @@ describe( "Path's node parsing" , function() {
 	var parsePathNode = function parsePathNode( str ) {
 		
 		try {
-			return restQuery.Node.parsePathNode( str ) ;
+			return restQuery.path.parseNode( str ) ;
 		}
 		catch ( error ) {
 			return error ;

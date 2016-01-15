@@ -27,10 +27,10 @@
 
 
 module.exports = {
-	pathParser: require( './pathParser.js' )
+	path: require( './path.js' )
 } ;
 
-},{"./pathParser.js":3}],2:[function(require,module,exports){
+},{"./path.js":3}],2:[function(require,module,exports){
 /*
 	The Cedric's Swiss Knife (CSK) - CSK REST Query
 
@@ -189,17 +189,17 @@ var camel = require( 'string-kit/lib/camel.js' ) ;
 
 
 
-var pathParser = {} ;
-module.exports = pathParser ;
+var pathModule = {} ;
+module.exports = pathModule ;
 
 
 
-pathParser.parsePath = function parsePath( path )
+pathModule.parse = function parse( path )
 {
 	var i , iMax , j , splitted , parsed , parsedNode , error ;
 	
 	if ( Array.isArray( path ) ) { return path ; }	// Already parsed
-	else if ( typeof path !== 'string' ) { throw new Error( "[restQuery] .parsePath() 'path' should be a string" ) ; }
+	else if ( typeof path !== 'string' ) { throw new Error( "[restQuery] .parse() 'path' should be a string" ) ; }
 	
 	try {
 		parsed = [] ;
@@ -209,7 +209,7 @@ pathParser.parsePath = function parsePath( path )
 		{
 			if ( splitted[ i ] === '' ) { continue ; }
 			
-			parsedNode = pathParser.parsePathNode( splitted[ i ] ) ;
+			parsedNode = pathModule.parseNode( splitted[ i ] ) ;
 			
 			if (
 				j &&
@@ -239,12 +239,12 @@ pathParser.parsePath = function parsePath( path )
                         
 
 
-pathParser.parsePathNode = function parsePathNode( str )
+pathModule.parseNode = function parseNode( str )
 {
 	var parsed = {} , match ;
 	
-	if ( str.length < 1 ) { throw new Error( '[restQuery] parsePathNode() : argument #0 length should be >= 1' ) ; }
-	if ( str.length > 72 ) { throw new Error( '[restQuery] parsePathNode() : argument #0 length should be <= 72' ) ; }
+	if ( str.length < 1 ) { throw new Error( '[restQuery] parseNode() : argument #0 length should be >= 1' ) ; }
+	if ( str.length > 72 ) { throw new Error( '[restQuery] parseNode() : argument #0 length should be <= 72' ) ; }
 	
 	// Firstly, check if it is an object's collection or method: it starts with an uppercase ascii letter
 	if ( charmap.upperCaseArray.indexOf( str[ 0 ] ) !== -1 )
@@ -265,7 +265,7 @@ pathParser.parsePathNode = function parsePathNode( str )
 				return parsed ;
 			}
 			
-			throw new Error( '[restQuery] parsePathNode() : argument #0 start with an uppercase and then a lowercase letter but mismatch a collection type' ) ;
+			throw new Error( '[restQuery] parseNode() : argument #0 start with an uppercase and then a lowercase letter but mismatch a collection type' ) ;
 		}
 		
 		if ( str.match( charmap.methodRegExp ) )
@@ -282,7 +282,7 @@ pathParser.parsePathNode = function parsePathNode( str )
 			return parsed ;
 		}
 		
-		throw new Error( '[restQuery] parsePathNode() : argument #0 start with an uppercase but mismatch collection or method type' ) ;
+		throw new Error( '[restQuery] parseNode() : argument #0 start with an uppercase but mismatch collection or method type' ) ;
 	}
 	
 	// Secondly, check if it is an ID: it is a 24 characters string containing only hexadecimal.
@@ -337,7 +337,7 @@ pathParser.parsePathNode = function parsePathNode( str )
 	}
 	
 	// Nothing had matched... this is not a valid path node
-	throw new Error( '[restQuery] parsePathNode() : argument #0 does not validate' ) ;
+	throw new Error( '[restQuery] parseNode() : argument #0 does not validate' ) ;
 } ;
 
 
