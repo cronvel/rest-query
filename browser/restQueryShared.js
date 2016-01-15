@@ -231,7 +231,7 @@ pathParser.parsePath = function parsePath( path )
 	catch ( error_ ) {
 		error = new Error( "Bad URL: '" + splitted[ i ] + "' does not match any node type" ) ;
 		error.type = 'badRequest' ;
-		return error ;
+		throw error ;
 	}
 	
 	return parsed ;
