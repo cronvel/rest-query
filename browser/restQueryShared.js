@@ -194,7 +194,7 @@ module.exports = pathModule ;
 
 
 
-pathModule.parse = function parse( path )
+pathModule.parse = function parse( path , isPattern )
 {
 	var i , iMax , j , splitted , parsed , parsedNode , error ;
 	
@@ -209,7 +209,7 @@ pathModule.parse = function parse( path )
 		{
 			if ( splitted[ i ] === '' ) { continue ; }
 			
-			parsedNode = pathModule.parseNode( splitted[ i ] ) ;
+			parsedNode = pathModule.parseNode( splitted[ i ] , isPattern ) ;
 			
 			if (
 				j &&
@@ -239,14 +239,38 @@ pathModule.parse = function parse( path )
                         
 
 
-pathModule.parseNode = function parseNode( str )
+pathModule.parseNode = function parseNode( str , isPattern )
 {
 	var parsed = {} , match ;
 	
 	if ( str.length < 1 ) { throw new Error( '[restQuery] parseNode() : argument #0 length should be >= 1' ) ; }
 	if ( str.length > 72 ) { throw new Error( '[restQuery] parseNode() : argument #0 length should be <= 72' ) ; }
 	
-	// Firstly, check if it is an object's collection or method: it starts with an uppercase ascii letter
+	// Firstly, check wildcard if isPattern
+	if ( isPattern )
+	{
+		switch ( str )
+		{
+			case '*' :
+				parsed.type = 'wildcard' ;
+				parsed.wildcard = 'any' ;
+				return parsed ;
+			case '...' :
+				parsed.type = 'wildcard' ;
+				parsed.wildcard = 'anyChildren' ;
+				return parsed ;
+			case '[id]' :
+				parsed.type = 'wildcard' ;
+				parsed.wildcard = 'anyId' ;
+				return parsed ;
+			case '[collection]' :
+				parsed.type = 'wildcard' ;
+				parsed.wildcard = 'anyCollection' ;
+				return parsed ;
+		}
+	}
+	
+	// Then, check if it is an object's collection or method: it starts with an uppercase ascii letter
 	if ( charmap.upperCaseArray.indexOf( str[ 0 ] ) !== -1 )
 	{
 		if ( str.length === 1 )
@@ -285,7 +309,7 @@ pathModule.parseNode = function parseNode( str )
 		throw new Error( '[restQuery] parseNode() : argument #0 start with an uppercase but mismatch collection or method type' ) ;
 	}
 	
-	// Secondly, check if it is an ID: it is a 24 characters string containing only hexadecimal.
+	// Then, check if it is an ID: it is a 24 characters string containing only hexadecimal.
 	// It should come before slugId and offset check.
 	if ( str.length === 24 && str.match( charmap.idRegExp ) )
 	{
@@ -338,6 +362,66 @@ pathModule.parseNode = function parseNode( str )
 	
 	// Nothing had matched... this is not a valid path node
 	throw new Error( '[restQuery] parseNode() : argument #0 does not validate' ) ;
+} ;
+
+
+
+/*
+	Wildcards:
+		*				match any path node
+		...				match any children node?
+		[id]			match any ID node
+		[collection]	match any collection node
+*/
+pathModule.match = function match( patternPath , path )
+{
+	var i , iMax ;
+	
+	try {
+		if ( ! Array.isArray( patternPath ) ) { patternPath = pathModule.parse( patternPath , true ) ; }
+		if ( ! Array.isArray( path ) ) { path = pathModule.parse( path ) ; }
+	}
+	catch ( error ) {
+		return false ;
+	}
+	
+	// Fast exit: the path should have at least as many node as the pattern
+	if ( path.length < patternPath.length ) { return false ; }
+	
+	// Fast exit 2: if the path has more node than the pattern, the pattern should finish with an 'anyChildren' wildcard
+	if ( path.length > patternPath.length && patternPath[ patternPath.length - 1 ].wildcard !== 'anyChildren' ) { return false ; }
+	
+	for ( i = 0 , iMax = patternPath.length ; i < iMax ; i ++ )
+	{
+		switch ( patternPath[ i ].wildcard )
+		{
+			case 'any' :
+				// Always match
+				break ;
+				
+			case 'anyChildren' :
+				// Always match globally immediately!
+				return true ;
+				
+			case 'anyId' :
+				// Match any id
+				if ( path[ i ].type !== 'id' ) { return false ; }
+				break ;
+				
+			case 'anyCollection' :
+				// Match any id
+				if ( path[ i ].type !== 'collection' ) { return false ; }
+				break ;
+				
+			default :
+				if ( patternPath[ i ].type !== path[ i ].type || patternPath[ i ].identifier !== path[ i ].identifier )
+				{
+					return false ;
+				}
+		}
+	}
+	
+	return true ;
 } ;
 
 

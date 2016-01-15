@@ -198,6 +198,55 @@ describe( "Path's node parsing" , function() {
 
 
 
+describe( "Path pattern matching" , function() {
+	
+	var pathMatch = restQuery.path.match ;
+	
+	it( "Basic pattern matching" , function() {
+		expect( pathMatch( '/Users' , '/Users' ) ).to.be.ok() ;
+		expect( pathMatch( '/Users/' , '/Users' ) ).to.be.ok() ;
+		expect( pathMatch( '/Users' , '/Users/' ) ).to.be.ok() ;
+		expect( pathMatch( '/Users' , '/Group' ) ).not.to.be.ok() ;
+		expect( pathMatch( '/Users/123456789012345678901234' , '/Users' ) ).not.to.be.ok() ;
+		expect( pathMatch( '/Users' , '/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+		expect( pathMatch( '/Users/123456789012345678901234' , '/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Users/12345678901234567890123a' , '/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+		expect( pathMatch( '/Board/123456789012345678901234/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/12345678901234567890123a/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+	} ) ;
+	
+	it( "Pattern matching with the '*' wildcard" , function() {
+		expect( pathMatch( '/Board/*/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/*/Users/*' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/*/*/*' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/123456789012345678901234/*' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+		expect( pathMatch( '/Board/123456789012345678901234/Users/*' , '/Board/123456789012345678901234/Users' ) ).not.to.be.ok() ;
+	} ) ;
+	
+	it( "Pattern matching with the '...' wildcard" , function() {
+		expect( pathMatch( '/Board/123456789012345678901234/Users/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/123456789012345678901234/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/123456789012345678901234/Users/123456789012345678901234/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+	} ) ;
+	
+	it( "Pattern matching with the '[id]' wildcard" , function() {
+		expect( pathMatch( '/Board/[id]/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/[id]/Users/[id]' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/123456789012345678901234/[id]/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+		expect( pathMatch( '/[id]/123456789012345678901234/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+	} ) ;
+	
+	it( "Pattern matching with the '[collection]' wildcard" , function() {
+		expect( pathMatch( '/Board/123456789012345678901234/[collection]/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/[collection]/123456789012345678901234/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/[collection]/123456789012345678901234/[collection]/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/[collection]/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+		expect( pathMatch( '/Board/[collection]/Users/[collection]' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+	} ) ;
+} ) ;
+
+	
+
 describe( "Parse HTTP request" , function() {
 	
 	it( "should parse a fake GET on /" , function( done ) {
