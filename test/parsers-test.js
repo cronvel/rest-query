@@ -101,38 +101,38 @@ describe( "Path's node parsing" , function() {
 	} ;
 	
 	it( "should parse a valid collection node as an collection's child of the current object" , function() {
-		expect( parsePathNode( 'Users' ) ).to.eql( { type: 'collection' , identifier: 'users' } ) ;
-		expect( parsePathNode( 'U' ) ).to.eql( { type: 'collection' , identifier: 'u' } ) ;
+		expect( parsePathNode( 'Users' ) ).to.eql( { type: 'collection' , identifier: 'users' , node: 'Users' } ) ;
+		expect( parsePathNode( 'U' ) ).to.eql( { type: 'collection' , identifier: 'u' , node: 'U' } ) ;
 	} ) ;
 	
 	it( "should parse a valid method node as a method" , function() {
-		expect( parsePathNode( 'REGENERATE-TOKEN' ) ).to.eql( { type: 'method' , identifier: 'regenerateToken' } ) ;
-		expect( parsePathNode( 'FILE' ) ).to.eql( { type: 'method' , identifier: 'file' } ) ;
+		expect( parsePathNode( 'REGENERATE-TOKEN' ) ).to.eql( { type: 'method' , identifier: 'regenerateToken' , node: 'REGENERATE-TOKEN' } ) ;
+		expect( parsePathNode( 'FILE' ) ).to.eql( { type: 'method' , identifier: 'file' , node: 'FILE' } ) ;
 	} ) ;
 	
 	it( "should parse a valid offset node as an offset" , function() {
-		expect( parsePathNode( '1258' ) ).to.eql( { type: 'offset' , identifier: 1258 } ) ;
-		expect( parsePathNode( '01258' ) ).to.eql( { type: 'offset' , identifier: 1258 } ) ;
-		expect( parsePathNode( '0' ) ).to.eql( { type: 'offset' , identifier: 0 } ) ;
-		expect( parsePathNode( '000' ) ).to.eql( { type: 'offset' , identifier: 0 } ) ;
+		expect( parsePathNode( '1258' ) ).to.eql( { type: 'offset' , identifier: 1258 , node: '1258' } ) ;
+		expect( parsePathNode( '01258' ) ).to.eql( { type: 'offset' , identifier: 1258 , node: '01258' } ) ;
+		expect( parsePathNode( '0' ) ).to.eql( { type: 'offset' , identifier: 0 , node: '0' } ) ;
+		expect( parsePathNode( '000' ) ).to.eql( { type: 'offset' , identifier: 0 , node: '000' } ) ;
 		
 		// Invalid entries
 		expect( parsePathNode( '000b' ).type ).not.to.be.equal( 'offset' ) ;
 	} ) ;
 	
 	it( "should parse a valid range node as a range" , function() {
-		expect( parsePathNode( '0-100' ) ).to.eql( { type: 'range' , min: 0 , max: 100 } ) ;
-		expect( parsePathNode( '156-345' ) ).to.eql( { type: 'range' , min: 156 , max: 345 } ) ;
+		expect( parsePathNode( '0-100' ) ).to.eql( { type: 'range' , min: 0 , max: 100 , node: '0-100' } ) ;
+		expect( parsePathNode( '156-345' ) ).to.eql( { type: 'range' , min: 156 , max: 345 , node: '156-345' } ) ;
 		
 		// Invalid entries
 		expect( parsePathNode( '12-13-15' ).type ).not.to.be.equal( 'range' ) ;
 	} ) ;
 	
 	it( "should parse a valid ID node as an ID" , function() {
-		expect( parsePathNode( '51d18492541d2e3614ca2a80' ) ).to.eql( { type: 'id' , identifier: '51d18492541d2e3614ca2a80' } ) ;
-		expect( parsePathNode( 'a1d18492541d2e3614ca2a80' ) ).to.eql( { type: 'id' , identifier: 'a1d18492541d2e3614ca2a80' } ) ;
-		expect( parsePathNode( 'aaaaaaaaaaaaaaaaaaaaaaaa' ) ).to.eql( { type: 'id' , identifier: 'aaaaaaaaaaaaaaaaaaaaaaaa' } ) ;
-		expect( parsePathNode( '111111111111111111111111' ) ).to.eql( { type: 'id' , identifier: '111111111111111111111111' } ) ;
+		expect( parsePathNode( '51d18492541d2e3614ca2a80' ) ).to.eql( { type: 'id' , identifier: '51d18492541d2e3614ca2a80' , node: '51d18492541d2e3614ca2a80' } ) ;
+		expect( parsePathNode( 'a1d18492541d2e3614ca2a80' ) ).to.eql( { type: 'id' , identifier: 'a1d18492541d2e3614ca2a80' , node: 'a1d18492541d2e3614ca2a80' } ) ;
+		expect( parsePathNode( 'aaaaaaaaaaaaaaaaaaaaaaaa' ) ).to.eql( { type: 'id' , identifier: 'aaaaaaaaaaaaaaaaaaaaaaaa' , node: 'aaaaaaaaaaaaaaaaaaaaaaaa' } ) ;
+		expect( parsePathNode( '111111111111111111111111' ) ).to.eql( { type: 'id' , identifier: '111111111111111111111111' , node: '111111111111111111111111' } ) ;
 		
 		// Invalid entries
 		expect( parsePathNode( '51d18492541d2e3614ca2a8' ).type ).not.to.be.equal( 'id' ) ;
@@ -141,15 +141,15 @@ describe( "Path's node parsing" , function() {
 	} ) ;
 	
 	it( "should parse a valid slugId node as a slugId" , function() {
-		expect( parsePathNode( 'abc' ) ).to.eql( { type: 'slugId' , identifier: 'abc' } ) ;
-		expect( parsePathNode( 'cronvel' ) ).to.eql( { type: 'slugId' , identifier: 'cronvel' } ) ;
-		expect( parsePathNode( 'c20nv31' ) ).to.eql( { type: 'slugId' , identifier: 'c20nv31' } ) ;
-		expect( parsePathNode( 'my-blog-entry' ) ).to.eql( { type: 'slugId' , identifier: 'my-blog-entry' } ) ;
-		expect( parsePathNode( 'a-24-characters-long-sid' ) ).to.eql( { type: 'slugId' , identifier: 'a-24-characters-long-sid' } ) ;
-		expect( parsePathNode( 'agaaaaaaaaaaaaaaaaaaaaaa' ) ).to.eql( { type: 'slugId' , identifier: 'agaaaaaaaaaaaaaaaaaaaaaa' } ) ;
-		expect( parsePathNode( '01b' ) ).to.eql( { type: 'slugId' , identifier: '01b' } ) ;
-		expect( parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' ) ).to.eql( { type: 'slugId' , identifier: 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' } ) ;
-		expect( parsePathNode( 'a' ) ).to.eql( { type: 'slugId' , identifier: 'a' } ) ;
+		expect( parsePathNode( 'abc' ) ).to.eql( { type: 'slugId' , identifier: 'abc' , node: 'abc' } ) ;
+		expect( parsePathNode( 'cronvel' ) ).to.eql( { type: 'slugId' , identifier: 'cronvel' , node: 'cronvel' } ) ;
+		expect( parsePathNode( 'c20nv31' ) ).to.eql( { type: 'slugId' , identifier: 'c20nv31' , node: 'c20nv31' } ) ;
+		expect( parsePathNode( 'my-blog-entry' ) ).to.eql( { type: 'slugId' , identifier: 'my-blog-entry' , node: 'my-blog-entry' } ) ;
+		expect( parsePathNode( 'a-24-characters-long-sid' ) ).to.eql( { type: 'slugId' , identifier: 'a-24-characters-long-sid' , node: 'a-24-characters-long-sid' } ) ;
+		expect( parsePathNode( 'agaaaaaaaaaaaaaaaaaaaaaa' ) ).to.eql( { type: 'slugId' , identifier: 'agaaaaaaaaaaaaaaaaaaaaaa' , node: 'agaaaaaaaaaaaaaaaaaaaaaa' } ) ;
+		expect( parsePathNode( '01b' ) ).to.eql( { type: 'slugId' , identifier: '01b' , node: '01b' } ) ;
+		expect( parsePathNode( 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' ) ).to.eql( { type: 'slugId' , identifier: 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' , node: 'azekjsdlmfjqmsljdfmklqsdlmfjslmfvqsdmljfgqsdjgmklhsdmhqgfqsdlmghlmkdhfga' } ) ;
+		expect( parsePathNode( 'a' ) ).to.eql( { type: 'slugId' , identifier: 'a' , node: 'a' } ) ;
 		
 		// Invalid entries
 		expect( parsePathNode( 'afaaaaaaaaaaaaaaaaaaaaaa' ).type ).not.to.be.equal( 'slugId' ) ;
@@ -159,10 +159,10 @@ describe( "Path's node parsing" , function() {
 	} ) ;
 	
 	it( "should parse a valid property node as a property of the current object" , function() {
-		expect( parsePathNode( '.bob' ) ).to.eql( { type: 'property' , identifier: 'bob' } ) ;
-		expect( parsePathNode( '.name' ) ).to.eql( { type: 'property' , identifier: 'name' } ) ;
-		expect( parsePathNode( '.n' ) ).to.eql( { type: 'property' , identifier: 'n' } ) ;
-		expect( parsePathNode( '.embedded.data' ) ).to.eql( { type: 'property' , identifier: 'embedded.data' } ) ;
+		expect( parsePathNode( '.bob' ) ).to.eql( { type: 'property' , identifier: 'bob' , node: '.bob' } ) ;
+		expect( parsePathNode( '.name' ) ).to.eql( { type: 'property' , identifier: 'name' , node: '.name' } ) ;
+		expect( parsePathNode( '.n' ) ).to.eql( { type: 'property' , identifier: 'n' , node: '.n' } ) ;
+		expect( parsePathNode( '.embedded.data' ) ).to.eql( { type: 'property' , identifier: 'embedded.data' , node: '.embedded.data' } ) ;
 		
 		// Invalid entries
 		expect( parsePathNode( '.' ) ).to.be.an( Error ) ;
@@ -174,9 +174,9 @@ describe( "Path's node parsing" , function() {
 	} ) ;
 	
 	it( "should parse a valid link property node as a link property of the current object" , function() {
-		expect( parsePathNode( '~name' ) ).to.eql( { type: 'linkProperty' , identifier: 'name' } ) ;
-		expect( parsePathNode( '~n' ) ).to.eql( { type: 'linkProperty' , identifier: 'n' } ) ;
-		expect( parsePathNode( '~embedded.data' ) ).to.eql( { type: 'linkProperty' , identifier: 'embedded.data' } ) ;
+		expect( parsePathNode( '~name' ) ).to.eql( { type: 'linkProperty' , identifier: 'name' , node: '~name' } ) ;
+		expect( parsePathNode( '~n' ) ).to.eql( { type: 'linkProperty' , identifier: 'n' , node: '~n' } ) ;
+		expect( parsePathNode( '~embedded.data' ) ).to.eql( { type: 'linkProperty' , identifier: 'embedded.data' , node: '~embedded.data' } ) ;
 		
 		// Invalid entries
 		expect( parsePathNode( '~' ) ).to.be.an( Error ) ;
@@ -190,8 +190,8 @@ describe( "Path's node parsing" , function() {
 	} ) ;
 	
 	it( "edge cases" , function() {	
-		expect( parsePathNode( 'U-' ) ).to.eql( { type: 'method' , identifier: 'u' } ) ;
-		expect( parsePathNode( 'U---' ) ).to.eql( { type: 'method' , identifier: 'u' } ) ;
+		expect( parsePathNode( 'U-' ) ).to.eql( { type: 'method' , identifier: 'u' , node: 'U-' } ) ;
+		expect( parsePathNode( 'U---' ) ).to.eql( { type: 'method' , identifier: 'u' , node: 'U---' } ) ;
 		expect( parsePathNode( '-U' ) ).to.be.an( Error ) ;
 	} ) ;
 } ) ;
@@ -224,8 +224,38 @@ describe( "Path pattern matching" , function() {
 	} ) ;
 	
 	it( "Pattern matching with the '...' wildcard" , function() {
-		expect( pathMatch( '/Board/123456789012345678901234/Users/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
-		expect( pathMatch( '/Board/123456789012345678901234/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.be.ok() ;
+		expect( pathMatch( '/Board/123456789012345678901234/Users/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) )
+			.to.eql( {
+				path: {
+					type: 'collection',
+					value: '/Board/123456789012345678901234/Users',
+					selectedChild: {
+						type: 'id',
+						value: '123456789012345678901234'
+					}
+				},
+				subPath: {
+					type: 'id',
+					value: '/123456789012345678901234' }
+				}
+			) ;
+		
+		expect( pathMatch( '/Board/123456789012345678901234/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) )
+			.to.eql( {
+				path: {
+					type: 'id',
+					value: '/Board/123456789012345678901234',
+					selectedChild: {
+						type: 'collection',
+						value: 'Users'
+					}
+				},
+				subPath: {
+					type: 'id',
+					value: '/Users/123456789012345678901234' }
+				}
+			) ;
+		
 		expect( pathMatch( '/Board/123456789012345678901234/Users/123456789012345678901234/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
 	} ) ;
 	
@@ -281,14 +311,17 @@ describe( "Parse HTTP request" , function() {
 				path: [
 					{
 						identifier: "path" ,
+						node: "path" ,
 						type: "slugId"
 					} ,
 					{
 						identifier: "to" ,
+						node: "to" ,
 						type: "slugId"
 					} ,
 					{
 						identifier: "json" ,
+						node: "json" ,
 						type: "slugId"
 					}
 				] ,
