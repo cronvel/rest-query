@@ -373,27 +373,32 @@ pathModule.parseNode = function parseNode( str , isPattern )
 		[id]			match any ID node
 		[collection]	match any collection node
 */
-pathModule.match = function match( patternPath , path )
+pathModule.match = function match( pathPattern , path )
 {
-	var i , iMax , matches = {} ;
+	var i , iMax , endWithAnySubPath , matches = {} ;
 	
 	try {
-		if ( ! Array.isArray( patternPath ) ) { patternPath = pathModule.parse( patternPath , true ) ; }
+		if ( ! Array.isArray( pathPattern ) ) { pathPattern = pathModule.parse( pathPattern , true ) ; }
 		if ( ! Array.isArray( path ) ) { path = pathModule.parse( path ) ; }
 	}
 	catch ( error ) {
 		return false ;
 	}
 	
-	// Fast exit: the path should have at least as many node as the pattern
-	if ( path.length < patternPath.length ) { return false ; }
+	endWithAnySubPath = pathPattern[ pathPattern.length - 1 ].wildcard === 'anySubPath' ;
 	
-	// Fast exit 2: if the path has more node than the pattern, the pattern should finish with an 'anySubPath' wildcard
-	if ( path.length > patternPath.length && patternPath[ patternPath.length - 1 ].wildcard !== 'anySubPath' ) { return false ; }
-	
-	for ( i = 0 , iMax = patternPath.length ; i < iMax ; i ++ )
+	// Fast exit: just check path and pathPattern length
+	if (
+		( ! endWithAnySubPath && path.length !== pathPattern.length ) ||
+		( endWithAnySubPath && path.length < pathPattern.length - 1 )
+	)
 	{
-		switch ( patternPath[ i ].wildcard )
+		return false ;
+	}
+	
+	for ( i = 0 , iMax = pathPattern.length ; i < iMax ; i ++ )
+	{
+		switch ( pathPattern[ i ].wildcard )
 		{
 			case 'any' :
 				// Always match
@@ -401,20 +406,32 @@ pathModule.match = function match( patternPath , path )
 				
 			case 'anySubPath' :
 				// Always match globally immediately!
-				return {
-					path: {
-						type: path[ i - 1 ].type ,
-						value: '/' + path.slice( 0 , i ).map( mapNode ).join( '/' ) ,
-						selectedChild: {
-							type: path[ i ].type ,
-							value: path[ i ].node
+				if ( path[ i ] )
+				{
+					return {
+						path: {
+							type: path[ i - 1 ].type ,
+							value: '/' + path.slice( 0 , i ).map( mapNode ).join( '/' ) ,
+							selectedChild: {
+								type: path[ i ].type ,
+								value: path[ i ].node
+							}
+						} ,
+						subPath: {
+							type: path[ path.length - 1 ].type ,
+							value: '/' + path.slice( i ).map( mapNode ).join( '/' )
 						}
-					} ,
-					subPath: {
-						type: path[ path.length - 1 ].type ,
-						value: '/' + path.slice( i ).map( mapNode ).join( '/' )
-					}
-				} ;
+					} ;
+				}
+				else
+				{
+					return {
+						path: {
+							type: path[ i - 1 ].type ,
+							value: '/' + path.slice( 0 , i ).map( mapNode ).join( '/' ) ,
+						}
+					} ;
+				}
 				
 			case 'anyId' :
 				// Match any id
@@ -427,7 +444,7 @@ pathModule.match = function match( patternPath , path )
 				break ;
 				
 			default :
-				if ( patternPath[ i ].type !== path[ i ].type || patternPath[ i ].identifier !== path[ i ].identifier )
+				if ( pathPattern[ i ].type !== path[ i ].type || pathPattern[ i ].identifier !== path[ i ].identifier )
 				{
 					return false ;
 				}

@@ -236,9 +236,9 @@ describe( "Path pattern matching" , function() {
 				},
 				subPath: {
 					type: 'id',
-					value: '/123456789012345678901234' }
+					value: '/123456789012345678901234'
 				}
-			) ;
+			} ) ;
 		
 		expect( pathMatch( '/Board/123456789012345678901234/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) )
 			.to.eql( {
@@ -252,11 +252,19 @@ describe( "Path pattern matching" , function() {
 				},
 				subPath: {
 					type: 'id',
-					value: '/Users/123456789012345678901234' }
+					value: '/Users/123456789012345678901234'
 				}
-			) ;
+			} ) ;
 		
-		expect( pathMatch( '/Board/123456789012345678901234/Users/123456789012345678901234/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
+		expect( pathMatch( '/Board/123456789012345678901234/Users/123456789012345678901234/...' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) )
+			.to.eql( {
+				path: {
+					type: 'id',
+					value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				}
+			} ) ;
+		
+		expect( pathMatch( '/Board/123456789012345678901234/Users/123456789012345678901234/...' , '/Board/123456789012345678901234/Users' ) ).not.to.be.ok() ;
 	} ) ;
 	
 	it( "Pattern matching with the '[id]' wildcard" , function() {
