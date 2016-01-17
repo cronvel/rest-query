@@ -263,6 +263,10 @@ pathModule.parseNode = function parseNode( str , isPattern )
 				parsed.type = 'wildcard' ;
 				parsed.wildcard = 'anyId' ;
 				return parsed ;
+			case '[document]' :
+				parsed.type = 'wildcard' ;
+				parsed.wildcard = 'anyDocument' ;
+				return parsed ;
 			case '[collection]' :
 				parsed.type = 'wildcard' ;
 				parsed.wildcard = 'anyCollection' ;
@@ -371,11 +375,12 @@ pathModule.parseNode = function parseNode( str , isPattern )
 		*				match any path node
 		...				match any children node?
 		[id]			match any ID node
+		[document]		match any ID and SlugId node
 		[collection]	match any collection node
 */
 pathModule.match = function match( pathPattern , path )
 {
-	var i , iMax , endWithAnySubPath , matches = {} ;
+	var i , iMax , iLast = 0 , iLastCollection = 0 , endWithAnySubPath , matches = {} , breakLoop ;
 	
 	try {
 		if ( ! Array.isArray( pathPattern ) ) { pathPattern = pathModule.parse( pathPattern , true ) ; }
@@ -396,8 +401,14 @@ pathModule.match = function match( pathPattern , path )
 		return false ;
 	}
 	
-	for ( i = 0 , iMax = pathPattern.length ; i < iMax ; i ++ )
+	for ( i = 0 , iMax = pathPattern.length ; i < iMax && ! breakLoop ; i ++ )
 	{
+		if ( path[ i ] )
+		{
+			iLast = i ;
+			if ( path[ i ].type === 'collection' && pathPattern[ i ].wildcard !== 'anySubPath' ) { iLastCollection = i ; }
+		}
+		
 		switch ( pathPattern[ i ].wildcard )
 		{
 			case 'any' :
@@ -408,34 +419,32 @@ pathModule.match = function match( pathPattern , path )
 				// Always match globally immediately!
 				if ( path[ i ] )
 				{
-					return {
-						path: {
-							type: path[ i - 1 ].type ,
-							value: '/' + path.slice( 0 , i ).map( mapNode ).join( '/' ) ,
-							selectedChild: {
-								type: path[ i ].type ,
-								value: path[ i ].node
-							}
-						} ,
-						subPath: {
-							type: path[ path.length - 1 ].type ,
-							value: '/' + path.slice( i ).map( mapNode ).join( '/' )
-						}
+					matches.subPath = {
+						type: path[ path.length - 1 ].type ,
+						value: '/' + path.slice( i ).map( mapNode ).join( '/' )
 					} ;
-				}
-				else
-				{
-					return {
-						path: {
-							type: path[ i - 1 ].type ,
-							value: '/' + path.slice( 0 , i ).map( mapNode ).join( '/' ) ,
+					
+					matches.path = {
+						type: path[ i - 1 ].type ,
+						value: '/' + path.slice( 0 , i ).map( mapNode ).join( '/' ) ,
+						selectedChild: {
+							type: path[ i ].type ,
+							value: path[ i ].node
 						}
 					} ;
 				}
 				
+				breakLoop = true ;
+				break ;
+				
 			case 'anyId' :
 				// Match any id
 				if ( path[ i ].type !== 'id' ) { return false ; }
+				break ;
+				
+			case 'anyDocument' :
+				// Match any id
+				if ( path[ i ].type !== 'id' && path[ i ].type !== 'slugId' ) { return false ; }
 				break ;
 				
 			case 'anyCollection' :
@@ -451,12 +460,21 @@ pathModule.match = function match( pathPattern , path )
 		}
 	}
 	
-	return {
-		path: {
+	
+	if ( ! matches.path )
+	{
+		matches.path = {
 			type: path[ path.length - 1 ].type ,
 			value: '/' + path.map( mapNode ).join( '/' )
-		}
+		} ;
+	}
+	
+	matches.collectionPath = {
+		type: path[ iLastCollection ].type ,
+		value: '/' + path.slice( 0 , iLastCollection + 1 ).map( mapNode ).join( '/' )
 	} ;
+	
+	return matches ;
 } ;
 
 
