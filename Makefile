@@ -13,6 +13,9 @@ install: log/npm-install.log
 # Just install things so it works, basicaly: it just performs a "npm install" ATM
 dev-install: log/npm-dev-install.log
 
+# Build everything
+build: browser README.md
+
 # Build the browser lib
 browser: browser/restQueryShared.js browser/restQueryShared.min.js
 

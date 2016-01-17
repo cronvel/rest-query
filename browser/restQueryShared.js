@@ -421,15 +421,17 @@ pathModule.match = function match( pathPattern , path )
 				{
 					matches.subPath = {
 						type: path[ path.length - 1 ].type ,
-						value: '/' + path.slice( i ).map( mapNode ).join( '/' )
+						value: '/' + path.slice( i ).map( mapNode ).join( '/' ) ,
+						node: path[ path.length - 1 ].node
 					} ;
 					
 					matches.path = {
 						type: path[ i - 1 ].type ,
 						value: '/' + path.slice( 0 , i ).map( mapNode ).join( '/' ) ,
+						node: path[ i - 1 ].node ,
 						selectedChild: {
 							type: path[ i ].type ,
-							value: path[ i ].node
+							node: path[ i ].node
 						}
 					} ;
 				}
@@ -464,14 +466,16 @@ pathModule.match = function match( pathPattern , path )
 	if ( ! matches.path )
 	{
 		matches.path = {
-			type: path[ path.length - 1 ].type ,
-			value: '/' + path.map( mapNode ).join( '/' )
+			type: path[ iLast ].type ,
+			value: '/' + path.map( mapNode ).join( '/' ) ,
+			node: path[ iLast ].node
 		} ;
 	}
 	
 	matches.collectionPath = {
 		type: path[ iLastCollection ].type ,
-		value: '/' + path.slice( 0 , iLastCollection + 1 ).map( mapNode ).join( '/' )
+		value: '/' + path.slice( 0 , iLastCollection + 1 ).map( mapNode ).join( '/' ) ,
+		node: path[ iLastCollection ].node
 	} ;
 	
 	return matches ;

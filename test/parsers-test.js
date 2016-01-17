@@ -212,22 +212,26 @@ describe( "Path pattern matching" , function() {
 		expect( pathMatch( '/Users/123456789012345678901234' , '/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Users/123456789012345678901234'
+				value: '/Users/123456789012345678901234' ,
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Users'
+				value: '/Users' ,
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/Users/12345678901234567890123a' , '/Users/123456789012345678901234' ) ).not.to.be.ok() ;
 		expect( pathMatch( '/Board/123456789012345678901234/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board/123456789012345678901234/Users'
+				value: '/Board/123456789012345678901234/Users',
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/Board/12345678901234567890123a/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
@@ -237,31 +241,37 @@ describe( "Path pattern matching" , function() {
 		expect( pathMatch( '/Board/*/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board/123456789012345678901234/Users'
+				value: '/Board/123456789012345678901234/Users',
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/Board/*/Users/*' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board/123456789012345678901234/Users'
+				value: '/Board/123456789012345678901234/Users',
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/Board/*/*/*' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board/123456789012345678901234/Users'
+				value: '/Board/123456789012345678901234/Users',
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/Board/123456789012345678901234/*' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
@@ -274,18 +284,21 @@ describe( "Path pattern matching" , function() {
 				path: {
 					type: 'collection',
 					value: '/Board',
+					node: 'Board',
 					selectedChild: {
 						type: 'id',
-						value: '123456789012345678901234'
+						node: '123456789012345678901234'
 					}
 				},
 				collectionPath: {
 					type: 'collection' ,
-					value: '/Board'
+					value: '/Board',
+					node: 'Board'
 				},
 				subPath: {
 					type: 'id',
-					value: '/123456789012345678901234/Users/123456789012345678901234'
+					value: '/123456789012345678901234/Users/123456789012345678901234',
+					node: '123456789012345678901234'
 				}
 			} ) ;
 		
@@ -294,18 +307,21 @@ describe( "Path pattern matching" , function() {
 				path: {
 					type: 'collection',
 					value: '/Board/123456789012345678901234/Users',
+					node: 'Users',
 					selectedChild: {
 						type: 'id',
-						value: '123456789012345678901234'
+						node: '123456789012345678901234'
 					}
 				},
 				collectionPath: {
 					type: 'collection' ,
-					value: '/Board/123456789012345678901234/Users'
+					value: '/Board/123456789012345678901234/Users',
+					node: 'Users'
 				},
 				subPath: {
 					type: 'id',
-					value: '/123456789012345678901234'
+					value: '/123456789012345678901234',
+					node: '123456789012345678901234'
 				}
 			} ) ;
 		
@@ -314,18 +330,21 @@ describe( "Path pattern matching" , function() {
 				path: {
 					type: 'id',
 					value: '/Board/123456789012345678901234',
+					node: '123456789012345678901234',
 					selectedChild: {
 						type: 'collection',
-						value: 'Users'
+						node: 'Users'
 					}
 				},
 				collectionPath: {
 					type: 'collection' ,
-					value: '/Board'
+					value: '/Board',
+					node: 'Board'
 				},
 				subPath: {
 					type: 'id',
-					value: '/Users/123456789012345678901234'
+					value: '/Users/123456789012345678901234',
+					node: '123456789012345678901234'
 				}
 			} ) ;
 		
@@ -333,11 +352,13 @@ describe( "Path pattern matching" , function() {
 			.to.eql( {
 				path: {
 					type: 'id',
-					value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+					value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+					node: '123456789012345678901234'
 				} ,
 				collectionPath: {
 					type: 'collection' ,
-					value: '/Board/123456789012345678901234/Users'
+					value: '/Board/123456789012345678901234/Users',
+					node: 'Users'
 				},
 			} ) ;
 		
@@ -348,32 +369,38 @@ describe( "Path pattern matching" , function() {
 		expect( pathMatch( '/Board/[id]' , '/Board/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234'
+				value: '/Board/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board'
+				value: '/Board',
+				node: 'Board'
 			}
 		} ) ;
 		expect( pathMatch( '/Board/[id]' , '/Board/slug' ) ).not.to.be.ok() ;
 		expect( pathMatch( '/Board/[id]/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board/123456789012345678901234/Users'
+				value: '/Board/123456789012345678901234/Users',
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/Board/[id]/Users/[id]' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board/123456789012345678901234/Users'
+				value: '/Board/123456789012345678901234/Users',
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/Board/123456789012345678901234/[id]/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
@@ -384,21 +411,25 @@ describe( "Path pattern matching" , function() {
 		expect( pathMatch( '/Board/[document]' , '/Board/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234'
+				value: '/Board/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board'
+				value: '/Board',
+				node: 'Board'
 			}
 		} ) ;
 		expect( pathMatch( '/Board/[document]' , '/Board/slug' ) ).to.eql( {
 			path: {
 				type: 'slugId',
-				value: '/Board/slug'
+				value: '/Board/slug',
+				node: 'slug'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board'
+				value: '/Board',
+				node: 'Board'
 			}
 		} ) ;
 	} ) ;
@@ -407,31 +438,37 @@ describe( "Path pattern matching" , function() {
 		expect( pathMatch( '/Board/123456789012345678901234/[collection]/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board/123456789012345678901234/Users'
+				value: '/Board/123456789012345678901234/Users',
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/[collection]/123456789012345678901234/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board/123456789012345678901234/Users'
+				value: '/Board/123456789012345678901234/Users',
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/[collection]/123456789012345678901234/[collection]/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).to.eql( {
 			path: {
 				type: 'id',
-				value: '/Board/123456789012345678901234/Users/123456789012345678901234'
+				value: '/Board/123456789012345678901234/Users/123456789012345678901234',
+				node: '123456789012345678901234'
 			},
 			collectionPath: {
 				type: 'collection' ,
-				value: '/Board/123456789012345678901234/Users'
+				value: '/Board/123456789012345678901234/Users',
+				node: 'Users'
 			}
 		} ) ;
 		expect( pathMatch( '/Board/[collection]/Users/123456789012345678901234' , '/Board/123456789012345678901234/Users/123456789012345678901234' ) ).not.to.be.ok() ;
