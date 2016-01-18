@@ -5,19 +5,13 @@
 
 # The first rule is the default rule, when invoking "make" without argument...
 # Build every buildable things
-all: install doc browser
+all: install doc
 
 # Just install things so it works, basicaly: it just performs a "npm install --production" ATM
 install: log/npm-install.log
 
 # Just install things so it works, basicaly: it just performs a "npm install" ATM
 dev-install: log/npm-dev-install.log
-
-# Build everything
-build: browser README.md
-
-# Build the browser lib
-browser: browser/restQueryShared.js browser/restQueryShared.min.js
 
 # This run the JsHint & Mocha BDD test, display it to STDOUT & save it to log/mocha.log and log/jshint.log
 test: log/jshint.log log/mocha.log
@@ -28,14 +22,11 @@ lint: log/jshint.log
 # This run the Mocha BDD test, display it to STDOUT & save it to log/mocha.log
 unit: log/mocha.log
 
-# Performs the browser tests
-browser-test: log/testling.log
-
 # This build the doc and README.md
 doc: README.md
 
 # This publish to NPM and push to Github, if we are on master branch only
-publish: check-if-commited browser README.md build-commit log/npm-publish.log log/github-push.log
+publish: check-if-commited README.md build-commit log/npm-publish.log log/github-push.log
 
 # Clean temporary things, or things that can be automatically regenerated
 clean: clean-all
@@ -46,21 +37,10 @@ clean: clean-all
 
 MOCHA=./node_modules/mocha/bin/mocha
 JSHINT=./node_modules/jshint/bin/jshint --verbose
-BROWSERIFY=./node_modules/.bin/browserify
-UGLIFY=./node_modules/.bin/uglifyjs
-TESTLING=./node_modules/.bin/testling
 
 
 
 # Files rules
-
-# Build the browser lib
-browser/restQueryShared.js: lib/*.js
-	${BROWSERIFY} lib/browser.js -i buffer -i mongodb -s restQueryShared -o browser/restQueryShared.js
-
-# Build the browser minified lib
-browser/restQueryShared.min.js: browser/restQueryShared.js
-	${UGLIFY} browser/restQueryShared.js -o browser/restQueryShared.min.js -m
 
 # JsHint STDOUT test
 log/jshint.log: log/npm-dev-install.log lib/*.js test/*.js
@@ -69,13 +49,6 @@ log/jshint.log: log/npm-dev-install.log lib/*.js test/*.js
 # Mocha BDD STDOUT test
 log/mocha.log: log/npm-dev-install.log lib/*.js test/*.js
 	${MOCHA} test/*.js -R spec | tee log/mocha.log ; exit $${PIPESTATUS[0]}
-
-# Testling: Browser-side Mocha
-#log/testling.log: log/npm-dev-install.log log/browser.log browser/*.js test/*.js
-log/testling.log: lib/*.js test/*.js
-	@echo -ne "\x1b[33mReminder: On linux, Xvfb should be installed!\x1b[0m\n"
-	killall Xvfb ; sleep 1
-	${TESTLING} | tee log/testling.log ; exit $${PIPESTATUS[0]}
 
 # README
 README.md: documentation.md
