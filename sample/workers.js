@@ -10,7 +10,7 @@ module.exports = {
 	
 	mail: function mail( context , scheduledTask , callback ) {
 		
-		log.info( 'Received a new task: %I' , scheduledTask.data ) ;
+		log.info( "Received a new 'mail' task: %I" , scheduledTask.data ) ;
 		//console.log( context ) ;
 		callback() ;
 	}
