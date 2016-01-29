@@ -729,7 +729,6 @@ describe( "Basic queries of top-level collections" , function() {
 							userAccess: {},
 							groupAccess: {},
 							publicAccess: 'all',
-							inheritAccess: 'none',
 							slugId: batch[ 0 ].slugId		// cannot be predicted
 						} ,
 						{
@@ -741,7 +740,6 @@ describe( "Basic queries of top-level collections" , function() {
 							userAccess: {},
 							groupAccess: {},
 							publicAccess: 'all',
-							inheritAccess: 'none',
 							slugId: batch[ 1 ].slugId		// cannot be predicted
 						}
 					] ) ;
@@ -3965,7 +3963,6 @@ describe( "Access" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: 'Inheritance: all' ,
 					content: 'Blah blah blah...' ,
-					inheritAccess: 'all'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -4052,7 +4049,6 @@ describe( "Access" , function() {
 					content: 'Blah blah blah...' ,
 					userAccess: userAccess ,
 					publicAccess: 'readCreate' ,
-					inheritAccess: 'min'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -4139,7 +4135,6 @@ describe( "Access" , function() {
 					content: 'Blah blah blah...' ,
 					userAccess: userAccess ,
 					publicAccess: 'read' ,
-					inheritAccess: 'max'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;

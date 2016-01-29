@@ -314,7 +314,6 @@ describe( "Basics tests" , function() {
 						userAccess: {},
 						groupAccess: {},
 						publicAccess: 'read',
-						inheritAccess: 'none',
 						parent: {
 							collection: null,
 							id: '/'
@@ -395,7 +394,6 @@ describe( "Basics tests" , function() {
 						userAccess: {},
 						groupAccess: {},
 						publicAccess: 'read',
-						inheritAccess: 'none',
 						parent: {
 							collection: null,
 							id: '/'
@@ -488,7 +486,6 @@ describe( "Basics tests" , function() {
 						userAccess: {},
 						groupAccess: {},
 						publicAccess: 'all',
-						inheritAccess: 'none',
 						parent: {
 							collection: null,
 							id: '/'
@@ -670,7 +667,6 @@ describe( "Basics tests on users" , function() {
 						userAccess: {},
 						groupAccess: {},
 						publicAccess: 'read',
-						inheritAccess: 'none',
 						parent: {
 							collection: null,
 							id: '/'
@@ -897,7 +893,6 @@ describe( "Links population" , function() {
 						userAccess: {},
 						groupAccess: {},
 						publicAccess: 'read',
-						inheritAccess: 'none',
 						parent: {
 							collection: null,
 							id: '/'
@@ -915,7 +910,6 @@ describe( "Links population" , function() {
 							userAccess: {},
 							groupAccess: {},
 							publicAccess: 'read',
-							inheritAccess: 'none',
 							parent: {
 								collection: null,
 								id: "/"
@@ -934,7 +928,6 @@ describe( "Links population" , function() {
 							userAccess: {},
 							groupAccess: {},
 							publicAccess: 'read',
-							inheritAccess: 'none',
 							parent: {
 								collection: null,
 								id: "/"
@@ -988,7 +981,6 @@ describe( "Links population" , function() {
 							userAccess: {},
 							groupAccess: {},
 							publicAccess: 'read',
-							inheritAccess: 'none',
 							parent: {
 								collection: null,
 								id: "/"
@@ -1007,7 +999,6 @@ describe( "Links population" , function() {
 							userAccess: {},
 							groupAccess: {},
 							publicAccess: 'read',
-							inheritAccess: 'none',
 							parent: {
 								collection: null,
 								id: '/'
@@ -1025,7 +1016,6 @@ describe( "Links population" , function() {
 								userAccess: {},
 								groupAccess: {},
 								publicAccess: 'read',
-								inheritAccess: 'none',
 								parent: {
 									collection: null,
 									id: "/"
@@ -1044,7 +1034,6 @@ describe( "Links population" , function() {
 								userAccess: {},
 								groupAccess: {},
 								publicAccess: 'read',
-								inheritAccess: 'none',
 								parent: {
 									collection: null,
 									id: "/"
@@ -1065,7 +1054,6 @@ describe( "Links population" , function() {
 							userAccess: {},
 							groupAccess: {},
 							publicAccess: 'read',
-							inheritAccess: 'none',
 							parent: {
 								collection: null,
 								id: "/"

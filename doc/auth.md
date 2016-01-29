@@ -19,6 +19,28 @@ Users restricted to a container belong to it:
 
 
 
+
+
+
+
+
+
+
+
+# This is not up to date with the access management refacto!!!
+
+
+
+
+
+
+
+
+
+
+
+
+
 Authorization's levels
 ======================
 
@@ -38,11 +60,9 @@ Resource-based authorization
 ============================
 
 Resource's schema: {
-	defaultInheritAccess: none|all|max|min
 }
 
 Resource: {
-	inheritAccess: none|all|max|min,
 	
 	userAccess: {
 		ID1: level,
