@@ -200,7 +200,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				id = blog._id ;
 				blog.$.save( callback ) ;
@@ -240,7 +240,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all' ,
+					publicAccess: 'all' ,
 					userAccess: userAccess
 				} ) ;
 				id = blog._id ;
@@ -281,7 +281,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.post( '/Blogs' , {
 					title: 'My wonderful life posted!!!' ,
 					description: 'This is a supa blog! (posted!)' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error , rawDocument ) {
 					expect( error ).not.to.be.ok() ;
 					id = rawDocument.id ;
@@ -323,7 +323,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -388,7 +388,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -398,7 +398,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! Now overwritten!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -465,7 +465,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
 					embedded: { a: 'a' , b: 'b' } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -476,7 +476,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					description: 'This is a supa blog! Now patched!' ,
 					"embedded.a": 'A' ,
 					parent: "should not overwrite" ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -517,7 +517,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
 					embedded: { a: 'a' , b: 'b' } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -559,7 +559,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -625,7 +625,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -701,7 +701,7 @@ describe( "Basic queries of top-level collections" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				id1 = blog._id ;
 				blog.$.save( callback ) ;
@@ -710,7 +710,7 @@ describe( "Basic queries of top-level collections" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'YAB' ,
 					description: 'Yet Another Blog' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				id2 = blog._id ;
 				blog.$.save( callback ) ;
@@ -728,7 +728,7 @@ describe( "Basic queries of top-level collections" , function() {
 							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: 'all',
+							publicAccess: 'all',
 							inheritAccess: 'none',
 							slugId: batch[ 0 ].slugId		// cannot be predicted
 						} ,
@@ -740,7 +740,7 @@ describe( "Basic queries of top-level collections" , function() {
 							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: 'all',
+							publicAccess: 'all',
 							inheritAccess: 'none',
 							slugId: batch[ 1 ].slugId		// cannot be predicted
 						}
@@ -803,7 +803,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				blogId = blog._id ;
 				blog.$.save( callback ) ;
@@ -814,7 +814,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
@@ -848,7 +848,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				blogId = blog._id ;
 				blog.$.save( callback ) ;
@@ -857,7 +857,7 @@ describe( "Queries of nested object" , function() {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
 					description: 'Oh yeah' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				anotherBlogId = anotherBlog._id ;
 				anotherBlog.$.save( callback ) ;
@@ -868,7 +868,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My second post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs' , id: blogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
@@ -911,7 +911,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				blogId = blog._id ;
 				blog.$.save( callback ) ;
@@ -922,7 +922,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
@@ -934,7 +934,7 @@ describe( "Queries of nested object" , function() {
 					title: 'nope!' ,
 					content: 'First!' ,
 					parent: { collection: 'posts', id: postId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				commentId = comment._id ;
 				//console.log( "commentId: " , commentId ) ;
@@ -979,7 +979,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				blogId = blog._id ;
 				blog.$.save( callback ) ;
@@ -988,7 +988,7 @@ describe( "Queries of nested object" , function() {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
 					description: 'Oh yeah' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				anotherBlogId = anotherBlog._id ;
 				anotherBlog.$.save( callback ) ;
@@ -999,7 +999,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1011,7 +1011,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My second post!' ,
 					content: 'Blih blih blih.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				anotherPostId = anotherPost._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1023,7 +1023,7 @@ describe( "Queries of nested object" , function() {
 					title: 'nope!' ,
 					content: 'First!' ,
 					parent: { collection: 'posts', id: postId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				commentId = comment._id ;
 				//console.log( "commentId: " , commentId ) ;
@@ -1092,7 +1092,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				blogId = blog._id ;
 				blog.$.save( callback ) ;
@@ -1101,7 +1101,7 @@ describe( "Queries of nested object" , function() {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
 					description: 'Oh yeah' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				anotherBlogId = anotherBlog._id ;
 				anotherBlog.$.save( callback ) ;
@@ -1112,7 +1112,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				postId1 = post._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1124,7 +1124,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My second post!' ,
 					content: 'Hi ho!' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				postId2 = post._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1136,7 +1136,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My alternate post!' ,
 					content: 'It does not belong to the same blog!' ,
 					parent: { collection: 'blogs', id: anotherBlogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				postIdAlt = post._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1148,7 +1148,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My third post!' ,
 					content: 'Yay!' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				postId3 = post._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1204,7 +1204,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				blogId = blog._id ;
 				blog.$.save( callback ) ;
@@ -1229,7 +1229,7 @@ describe( "Queries of nested object" , function() {
 						title: 'My first post!!!' ,
 						content: 'Blah blah blah...' ,
 						parent: 'should not overwrite' ,
-						otherAccess: 'all'
+						publicAccess: 'all'
 					} ,
 					null ,
 					{ performer: performer } ,
@@ -1270,7 +1270,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				blogId = blog._id ;
 				blog.$.save( callback ) ;
@@ -1295,7 +1295,7 @@ describe( "Queries of nested object" , function() {
 						title: 'My first post!!!' ,
 						content: 'Blah blah blah...' ,
 						parent: 'should not overwrite' ,
-						otherAccess: 'all'
+						publicAccess: 'all'
 					} ,
 					null , { performer: performer } ,
 					function( error , object ) {
@@ -1321,7 +1321,7 @@ describe( "Queries of nested object" , function() {
 						title: 'My first post???' ,
 						content: 'Blah?' ,
 						parent: 'should not overwrite' ,
-						otherAccess: 'all'
+						publicAccess: 'all'
 					} ,
 					null , { performer: performer } ,
 					function( error , object ) {
@@ -1360,7 +1360,7 @@ describe( "Queries of nested object" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				blogId = blog._id ;
 				blog.$.save( callback ) ;
@@ -1369,7 +1369,7 @@ describe( "Queries of nested object" , function() {
 				anotherBlog = app.root.children.blogs.collection.createDocument( {
 					title: 'Another blog' ,
 					description: 'Oh yeah' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				anotherBlogId = anotherBlog._id ;
 				anotherBlog.$.save( callback ) ;
@@ -1380,7 +1380,7 @@ describe( "Queries of nested object" , function() {
 					title: 'My second post!' ,
 					content: 'Blah blah blah.' ,
 					parent: { collection: 'blogs', id: blogId } ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} ) ;
 				postId = post._id ;
 				//console.log( "postId: " , postId ) ;
@@ -1393,7 +1393,7 @@ describe( "Queries of nested object" , function() {
 					{
 						title: 'My edited post!' ,
 						content: 'Plop.' ,
-						otherAccess: 'all'
+						publicAccess: 'all'
 					} ,
 					null , { performer: performer } ,
 					function( error , object ) {
@@ -1445,7 +1445,7 @@ describe( "Links" , function() {
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
 					password: "pw",
-					otherAccess: "all"
+					publicAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					godfatherId = response.id ;
@@ -1458,7 +1458,7 @@ describe( "Links" , function() {
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
 					password: "pw",
-					otherAccess: "all",
+					publicAccess: "all",
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -1513,7 +1513,7 @@ describe( "Links" , function() {
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
 					password: "pw",
-					otherAccess: "all"
+					publicAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					userId = response.id ;
@@ -1526,7 +1526,7 @@ describe( "Links" , function() {
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
 						password: "pw",
-						otherAccess: "all"
+						publicAccess: "all"
 					} ,
 					null , { performer: performer } ,
 					function( error , response ) {
@@ -1581,7 +1581,7 @@ describe( "Links" , function() {
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
 					password: "pw",
-					otherAccess: "all"
+					publicAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					godfatherId = response.id ;
@@ -1594,7 +1594,7 @@ describe( "Links" , function() {
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
 					password: "pw",
-					otherAccess: "all",
+					publicAccess: "all",
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -1621,7 +1621,7 @@ describe( "Links" , function() {
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
 						password: "pw",
-						otherAccess: "all"
+						publicAccess: "all"
 					} ,
 					null , { performer: performer } ,
 					function( error , object ) {
@@ -1663,7 +1663,7 @@ describe( "Links" , function() {
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
 					password: "pw",
-					otherAccess: "all"
+					publicAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					godfatherId = response.id ;
@@ -1676,7 +1676,7 @@ describe( "Links" , function() {
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
 					password: "pw",
-					otherAccess: "all",
+					publicAccess: "all",
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -1737,7 +1737,7 @@ describe( "Links" , function() {
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
 					password: "pw",
-					otherAccess: "all"
+					publicAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					godfatherId = response.id ;
@@ -1750,7 +1750,7 @@ describe( "Links" , function() {
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
 					password: "pw",
-					otherAccess: "all",
+					publicAccess: "all",
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -1813,7 +1813,7 @@ describe( "Links" , function() {
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
 					password: "pw",
-					otherAccess: "all"
+					publicAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					userId = response.id ;
@@ -1828,7 +1828,7 @@ describe( "Links" , function() {
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
 						password: "pw",
-						otherAccess: "all"
+						publicAccess: "all"
 					} ,
 					null ,
 					{ performer: performer } ,
@@ -1846,7 +1846,7 @@ describe( "Links" , function() {
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
 						password: "pw",
-						otherAccess: "all"
+						publicAccess: "all"
 					} ,
 					null , { performer: performer } ,
 					function( error , response ) {
@@ -1864,7 +1864,7 @@ describe( "Links" , function() {
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
 						password: "pw",
-						otherAccess: "all"
+						publicAccess: "all"
 					} ,
 					null ,
 					{ performer: performer } ,
@@ -1896,7 +1896,7 @@ describe( "Links" , function() {
 					lastName: "Doe",
 					email: "big-joe@gmail.com",
 					password: "pw",
-					otherAccess: "all"
+					publicAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					fatherId = response.id ;
@@ -1909,7 +1909,7 @@ describe( "Links" , function() {
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
 					password: "pw",
-					otherAccess: "all"
+					publicAccess: "all"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					godfatherId = response.id ;
@@ -1922,7 +1922,7 @@ describe( "Links" , function() {
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
 					password: "pw",
-					otherAccess: "all",
+					publicAccess: "all",
 					father: fatherId ,
 					godfather: godfatherId
 				} , null , { performer: performer } , function( error , response ) {
@@ -2076,7 +2076,7 @@ describe( "Slug usage" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -2111,7 +2111,7 @@ describe( "Slug usage" , function() {
 				app.root.post( '/Blogs' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -2121,7 +2121,7 @@ describe( "Slug usage" , function() {
 				app.root.post( '/Blogs' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog 2!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'conflict' ) ;
@@ -2150,7 +2150,7 @@ describe( "Slug usage" , function() {
 				app.root.post( '/Blogs' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -2170,7 +2170,7 @@ describe( "Slug usage" , function() {
 				app.root.put( '/Blogs/my-wonderful-life' , {
 					title: 'New title!' ,
 					description: 'New description!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -2263,7 +2263,7 @@ describe( "Auto collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -2316,7 +2316,7 @@ describe( "Auto collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -2326,7 +2326,7 @@ describe( "Auto collection" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , {
 					title: 'You know what?' ,
 					content: "I'm happy!" ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -2429,7 +2429,7 @@ describe( "Token creation" , function() {
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2584,7 +2584,7 @@ describe( "Token creation" , function() {
 				app.root.post( '/Blogs' , {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2652,7 +2652,7 @@ describe( "Token creation" , function() {
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2825,7 +2825,7 @@ describe( "Token creation" , function() {
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -2953,7 +2953,7 @@ describe( "Token creation" , function() {
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3062,7 +3062,7 @@ describe( "Token creation" , function() {
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
 					password: "pw",
-					otherAccess: 'all'
+					publicAccess: 'all'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					doormen( { type: 'objectId' } , response.id ) ;
@@ -3406,7 +3406,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3490,7 +3490,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3526,7 +3526,7 @@ describe( "Access" , function() {
 				app.root.post( '/Blogs' , {
 					title: 'Public' ,
 					description: 'This is public' ,
-					otherAccess: 'read'
+					publicAccess: 'read'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3541,7 +3541,7 @@ describe( "Access" , function() {
 					title: 'Selective' ,
 					description: 'This is selective' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3556,7 +3556,7 @@ describe( "Access" , function() {
 					title: 'Closed' ,
 					description: 'This is closed' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3622,7 +3622,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3637,7 +3637,7 @@ describe( "Access" , function() {
 					title: "I've changed my mind!" ,
 					description: 'Seriously!' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3695,7 +3695,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3758,7 +3758,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3813,7 +3813,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3823,7 +3823,7 @@ describe( "Access" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: 'Put one' ,
 					content: 'Blah blah blah...' ,
-					otherAccess: 'read'
+					publicAccess: 'read'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3834,7 +3834,7 @@ describe( "Access" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d1' , {
 					title: 'Put two' ,
 					content: 'Blah blah blah...' ,
-					otherAccess: 'read'
+					publicAccess: 'read'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
@@ -3847,7 +3847,7 @@ describe( "Access" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d2' , {
 					title: 'Put three' ,
 					content: 'Blah blah blah...' ,
-					otherAccess: 'read'
+					publicAccess: 'read'
 				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
@@ -3860,7 +3860,7 @@ describe( "Access" , function() {
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d3' , {
 					title: 'Put four' ,
 					content: 'Blah blah blah...' ,
-					otherAccess: 'read'
+					publicAccess: 'read'
 				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
@@ -3884,7 +3884,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3894,7 +3894,7 @@ describe( "Access" , function() {
 				app.root.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
 					title: 'Post one' ,
 					content: 'Blah blah blah...' ,
-					otherAccess: 'read'
+					publicAccess: 'read'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -3905,7 +3905,7 @@ describe( "Access" , function() {
 				app.root.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
 					title: 'Post two' ,
 					content: 'Blah blah blah...' ,
-					otherAccess: 'read'
+					publicAccess: 'read'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
@@ -3918,7 +3918,7 @@ describe( "Access" , function() {
 				app.root.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
 					title: 'Post three' ,
 					content: 'Blah blah blah...' ,
-					otherAccess: 'read'
+					publicAccess: 'read'
 				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
@@ -3931,7 +3931,7 @@ describe( "Access" , function() {
 				app.root.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
 					title: 'Post four' ,
 					content: 'Blah blah blah...' ,
-					otherAccess: 'read'
+					publicAccess: 'read'
 				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
@@ -3955,7 +3955,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'passThrough'
+					publicAccess: 'passThrough'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -4036,7 +4036,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'readCreateModify'	// will be lowered in the child
+					publicAccess: 'readCreateModify'	// will be lowered in the child
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -4051,7 +4051,7 @@ describe( "Access" , function() {
 					title: 'Inheritance: min' ,
 					content: 'Blah blah blah...' ,
 					userAccess: userAccess ,
-					otherAccess: 'readCreate' ,
+					publicAccess: 'readCreate' ,
 					inheritAccess: 'min'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
@@ -4123,7 +4123,7 @@ describe( "Access" , function() {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
-					otherAccess: 'passThrough'
+					publicAccess: 'passThrough'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
@@ -4138,7 +4138,7 @@ describe( "Access" , function() {
 					title: 'Inheritance: max' ,
 					content: 'Blah blah blah...' ,
 					userAccess: userAccess ,
-					otherAccess: 'read' ,
+					publicAccess: 'read' ,
 					inheritAccess: 'max'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
@@ -4219,7 +4219,7 @@ describe( "Access" , function() {
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
 					groupAccess: groupAccess ,
-					otherAccess: 'none'
+					publicAccess: 'none'
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;

@@ -313,7 +313,7 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: 'read',
+						publicAccess: 'read',
 						inheritAccess: 'none',
 						parent: {
 							collection: null,
@@ -394,7 +394,7 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: 'read',
+						publicAccess: 'read',
 						inheritAccess: 'none',
 						parent: {
 							collection: null,
@@ -424,7 +424,7 @@ describe( "Basics tests" , function() {
 			body: JSON.stringify( {
 				title: "My website!",
 				description: "... about my wonderful life",
-				otherAccess: 'all'
+				publicAccess: 'all'
 			} )
 		} ;
 		
@@ -487,7 +487,7 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: 'all',
+						publicAccess: 'all',
 						inheritAccess: 'none',
 						parent: {
 							collection: null,
@@ -517,7 +517,7 @@ describe( "Basics tests" , function() {
 			body: JSON.stringify( {
 				title: "My website!",
 				description: "... about my wonderful life",
-				otherAccess: 'all'
+				publicAccess: 'all'
 			} )
 		} ;
 		
@@ -669,7 +669,7 @@ describe( "Basics tests on users" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: 'read',
+						publicAccess: 'read',
 						inheritAccess: 'none',
 						parent: {
 							collection: null,
@@ -701,7 +701,7 @@ describe( "Basics tests on users" , function() {
 				lastName: "Doe",
 				email: "john.doe@gmail.com",
 				password: "pw",
-				otherAccess: 'all'
+				publicAccess: 'all'
 			} )
 		} ;
 		
@@ -896,7 +896,7 @@ describe( "Links population" , function() {
 						token: {},
 						userAccess: {},
 						groupAccess: {},
-						otherAccess: 'read',
+						publicAccess: 'read',
 						inheritAccess: 'none',
 						parent: {
 							collection: null,
@@ -914,7 +914,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: 'read',
+							publicAccess: 'read',
 							inheritAccess: 'none',
 							parent: {
 								collection: null,
@@ -933,7 +933,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: 'read',
+							publicAccess: 'read',
 							inheritAccess: 'none',
 							parent: {
 								collection: null,
@@ -987,7 +987,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: 'read',
+							publicAccess: 'read',
 							inheritAccess: 'none',
 							parent: {
 								collection: null,
@@ -1006,7 +1006,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: 'read',
+							publicAccess: 'read',
 							inheritAccess: 'none',
 							parent: {
 								collection: null,
@@ -1024,7 +1024,7 @@ describe( "Links population" , function() {
 								token: {},
 								userAccess: {},
 								groupAccess: {},
-								otherAccess: 'read',
+								publicAccess: 'read',
 								inheritAccess: 'none',
 								parent: {
 									collection: null,
@@ -1043,7 +1043,7 @@ describe( "Links population" , function() {
 								token: {},
 								userAccess: {},
 								groupAccess: {},
-								otherAccess: 'read',
+								publicAccess: 'read',
 								inheritAccess: 'none',
 								parent: {
 									collection: null,
@@ -1064,7 +1064,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							otherAccess: 'read',
+							publicAccess: 'read',
 							inheritAccess: 'none',
 							parent: {
 								collection: null,

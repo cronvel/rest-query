@@ -54,7 +54,7 @@ Resource: {
 		ID2: level,
 		...
 	},
-	otherAccess: level,
+	publicAccess: level,
 	
 	childCollectionAccess: {
 		<collectionId1>: {
@@ -68,7 +68,7 @@ Resource: {
 				ID2: level,
 				...
 			},
-			otherAccess: level,
+			publicAccess: level,
 		
 		<collectionId2>: {
 			userAccess: {
@@ -81,7 +81,7 @@ Resource: {
 				ID2: level,
 				...
 			},
-			otherAccess: level,
+			publicAccess: level,
 	}
 }
 
