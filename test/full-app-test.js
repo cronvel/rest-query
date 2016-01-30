@@ -313,7 +313,7 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						publicAccess: 'read',
+						publicAccess: { traverse: 1, read: 3, create: 1 } ,
 						parent: {
 							collection: null,
 							id: '/'
@@ -393,7 +393,7 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						publicAccess: 'read',
+						publicAccess: { traverse: 1, read: 3 , create: 1 } ,
 						parent: {
 							collection: null,
 							id: '/'
@@ -422,7 +422,7 @@ describe( "Basics tests" , function() {
 			body: JSON.stringify( {
 				title: "My website!",
 				description: "... about my wonderful life",
-				publicAccess: 'all'
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 }
 			} )
 		} ;
 		
@@ -485,7 +485,7 @@ describe( "Basics tests" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						publicAccess: 'all',
+						publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
 						parent: {
 							collection: null,
 							id: '/'
@@ -514,7 +514,7 @@ describe( "Basics tests" , function() {
 			body: JSON.stringify( {
 				title: "My website!",
 				description: "... about my wonderful life",
-				publicAccess: 'all'
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 }
 			} )
 		} ;
 		
@@ -666,7 +666,7 @@ describe( "Basics tests on users" , function() {
 						slugId: data.slugId,	// Cannot be predicted
 						userAccess: {},
 						groupAccess: {},
-						publicAccess: 'read',
+						publicAccess: { traverse: 1, read: 3 , create: 1 } ,
 						parent: {
 							collection: null,
 							id: '/'
@@ -697,7 +697,7 @@ describe( "Basics tests on users" , function() {
 				lastName: "Doe",
 				email: "john.doe@gmail.com",
 				password: "pw",
-				publicAccess: 'all'
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 }
 			} )
 		} ;
 		
@@ -892,7 +892,7 @@ describe( "Links population" , function() {
 						token: {},
 						userAccess: {},
 						groupAccess: {},
-						publicAccess: 'read',
+						publicAccess: { traverse: 1, read: 3, create: 1 },
 						parent: {
 							collection: null,
 							id: '/'
@@ -909,7 +909,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							publicAccess: 'read',
+							publicAccess: { traverse: 1, read: 3, create: 1 },
 							parent: {
 								collection: null,
 								id: "/"
@@ -927,7 +927,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							publicAccess: 'read',
+							publicAccess: { traverse: 1, read: 3, create: 1 },
 							parent: {
 								collection: null,
 								id: "/"
@@ -980,7 +980,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							publicAccess: 'read',
+							publicAccess: { traverse: 1, read: 3, create: 1 },
 							parent: {
 								collection: null,
 								id: "/"
@@ -998,7 +998,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							publicAccess: 'read',
+							publicAccess: { traverse: 1, read: 3, create: 1 },
 							parent: {
 								collection: null,
 								id: '/'
@@ -1015,7 +1015,7 @@ describe( "Links population" , function() {
 								token: {},
 								userAccess: {},
 								groupAccess: {},
-								publicAccess: 'read',
+								publicAccess: { traverse: 1, read: 3, create: 1 },
 								parent: {
 									collection: null,
 									id: "/"
@@ -1033,7 +1033,7 @@ describe( "Links population" , function() {
 								token: {},
 								userAccess: {},
 								groupAccess: {},
-								publicAccess: 'read',
+								publicAccess: { traverse: 1, read: 3, create: 1 },
 								parent: {
 									collection: null,
 									id: "/"
@@ -1053,7 +1053,7 @@ describe( "Links population" , function() {
 							token: {},
 							userAccess: {},
 							groupAccess: {},
-							publicAccess: 'read',
+							publicAccess: { traverse: 1, read: 3, create: 1 },
 							parent: {
 								collection: null,
 								id: "/"

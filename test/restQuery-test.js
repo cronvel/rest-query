@@ -144,6 +144,8 @@ function commonApp( callback )
 
 
 
+
+
 			/* Tests */
 
 
@@ -448,7 +450,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "zzz PUT, then PATCH, then GET (featuring embedded data)" , function( done ) {
+	it( "PUT, then PATCH, then GET (featuring embedded data)" , function( done ) {
 		
 		var app , performer , blog , id ;
 		
@@ -728,7 +730,7 @@ describe( "Basic queries of top-level collections" , function() {
 							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
-							publicAccess: 'all',
+							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
 							slugId: batch[ 0 ].slugId		// cannot be predicted
 						} ,
 						{
@@ -739,7 +741,7 @@ describe( "Basic queries of top-level collections" , function() {
 							parent: { id: '/', collection: null },
 							userAccess: {},
 							groupAccess: {},
-							publicAccess: 'all',
+							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
 							slugId: batch[ 1 ].slugId		// cannot be predicted
 						}
 					] ) ;
@@ -3613,7 +3615,7 @@ describe( "Access" , function() {
 		async.series( [
 			function( callback ) {
 				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
+				userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
 				userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
@@ -3628,7 +3630,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
+				userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
 				userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
 				
 				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
@@ -3941,6 +3943,9 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "PATCH of nested resource with inheritance" ) ;
+	
+	/*
 	it( "PATCH of nested resource with inheritAccess: all" , function( done ) {
 		
 		async.series( [
@@ -4197,6 +4202,7 @@ describe( "Access" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	*/
 	
 	it( "Access by groups" , function( done ) {
 		

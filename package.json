@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "async-kit": "^0.6.8",
-    "doormen": "^0.4.5",
+    "doormen": "^0.4.8",
     "error-status": "^1.6.6",
     "fs-kit": "^0.1.3",
     "hash-kit": "^0.2.0",
@@ -23,7 +23,7 @@
     "minimist": "^1.2.0",
     "qs-kit": "^0.2.0",
     "rest-query-shared": "^0.14.7",
-    "roots-db": "^0.12.19",
+    "roots-db": "^0.12.20",
     "server-kit": "^0.2.26",
     "string-kit": "^0.3.11",
     "token-kit": "^0.1.3",
