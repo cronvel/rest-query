@@ -256,7 +256,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			function( callback ) {
 				app.root.get( '/Blogs/' + id + '/.userAccess.' + randomId , { performer: performer } , function( error , access ) {
 					expect( error ).not.to.be.ok() ;
-					expect( access ).to.be( 'read' ) ;
+					expect( access ).to.eql( { traverse: 1, read: 3, write: 0, create: 0, delete: 0 } ) ;
 					callback() ;
 				} ) ;
 			}
