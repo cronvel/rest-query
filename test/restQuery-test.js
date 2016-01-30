@@ -448,7 +448,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "PUT, then PATCH, then GET (featuring embedded data)" , function( done ) {
+	it( "zzz PUT, then PATCH, then GET (featuring embedded data)" , function( done ) {
 		
 		var app , performer , blog , id ;
 		
