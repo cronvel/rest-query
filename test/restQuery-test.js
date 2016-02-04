@@ -3943,267 +3943,6 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "PATCH of nested resource with inheritance" ) ;
-	
-	/*
-	it( "PATCH of nested resource with inheritAccess: all" , function( done ) {
-		
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
-				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'passThrough'
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: 'Inheritance: all' ,
-					content: 'Blah blah blah...' ,
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I've changed my mind!"
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I've changed my mind!"
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: performer } , function( error ) {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: unauthorizedPerformer } , function( error ) {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-		.exec( done ) ;
-	} ) ;
-	
-	it( "PATCH of nested resource with inheritAccess: min" , function( done ) {
-		
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// will be lowered in the child
-				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'readCreateModify'	// will be lowered in the child
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
-				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: 'Inheritance: min' ,
-					content: 'Blah blah blah...' ,
-					userAccess: userAccess ,
-					publicAccess: 'readCreate' ,
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I've changed my mind!"
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I've changed my mind!"
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: performer } , function( error ) {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: unauthorizedPerformer } , function( error ) {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-		.exec( done ) ;
-	} ) ;
-	
-	it( "PATCH of nested resource with inheritAccess: max" , function( done ) {
-		
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// will be raised in the child
-				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'passThrough'
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
-				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: 'Inheritance: max' ,
-					content: 'Blah blah blah...' ,
-					userAccess: userAccess ,
-					publicAccess: 'read' ,
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I've changed my mind!"
-				} , null , { performer: authorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: performer } , function( error , rawDocument ) {
-					expect( error ).not.to.be.ok() ;
-					expect( rawDocument.title ).to.be( "I've changed my mind!" ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: performer } , function( error ) {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: unauthorizedPerformer } , function( error ) {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "Yeah! I can change that!"
-				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user should be able to read
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: performer } , function( error , rawDocument ) {
-					expect( error ).not.to.be.ok() ;
-					expect( rawDocument.title ).to.be( "Yeah! I can change that!" ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-		.exec( done ) ;
-	} ) ;
-	*/
-	
 	it( "Access by groups" , function( done ) {
 		
 		async.series( [
@@ -4279,6 +4018,137 @@ describe( "Access" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "PATCH of nested resource with inheritance" , function( done ) {
+		
+		async.series( [
+			function( callback ) {
+				var userAccess = {} ;
+				
+				userAccess[ authorizedId ] = {
+					read: 4 ,
+					write: 4 ,
+					create: 1 ,
+					inheritance: {
+						read: 4 ,
+						write: 4
+					}
+				} ;
+				
+				userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
+				
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					title: 'My wonderful life 2!!!' ,
+					description: 'This is a supa blog! (x2)' ,
+					userAccess: userAccess ,
+					publicAccess: 'passThrough'
+				} , null , { performer: authorizedPerformer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+					title: 'A boring title' ,
+					content: 'Blah blah blah...' ,
+				} , null , { performer: authorizedPerformer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+					title: "I've changed my mind!"
+				} , null , { performer: authorizedPerformer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User not listed in specific rights
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+					{ performer: authorizedPerformer } ,
+					function( error , document ) {
+						expect( error ).not.to.be.ok() ;
+						expect( document.title ).to.be( "I've changed my mind!" ) ;
+						callback() ;
+					}
+				) ;
+			} ,
+			function( callback ) {
+				// Non-connected user
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+					title: "I can't do that!"
+				} , null , { performer: performer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'unauthorized' ) ;
+					expect( error.message ).to.be( 'Public access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User not listed in specific rights
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+					title: "I can't do that!"
+				} , null , { performer: unauthorizedPerformer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User listed, but with too low rights
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+					title: "I can't do that!"
+				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'forbidden' ) ;
+					expect( error.message ).to.be( 'Access forbidden.' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			
+			// Now give public access
+			
+			function( callback ) {
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+					publicAccess: {
+						traverse: 1 ,
+						inheritance: {
+							read: 4 ,
+							write: 4
+						}
+					}
+				} , null , { performer: authorizedPerformer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// Non-connected user
+				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+					title: "I can do that!"
+				} , null , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				// User not listed in specific rights
+				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+					{ performer: unauthorizedPerformer } ,
+					function( error , document ) {
+						expect( error ).not.to.be.ok() ;
+						expect( document.title ).to.be( "I can do that!" ) ;
+						callback() ;
+					}
+				) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "More inheritance tests needed" ) ;
 } ) ;
 
 

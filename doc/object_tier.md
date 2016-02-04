@@ -5,7 +5,7 @@ Think of a book. Each tier is a part of it.
 
 
 
-Tier 0: Identification
+Tier 1: Identification
 ======================
 
 This is the cover of the book. Even if we are not allowed to access the content of this book, we can see its cover,
@@ -23,7 +23,7 @@ A tier 0 request will return document's properties containing identification-onl
 
 
 
-Tier 1: Summary
+Tier 2: Summary
 ===============
 
 This is the summary, the table of content and the introduction of the book.
@@ -40,7 +40,7 @@ E.g.:
 
 
 
-Tier 2: Content
+Tier 3: Content
 ===============
 
 This is the content of the book.
@@ -53,7 +53,7 @@ E.g.:
 
 
 
-Tier 3: Restricted
+Tier 4: Restricted
 ==================
 
 This tier contains data that would normally be held hidden to regular users.
@@ -65,7 +65,7 @@ E.g.:
 
 
 
-Tier 4: Internals
+Tier 5: Internals
 =================
 
 The last tier contains data that are mostly useful internally.
