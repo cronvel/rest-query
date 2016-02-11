@@ -4162,8 +4162,13 @@ describe( "Indexes" , function() {
 
 describe( "Hooks" , function() {
 	
-	it( "Test app's hooks" ) ;
-	it( "Test collection's hooks" ) ;
+	it( "Test init (app) hooks" ) ;
+	it( "Test beforeCreate hooks" ) ;
+	it( "Test afterCreate hooks" ) ;
+	it( "Test beforeModify hooks" ) ;
+	it( "Test afterModify (TODO) hooks" ) ;
+	it( "Test beforeDelete hooks" ) ;
+	it( "Test afterDelete (TODO) hooks" ) ;
 } ) ;
 
 
