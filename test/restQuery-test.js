@@ -4166,9 +4166,9 @@ describe( "Hooks" , function() {
 	it( "Test beforeCreate hooks" ) ;
 	it( "Test afterCreate hooks" ) ;
 	it( "Test beforeModify hooks" ) ;
-	it( "Test afterModify (TODO) hooks" ) ;
+	it( "Test afterModify hooks" ) ;
 	it( "Test beforeDelete hooks" ) ;
-	it( "Test afterDelete (TODO) hooks" ) ;
+	it( "Test afterDelete hooks" ) ;
 } ) ;
 
 
