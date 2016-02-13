@@ -39,13 +39,23 @@ var commands = exports.commands = {} ;
 
 commands.login = function ( args , query , callback )
 {
-	api.emulateMulti( [
+	api.emulate( [
 			'Content-Type: application/json' ,
 			'body ' + JSON.stringify( { login: args[ 0 ] , password: args[ 1 ] , type: 'header' } ) ,
 			'post /Users/CREATE-TOKEN' ,
 		] ,
 		function() {
-			var token = JSON.parse( api.lastResponse().body ).token ;
+			var token ;
+			
+			try {
+				token = JSON.parse( api.lastResponse().body ).token ;
+			}
+			catch ( error ) {
+				api.term( "%E\n" ) ;
+				callback() ;
+				return ;
+			}
+			
 			api.emulate( 'X-Token: ' + token , callback ) ;
 		}
 	) ;
@@ -55,21 +65,28 @@ commands.login = function ( args , query , callback )
 
 commands.createUser = function ( args , query , callback )
 {
-	var name = args[ 0 ].split( '@' )[ 0 ].split( '.' ) ;
+	var firstName , lastName , tmp ;
 	
-	api.emulateMulti( [
+	tmp = args[ 0 ].split( '@' )[ 0 ].split( '.' ) ;
+	
+	firstName = tmp[ 0 ] || 'Robert' ;
+	firstName = firstName[ 0 ].toUpperCase() + firstName.slice( 1 ) ;
+	
+	lastName = tmp[ 1 ] || 'Polson' ;
+	lastName = lastName[ 0 ].toUpperCase() + lastName.slice( 1 ) ;
+	
+	api.emulate( [
 			'Content-Type: application/json' ,
 			'body ' + JSON.stringify( {
 				email: args[ 0 ] ,
 				password: args[ 1 ] ,
-				firstName: name[ 0 ] || 'Robert' ,
-				lastName: name[ 1 ] || 'Polson' ,
+				firstName: firstName ,
+				lastName: lastName ,
 			} ) ,
 			'post /Users' ,
 		] ,
 		callback
 	) ;
-} ;
-
+} ; 
 
 
