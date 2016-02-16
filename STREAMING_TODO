@@ -1,0 +1,15 @@
+
+Streaming steps:
+
+- home-made JSON.stringify() that supports circular references
+	(for ideas, see: https://github.com/WebReflection  &  https://www.npmjs.com/package/json-stringify-safe),
+	since it will be slower than native JSON.stringify(), use it only on populated documents.
+	It is not needed anymore for RestQuery to clone document when populated other documents.
+
+- JSON stringify() is streamed: it creates a Stream object, it uses generators, it does not retain anything
+
+- RootsDB/RestQuery streams: does not retain documents, use MongoDB cursors to create a RootsDB stream, RestQuery will
+	stream thing back to the client (access right will be streamed too), the client will receive "flat" data in the
+	JSON stream format (one JSON per line) with a trailing JSON containing information about how to re-structure data.
+
+
