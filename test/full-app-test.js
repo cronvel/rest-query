@@ -27,6 +27,8 @@
 /* jshint unused:false */
 /* global describe, it, before, after */
 
+"use strict" ;
+
 
 
 var cli = getCliOptions() ;

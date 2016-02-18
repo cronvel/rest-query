@@ -27,6 +27,8 @@
 /* jshint unused:false */
 /* global describe, it, before, after, beforeEach */
 
+"use strict" ;
+
 
 
 var cliOptions = getCliOptions() ;
@@ -2636,7 +2638,7 @@ describe( "Token creation" , function() {
 	
 	it( "POST /Users/CREATE-TOKEN action should cleanup outdated tokens" , function( done ) {
 		
-		var app , performer , id , token ;
+		var app , performer , id , token , duration ;
 		
 		async.series( [
 			function( callback ) {
@@ -2809,7 +2811,7 @@ describe( "Token creation" , function() {
 	
 	it( "POST /Users/REGENERATE-TOKEN should generate a new token using an existing one that will have its TTL shortened" , function( done ) {
 		
-		var app , performer , oldTokenPerformer , id , oldToken , newToken , oldTokenOldExpirationTime ;
+		var app , performer , oldTokenPerformer , id , oldToken , newToken , oldTokenOldExpirationTime , oldTokenNewExpirationTime ;
 		
 		async.series( [
 			function( callback ) {
