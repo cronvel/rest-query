@@ -1969,6 +1969,93 @@ describe( "Links" , function() {
 
 
 
+describe( "Multi-links" , function() {
+	
+	it( "zzz GET on a multi-link" , function( done ) {
+		
+		var app , performer , groupId , userId1 , userId2 , userId3 ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId1 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Jack",
+					lastName: "Wallace",
+					email: "jack.wallace@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId2 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Bobby",
+					lastName: "Fischer",
+					email: "bobby.fischer@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId3 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Groups' , {
+					name: "The Group",
+					users: [ userId1 , userId2 , userId3 ],
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					groupId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			/*
+			function( callback ) {
+				app.root.get( '/Groups/' + groupId , { performer: performer , query: { populate: 'users' } } , function( error , group ) {
+					expect( error ).not.to.be.ok() ;
+					console.log( group ) ;
+					callback() ;
+				} ) ;
+			} ,
+			*/
+			function( callback ) {
+				app.root.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
+					expect( error ).not.to.be.ok() ;
+					console.log( batch ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "Users" , function() {
 	
 	it( "GET on an unexisting user" ) ;
@@ -4171,6 +4258,13 @@ describe( "Hooks" , function() {
 	it( "Test afterModify hooks" ) ;
 	it( "Test beforeDelete hooks" ) ;
 	it( "Test afterDelete hooks" ) ;
+} ) ;
+
+
+
+describe( "Populate" , function() {
+	
+	it( "Test populate" ) ;
 } ) ;
 
 
