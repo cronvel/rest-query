@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.18.9",
+  "version": "0.18.10",
   "engines": {
     "node": ">=4.0.0"
   },
@@ -22,12 +22,12 @@
     "logfella": "^0.3.25",
     "minimist": "^1.2.0",
     "qs-kit": "^0.2.0",
-    "rest-query-shared": "^0.17.11",
+    "rest-query-shared": "^0.18.9",
     "roots-db": "^0.12.32",
     "server-kit": "^0.2.30",
     "string-kit": "^0.4.3",
     "token-kit": "^0.1.4",
-    "tree-kit": "^0.5.13"
+    "tree-kit": "^0.5.18"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
