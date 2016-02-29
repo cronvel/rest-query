@@ -1497,6 +1497,8 @@ describe( "Links" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "GET through a link" ) ;
+	
 	it( "PUT (create) on a link" , function( done ) {
 		
 		var app , performer , blog , id , userId , godfatherId ;
@@ -1647,6 +1649,8 @@ describe( "Links" , function() {
 		.exec( done ) ;
 	} ) ;
 	
+	it( "PUT through a link" ) ;
+	
 	it( "PATCH on a link" , function( done ) {
 		
 		var app , performer , blog , id , userId , godfatherId ;
@@ -1720,6 +1724,8 @@ describe( "Links" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	
+	it( "PATCH through a link" ) ;
 	
 	it( "DELETE on a link" , function( done ) {
 		
@@ -1796,6 +1802,8 @@ describe( "Links" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	
+	it( "DELETE through a link" ) ;
 	
 	it( "POST on a link should fail (it doesn't make sense)" , function( done ) {
 		
@@ -1879,6 +1887,8 @@ describe( "Links" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	
+	it( "DELETE through a link" ) ;
 	
 	it( "GET + populate links" , function( done ) {
 		
@@ -1971,7 +1981,7 @@ describe( "Links" , function() {
 
 describe( "Multi-links" , function() {
 	
-	it( "zzz GET on a multi-link" , function( done ) {
+	it( "GET on a multi-link" , function( done ) {
 		
 		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
 		
@@ -2055,6 +2065,99 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			*/
+			function( callback ) {
+				app.root.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( batch ) ;
+					expect( batch ).to.have.length( 3 ) ;
+					
+					var has = {} ;
+					has[ batch[ 0 ].firstName ] = true ;
+					has[ batch[ 1 ].firstName ] = true ;
+					has[ batch[ 2 ].firstName ] = true ;
+					expect( has ).to.eql( { Bobby: true , Jack: true , Joe: true } ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "POST on a multi-link should create a new resource and add it to the current link's array" , function( done ) {
+		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId1 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Not In",
+					lastName: "Dagroup",
+					email: "notindagroup@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId4 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Groups' , {
+					name: "The Group",
+					users: [ userId1 ],
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					groupId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Groups/' + groupId + '/~~users' , {
+					firstName: "Jack",
+					lastName: "Wallace",
+					email: "jack.wallace@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId2 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Groups/' + groupId + '/~~users' , {
+					firstName: "Bobby",
+					lastName: "Fischer",
+					email: "bobby.fischer@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId3 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
 			function( callback ) {
 				app.root.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
