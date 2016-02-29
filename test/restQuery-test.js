@@ -1981,7 +1981,7 @@ describe( "Links" , function() {
 
 describe( "Multi-links" , function() {
 	
-	it( "GET on a multi-link" , function( done ) {
+	it( "GET on and through a multi-link" , function( done ) {
 		
 		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
 		
@@ -2056,15 +2056,6 @@ describe( "Multi-links" , function() {
 					callback() ;
 				} ) ;
 			} ,
-			/*
-			function( callback ) {
-				app.root.get( '/Groups/' + groupId , { performer: performer , query: { populate: 'users' } } , function( error , group ) {
-					expect( error ).not.to.be.ok() ;
-					console.log( group ) ;
-					callback() ;
-				} ) ;
-			} ,
-			*/
 			function( callback ) {
 				app.root.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
@@ -2077,6 +2068,13 @@ describe( "Multi-links" , function() {
 					has[ batch[ 2 ].firstName ] = true ;
 					expect( has ).to.eql( { Bobby: true , Jack: true , Joe: true } ) ;
 					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
+					expect( error ).not.to.be.ok() ;
+					console.log( document ) ;
 					callback() ;
 				} ) ;
 			}
@@ -2176,6 +2174,11 @@ describe( "Multi-links" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	
+	it( "POST through a multi-link" ) ;
+	it( "PUT through a multi-link" ) ;
+	it( "PATCH through a multi-link" ) ;
+	it( "DELETE through a multi-link" ) ;
 } ) ;
 
 
