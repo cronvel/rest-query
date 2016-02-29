@@ -1973,7 +1973,7 @@ describe( "Multi-links" , function() {
 	
 	it( "zzz GET on a multi-link" , function( done ) {
 		
-		var app , performer , groupId , userId1 , userId2 , userId3 ;
+		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
 		
 		async.series( [
 			function( callback ) {
@@ -2023,6 +2023,19 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Not In",
+					lastName: "Dagroup",
+					email: "notindagroup@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId4 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
 				app.root.post( '/Groups' , {
 					name: "The Group",
 					users: [ userId1 , userId2 , userId3 ],
@@ -2045,7 +2058,15 @@ describe( "Multi-links" , function() {
 			function( callback ) {
 				app.root.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
-					console.log( batch ) ;
+					//console.log( batch ) ;
+					expect( batch ).to.have.length( 3 ) ;
+					
+					var has = {} ;
+					has[ batch[ 0 ].firstName ] = true ;
+					has[ batch[ 1 ].firstName ] = true ;
+					has[ batch[ 2 ].firstName ] = true ;
+					expect( has ).to.eql( { Bobby: true , Jack: true , Joe: true } ) ;
+					
 					callback() ;
 				} ) ;
 			}
