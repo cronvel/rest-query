@@ -658,6 +658,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 	} ) ;
 	
 	it( "DELETE on a property of an object" ) ;
+	it( "DELETE should recursively delete all children [NOT CODED ATM]" ) ;
 } ) ;
 
 
@@ -1888,7 +1889,7 @@ describe( "Links" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "DELETE through a link" ) ;
+	it( "POST through a link" ) ;
 	
 	it( "GET + populate links" , function( done ) {
 		
@@ -2260,10 +2261,82 @@ describe( "Multi-links" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	
-	
-	
-	it( "DELETE through a multi-link" ) ;
+	it( "DELETE through a multi-link should remove the targeted link" , function( done ) {
+		
+		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId1 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Jack",
+					lastName: "Wallace",
+					email: "jack.wallace@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId2 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Groups' , {
+					name: "The Group",
+					users: [ userId1 , userId2 ],
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					groupId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.delete( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( batch ) ;
+					expect( batch ).to.have.length( 1 ) ;
+					expect( batch[ 0 ]._id.toString()  ).to.be( userId2.toString() ) ;
+					expect( batch[ 0 ].firstName  ).to.be( 'Jack' ) ;
+					expect( batch[ 0 ].lastName  ).to.be( 'Wallace' ) ;
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
 } ) ;
 
 
