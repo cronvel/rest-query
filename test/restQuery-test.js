@@ -2074,7 +2074,15 @@ describe( "Multi-links" , function() {
 			function( callback ) {
 				app.root.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
 					expect( error ).not.to.be.ok() ;
-					console.log( document ) ;
+					expect( document._id.toString() ).to.be( userId1.toString() ) ;
+					expect( document.email ).to.be( 'joe.doe@gmail.com' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Groups/' + groupId + '/~~users/' + userId4 , { performer: performer } , function( error , document ) {
+					expect( error ).to.be.ok() ;
+					expect( error.type ).to.be( 'notFound' ) ;
 					callback() ;
 				} ) ;
 			}
