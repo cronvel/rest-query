@@ -2185,7 +2185,84 @@ describe( "Multi-links" , function() {
 	
 	it( "POST through a multi-link" ) ;
 	it( "PUT through a multi-link" ) ;
-	it( "PATCH through a multi-link" ) ;
+	
+	it( "PATCH through a multi-link" , function( done ) {
+		
+		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId1 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Jack",
+					lastName: "Wallace",
+					email: "jack.wallace@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId2 = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Groups' , {
+					name: "The Group",
+					users: [ userId1 , userId2 ],
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					groupId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.patch(
+					'/Groups/' + groupId + '/~~users/' + userId1 ,
+					{ firstName: "Joey" , email: "joey.doe@gmail.com" } ,
+					null ,
+					{ performer: performer } ,
+					function( error , document ) {
+						expect( error ).not.to.be.ok() ;
+						callback() ;
+					}
+				) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
+					expect( error ).not.to.be.ok() ;
+					expect( document._id.toString() ).to.be( userId1.toString() ) ;
+					expect( document.firstName ).to.be( 'Joey' ) ;
+					expect( document.email ).to.be( 'joey.doe@gmail.com' ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	
+	
+	
 	it( "DELETE through a multi-link" ) ;
 } ) ;
 
