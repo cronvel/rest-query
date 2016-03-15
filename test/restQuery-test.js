@@ -4570,6 +4570,26 @@ describe( "Client error management" , function() {
 
 describe( "Misc" , function() {
 	
+	it( "Shema's 'defaultPublicAccess'" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
+						.to.eql( { traverse: 1, read: 3, create: 1 } ) ;
+					expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
+						.to.eql( { read: 3 } ) ;
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 	it( "Test CORS" ) ;
 	it( "Test rootObject" ) ;
 } ) ;

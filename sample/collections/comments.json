@@ -1,5 +1,6 @@
 {
 	"path": "/comments" ,
+	"defaultPublicAccess": { "read": 3 } ,
 	"properties": {
 		"title": { "type": "string" },
 		"content": { "type": "string" }
