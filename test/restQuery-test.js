@@ -4549,6 +4549,31 @@ describe( "Hooks" , function() {
 
 describe( "Custom methods (POST to a METHOD)" , function() {
 	
+	it( "Custom root object method" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/SUPA-METHOD' , {
+					to: 'toto'
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					expect( response ).to.eql( { done: 'something' , to: 'toto' } ) ;
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
+	
 	it( "Custom collection method" , function( done ) {
 		
 		var app , performer , blog , id ;
