@@ -4549,7 +4549,7 @@ describe( "Hooks" , function() {
 
 describe( "Custom methods (POST to a METHOD)" , function() {
 	
-	it( "Custom method" , function( done ) {
+	it( "Custom collection method" , function( done ) {
 		
 		var app , performer , blog , id ;
 		
@@ -4567,6 +4567,65 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					expect( response ).to.eql( { done: 'something' , to: 'toto' } ) ;
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "Custom object method" , function( done ) {
+		
+		var app , performer , blog , userId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw",
+					publicAccess: "all"
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					userId = response.id ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' , {
+					lastName: 'Toto'
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					expect( response.done ).to.be( 'nothing' ) ;
+					expect( response.to.firstName ).to.be( 'Joe' ) ;
+					expect( response.to.lastName ).to.be( 'Doe' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' , {
+					firstName: 'Toto'
+				} , null , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					expect( response.done ).to.be( 'something' ) ;
+					expect( response.to.firstName ).to.be( 'Toto' ) ;
+					expect( response.to.lastName ).to.be( 'Doe' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.root.get( '/Users/' + userId , { performer: performer } , function( error , user ) {
+					expect( error ).not.to.be.ok() ;
+					expect( user.firstName ).to.be( 'Toto' ) ;
+					expect( user.lastName ).to.be( 'Doe' ) ;
 					callback() ;
 				} ) ;
 			} ,
