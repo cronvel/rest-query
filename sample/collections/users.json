@@ -13,5 +13,6 @@
 	} ,
 	"meta": {} ,
 	"indexes": [] ,
+	"@methods": "users.methods.js" ,
 	"@hooks": "users.hooks.js"
 }
