@@ -18,18 +18,6 @@ All request accept a callback of the form: `function( error , response , respons
 		a resource created by a POST request)
 	* a binary stream to send back to the client
 	
-* responseContext `Object` an object containing various information on performed request, usually having those common properties:
-	
-	* input `Object` see (*Common context input*)[#ref.common-context.input]
-	* output `Object` see (*Common context output*)[#ref.common-context.output]
-	* collectionNode `Object` instance of `restQuery.collectionNode` of the context of this hook
-	* objectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook
-	* parentObjectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook, is set when
-		the `objectNode` property does not make sense (e.g.: the *leaf* resource is a collection)
-	* document `Object` (optional) the targeted/created document in its final state
-	* batchOf `Array` (optional) parent batch the current document is part of
-	* linker `Object` (optional) the objectNode that linked the document
-	
-	* patchDocument `Object` (optional) a patch to apply on a existing document.
-	* existing `Object` (optional) if set, it is an existing document about to be patched or overwritten.
+* responseContext `Object` an object containing various information on the current request to be processed,     
+	see (*Common context*)[#ref.common-context]
 

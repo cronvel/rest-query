@@ -8,6 +8,8 @@ Work in progress, early alpha.
 
 
 
+
+
 ## Hooks
 
 A hook is a registered function that is triggered when some event occurs.
@@ -23,6 +25,8 @@ There are few differences between a classical event (i.e.: the observer pattern)
 
 Whatever the hook, they are always functions of the form: `function( hookContext , callback )`.
 
+Inside a hook, the `this` context is always the current `restQuery.App` instance.
+
 
 
 ### App hooks
@@ -31,14 +35,10 @@ App hooks are executed when the restQuery app is at different stage of execution
 
 The hook is a function of the form: `function( hookContext , callback )`, where:
 
-* hookContext `Object` an object containing various information on the current request to be processed, usually having those
-	common properties:
-	
-	* app `Object` instance of `restQuery.App`
+* hookContext `Object` this object is currently empty
 
 * callback `Function(error)` this is the completion callback, the current restQuery stage will wait for the hook to trigger
 	its callback to continue, however if the hook call its callback with an error, the restQuery app will be aborted.
-
 
 
 
@@ -55,21 +55,8 @@ Document hooks are executed when a user issue a request on a document.
 
 The hook is a function of the form: `function( hookContext , callback )`, where:
 
-* hookContext `Object` an object containing various information on the current request to be processed, usually having those
-	common properties:
-	
-	* app `Object` instance of `restQuery.App`
-	* collectionNode `Object` instance of `restQuery.collectionNode` of the context of this hook
-	* method `string` the method of the restQuery request, most of time this is the HTTP method used, but sometime restQuery
-		can exchange it internally to an equivalent (e.g.: a PUT on a subpart of the document is replaced by a PATCH on the
-		whole document).
-	* performer `Object` instance of `Performer` that most notably has a`.getUser()` method
-	* incomingDocument `Object` a whole document to create or that will overwrite another.
-	* patchDocument `Object` a patch to apply on a existing document.
-	* existing `Object` or `falsy`, if set, it is an existing document about to be patched or overwritten.
-	* query `Object` the query modifier, most of time this is the query string of the HTTP request.
-	* attachmentStreams `Object` an object describing attachment streams of the request.
-	* linkedFrom `Object` or `falsy`, if set, the request is issued on a link and this contains the document linking it.
+* hookContext `Object` an object containing various information on the current request to be processed,
+	see (*Common context*)[#ref.common-context]
 
 * callback `Function(error)` this is the completion callback, the request processing will wait for the hook to trigger its callback
 	to continue, however if the hook call its callback with an error, the request will be aborted.
@@ -108,5 +95,69 @@ When:
 
 * a DELETE request deleting a document
 
+
+
+
+
+## Request callback
+
+All request accept a callback of the form: `function( error , response , responseContext )`.
+
+* error: if set, then the request has not been performed, for various reasons, e.g.
+	* an application error (internal error)
+	* the user performing the action is not authorized
+	* the request does not make any sense
+	* the requested resources does not exist
+	* and so on...
+
+* response `Object` it is the response to the request, it depends on the kind of request, it can be:
+	* a document
+	* a batch of documents
+	* a response object (not a document, but an object with insightful information about what happend, e.g. the ID of
+		a resource created by a POST request)
+	* a binary stream to send back to the client
+	
+* responseContext `Object` an object containing various information on the current request to be processed,     
+	see (*Common context*)[#ref.common-context]
+
+
+
+
+<a name="ref.common-context"></a>
+## Common context
+
+This is the common object format passed to hook, custom method and as the third argument of the request callback.
+Usual properties are:
+                                                    
+* input `Object` contains data that have been passed as input (e.g. by a HTTP client, or by an internal call), where:
+	
+	* method `string` the original method used (i.e. the lower-cased HTTP method)
+	* pathParts `Array` the fully parsed path to the resource
+	* query `Object` particular query (filters, populate, etc...) to apply on the resource
+	* performer `Object` an instance of `restQuery.Performer`, it represents the user or the entity performing the action
+	* document `Object` (optional) the given document, if any (e.g. the body of a HTTP PUT request)
+	* attachmentStreams `Object` (optional) the given binary stream, if any (e.g. a part of a multipart body of a HTTP PUT request)
+
+* output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client,
+	or to an internal callback), where:
+	
+	* httpStatus (optional) `number` a particular HTTP status that may overide the default one
+	* meta `Object` (optional) meta-data of the document, common meta data:
+		
+		* contentType (optional) `string` the type of the content, default to `application/json`
+		* filename (optional) `string` if binary data is about to be sent, this is the name of the file
+	
+	* serializer `Function` (optional) the serializer to use, default to JSON.stringify()
+	* serializerArg (optional) an extra argument to pass to the serializer
+
+* collectionNode `Object` instance of `restQuery.collectionNode` of the context of this hook
+* objectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook
+* parentObjectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook, is set when
+	the `objectNode` property does not make sense (e.g. POST on a collection)
+* document `Object` (optional) the targeted/created document in its final state.
+* incomingDocument `Object` (optional) a whole document to create or that will overwrite another.
+* patchDocument `Object` (optional) a patch to apply on a existing document.
+* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
+* linker `Object` (optional) the objectNode that linked the document
 
 

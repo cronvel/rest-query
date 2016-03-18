@@ -10,7 +10,7 @@ module.exports = {
 	beforeCreate: function( context , callback ) {
 		log.debug( '>>>>>>>>>> beforeCreate, context: %I' , context ) ;
 		
-		context.performer.getUser( function( error , user ) {
+		context.input.performer.getUser( function( error , user ) {
 			log.debug( '>>>>>>>>>> beforeCreate, user: %I' , user ) ;
 			callback() ;
 		} ) ;
@@ -19,7 +19,7 @@ module.exports = {
 	beforeModify: function( context , callback ) {
 		log.debug( '>>>>>>>>>> beforeModify, context: %I' , context ) ;
 		
-		context.performer.getUser( function( error , user ) {
+		context.input.performer.getUser( function( error , user ) {
 			log.debug( '>>>>>>>>>> beforeModify, user: %I' , user ) ;
 			callback() ;
 		} ) ;
@@ -28,7 +28,7 @@ module.exports = {
 	beforeDelete: function( context , callback ) {
 		log.debug( '>>>>>>>>>> beforeDelete, context: %I' , context ) ;
 		
-		context.performer.getUser( function( error , user ) {
+		context.input.performer.getUser( function( error , user ) {
 			log.debug( '>>>>>>>>>> beforeDelete, user: %I' , user ) ;
 			callback() ;
 		} ) ;

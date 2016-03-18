@@ -45,19 +45,8 @@ Document hooks are executed when a user issue a request on a document.
 
 The hook is a function of the form: `function( hookContext , callback )`, where:
 
-* hookContext `Object` an object containing various information on the current request to be processed, usually having those
-	common properties:
-	
-	* input `Object` see (*Common context input*)[#ref.common-context.input]
-	* output `Object` see (*Common context output*)[#ref.common-context.output]
-	* collectionNode `Object` instance of `restQuery.collectionNode` of the context of this hook
-	* objectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook
-	* parentObjectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook, is set when
-		the `objectNode` property does not make sense (e.g. POST on a collection)
-	* incomingDocument `Object` (optional) a whole document to create or that will overwrite another.
-	* patchDocument `Object` (optional) a patch to apply on a existing document.
-	* existing `Object` (optional) if set, it is an existing document about to be patched or overwritten.
-	* linker `Object` (optional) if set, the request is issued on a link and this contains the document linking it.
+* hookContext `Object` an object containing various information on the current request to be processed,
+	see (*Common context*)[#ref.common-context]
 
 * callback `Function(error)` this is the completion callback, the request processing will wait for the hook to trigger its callback
 	to continue, however if the hook call its callback with an error, the request will be aborted.

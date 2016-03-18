@@ -1,8 +1,12 @@
 
 
+
+<a name="ref.common-context"></a>
 ## Common context
 
-<a name="ref.common-context.input"></a>
+This is the common object format passed to hook, custom method and as the third argument of the request callback.
+Usual properties are:
+                                                    
 * input `Object` contains data that have been passed as input (e.g. by a HTTP client, or by an internal call), where:
 	
 	* method `string` the original method used (i.e. the lower-cased HTTP method)
@@ -12,7 +16,6 @@
 	* document `Object` (optional) the given document, if any (e.g. the body of a HTTP PUT request)
 	* attachmentStreams `Object` (optional) the given binary stream, if any (e.g. a part of a multipart body of a HTTP PUT request)
 
-<a name="ref.common-context.output"></a>
 * output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client,
 	or to an internal callback), where:
 	
@@ -24,3 +27,15 @@
 	
 	* serializer `Function` (optional) the serializer to use, default to JSON.stringify()
 	* serializerArg (optional) an extra argument to pass to the serializer
+
+* collectionNode `Object` instance of `restQuery.collectionNode` of the context of this hook
+* objectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook
+* parentObjectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook, is set when
+	the `objectNode` property does not make sense (e.g. POST on a collection)
+* document `Object` (optional) the targeted/created document in its final state.
+* incomingDocument `Object` (optional) a whole document to create or that will overwrite another.
+* patchDocument `Object` (optional) a patch to apply on a existing document.
+* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
+* linker `Object` (optional) the objectNode that linked the document
+
+
