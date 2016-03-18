@@ -1,13 +1,5 @@
 
 
-# restQuery: perform REST queries on your database!
-
-Work in progress, early alpha.
-
-**/!\ This documentation is a work in progress! /!\\**
-
-
-
 ## Hooks
 
 A hook is a registered function that is triggered when some event occurs.
@@ -23,6 +15,8 @@ There are few differences between a classical event (i.e.: the observer pattern)
 
 Whatever the hook, they are always functions of the form: `function( hookContext , callback )`.
 
+Inside a hook, the `this` context is always the current `restQuery.App` instance.
+
 
 
 ### App hooks
@@ -31,14 +25,10 @@ App hooks are executed when the restQuery app is at different stage of execution
 
 The hook is a function of the form: `function( hookContext , callback )`, where:
 
-* hookContext `Object` an object containing various information on the current request to be processed, usually having those
-	common properties:
-	
-	* app `Object` instance of `restQuery.App`
+* hookContext `Object` this object is currently empty
 
 * callback `Function(error)` this is the completion callback, the current restQuery stage will wait for the hook to trigger
 	its callback to continue, however if the hook call its callback with an error, the restQuery app will be aborted.
-
 
 
 
@@ -58,18 +48,16 @@ The hook is a function of the form: `function( hookContext , callback )`, where:
 * hookContext `Object` an object containing various information on the current request to be processed, usually having those
 	common properties:
 	
-	* app `Object` instance of `restQuery.App`
+	* input `Object` see (*Common context input*)[#ref.common-context.input]
+	* output `Object` see (*Common context output*)[#ref.common-context.output]
 	* collectionNode `Object` instance of `restQuery.collectionNode` of the context of this hook
-	* method `string` the method of the restQuery request, most of time this is the HTTP method used, but sometime restQuery
-		can exchange it internally to an equivalent (e.g.: a PUT on a subpart of the document is replaced by a PATCH on the
-		whole document).
-	* performer `Object` instance of `Performer` that most notably has a`.getUser()` method
-	* incomingDocument `Object` a whole document to create or that will overwrite another.
-	* patchDocument `Object` a patch to apply on a existing document.
-	* existing `Object` or `falsy`, if set, it is an existing document about to be patched or overwritten.
-	* query `Object` the query modifier, most of time this is the query string of the HTTP request.
-	* attachmentStreams `Object` an object describing attachment streams of the request.
-	* linkedFrom `Object` or `falsy`, if set, the request is issued on a link and this contains the document linking it.
+	* objectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook
+	* parentObjectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook, is set when
+		the `objectNode` property does not make sense (e.g. POST on a collection)
+	* incomingDocument `Object` (optional) a whole document to create or that will overwrite another.
+	* patchDocument `Object` (optional) a patch to apply on a existing document.
+	* existing `Object` (optional) if set, it is an existing document about to be patched or overwritten.
+	* linker `Object` (optional) if set, the request is issued on a link and this contains the document linking it.
 
 * callback `Function(error)` this is the completion callback, the request processing will wait for the hook to trigger its callback
 	to continue, however if the hook call its callback with an error, the request will be aborted.
