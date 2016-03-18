@@ -176,7 +176,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/111111111111111111111111' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/111111111111111111111111' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -210,11 +210,11 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/' , function( error , object ) {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
+				//app.get( '/Posts/' , function( error , object ) {
+				//app.get( '/Blogs/' , function( error , object ) {
+				app.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life' ) ;
 					expect( object.description ).to.be( 'This is a supa blog!' ) ;
@@ -251,14 +251,14 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + id + '/.title' , { performer: performer } , function( error , title ) {
+				app.get( '/Blogs/' + id + '/.title' , { performer: performer } , function( error , title ) {
 					expect( error ).not.to.be.ok() ;
 					expect( title ).to.be( 'My wonderful life' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + id + '/.userAccess.' + randomId , { performer: performer } , function( error , access ) {
+				app.get( '/Blogs/' + id + '/.userAccess.' + randomId , { performer: performer } , function( error , access ) {
 					expect( error ).not.to.be.ok() ;
 					expect( access ).to.eql( { traverse: 1, read: 3 } ) ;
 					callback() ;
@@ -282,7 +282,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			} ,
 			function( callback ) {
 				//try {
-				app.root.post( '/Blogs' , {
+				app.post( '/Blogs' , {
 					title: 'My wonderful life posted!!!' ,
 					description: 'This is a supa blog! (posted!)' ,
 					publicAccess: 'all'
@@ -295,11 +295,11 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				//} catch ( error ) { console.log( '##############' ) ; }
 			} ,
 			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/' , function( error , object ) {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
+				//app.get( '/Posts/' , function( error , object ) {
+				//app.get( '/Blogs/' , function( error , object ) {
+				app.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life posted!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (posted!)' ) ;
@@ -324,7 +324,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					publicAccess: 'all'
@@ -334,11 +334,11 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/' , function( error , object ) {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				//app.get( '/Posts/' , function( error , object ) {
+				//app.get( '/Blogs/' , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
@@ -364,7 +364,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			} ,
 			function( callback ) {
 				// Same ID than in previous test
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -389,7 +389,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
 					publicAccess: 'all'
@@ -399,7 +399,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! Now overwritten!' ,
 					publicAccess: 'all'
@@ -409,11 +409,11 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/' , function( error , object ) {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				//app.get( '/Posts/' , function( error , object ) {
+				//app.get( '/Blogs/' , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now overwritten!' ) ;
@@ -438,7 +438,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( '/Blogs/111111111111111111111111' , {
+				app.patch( '/Blogs/111111111111111111111111' , {
 					description: 'Oh yeah!'
 				} , null , { performer: performer } , function( error , object ) {
 					
@@ -465,7 +465,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
 					embedded: { a: 'a' , b: 'b' } ,
@@ -476,7 +476,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					description: 'This is a supa blog! Now patched!' ,
 					"embedded.a": 'A' ,
 					parent: "should not overwrite" ,
@@ -487,11 +487,11 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/' , function( error , object ) {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				//app.get( '/Posts/' , function( error , object ) {
+				//app.get( '/Blogs/' , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
@@ -517,7 +517,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
 					embedded: { a: 'a' , b: 'b' } ,
@@ -528,13 +528,13 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/.embedded' , { a: 'omg' } , null , { performer: performer } , function( error ) {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/.embedded' , { a: 'omg' } , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
@@ -560,7 +560,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 3!!!' ,
 					description: 'This is a supa blog! (x3)' ,
 					publicAccess: 'all'
@@ -570,13 +570,13 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/.title' , "Change dat title." , null , { performer: performer } , function( error ) {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/.title' , "Change dat title." , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'Change dat title.' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
@@ -601,7 +601,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( '/Blogs/111111111111111111111111' , { performer: performer } , function( error , object ) {
+				app.delete( '/Blogs/111111111111111111111111' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
@@ -626,7 +626,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					publicAccess: 'all'
@@ -636,17 +636,17 @@ describe( "Basic queries of object of a top-level collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
+				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/' , function( error , object ) {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				//app.get( '/Posts/' , function( error , object ) {
+				//app.get( '/Blogs/' , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
@@ -679,7 +679,7 @@ describe( "Basic queries of top-level collections" , function() {
 			} ,
 			function( callback ) {
 				
-				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
+				app.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( batch ).to.be.eql( [] ) ;
@@ -721,7 +721,7 @@ describe( "Basic queries of top-level collections" , function() {
 				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs' , { performer: performer } , function( error , batch ) {
+				app.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( batch ).to.be.eql( [
@@ -774,7 +774,7 @@ describe( "Queries of nested object" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get(
+				app.get(
 					'/Blogs/111111111111111111111111/Posts/111111111111111111111111' ,
 					{ performer: performer } ,
 					function( error , object ) {
@@ -824,7 +824,7 @@ describe( "Queries of nested object" , function() {
 				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My first post!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah.' ) ;
@@ -878,7 +878,7 @@ describe( "Queries of nested object" , function() {
 				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My second post!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah.' ) ;
@@ -886,7 +886,7 @@ describe( "Queries of nested object" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
@@ -953,7 +953,7 @@ describe( "Queries of nested object" , function() {
 			} ,
 			//*/
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'nope!' ) ;
 					expect( object.content ).to.be( 'First!' ) ;
@@ -1042,7 +1042,7 @@ describe( "Queries of nested object" , function() {
 			} ,
 			//*/
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'nope!' ) ;
 					expect( object.content ).to.be( 'First!' ) ;
@@ -1050,7 +1050,7 @@ describe( "Queries of nested object" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
@@ -1059,7 +1059,7 @@ describe( "Queries of nested object" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + anotherPostId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + anotherPostId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My second post!' ) ;
 					expect( object.content ).to.be( 'Blih blih blih.' ) ;
@@ -1067,7 +1067,7 @@ describe( "Queries of nested object" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + anotherPostId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + anotherPostId + '/Comments/' + commentId , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					expect( error.httpStatus ).to.be( 404 ) ;
@@ -1158,7 +1158,7 @@ describe( "Queries of nested object" , function() {
 				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts' , { performer: performer } , function( error , batch ) {
+				app.get( '/Blogs/' + blogId + '/Posts' , { performer: performer } , function( error , batch ) {
 					
 					var i ;
 					
@@ -1226,7 +1226,7 @@ describe( "Queries of nested object" , function() {
 			} ,
 			*/
 			function( callback ) {
-				app.root.post(
+				app.post(
 					'/Blogs/' + blogId + '/Posts' ,
 					{
 						title: 'My first post!!!' ,
@@ -1244,7 +1244,7 @@ describe( "Queries of nested object" , function() {
 				) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My first post!!!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah...' ) ;
@@ -1292,7 +1292,7 @@ describe( "Queries of nested object" , function() {
 			} ,
 			*/
 			function( callback ) {
-				app.root.put(
+				app.put(
 					'/Blogs/' + blogId + '/Posts/' + postId ,
 					{
 						title: 'My first post!!!' ,
@@ -1308,7 +1308,7 @@ describe( "Queries of nested object" , function() {
 				) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My first post!!!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah...' ) ;
@@ -1318,7 +1318,7 @@ describe( "Queries of nested object" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put(
+				app.put(
 					'/Blogs/' + blogId + '/Posts/' + postId ,
 					{
 						title: 'My first post???' ,
@@ -1334,7 +1334,7 @@ describe( "Queries of nested object" , function() {
 				) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My first post???' ) ;
 					expect( object.content ).to.be( 'Blah?' ) ;
@@ -1391,7 +1391,7 @@ describe( "Queries of nested object" , function() {
 			} ,
 			// Ancestry mismatch
 			function( callback ) {
-				app.root.put(
+				app.put(
 					'/Blogs/' + anotherBlogId + '/Posts/' + postId ,
 					{
 						title: 'My edited post!' ,
@@ -1411,7 +1411,7 @@ describe( "Queries of nested object" , function() {
 			} ,
 			// Should not be edited
 			function( callback ) {
-				app.root.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My second post!' ) ;
 					expect( object.content ).to.be( 'Blah blah blah.' ) ;
@@ -1443,7 +1443,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "THE",
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
@@ -1456,7 +1456,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -1470,7 +1470,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'Joe' ) ;
@@ -1483,7 +1483,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'THE' ) ;
@@ -1513,7 +1513,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -1526,7 +1526,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Users/' + userId + '/~godfather' , {
+				app.put( '/Users/' + userId + '/~godfather' , {
 						firstName: "DAT",
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
@@ -1541,7 +1541,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'DAT' ) ;
@@ -1553,7 +1553,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + godfatherId , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + godfatherId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'DAT' ) ;
@@ -1581,7 +1581,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "THE",
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
@@ -1594,7 +1594,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -1608,7 +1608,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'Joe' ) ;
@@ -1621,7 +1621,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Users/' + userId + '/~godfather' , {
+				app.put( '/Users/' + userId + '/~godfather' , {
 						firstName: "DAT",
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
@@ -1635,7 +1635,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'DAT' ) ;
@@ -1665,7 +1665,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "THE",
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
@@ -1678,7 +1678,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -1692,7 +1692,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'Joe' ) ;
@@ -1705,13 +1705,13 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( '/Users/' + userId + '/~godfather' , { firstName: 'Da' } , null , { performer: performer } , function( error , object ) {
+				app.patch( '/Users/' + userId + '/~godfather' , { firstName: 'Da' } , null , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'Da' ) ;
@@ -1741,7 +1741,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "THE",
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
@@ -1754,7 +1754,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -1768,7 +1768,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + userId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'Joe' ) ;
@@ -1781,20 +1781,20 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+				app.delete( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + godfatherId , { performer: performer } , function( error , object ) {
+				app.get( '/Users/' + godfatherId , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					callback() ;
@@ -1819,7 +1819,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -1834,7 +1834,7 @@ describe( "Links" , function() {
 			
 			// POST when the link does not exist
 			function( callback ) {
-				app.root.post( '/Users/' + userId + '/~godfather' , {
+				app.post( '/Users/' + userId + '/~godfather' , {
 						firstName: "DAT",
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
@@ -1852,7 +1852,7 @@ describe( "Links" , function() {
 			
 			
 			function( callback ) {
-				app.root.put( '/Users/' + userId + '/~godfather' , {
+				app.put( '/Users/' + userId + '/~godfather' , {
 						firstName: "DAT",
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
@@ -1870,7 +1870,7 @@ describe( "Links" , function() {
 			
 			// POST when the link exist
 			function( callback ) {
-				app.root.post( '/Users/' + userId + '/~godfather' , {
+				app.post( '/Users/' + userId + '/~godfather' , {
 						firstName: "DAT",
 						lastName: "GODFATHER!",
 						email: "godfather@gmail.com",
@@ -1904,7 +1904,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Big Joe",
 					lastName: "Doe",
 					email: "big-joe@gmail.com",
@@ -1917,7 +1917,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "THE",
 					lastName: "GODFATHER",
 					email: "godfather@gmail.com",
@@ -1930,7 +1930,7 @@ describe( "Links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -1952,7 +1952,7 @@ describe( "Links" , function() {
 					}
 				} ;
 				
-				app.root.get( '/Users/' + userId , context , function( error , object ) {
+				app.get( '/Users/' + userId , context , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					
 					expect( object.firstName ).to.be( 'Joe' ) ;
@@ -1995,7 +1995,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -2008,7 +2008,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Jack",
 					lastName: "Wallace",
 					email: "jack.wallace@gmail.com",
@@ -2021,7 +2021,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fischer",
 					email: "bobby.fischer@gmail.com",
@@ -2034,7 +2034,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Not In",
 					lastName: "Dagroup",
 					email: "notindagroup@gmail.com",
@@ -2047,7 +2047,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Groups' , {
+				app.post( '/Groups' , {
 					name: "The Group",
 					users: [ userId1 , userId2 , userId3 ],
 					publicAccess: "all"
@@ -2058,7 +2058,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
+				app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( batch ) ;
 					expect( batch ).to.have.length( 3 ) ;
@@ -2073,7 +2073,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
+				app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
 					expect( error ).not.to.be.ok() ;
 					expect( document._id.toString() ).to.be( userId1.toString() ) ;
 					expect( document.email ).to.be( 'joe.doe@gmail.com' ) ;
@@ -2081,7 +2081,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Groups/' + groupId + '/~~users/' + userId4 , { performer: performer } , function( error , document ) {
+				app.get( '/Groups/' + groupId + '/~~users/' + userId4 , { performer: performer } , function( error , document ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					callback() ;
@@ -2103,7 +2103,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -2116,7 +2116,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Not In",
 					lastName: "Dagroup",
 					email: "notindagroup@gmail.com",
@@ -2129,7 +2129,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Groups' , {
+				app.post( '/Groups' , {
 					name: "The Group",
 					users: [ userId1 ],
 					publicAccess: "all"
@@ -2140,7 +2140,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Groups/' + groupId + '/~~users' , {
+				app.post( '/Groups/' + groupId + '/~~users' , {
 					firstName: "Jack",
 					lastName: "Wallace",
 					email: "jack.wallace@gmail.com",
@@ -2153,7 +2153,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Groups/' + groupId + '/~~users' , {
+				app.post( '/Groups/' + groupId + '/~~users' , {
 					firstName: "Bobby",
 					lastName: "Fischer",
 					email: "bobby.fischer@gmail.com",
@@ -2166,7 +2166,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
+				app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( batch ) ;
 					expect( batch ).to.have.length( 3 ) ;
@@ -2200,7 +2200,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -2213,7 +2213,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Jack",
 					lastName: "Wallace",
 					email: "jack.wallace@gmail.com",
@@ -2226,7 +2226,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Groups' , {
+				app.post( '/Groups' , {
 					name: "The Group",
 					users: [ userId1 , userId2 ],
 					publicAccess: "all"
@@ -2237,7 +2237,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch(
+				app.patch(
 					'/Groups/' + groupId + '/~~users/' + userId1 ,
 					{ firstName: "Joey" , email: "joey.doe@gmail.com" } ,
 					null ,
@@ -2249,7 +2249,7 @@ describe( "Multi-links" , function() {
 				) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
+				app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
 					expect( error ).not.to.be.ok() ;
 					expect( document._id.toString() ).to.be( userId1.toString() ) ;
 					expect( document.firstName ).to.be( 'Joey' ) ;
@@ -2274,7 +2274,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -2287,7 +2287,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Jack",
 					lastName: "Wallace",
 					email: "jack.wallace@gmail.com",
@@ -2300,7 +2300,7 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Groups' , {
+				app.post( '/Groups' , {
 					name: "The Group",
 					users: [ userId1 , userId2 ],
 					publicAccess: "all"
@@ -2311,20 +2311,20 @@ describe( "Multi-links" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
+				app.delete( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
+				app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , function( error , document ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
+				app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( batch ) ;
 					expect( batch ).to.have.length( 1 ) ;
@@ -2362,7 +2362,7 @@ describe( "Users" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Users/5437f846e41d0e910ec9a5d8' , {
+				app.put( '/Users/5437f846e41d0e910ec9a5d8' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -2373,11 +2373,11 @@ describe( "Users" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				//app.root.get( '/' , function( error , object ) {
+				//app.get( '/' , function( error , object ) {
 				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.root.get( '/Posts/' , function( error , object ) {
-				//app.root.get( '/Blogs/' , function( error , object ) {
-				app.root.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				//app.get( '/Posts/' , function( error , object ) {
+				//app.get( '/Blogs/' , function( error , object ) {
+				app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.firstName ).to.be( 'Joe' ) ;
 					expect( object.lastName ).to.be( 'Doe' ) ;
@@ -2447,7 +2447,7 @@ describe( "Slug usage" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					publicAccess: 'all'
@@ -2457,7 +2457,7 @@ describe( "Slug usage" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
@@ -2482,7 +2482,7 @@ describe( "Slug usage" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs' , {
+				app.post( '/Blogs' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					publicAccess: 'all'
@@ -2492,7 +2492,7 @@ describe( "Slug usage" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs' , {
+				app.post( '/Blogs' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog 2!' ,
 					publicAccess: 'all'
@@ -2521,7 +2521,7 @@ describe( "Slug usage" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs' , {
+				app.post( '/Blogs' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					publicAccess: 'all'
@@ -2531,7 +2531,7 @@ describe( "Slug usage" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
@@ -2541,7 +2541,7 @@ describe( "Slug usage" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/my-wonderful-life' , {
+				app.put( '/Blogs/my-wonderful-life' , {
 					title: 'New title!' ,
 					description: 'New description!' ,
 					publicAccess: 'all'
@@ -2551,7 +2551,7 @@ describe( "Slug usage" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'New title!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
@@ -2560,14 +2560,14 @@ describe( "Slug usage" , function() {
 			} ,
 			function( callback ) {
 				// It should not change its slug
-				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'New title!' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( '/Blogs/my-wonderful-life' , {
+				app.patch( '/Blogs/my-wonderful-life' , {
 					title: 'A brand new title!'
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
@@ -2575,7 +2575,7 @@ describe( "Slug usage" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'A brand new title!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
@@ -2584,20 +2584,20 @@ describe( "Slug usage" , function() {
 			} ,
 			function( callback ) {
 				// It should not change its slug
-				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'A brand new title!' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( '/Blogs/my-wonderful-life' , { performer: performer } , function( error ) {
+				app.delete( '/Blogs/my-wonderful-life' , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/' + id , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					callback() ;
@@ -2605,7 +2605,7 @@ describe( "Slug usage" , function() {
 			} ,
 			function( callback ) {
 				// It should not change its slug
-				app.root.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'notFound' ) ;
 					callback() ;
@@ -2634,7 +2634,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					publicAccess: 'all'
@@ -2644,7 +2644,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
@@ -2653,7 +2653,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
@@ -2662,7 +2662,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/my-wonderful-life' , { performer: performer } , function( error , object ) {
+				app.get( '/my-wonderful-life' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
@@ -2687,7 +2687,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life!!!' ,
 					description: 'This is a supa blog!' ,
 					publicAccess: 'all'
@@ -2697,7 +2697,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , {
 					title: 'You know what?' ,
 					content: "I'm happy!" ,
 					publicAccess: 'all'
@@ -2707,7 +2707,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
@@ -2717,7 +2717,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
@@ -2727,7 +2727,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
@@ -2737,7 +2737,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
@@ -2747,7 +2747,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/my-wonderful-life/you-know-what' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/my-wonderful-life/you-know-what' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
@@ -2757,7 +2757,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/my-wonderful-life/Posts/you-know-what' , { performer: performer } , function( error , object ) {
+				app.get( '/my-wonderful-life/Posts/you-know-what' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
@@ -2767,7 +2767,7 @@ describe( "Auto collection" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/my-wonderful-life/you-know-what' , { performer: performer } , function( error , object ) {
+				app.get( '/my-wonderful-life/you-know-what' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'You know what?' ) ;
 					expect( object.slugId ).to.be( 'you-know-what' ) ;
@@ -2798,7 +2798,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -2812,7 +2812,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2848,7 +2848,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				// Should found the token in the user document 
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					expect( response.token[ token ] ).to.be.ok() ;
 					callback() ;
@@ -2871,7 +2871,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -2884,7 +2884,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "wrong@gmail.com" ,
 					password: "pw",
@@ -2913,7 +2913,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -2926,7 +2926,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "bad pw",
@@ -2955,7 +2955,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs' , {
+				app.post( '/Blogs' , {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
 					publicAccess: 'all'
@@ -2967,7 +2967,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs/' + blogId + '/Users' , {
+				app.post( '/Blogs/' + blogId + '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -2980,7 +2980,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs/' + blogId + '/Users/CREATE-TOKEN' , {
+				app.post( '/Blogs/' + blogId + '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -2994,7 +2994,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				// Should not works globally!
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3021,7 +3021,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -3038,7 +3038,7 @@ describe( "Token creation" , function() {
 				
 				duration = 300 ;
 				
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3075,7 +3075,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				// Should be there
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
 					expect( response.token[ token ] ).to.be.ok() ;
@@ -3086,7 +3086,7 @@ describe( "Token creation" , function() {
 				
 				duration = 100000 ;
 				
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3121,7 +3121,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				// Should still be there
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( token , response ) ;
 					expect( response.token[ token ] ).to.be.ok() ;
@@ -3135,7 +3135,7 @@ describe( "Token creation" , function() {
 				
 				duration = 100000 ;
 				
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3170,7 +3170,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				// Should have been garbage collected
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
 					expect( response.token[ token ] ).not.to.be.ok() ;
@@ -3194,7 +3194,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -3208,7 +3208,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3253,7 +3253,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
 					expect( response.token[ oldToken ] ).to.be.ok() ;
@@ -3261,7 +3261,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/REGENERATE-TOKEN' , {} , null , { performer: oldTokenPerformer } , function( error , response ) {
+				app.post( '/Users/REGENERATE-TOKEN' , {} , null , { performer: oldTokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					
 					//console.log( response ) ;
@@ -3295,7 +3295,7 @@ describe( "Token creation" , function() {
 			} ,
 			function( callback ) {
 				// the old token should have been garbage collected
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
 					expect( response.token[ oldToken ] ).to.be.ok() ;
@@ -3322,7 +3322,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -3336,7 +3336,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3382,7 +3382,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
 					expect( response.token[ token ] ).to.be.ok() ;
@@ -3390,13 +3390,13 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
+				app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
 					expect( response.token[ token ] ).not.to.be.ok() ;
@@ -3408,7 +3408,7 @@ describe( "Token creation" , function() {
 				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
 				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 				
-				app.root.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
+				app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
@@ -3431,7 +3431,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -3445,7 +3445,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3491,7 +3491,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3535,7 +3535,7 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
 					expect( response.token[ token ] ).to.be.ok() ;
@@ -3544,13 +3544,13 @@ describe( "Token creation" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/REVOKE-ALL-TOKENS' , {} , null , { performer: tokenPerformer } , function( error , response ) {
+				app.post( '/Users/REVOKE-ALL-TOKENS' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + id , { performer: performer } , function( error , response ) {
+				app.get( '/Users/' + id , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
 					//console.log( response ) ;
 					expect( response.token[ token ] ).not.to.be.ok() ;
@@ -3563,14 +3563,14 @@ describe( "Token creation" , function() {
 				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
 				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 				
-				app.root.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
+				app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer2 } , function( error , response ) {
+				app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer2 } , function( error , response ) {
 					expect( error ).to.be.ok() ;
 					expect( error.message ).to.be( 'Token not found.' ) ;
 					callback() ;
@@ -3607,7 +3607,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Bobby",
 					lastName: "Fisher",
 					email: "bobby.fisher@gmail.com",
@@ -3620,7 +3620,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3641,7 +3641,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Groupy",
 					lastName: "Groups",
 					email: "groupy@gmail.com",
@@ -3654,7 +3654,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "groupy@gmail.com" ,
 					password: "groupy",
@@ -3675,7 +3675,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "not",
 					lastName: "enough",
 					email: "not-enough@gmail.com",
@@ -3688,7 +3688,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "not-enough@gmail.com" ,
 					password: "notenough",
@@ -3709,7 +3709,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Peon",
 					lastName: "Peon",
 					email: "peon@gmail.com",
@@ -3722,7 +3722,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "peon@gmail.com" ,
 					password: "peon",
@@ -3743,7 +3743,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Groups' , {
+				app.post( '/Groups' , {
 					name: "unauthorized group",
 					users: [ notEnoughAuthorizedId , authorizedByGroupId ]
 				} , null , { performer: performer } , function( error , response ) {
@@ -3754,7 +3754,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Groups' , {
+				app.post( '/Groups' , {
 					name: "authorized group",
 					users: [ authorizedByGroupId ]
 				} , null , { performer: performer } , function( error , response ) {
@@ -3776,7 +3776,7 @@ describe( "Access" , function() {
 				userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass
 				userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
@@ -3787,7 +3787,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
@@ -3797,7 +3797,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
@@ -3807,7 +3807,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
@@ -3817,7 +3817,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User listed, but with too low rights
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
@@ -3835,7 +3835,7 @@ describe( "Access" , function() {
 		
 		async.series( [
 			function( callback ) {
-				app.root.post( '/Users/CREATE-TOKEN' , {
+				app.post( '/Users/CREATE-TOKEN' , {
 					type: "header" ,
 					login: "bobby.fisher@gmail.com" ,
 					password: "pw",
@@ -3860,7 +3860,7 @@ describe( "Access" , function() {
 				var userAccess = {} ;
 				userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
@@ -3871,7 +3871,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
@@ -3881,7 +3881,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Expired token
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: expiredTokenPerformer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: expiredTokenPerformer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
@@ -3897,7 +3897,7 @@ describe( "Access" , function() {
 		
 		async.series( [
 			function( callback ) {
-				app.root.post( '/Blogs' , {
+				app.post( '/Blogs' , {
 					title: 'Public' ,
 					description: 'This is public' ,
 					publicAccess: 'read'
@@ -3911,7 +3911,7 @@ describe( "Access" , function() {
 				userAccess[ authorizedId ] = 'read' ;
 				userAccess[ notEnoughAuthorizedId ] = 'read' ;
 				
-				app.root.post( '/Blogs' , {
+				app.post( '/Blogs' , {
 					title: 'Selective' ,
 					description: 'This is selective' ,
 					userAccess: userAccess ,
@@ -3926,7 +3926,7 @@ describe( "Access" , function() {
 				userAccess[ authorizedId ] = 'read' ;
 				userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;
 				
-				app.root.post( '/Blogs' , {
+				app.post( '/Blogs' , {
 					title: 'Closed' ,
 					description: 'This is closed' ,
 					userAccess: userAccess ,
@@ -3937,7 +3937,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/' , { performer: authorizedPerformer } , function( error , batch ) {
+				app.get( '/Blogs/' , { performer: authorizedPerformer } , function( error , batch ) {
 					
 					expect( error ).not.to.be.ok() ;
 					//console.log( batch ) ;
@@ -3953,7 +3953,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.get( '/Blogs/' , { performer: performer } , function( error , batch ) {
+				app.get( '/Blogs/' , { performer: performer } , function( error , batch ) {
 					
 					expect( error ).not.to.be.ok() ;
 					expect( batch.length ).to.be( 1 ) ;
@@ -3963,7 +3963,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.get( '/Blogs/' , { performer: unauthorizedPerformer } , function( error , batch ) {
+				app.get( '/Blogs/' , { performer: unauthorizedPerformer } , function( error , batch ) {
 					
 					expect( batch.length ).to.be( 1 ) ;
 					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
@@ -3972,7 +3972,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User listed, but with too low rights
-				app.root.get( '/Blogs/' , { performer: notEnoughAuthorizedPerformer } , function( error , batch ) {
+				app.get( '/Blogs/' , { performer: notEnoughAuthorizedPerformer } , function( error , batch ) {
 					
 					expect( batch.length ).to.be( 2 ) ;
 					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
@@ -3992,7 +3992,7 @@ describe( "Access" , function() {
 				userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
 				userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
@@ -4007,7 +4007,7 @@ describe( "Access" , function() {
 				userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
 				userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I've changed my mind!" ,
 					description: 'Seriously!' ,
 					userAccess: userAccess ,
@@ -4019,7 +4019,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!" ,
 					description: 'Seriously!'
 				} , null , { performer: performer } , function( error ) {
@@ -4031,7 +4031,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!" ,
 					description: 'Seriously!'
 				} , null , { performer: unauthorizedPerformer } , function( error ) {
@@ -4043,7 +4043,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User listed, but with too low rights
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!" ,
 					description: 'Seriously!'
 				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
@@ -4065,7 +4065,7 @@ describe( "Access" , function() {
 				userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
 				userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
@@ -4076,7 +4076,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I've changed my mind!"
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
@@ -4085,7 +4085,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!"
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
@@ -4096,7 +4096,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!"
 				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
@@ -4107,7 +4107,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User listed, but with too low rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!"
 				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
@@ -4128,7 +4128,7 @@ describe( "Access" , function() {
 				userAccess[ authorizedId ] = 'all' ;	// Minimal right that pass
 				userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
@@ -4140,7 +4140,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
+				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4149,7 +4149,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error ) {
+				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4158,7 +4158,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User listed, but with too low rights
-				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error ) {
+				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
 					expect( error.message ).to.be( 'Access forbidden.' ) ;
@@ -4166,7 +4166,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error ) {
+				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;
@@ -4183,7 +4183,7 @@ describe( "Access" , function() {
 				userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass
 				userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
@@ -4194,7 +4194,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: 'Put one' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
@@ -4205,7 +4205,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d1' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d1' , {
 					title: 'Put two' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
@@ -4218,7 +4218,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d2' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d2' , {
 					title: 'Put three' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
@@ -4231,7 +4231,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User listed, but with too low rights
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d3' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d3' , {
 					title: 'Put four' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
@@ -4254,7 +4254,7 @@ describe( "Access" , function() {
 				userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass
 				userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
@@ -4265,7 +4265,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
+				app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
 					title: 'Post one' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
@@ -4276,7 +4276,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
+				app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
 					title: 'Post two' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
@@ -4289,7 +4289,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
+				app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
 					title: 'Post three' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
@@ -4302,7 +4302,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User listed, but with too low rights
-				app.root.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
+				app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
 					title: 'Post four' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
@@ -4328,7 +4328,7 @@ describe( "Access" , function() {
 				var groupAccess = {} ;
 				groupAccess[ authorizedGroupId ] = 'read' ;
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
@@ -4340,7 +4340,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
@@ -4350,7 +4350,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User authorized by its group
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedByGroupPerformer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedByGroupPerformer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
@@ -4360,7 +4360,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User listed, but with too low rights
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
@@ -4370,7 +4370,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
@@ -4380,7 +4380,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'forbidden' ) ;
@@ -4410,7 +4410,7 @@ describe( "Access" , function() {
 				
 				userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
 				
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: 'My wonderful life 2!!!' ,
 					description: 'This is a supa blog! (x2)' ,
 					userAccess: userAccess ,
@@ -4421,7 +4421,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: 'A boring title' ,
 					content: 'Blah blah blah...' ,
 				} , null , { performer: authorizedPerformer } , function( error ) {
@@ -4430,7 +4430,7 @@ describe( "Access" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I've changed my mind!"
 				} , null , { performer: authorizedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
@@ -4439,7 +4439,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 					{ performer: authorizedPerformer } ,
 					function( error , document ) {
 						expect( error ).not.to.be.ok() ;
@@ -4450,7 +4450,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).to.be.ok() ;
@@ -4461,7 +4461,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
 				} , null , { performer: unauthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
@@ -4472,7 +4472,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User listed, but with too low rights
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
 				} , null , { performer: notEnoughAuthorizedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
@@ -4485,7 +4485,7 @@ describe( "Access" , function() {
 			// Now give public access
 			
 			function( callback ) {
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					publicAccess: {
 						traverse: 1 ,
 						inheritance: {
@@ -4500,7 +4500,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.root.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can do that!"
 				} , null , { performer: performer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
@@ -4509,7 +4509,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// User not listed in specific rights
-				app.root.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 					{ performer: unauthorizedPerformer } ,
 					function( error , document ) {
 						expect( error ).not.to.be.ok() ;
@@ -4562,7 +4562,7 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/SUPA-METHOD' , {
+				app.post( '/SUPA-METHOD' , {
 					to: 'toto'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -4587,7 +4587,7 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/DO-SOMETHING' , {
+				app.post( '/Users/DO-SOMETHING' , {
 					to: 'toto'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -4612,7 +4612,7 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users' , {
+				app.post( '/Users' , {
 					firstName: "Joe",
 					lastName: "Doe",
 					email: "joe.doe@gmail.com",
@@ -4625,7 +4625,7 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' , {
+				app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' , {
 					lastName: 'Toto'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -4636,7 +4636,7 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' , {
+				app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' , {
 					firstName: 'Toto'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
@@ -4647,7 +4647,7 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				app.root.get( '/Users/' + userId , { performer: performer } , function( error , user ) {
+				app.get( '/Users/' + userId , { performer: performer } , function( error , user ) {
 					expect( error ).not.to.be.ok() ;
 					expect( user.firstName ).to.be( 'Toto' ) ;
 					expect( user.lastName ).to.be( 'Doe' ) ;
