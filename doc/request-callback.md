@@ -19,5 +19,5 @@ All request accept a callback of the form: `function( error , response , respons
 	* a binary stream to send back to the client
 	
 * responseContext `Object` an object containing various information on the current request to be processed,     
-	see (*Common context*)[#ref.common-context]
+	see [*Common context*](#ref.common-context)
 

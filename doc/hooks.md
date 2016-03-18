@@ -46,7 +46,7 @@ Document hooks are executed when a user issue a request on a document.
 The hook is a function of the form: `function( hookContext , callback )`, where:
 
 * hookContext `Object` an object containing various information on the current request to be processed,
-	see (*Common context*)[#ref.common-context]
+	see [*Common context*](#ref.common-context)
 
 * callback `Function(error)` this is the completion callback, the request processing will wait for the hook to trigger its callback
 	to continue, however if the hook call its callback with an error, the request will be aborted.
