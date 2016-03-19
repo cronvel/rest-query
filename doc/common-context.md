@@ -28,14 +28,15 @@ Usual properties are:
 	* serializer `Function` (optional) the serializer to use, default to JSON.stringify()
 	* serializerArg (optional) an extra argument to pass to the serializer
 
+* document `Object` (optional) the targeted/created document in its final state.
+* incomingDocument `Object` (optional) a whole document to create or that will overwrite another.
+* incomingPatch `Object` (optional) a patch to apply on a existing document.
+* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
+* deletedDocument `Object` (optional) if set, it is a document that have been deleted or replaced.
 * collectionNode `Object` instance of `restQuery.collectionNode` of the context of this hook
 * objectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook
 * parentObjectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook, is set when
 	the `objectNode` property does not make sense (e.g. POST on a collection)
-* document `Object` (optional) the targeted/created document in its final state.
-* incomingDocument `Object` (optional) a whole document to create or that will overwrite another.
-* patchDocument `Object` (optional) a patch to apply on a existing document.
-* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
-* linker `Object` (optional) the objectNode that linked the document
+* linkerObjectNode `Object` (optional) the objectNode that linked the document
 
 
