@@ -62,6 +62,7 @@ var expect = require( 'expect.js' ) ;
 var doormen = require( 'doormen' ) ;
 
 var fsKit = require( 'fs-kit' ) ;
+var hash = require( 'hash-kit' ) ;
 
 
 
@@ -2373,10 +2374,6 @@ describe( "Users" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				//app.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.get( '/Posts/' , function( error , object ) {
-				//app.get( '/Blogs/' , function( error , object ) {
 				app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
 					expect( object.firstName ).to.be( 'Joe' ) ;
@@ -2388,6 +2385,8 @@ describe( "Users" , function() {
 					expect( object.password.algo ).to.be( 'sha512' ) ;
 					expect( object.password.salt ).to.be.a( 'string' ) ;
 					expect( object.password.hash ).to.be.a( 'string' ) ;
+					// check the password
+					expect( hash.password( "pw" , object.password.salt , object.password.algo ) ).to.be( object.password.hash ) ;
 					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
@@ -2400,7 +2399,80 @@ describe( "Users" , function() {
 	
 	it( "PATCH on an unexisting user" ) ;
 	
-	it( "PUT, then PATCH, then GET" ) ;
+	it( "PUT, then PATCH, then GET" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.put( '/Users/5437f846e41d0e910ec9a5d8' , {
+					firstName: "Joe",
+					lastName: "Doe",
+					email: "joe.doe@gmail.com",
+					password: "pw" ,
+					publicAccess: 'all'
+				} , null , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					expect( object.firstName ).to.be( 'Joe' ) ;
+					expect( object.lastName ).to.be( 'Doe' ) ;
+					expect( object.slugId ).to.be( 'joe-doe' ) ;
+					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
+					//console.log( object.password ) ;
+					expect( object.password ).to.be.an( 'object' ) ;
+					expect( object.password.algo ).to.be( 'sha512' ) ;
+					expect( object.password.salt ).to.be.a( 'string' ) ;
+					expect( object.password.hash ).to.be.a( 'string' ) ;
+					// check the password
+					expect( hash.password( "pw" , object.password.salt , object.password.algo ) ).to.be( object.password.hash ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.patch( '/Users/5437f846e41d0e910ec9a5d8' , {
+					firstName: "Joey",
+					lastName: "Doe",
+					email: "joey.doe@gmail.com",
+					password: "pw2"
+				} , null , { performer: performer } , function( error ) {
+					expect( error ).not.to.be.ok() ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					expect( object.firstName ).to.be( 'Joey' ) ;
+					expect( object.lastName ).to.be( 'Doe' ) ;
+					expect( object.slugId ).to.be( 'joe-doe' ) ;
+					expect( object.email ).to.be( 'joey.doe@gmail.com' ) ;
+					//console.log( object.password ) ;
+					expect( object.password ).to.be.an( 'object' ) ;
+					expect( object.password.algo ).to.be( 'sha512' ) ;
+					expect( object.password.salt ).to.be.a( 'string' ) ;
+					expect( object.password.hash ).to.be.a( 'string' ) ;
+					// check the password
+					expect( hash.password( "pw2" , object.password.salt , object.password.algo ) ).to.be( object.password.hash ) ;
+					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
 	
 	it( "DELETE on an unexisting user" ) ;
 	
