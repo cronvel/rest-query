@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.23.1",
+  "version": "0.23.2",
   "engines": {
     "node": ">=4.0.0"
   },
@@ -23,8 +23,8 @@
     "logfella": "^0.3.25",
     "minimist": "^1.2.0",
     "qs-kit": "^0.2.0",
-    "rest-query-shared": "^0.19.0",
-    "roots-db": "^0.12.36",
+    "rest-query-shared": "^0.19.1",
+    "roots-db": "^0.12.37",
     "server-kit": "^0.2.31",
     "string-kit": "^0.4.3",
     "token-kit": "^0.1.4",
