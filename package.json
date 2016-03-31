@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.25.1",
+  "version": "0.25.2",
   "engines": {
     "node": ">=4.0.0"
   },
@@ -24,7 +24,7 @@
     "minimist": "^1.2.0",
     "qs-kit": "^0.2.0",
     "rest-query-shared": "^0.19.1",
-    "roots-db": "^0.12.37",
+    "roots-db": "^0.12.38",
     "server-kit": "^0.2.31",
     "string-kit": "^0.4.3",
     "token-kit": "^0.1.4",
@@ -34,7 +34,7 @@
     "expect.js": "^0.3.1",
     "jshint": "^2.9.1",
     "mocha": "^2.4.5",
-    "mongodb": "^2.1.7",
+    "mongodb": "^2.1.14",
     "smart-preprocessor": "^0.2.0"
   },
   "scripts": {
