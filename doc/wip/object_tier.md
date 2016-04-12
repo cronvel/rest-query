@@ -13,13 +13,13 @@ its title and references, eventually the author that has written it.
 
 Those data WILL BE EXPOSED as soon as the user has an access to a document that link them.
 
-A tier 0 request will return document's properties containing identification-only values, e.g.:
+A tier 1 request will return document's properties containing identification-only values, e.g.:
 
 * id/_id
 * slug
 * title
 * email/login
-* name, firstName, lastName
+* eventually: name, firstName, lastName
 
 
 
@@ -37,6 +37,7 @@ E.g.:
 * tags
 * summary
 * other links
+* eventually: name, firstName, lastName (if not in the tier 1)
 
 
 
