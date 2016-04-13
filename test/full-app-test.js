@@ -1537,6 +1537,110 @@ describe( "Links population" , function() {
 					
 					callback() ;
 				} ) ;
+			},
+			function( callback ) {
+				getQuery = {
+					method: 'GET' ,
+					path: '/Users?populate=[father,godfather]&tier=5&pTier=1' ,
+					headers: {
+						Host: 'localhost'
+					}
+				} ;
+				
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					data.sort( function( a , b ) {
+						return a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ;
+					} ) ;
+					
+					delete data[ 0 ].password ;
+					delete data[ 1 ].password ;
+					delete data[ 2 ].password ;
+					
+					expect( data ).to.be.eql( [
+						{
+							_id: data[ 0 ]._id,
+							firstName: "Big Joe",
+							lastName: "Doe",
+							email: "big.joe.doe@gmail.com",
+							login: "big.joe.doe@gmail.com",
+							isApiKey: false,
+							slugId: data[ 0 ].slugId,
+							groups: [],
+							//father: null, godfather: null,
+							token: {},
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 3, create: 1 },
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						},
+						{
+							_id: data[ 1 ]._id,
+							firstName: "Joe",
+							lastName: "Doe",
+							email: "joe.doe@gmail.com",
+							login: "joe.doe@gmail.com",
+							isApiKey: false,
+							slugId: data[ 1 ].slugId,	// Cannot be predicted
+							groups: [],
+							token: {},
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 3, create: 1 },
+							parent: {
+								collection: null,
+								id: '/'
+							},
+							father: {
+								_id: data[ 0 ]._id,
+								login: "big.joe.doe@gmail.com",
+								parent: {
+									collection: null,
+									id: "/"
+								},
+							},
+							godfather: {
+								_id: data[ 2 ]._id,
+								login: "godfather@gmail.com",
+								parent: {
+									collection: null,
+									id: "/"
+								},
+							}
+						},
+						{
+							_id: data[ 2 ]._id,
+							firstName: "THE",
+							lastName: "GODFATHER",
+							email: "godfather@gmail.com",
+							login: "godfather@gmail.com",
+							isApiKey: false,
+							slugId: data[ 2 ].slugId,
+							groups: [],
+							//father: null, godfather: null,
+							token: {},
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 3, create: 1 },
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						}
+					] ) ;
+					
+					callback() ;
+				} ) ;
 			}
 		] )
 		.exec( done ) ;
