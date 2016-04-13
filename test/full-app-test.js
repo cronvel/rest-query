@@ -654,6 +654,139 @@ describe( "Basics tests" , function() {
 		
 	} ) ;
 	
+	it( "Multiple PUT then GET on the whole blog collection" , function( done ) {
+		
+		var putQuery1 = {
+			method: 'PUT' ,
+			path: '/Blogs/543bb877bd15489d0d7b0121' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: "First post!",
+				description: "Everything started with that."
+			} )
+		} ;
+		
+		var putQuery2 = {
+			method: 'PUT' ,
+			path: '/Blogs/543bb877bd15489d0d7b0122' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: "About",
+				description: "About this blog."
+			} )
+		} ;
+		
+		var putQuery3 = {
+			method: 'PUT' ,
+			path: '/Blogs/543bb877bd15489d0d7b0123' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: "10 things about nothing",
+				description: "10 things you should know... or not..."
+			} )
+		} ;
+		
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Blogs/' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		async.series( [
+			function( callback ) {
+				requester( putQuery1 , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( putQuery2 , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( putQuery3 , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 201 ) ;
+					
+					//console.log( "Response:" , response ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					data = data.sort( ( a , b ) => a._id < b._id ? -1 : 1 ) ;
+					
+					expect( data ).to.be.eql( [ 
+						{
+							_id: "543bb877bd15489d0d7b0121",
+							title: "First post!",
+							description: "Everything started with that.",
+							slugId: data[ 0 ].slugId,	// Cannot be predicted
+							parent: {
+								collection: null,
+								id: '/'
+							},
+						} ,
+						{
+							_id: "543bb877bd15489d0d7b0122",
+							title: "About",
+							description: "About this blog.",
+							slugId: data[ 1 ].slugId,	// Cannot be predicted
+							parent: {
+								collection: null,
+								id: '/'
+							},
+						} ,
+						{
+							_id: "543bb877bd15489d0d7b0123",
+							title: "10 things about nothing",
+							description: "10 things you should know... or not...",
+							slugId: data[ 2 ].slugId,	// Cannot be predicted
+							parent: {
+								collection: null,
+								id: '/'
+							},
+						} ,
+					] ) ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
 } ) ;
 
 
@@ -1003,6 +1136,84 @@ describe( "Links population" , function() {
 							lastName: "Doe",
 							email: "big.joe.doe@gmail.com",
 							login: "big.joe.doe@gmail.com",
+							slugId: data.father.slugId,
+							groups: [],
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						},
+						godfather: {
+							_id: data.godfather._id,
+							firstName: "THE",
+							lastName: "GODFATHER",
+							email: "godfather@gmail.com",
+							login: "godfather@gmail.com",
+							slugId: data.godfather.slugId,
+							groups: [],
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						}
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				getQuery = {
+					method: 'GET' ,
+					path: '/Users/' + u3 + '?populate=[father,godfather]&tier=5&pTier=5' ,
+					headers: {
+						Host: 'localhost'
+					}
+				} ;
+				
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data.password ).to.be.an( 'object' ) ;
+					expect( data.password.algo ).to.be.a( 'string' ) ;
+					expect( data.password.salt ).to.be.a( 'string' ) ;
+					expect( data.password.hash ).to.be.a( 'string' ) ;
+					delete data.password ;
+					delete data.father.password ;
+					delete data.godfather.password ;
+					
+					expect( data ).to.be.eql( {
+						_id: data._id,
+						firstName: "Joe",
+						lastName: "Doe",
+						email: "joe.doe@gmail.com",
+						login: "joe.doe@gmail.com",
+						slugId: data.slugId,	// Cannot be predicted
+						groups: [],
+						parent: {
+							collection: null,
+							id: '/'
+						},
+						isApiKey: false,
+						token: {},
+						publicAccess: {
+							create: 1,
+							read: 3,
+							traverse: 1
+						},
+						userAccess: {},
+						groupAccess: {},
+						father: {
+							_id: data.father._id,
+							firstName: "Big Joe",
+							lastName: "Doe",
+							email: "big.joe.doe@gmail.com",
+							login: "big.joe.doe@gmail.com",
 							isApiKey: false,
 							slugId: data.father.slugId,
 							groups: [],
@@ -1041,7 +1252,170 @@ describe( "Links population" , function() {
 			function( callback ) {
 				getQuery = {
 					method: 'GET' ,
+					path: '/Users/' + u3 + '?populate=[father,godfather]&tier=5&pTier=1' ,
+					headers: {
+						Host: 'localhost'
+					}
+				} ;
+				
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data.password ).to.be.an( 'object' ) ;
+					expect( data.password.algo ).to.be.a( 'string' ) ;
+					expect( data.password.salt ).to.be.a( 'string' ) ;
+					expect( data.password.hash ).to.be.a( 'string' ) ;
+					delete data.password ;
+					delete data.father.password ;
+					delete data.godfather.password ;
+					
+					expect( data ).to.be.eql( {
+						_id: data._id,
+						firstName: "Joe",
+						lastName: "Doe",
+						email: "joe.doe@gmail.com",
+						login: "joe.doe@gmail.com",
+						slugId: data.slugId,	// Cannot be predicted
+						groups: [],
+						parent: {
+							collection: null,
+							id: '/'
+						},
+						isApiKey: false,
+						token: {},
+						publicAccess: {
+							create: 1,
+							read: 3,
+							traverse: 1
+						},
+						userAccess: {},
+						groupAccess: {},
+						father: {
+							_id: data.father._id,
+							login: "big.joe.doe@gmail.com",
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						},
+						godfather: {
+							_id: data.godfather._id,
+							login: "godfather@gmail.com",
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						}
+					} ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				getQuery = {
+					method: 'GET' ,
 					path: '/Users?populate=[father,godfather]' ,
+					headers: {
+						Host: 'localhost'
+					}
+				} ;
+				
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					data.sort( function( a , b ) {
+						return a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ;
+					} ) ;
+					
+					expect( data ).to.be.eql( [
+						{
+							_id: data[ 0 ]._id,
+							firstName: "Big Joe",
+							lastName: "Doe",
+							email: "big.joe.doe@gmail.com",
+							login: "big.joe.doe@gmail.com",
+							slugId: data[ 0 ].slugId,
+							groups: [],
+							//father: null, godfather: null,
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						},
+						{
+							_id: data[ 1 ]._id,
+							firstName: "Joe",
+							lastName: "Doe",
+							email: "joe.doe@gmail.com",
+							login: "joe.doe@gmail.com",
+							slugId: data[ 1 ].slugId,	// Cannot be predicted
+							groups: [],
+							parent: {
+								collection: null,
+								id: '/'
+							},
+							father: {
+								_id: data[ 0 ]._id,
+								firstName: "Big Joe",
+								lastName: "Doe",
+								email: "big.joe.doe@gmail.com",
+								login: "big.joe.doe@gmail.com",
+								slugId: data[ 0 ].slugId,
+								groups: [],
+								parent: {
+									collection: null,
+									id: "/"
+								},
+							},
+							godfather: {
+								_id: data[ 2 ]._id,
+								firstName: "THE",
+								lastName: "GODFATHER",
+								email: "godfather@gmail.com",
+								login: "godfather@gmail.com",
+								slugId: data[ 2 ].slugId,
+								groups: [],
+								parent: {
+									collection: null,
+									id: "/"
+								},
+							}
+						},
+						{
+							_id: data[ 2 ]._id,
+							firstName: "THE",
+							lastName: "GODFATHER",
+							email: "godfather@gmail.com",
+							login: "godfather@gmail.com",
+							slugId: data[ 2 ].slugId,
+							groups: [],
+							//father: null, godfather: null,
+							parent: {
+								collection: null,
+								id: "/"
+							},
+						}
+					] ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				getQuery = {
+					method: 'GET' ,
+					path: '/Users?populate=[father,godfather]&tier=5&pTier=5' ,
 					headers: {
 						Host: 'localhost'
 					}
