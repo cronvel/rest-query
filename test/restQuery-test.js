@@ -123,7 +123,9 @@ function commonApp( callback )
 	if ( currentApp ) { currentApp.shutdown() ; }
 	
 	var app = restQuery.createApp( __dirname + '/../sample/main.json' , cliOptions ) ;
-	var performer = app.createPerformer() ;
+	
+	// Create a system performer
+	var performer = app.createPerformer( null , true ) ;
 	
 	currentApp = app ;
 	
@@ -3660,6 +3662,7 @@ describe( "Token creation" , function() {
 describe( "Access" , function() {
 	
 	var app , performer ,
+		notConnectedPerformer ,
 		authorizedId , authorizedPerformer ,
 		authorizedByGroupId , authorizedByGroupPerformer ,
 		notEnoughAuthorizedId , notEnoughAuthorizedPerformer ,
@@ -3675,6 +3678,7 @@ describe( "Access" , function() {
 				commonApp( function( error , a , p ) {
 					app = a ;
 					performer = p ;
+					notConnectedPerformer = app.createPerformer() ;
 					callback() ;
 				} ) ;
 			} ,
@@ -3869,7 +3873,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
@@ -4025,7 +4029,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.get( '/Blogs/' , { performer: performer } , function( error , batch ) {
+				app.get( '/Blogs/' , { performer: notConnectedPerformer } , function( error , batch ) {
 					
 					expect( error ).not.to.be.ok() ;
 					expect( batch.length ).to.be( 1 ) ;
@@ -4094,7 +4098,7 @@ describe( "Access" , function() {
 				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!" ,
 					description: 'Seriously!'
-				} , null , { performer: performer } , function( error ) {
+				} , null , { performer: notConnectedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4159,7 +4163,7 @@ describe( "Access" , function() {
 				// Non-connected user
 				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
 					title: "I cant do that!"
-				} , null , { performer: performer } , function( error ) {
+				} , null , { performer: notConnectedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4212,7 +4216,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error ) {
+				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4281,7 +4285,7 @@ describe( "Access" , function() {
 					title: 'Put two' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
-				} , null , { performer: performer } , function( error ) {
+				} , null , { performer: notConnectedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4352,7 +4356,7 @@ describe( "Access" , function() {
 					title: 'Post two' ,
 					content: 'Blah blah blah...' ,
 					publicAccess: 'read'
-				} , null , { performer: performer } , function( error ) {
+				} , null , { performer: notConnectedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4442,7 +4446,7 @@ describe( "Access" , function() {
 			} ,
 			function( callback ) {
 				// Non-connected user
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , function( error , object ) {
+				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } , function( error , object ) {
 					
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
@@ -4524,7 +4528,7 @@ describe( "Access" , function() {
 				// Non-connected user
 				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can't do that!"
-				} , null , { performer: performer } , function( error ) {
+				} , null , { performer: notConnectedPerformer } , function( error ) {
 					expect( error ).to.be.ok() ;
 					expect( error.type ).to.be( 'unauthorized' ) ;
 					expect( error.message ).to.be( 'Public access forbidden.' ) ;
@@ -4574,7 +4578,7 @@ describe( "Access" , function() {
 				// Non-connected user
 				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
 					title: "I can do that!"
-				} , null , { performer: performer } , function( error ) {
+				} , null , { performer: notConnectedPerformer } , function( error ) {
 					expect( error ).not.to.be.ok() ;
 					callback() ;
 				} ) ;

@@ -106,6 +106,7 @@ describe( "Parse HTTP request" , function() {
 				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'get' ,
+				tier: 3 ,
 				query: {}
 			} ) ;
 			
@@ -142,6 +143,7 @@ describe( "Parse HTTP request" , function() {
 				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'get' ,
+				tier: 3 ,
 				query: { populate: 'group' }
 			} ) ;
 			
@@ -162,6 +164,7 @@ describe( "Parse HTTP request" , function() {
 				//type: 'json' ,
 				host: 'localhost' ,
 				method: 'post' ,
+				tier: 3 ,
 				query: {} ,
 				data: { a: 'simple', json: 'file' }
 			} ) ;

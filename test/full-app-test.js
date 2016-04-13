@@ -313,13 +313,40 @@ describe( "Basics tests" , function() {
 						title: "My website!",
 						description: "... about my wonderful life",
 						slugId: data.slugId,	// Cannot be predicted
-						userAccess: {},
-						groupAccess: {},
-						publicAccess: { traverse: 1, read: 3, create: 1 } ,
 						parent: {
 							collection: null,
 							id: '/'
-						}
+						},
+					} ) ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				getQuery.path += "?tier=4" ;
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data ).to.be.eql( {
+						_id: "543bb877bd15489d0d7b0120",
+						title: "My website!",
+						description: "... about my wonderful life",
+						slugId: data.slugId,	// Cannot be predicted
+						parent: {
+							collection: null,
+							id: '/'
+						},
+						userAccess: {},
+						groupAccess: {},
+						publicAccess: { traverse: 1, read: 3, create: 1 } ,
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
@@ -329,7 +356,6 @@ describe( "Basics tests" , function() {
 			}
 		] )
 		.exec( done ) ;
-		
 	} ) ;
 	
 	it( "POST then GET on a blog" , function( done ) {
@@ -393,9 +419,6 @@ describe( "Basics tests" , function() {
 						title: "My website!",
 						description: "... about my wonderful life",
 						slugId: data.slugId,	// Cannot be predicted
-						userAccess: {},
-						groupAccess: {},
-						publicAccess: { traverse: 1, read: 3 , create: 1 } ,
 						parent: {
 							collection: null,
 							id: '/'
@@ -406,10 +429,39 @@ describe( "Basics tests" , function() {
 					
 					callback() ;
 				} ) ;
+			} ,
+			function( callback ) {
+				getQuery.path += "?tier=4" ;
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data ).to.be.eql( {
+						_id: postDocument.id,
+						title: "My website!",
+						description: "... about my wonderful life",
+						slugId: data.slugId,	// Cannot be predicted
+						parent: {
+							collection: null,
+							id: '/'
+						} ,
+						userAccess: {},
+						groupAccess: {},
+						publicAccess: { traverse: 1, read: 3 , create: 1 }
+					} ) ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
 			}
 		] )
 		.exec( done ) ;
-		
 	} ) ;
 	
 	it( "PUT, PATCH then GET on a blog" , function( done ) {
@@ -485,13 +537,40 @@ describe( "Basics tests" , function() {
 						title: "My *NEW* website!",
 						description: "... about my wonderful life",
 						slugId: data.slugId,	// Cannot be predicted
-						userAccess: {},
-						groupAccess: {},
-						publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
 						parent: {
 							collection: null,
 							id: '/'
 						}
+					} ) ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				getQuery.path += "?tier=4" ;
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data ).to.be.eql( {
+						_id: "543bb877bd15489d0d7b0121",
+						title: "My *NEW* website!",
+						description: "... about my wonderful life",
+						slugId: data.slugId,	// Cannot be predicted
+						parent: {
+							collection: null,
+							id: '/'
+						},
+						userAccess: {},
+						groupAccess: {},
+						publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
 					} ) ;
 					
 					//console.log( "Response:" , response ) ;
@@ -640,6 +719,36 @@ describe( "Basics tests on users" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
+				requester( getQuery , function( error , response ) {
+					
+					expect( error ).not.to.be.ok() ;
+					expect( response.status ).to.be( 200 ) ;
+					
+					expect( response.body ).to.be.ok() ;
+					
+					var data = JSON.parse( response.body ) ;
+					
+					expect( data ).to.be.eql( {
+						_id: "543bb877bd15489d0d7b0130",
+						firstName: "Joe",
+						lastName: "Doe2",
+						email: "joe.doe2@gmail.com",
+						login: "joe.doe2@gmail.com",
+						groups: [],
+						slugId: data.slugId,	// Cannot be predicted
+						parent: {
+							collection: null,
+							id: '/'
+						}
+					} ) ;
+					
+					//console.log( "Response:" , response ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				getQuery.path += "?tier=5" ;
 				requester( getQuery , function( error , response ) {
 					
 					expect( error ).not.to.be.ok() ;
@@ -873,12 +982,6 @@ describe( "Links population" , function() {
 					
 					var data = JSON.parse( response.body ) ;
 					
-					expect( data.password ).to.be.an( 'object' ) ;
-					expect( data.password.algo ).to.be.a( 'string' ) ;
-					expect( data.password.salt ).to.be.a( 'string' ) ;
-					expect( data.password.hash ).to.be.a( 'string' ) ;
-					//console.log( data.password ) ;
-					delete data.password ;
 					delete data.father.password ;
 					delete data.godfather.password ;
 					
@@ -888,13 +991,8 @@ describe( "Links population" , function() {
 						lastName: "Doe",
 						email: "joe.doe@gmail.com",
 						login: "joe.doe@gmail.com",
-						isApiKey: false,
 						slugId: data.slugId,	// Cannot be predicted
 						groups: [],
-						token: {},
-						userAccess: {},
-						groupAccess: {},
-						publicAccess: { traverse: 1, read: 3, create: 1 },
 						parent: {
 							collection: null,
 							id: '/'
