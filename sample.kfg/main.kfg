@@ -1,10 +1,10 @@
 collections:
-	users: @collections/users.json
-	groups: @collections/groups.json
-	scheduledTasks: @collections/scheduledTasks.json
-	blogs: @collections/blogs.json
-	posts: @collections/posts.json
-	comments: @collections/comments.json
+	users: @@collections/users.kfg
+	groups: @@collections/groups.kfg
+	scheduledTasks: @@collections/scheduledTasks.kfg
+	blogs: @@collections/blogs.kfg
+	posts: @@collections/posts.kfg
+	comments: @@collections/comments.kfg
 
 tree:
 	users: null
@@ -22,8 +22,8 @@ passwords:
 	salt: 3113 n3 v3u+ p45 13 d123
 
 rootAutoCollection: blogs
-rootObject: @rootObject.json
-rootMethods: @rootMethods.js
+rootObject: @@rootObject.kfg
+rootMethods: @@rootMethods.js
 scheduler:
 	active: true
 	period: 1000
@@ -42,7 +42,7 @@ log:
 			role: mon
 			listen: 4321
 
-hooks: @app.hooks.js
-workers: @workers.js
+hooks: @@app.hooks.js
+workers: @@workers.js
 
 (*>) @config.local.kfg

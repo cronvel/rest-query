@@ -1,0 +1,10 @@
+path: /posts
+properties:
+	title:
+		type: string
+	content:
+		type: string
+meta: object
+indexes: array
+hooks: object
+slugGenerationProperty: title

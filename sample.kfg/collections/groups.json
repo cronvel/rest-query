@@ -1,8 +1,0 @@
-{
-	"restQueryType": "groups" ,
-	"path": "/groups" ,
-	"properties": {} ,
-	"meta": {} ,
-	"indexes": [] ,
-	"hooks": {}
-}

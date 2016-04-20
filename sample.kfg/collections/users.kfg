@@ -1,0 +1,29 @@
+restQueryType: users
+path: /users
+attachmentPath: /users
+properties:
+	firstName:
+		type: string
+	lastName:
+		type: string
+	email: 
+		type: email
+	avatar:
+		type: attachment
+		optional: true
+	bigAvatar:
+		type: attachment
+		optional: true
+	father: 
+		type: link
+		collection: users
+		optional: true
+	godfather: 
+		type: link
+		collection: users
+		optional: true 
+meta: object
+indexes: array
+collectionMethods: @@users.collectionMethods.js
+objectMethods: @@users.objectMethods.js
+hooks: @@users.hooks.js

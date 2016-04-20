@@ -1,0 +1,14 @@
+path: /blogs
+properties:
+	title:
+		type: string
+	description:
+		type: string
+	embedded:
+		optional: true
+		type: strictObject
+meta: object
+indexes: array 
+hooks: @@blogs.hooks.js 
+slugGenerationProperty: title 
+autoCollection: posts
