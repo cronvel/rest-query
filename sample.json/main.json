@@ -43,5 +43,5 @@
 	} ,
 	"@hooks": "app.hooks.js" ,
 	"@workers": "workers.js" ,
-	"?@*>": "config.local.json"
+	"@*>": "config.local.json"
 }

@@ -122,7 +122,7 @@ function commonApp( callback )
 {
 	if ( currentApp ) { currentApp.shutdown() ; }
 	
-	var app = restQuery.createApp( __dirname + '/../sample/main.json' , cliOptions ) ;
+	var app = restQuery.createApp( __dirname + '/../sample.kfg/main.kfg' , cliOptions ) ;
 	
 	// Create a system performer
 	var performer = app.createPerformer( null , true ) ;

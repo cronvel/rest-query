@@ -133,7 +133,7 @@ function connect( callback )
 function runApp( maybeCallback )
 {
 	appProcess = childProcess.spawn( __dirname + '/../bin/restquery' , [
-		__dirname + '/../sample/main.json' ,
+		__dirname + '/../sample.kfg/main.kfg' ,
 		'--port' , appPort ,
 		'--buildIndexes'
 	] ) ;

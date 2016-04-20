@@ -1,0 +1,11 @@
+{
+	"path": "/posts" ,
+	"properties": {
+		"title": { "type": "string" },
+		"content": { "type": "string" }
+	} ,
+	"meta": {} ,
+	"indexes": [] ,
+	"hooks": {} ,
+	"slugGenerationProperty": "title"
+}
