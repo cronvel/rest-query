@@ -4643,7 +4643,14 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 					to: 'toto'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( { done: 'something' , to: 'toto' } ) ;
+					expect( response ).to.eql( { done: "something" , to: "toto" } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/SUPA-METHOD' , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					expect( response ).to.eql( { done: "nothing" , cause: "this is a GET request" } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4668,7 +4675,14 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 					to: 'toto'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( { done: 'something' , to: 'toto' } ) ;
+					expect( response ).to.eql( { done: "something" , to: "toto" } ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Users/DO-SOMETHING' , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					expect( response ).to.eql( { done: "nothing" , cause: "this is a GET request" } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4720,6 +4734,13 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 					expect( response.done ).to.be( 'something' ) ;
 					expect( response.to.firstName ).to.be( 'Toto' ) ;
 					expect( response.to.lastName ).to.be( 'Doe' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Users/' + userId + '/CHANGE-FIRST-NAME' , { performer: performer } , function( error , response ) {
+					expect( error ).not.to.be.ok() ;
+					expect( response ).to.eql( { done: "nothing" , cause: "this is a GET request" } ) ;
 					callback() ;
 				} ) ;
 			} ,
