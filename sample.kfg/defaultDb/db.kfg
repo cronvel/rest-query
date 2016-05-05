@@ -1,0 +1,14 @@
+collection: users
+documents:
+	-	firstName: Joe
+		lastName: Doe
+		email: joe.doe@gmail.com
+		login: jdoe
+	-	firstName: Bobby
+		lastName: Fisher
+		email: bobby.fisher@gmail.com
+		login: bfisher
+	-	firstName: Jack
+		lastName: Wallace
+		email: jack.wallace@gmail.com
+		login: jwallace
