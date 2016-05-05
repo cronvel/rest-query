@@ -1,5 +1,4 @@
-collection: users
-documents:
+users:
 	-	firstName: Joe
 		lastName: Doe
 		email: joe.doe@gmail.com
@@ -12,3 +11,6 @@ documents:
 		lastName: Wallace
 		email: jack.wallace@gmail.com
 		login: jwallace
+blogs:
+	-	title: YAB
+		description: Yet another blog

@@ -4811,6 +4811,9 @@ describe( "Misc" , function() {
 	
 	it( "Test CORS" ) ;
 	it( "Test rootObject" ) ;
+	
+	it( "Test --buildIndexes" ) ;
+	it( "Test --initDb <filepath>" ) ;
 } ) ;
 
 
