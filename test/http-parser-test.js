@@ -127,17 +127,23 @@ describe( "Parse HTTP request" , function() {
 				path: [
 					{
 						identifier: "path" ,
-						node: "path" ,
+						isCollection: false ,
+						isDocument: true ,
+						value: "path" ,
 						type: "slugId"
 					} ,
 					{
 						identifier: "to" ,
-						node: "to" ,
+						isCollection: false ,
+						isDocument: true ,
+						value: "to" ,
 						type: "slugId"
 					} ,
 					{
 						identifier: "json" ,
-						node: "json" ,
+						isCollection: false ,
+						isDocument: true ,
+						value: "json" ,
 						type: "slugId"
 					}
 				] ,
