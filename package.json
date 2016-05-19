@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.31.1",
+  "version": "0.31.2",
   "engines": {
     "node": ">=4.0.0"
   },
@@ -23,8 +23,8 @@
     "logfella": "^0.3.30",
     "minimist": "^1.2.0",
     "qs-kit": "^0.4.1",
-    "rest-query-shared": "^0.32.1",
-    "roots-db": "^0.13.6",
+    "rest-query-shared": "^0.32.2",
+    "roots-db": "^0.13.7",
     "server-kit": "^0.2.38",
     "string-kit": "^0.4.4",
     "token-kit": "^0.1.4",
@@ -52,5 +52,13 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cronvel/rest-query/issues"
+  },
+  "copyright": {
+    "title": "Rest Query",
+    "years": [
+      2014,
+      2016
+    ],
+    "owner": "Cédric Ronvel"
   }
 }
