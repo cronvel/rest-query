@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.31.4",
+  "version": "0.31.5",
   "engines": {
     "node": ">=4.0.0"
   },
@@ -13,28 +13,28 @@
     "restquery": "./bin/restquery"
   },
   "dependencies": {
-    "async-kit": "^1.0.0",
-    "doormen": "^0.4.21",
+    "async-kit": "^2.0.1",
+    "doormen": "^0.4.24",
     "error-status": "^1.7.0",
     "fs-kit": "^0.1.3",
     "hash-kit": "^0.2.0",
     "json-kit": "^0.4.4",
     "kung-fig": "^0.12.1",
-    "logfella": "^0.3.30",
+    "logfella": "^0.3.31",
     "minimist": "^1.2.0",
     "qs-kit": "^0.4.1",
-    "rest-query-shared": "^0.32.9",
-    "roots-db": "^0.13.7",
-    "server-kit": "^0.2.38",
-    "string-kit": "^0.4.4",
+    "rest-query-shared": "^0.32.11",
+    "roots-db": "^0.13.8",
+    "server-kit": "^0.2.39",
+    "string-kit": "^0.5.4",
     "token-kit": "^0.1.4",
     "tree-kit": "^0.5.20"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
     "jshint": "^2.9.2",
-    "mocha": "^2.4.5",
-    "mongodb": "^2.1.16",
+    "mocha": "^2.5.3",
+    "mongodb": "^2.1.20",
     "smart-preprocessor": "^0.2.0"
   },
   "scripts": {
