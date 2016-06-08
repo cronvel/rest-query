@@ -66,7 +66,7 @@ Each node as type. A node type is determinist: just by looking at the string we 
   The link node returns the linked document.
   E.g.: `~avatar` returns a document linked by the parent document under the `avatar` property name.
 
-* Multi-Link node: start with a double tilde '~~' and followed by any number of alpha-numeric characters.
+* Multi-Link node: start with a double tilde `~~` and followed by any number of alpha-numeric characters.
   This is collection linked by the parent document.
   Its name is converted by simply removing the double tilde, the remaining characters exactly matches a property name of
   the parent document, which is a multi-link. The multi-link node returns a batch of documents.
