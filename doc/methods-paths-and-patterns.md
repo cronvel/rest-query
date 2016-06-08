@@ -52,14 +52,14 @@ Each node as type. A node type is determinist: just by looking at the string we 
   with the POST method.
   E.g.: `CREATE-TOKEN` execute the method `createToken()` on its parent node.
 
-* Property node: start with a dot '.' and followed by any number of alpha-numeric characters.
+* Property node: start with a dot `.` and followed by any number of alpha-numeric characters.
   This is a property of the parent document.
   Its name is converted by simply removing the first dot, the remaining characters exactly matches the property name of a document.
   E.g.: `.title` returns the property `title` of the parent document.
   It is possible to join adjacent property node into only one node, e.g.: `.meta/.tags` can be joined into `.meta.tags`,
   assuming `meta` is a nested object of the parent document, and `tags` a property of `meta`.
 
-* Link node: start with a tilde '~' and followed by any number of alpha-numeric characters.
+* Link node: start with a tilde `~` and followed by any number of alpha-numeric characters.
   This is document linked by the parent document.
   Its name is converted by simply removing the tilde, the remaining characters exactly matches a property name of the parent document,
   which is a link.
