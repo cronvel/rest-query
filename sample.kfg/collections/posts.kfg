@@ -4,7 +4,7 @@ properties:
 		type: string
 	content:
 		type: string
-meta: object
-indexes: array
-hooks: object
+meta: <object>
+indexes: <array>
+hooks: <object>
 slugGenerationProperty: title

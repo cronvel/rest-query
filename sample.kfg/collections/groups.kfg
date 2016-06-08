@@ -1,6 +1,6 @@
 restQueryType: groups
 path: /groups
-properties: object
-meta: object
-indexes: array
-hooks: object
+properties: <object>
+meta: <object>
+indexes: <array>
+hooks: <object>

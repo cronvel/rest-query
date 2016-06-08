@@ -7,8 +7,8 @@ properties:
 	embedded:
 		optional: true
 		type: strictObject
-meta: object
-indexes: array
+meta: <object>
+indexes: <array>
 hooks: @@blogs.hooks.js 
 slugGenerationProperty: title 
 autoCollection: posts

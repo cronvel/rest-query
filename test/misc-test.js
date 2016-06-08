@@ -32,6 +32,8 @@
 
 
 var doormen = require( 'doormen' ) ;
+var kungFig = require( 'kung-fig' ) ;
+var string = require( 'string-kit' ) ;
 
 // restQuery will extend doormen, so it should be loaded
 var restQuery = require( '../lib/restQuery.js' ) ;	// jshint ignore:line
@@ -54,3 +56,19 @@ describe( "doormen's restQuery specific" , function() {
 } ) ;
 
 
+describe( "KFG and JSON conformance" , function() {
+
+	it( "KFG and JSON should create the same config" , function() {
+		var kfg = kungFig.load( __dirname + '/../sample.kfg/main.kfg' ) ;
+		//console.error( JSON.stringify( kfg , null , '\t' ) ) ;
+		console.error( string.inspect( {style:'color',depth: 10} , kfg ) ) ;
+		
+		var json = kungFig.load( __dirname + '/../sample.json/main.json' ) ;
+		//console.error( JSON.stringify( json , null , '\t' ) ) ;
+		console.error( string.inspect( {style:'color',depth: 10} , json ) ) ;
+		
+		doormen.equals( JSON.stringify( kfg ) , JSON.stringify( json ) ) ;
+		//doormen.equals( kfg , json ) ;
+		return ;
+	} ) ;
+} ) ;
