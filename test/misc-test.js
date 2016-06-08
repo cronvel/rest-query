@@ -61,13 +61,17 @@ describe( "KFG and JSON conformance" , function() {
 	it( "KFG and JSON should create the same config" , function() {
 		var kfg = kungFig.load( __dirname + '/../sample.kfg/main.kfg' ) ;
 		//console.error( JSON.stringify( kfg , null , '\t' ) ) ;
-		console.error( string.inspect( {style:'color',depth: 10} , kfg ) ) ;
+		//console.error( string.inspect( {style:'color',depth: 10} , kfg ) ) ;
+		//var kfg2 = kungFig.reduce( kfg , { port: 7777 } ) ;
+		//console.error( string.inspect( {style:'color',depth: 10} , kfg2 ) ) ;
 		
 		var json = kungFig.load( __dirname + '/../sample.json/main.json' ) ;
 		//console.error( JSON.stringify( json , null , '\t' ) ) ;
-		console.error( string.inspect( {style:'color',depth: 10} , json ) ) ;
+		//console.error( string.inspect( {style:'color',depth: 10} , json ) ) ;
 		
 		doormen.equals( JSON.stringify( kfg ) , JSON.stringify( json ) ) ;
+		
+		// /!\ Doormen fails on this test /!\
 		//doormen.equals( kfg , json ) ;
 		return ;
 	} ) ;
