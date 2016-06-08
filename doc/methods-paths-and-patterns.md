@@ -3,14 +3,14 @@
 
 # Methods overview
 
-* GET: *retrieve* an object or a collection of objects
-* PUT: *create* or *update* (overwrite) an object in the collection, the object is placed at the exact place
-  in the provided URI, with the exact ID provided, except if it violate uniqueness, if an object exists, 
+* GET: *retrieve* a document or a collection (array of documents)
+* PUT: *create* or *update* (overwrite) a document in the collection, the document is placed at the exact place
+  in the provided URI, with the exact ID provided, except if it violate uniqueness, if a document exists, 
   it is replaced entirely by the new object.
-* PATCH: *update* partially, update only parts of the object present in the patch body
-* DELETE: *delete* the object (or the collection, if possible)
+* PATCH: *update* partially, update only parts of the document present in the patch body
+* DELETE: *delete* the document (or the collection, if possible)
 * POST:
-	* *create* an object on the collection 
+	* *create* a document on the collection 
 	* execute a method of a collection, e.g. `POST /Users/CREATE-TOKEN` will authenticate the user with {ID} as ID
 	* execute a method of a document, e.g. `POST /Users/{id}/SOME-METHOD` will execute `someMethod()` of the user (document)
 	* POST always indicate something that cannot be done offline.
@@ -33,8 +33,8 @@ Each node as type. A node type is determinist: just by looking at the string we 
 
 # Path's Node types
 
-* Collection node: start with an upper-case letter, and followed by a low-case letter, followed by any alpha-numeric characters
-  (both low and upper case). A collection is a batch of documents.
+* Collection node: start with an upper-case letter, and followed by a low-case letter, followed by any number of
+  alpha-numeric characters (both low and upper case). A collection is a batch of documents.
   Its name is converted into camelCase (first letter is lowercased) to match a database collection/table and a schema.
   E.g.: `Users` is a collection of `users` (schema) store in the collection/table `users` in the database
 
@@ -47,26 +47,29 @@ Each node as type. A node type is determinist: just by looking at the string we 
   SlugIds are unique among their siblings.
   E.g.: `my-wonderful-blog`.
 
-* Method node: only contains upper case letters, numbers and hyphen, and should start with 2 upper case letters.
+* Method node: start with 2 upper case letters, followed by any number of upper case letters, numbers and hyphen.
   Its name converted to camelCase is used to execute a special methods on a collection or a document, and could only be used
   with the POST method.
   E.g.: `CREATE-TOKEN` execute the method `createToken()` on its parent node.
 
-* Property node: start with a dot '.' and followed by any alpha-numeric characters. This is a property of the parent document.
-  Its name is converted by simply removing the first dot, the following exactly matches the property name of a document.
+* Property node: start with a dot '.' and followed by any number of alpha-numeric characters.
+  This is a property of the parent document.
+  Its name is converted by simply removing the first dot, the remaining characters exactly matches the property name of a document.
   E.g.: `.title` returns the property `title` of the parent document.
   It is possible to join adjacent property node into only one node, e.g.: `.meta/.tags` can be joined into `.meta.tags`,
   assuming `meta` is a nested object of the parent document, and `tags` a property of `meta`.
 
-* Link node: start with a tilde '~' and followed by any alpha-numeric characters. This is document linked by the parent document.
-  Its name is converted by simply removing the tilde, the following exactly matches a property name of the parent document,
-  which is a link. The link node returns the linked document.
+* Link node: start with a tilde '~' and followed by any number of alpha-numeric characters.
+  This is document linked by the parent document.
+  Its name is converted by simply removing the tilde, the remaining characters exactly matches a property name of the parent document,
+  which is a link.
+  The link node returns the linked document.
   E.g.: `~avatar` returns a document linked by the parent document under the `avatar` property name.
 
-* Multi-Link node: start with a double tilde '~~' and followed by any alpha-numeric characters. This is collection linked
-  by the parent document.
-  Its name is converted by simply removing the double tilde, the following exactly matches a property name of the parent document,
-  which is a multi-link. The multi-link node returns a batch of documents.
+* Multi-Link node: start with a double tilde '~~' and followed by any number of alpha-numeric characters.
+  This is collection linked by the parent document.
+  Its name is converted by simply removing the double tilde, the remaining characters exactly matches a property name of
+  the parent document, which is a multi-link. The multi-link node returns a batch of documents.
   E.g.: `~~friends` returns a batch of documents linked by the parent document under the `friends` property name.
 
 Examples:
@@ -82,11 +85,11 @@ Examples:
 
 # Pattern matching
 
-Path pattern are path that contains wildcards. All wildcards start with an opening braces and end with a closing brace.
+Path pattern are path that contains wildcard tags. All tags start with an opening braces and end with a closing brace.
 
 E.g.: `/Users/{id}` is a pattern that matches all path consisting in a `Users` collection node and any ID node type.
 
-List of wildcards:
+List of wildcards/tags:
 
 * `{id}`: match any node of the ID type
 * `{slugId}`: match any node of the slugId type
@@ -101,10 +104,14 @@ E.g.: `/Users/{document}/{...}` will match:
 * `/Users/123456789012345678901234/~~friends`
 * `/Users/bob/~avatar`
 
-A context object may be passed to the pattern-matcher. The pattern can refer to it a markup starting with `$`, producing
-markup like: `{$path.to.some.property}`.
 
-E.g.: assuming we got a this context object:
+
+# Contextified patterns
+
+A context object may be passed to the pattern-matcher. The pattern can refer to it by a markup starting with `$`,
+producing markup like: `{$path.to.some.property}`.
+
+E.g.: assuming we got this context object:
 
 ```
 {
@@ -117,6 +124,41 @@ E.g.: assuming we got a this context object:
 ```
 
 ... then the pattern `/Users/{$connectedUser.id}/~avatar` will match `/Users/123456789012345678901234/~avatar`.
+
+
+
+# Capturing matches
+
+When a path is matching a pattern, the result is an object containing a lot of matches, in the form of parsed path.
+
+A parsed path is an array of Node object.
+The array has a special `.toString()` method that convert it back to the path's string.
+
+E.g.: The pattern `/Users/{document}/{...}` will match `/Users/123456789012345678901234/~~friends`, the resulting object
+would have the properties:
+
+* .full: the full path that matched
+* .primaryPath: contains the parsed path `/Users/123456789012345678901234` (anything that matched before the {...} tag,
+* .document.match: contains the parsed path `/123456789012345678901234`
+* .document.before: contains the parsed path `/Users`
+* .document.after: contains the parsed path `/~~friends`
+* .document.upto: contains the parsed path `/Users/123456789012345678901234`
+* .document.onward: contains the parsed path `/123456789012345678901234/~~friends`
+* .users.match: contains the parsed path `/Users`
+* .users.onward: contains the parsed path `/123456789012345678901234/~~friends`
+* .usersDocument.match: contains the parsed path `/123456789012345678901234`
+  or the full path if no {...} tag are present)
+* ... and many others...
+
+
+
+## Naming captured matches
+
+It is possible to give a custom name to matches by appending a colon ':' and a name at the end of the tag.
+E.g.: The pattern `/Users/{document:userId}/{...}` will have a property `userId` instead of `document`.
+
+
+
 
 
 
