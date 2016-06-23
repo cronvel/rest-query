@@ -1,6 +1,6 @@
 
 
-# Rest Query: perform REST queries on your database!
+# Rest Query
 
 ![Rest Query](https://raw.githubusercontent.com/cronvel/rest-query/master/rest-query.png)
 
