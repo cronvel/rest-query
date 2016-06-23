@@ -2,7 +2,7 @@
 
 # Rest Query
 
-![Rest Query](https://raw.githubusercontent.com/cronvel/rest-query/master/rest-query.png)
+![Rest Query](https://raw.githubusercontent.com/cronvel/rest-query/master/logo/rest-query.png)
 
 Work in progress, early alpha.
 
