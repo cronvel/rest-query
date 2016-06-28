@@ -763,6 +763,35 @@ describe( "Basic queries of top-level collections" , function() {
 
 
 
+describe( "Built-in collection method: SCHEMA" , function() {
+	
+	it( "should get the schema of the schema" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				
+				app.get( '/Blogs/SCHEMA' , { performer: performer } , function( error , schema ) {
+					expect( error ).not.to.be.ok() ;
+					expect( schema ).to.be.eql( app.collectionNodes.blogs.schema ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+} ) ;
+	
+
+
 describe( "Queries of nested object" , function() {
 	
 	it( "GET on an unexisting nested item" , function( done ) {
