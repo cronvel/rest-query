@@ -1,6 +1,3 @@
 restQueryType: scheduledTasks
 path: /scheduledTasks
 properties: <object>
-meta: <object>
-indexes: <array>
-hooks: <object>

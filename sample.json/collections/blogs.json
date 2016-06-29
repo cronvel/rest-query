@@ -1,12 +1,13 @@
 {
 	"path": "/blogs" ,
+	"extraProperties": true ,
 	"properties": {
 		"title": { "type": "string" },
 		"description": { "type": "string" },
-		"embedded": { "optional": true, "type": "strictObject" }
+		"embedded": { "optional": true, "type": "strictObject" } ,
+		"customSchema": { "optional": true, "type": "strictObject" }
 	} ,
-	"meta": {} ,
-	"indexes": [] ,
+	"alterSchemaProperty": "customSchema" ,
 	"@@hooks": "blogs.hooks.js" ,
 	"slugGenerationProperty": "title" ,
 	"autoCollection": "posts"

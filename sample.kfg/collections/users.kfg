@@ -22,8 +22,6 @@ properties:
 		type: link
 		collection: users
 		optional: true 
-meta: <object>
-indexes: <array>
 collectionMethods: @@users.collectionMethods.js
 objectMethods: @@users.objectMethods.js
 hooks: @@users.hooks.js

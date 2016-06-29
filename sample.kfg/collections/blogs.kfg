@@ -1,4 +1,5 @@
 path: /blogs
+extraProperties: true
 properties:
 	title:
 		type: string
@@ -7,8 +8,10 @@ properties:
 	embedded:
 		optional: true
 		type: strictObject
-meta: <object>
-indexes: <array>
+	customSchema:
+		optional: true
+		type: strictObject
+alterSchemaProperty: customSchema
 hooks: @@blogs.hooks.js 
 slugGenerationProperty: title 
 autoCollection: posts

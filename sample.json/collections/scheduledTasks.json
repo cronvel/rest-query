@@ -1,8 +1,5 @@
 {
 	"restQueryType": "scheduledTasks" ,
 	"path": "/scheduledTasks" ,
-	"properties": {} ,
-	"meta": {} ,
-	"indexes": [] ,
-	"hooks": {}
+	"properties": {}
 }
