@@ -788,6 +788,39 @@ describe( "Built-in collection method: SCHEMA" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+	
+	it( "should get the schema of the schema" , function( done ) {
+		
+		var app , performer , blog , id ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!' ,
+					publicAccess: 'all'
+				} ) ;
+				id = blog._id ;
+				blog.$.save( callback ) ;
+			} ,
+			function( callback ) {
+				
+				app.get( '/Blogs/' + id + '/SCHEMA' , { performer: performer } , function( error , schema ) {
+					expect( error ).not.to.be.ok() ;
+					expect( schema ).to.be.eql( app.collectionNodes.blogs.schema ) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
 } ) ;
 	
 
