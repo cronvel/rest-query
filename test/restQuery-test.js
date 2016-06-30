@@ -4855,23 +4855,30 @@ describe( "Alter Schema" , function() {
 				blog.$.save( callback ) ;
 			} ,
 			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
+				app.post( '/Blogs/' + blogId + '/Posts/' , {
 					title: 'My first post!' ,
 					content: 'Blah blah blah.' ,
-					custom: 'value' ,
-					parent: { collection: 'blogs', id: blogId } ,
-					publicAccess: 'all'
+					custom: 'value'
+				} , null , { performer: performer } , function( error , rawDocument ) {
+					expect( error ).not.to.be.ok() ;
+					postId = rawDocument.id ;
+					//console.log( 'ID:' , id ) ;
+					callback() ;
 				} ) ;
-				postId = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
 			} ,
 			function( callback ) {
 				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My first post!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					console.log( object ) ;
+					/*
+					expect( object ).to.eql(
+						tree.extend(
+							{ deep: true } ,
+							app.root.children.blogs.children.posts.schema ,
+							{ properties: { custom: { type: 'string' } } }
+						)
+					) ;
+					*/
 					callback() ;
 				} ) ;
 			} ,
