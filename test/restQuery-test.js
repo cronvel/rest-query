@@ -4824,7 +4824,7 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 
 describe( "Alter Schema" , function() {
 	
-	it( "zzz altered schema should affect the SCHEMA method output" , function( done ) {
+	it( "altered schema should alter the SCHEMA method output" , function( done ) {
 		
 		var app , performer , blog , post , blogId , postId ;
 		
@@ -4840,15 +4840,212 @@ describe( "Alter Schema" , function() {
 				blog = app.root.children.blogs.collection.createDocument( {
 					title: 'My wonderful life' ,
 					description: 'This is a supa blog!' ,
-					//*
 					customSchema: {
 						posts: {
+							extraProperties: true ,
 							properties: {
 								custom: { type: 'string' }
 							}
 						}
 					} ,
-					//*/
+					publicAccess: 'all'
+				} ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Blogs/' + blogId + '/Posts/SCHEMA' , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					expect( object ).to.eql(
+						tree.extend(
+							{ deep: true } ,
+							app.root.children.blogs.children.posts.schema ,
+							{ properties: { custom: { type: 'string' } } }
+						)
+					) ;
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "altered schema should alter POST" , function( done ) {
+		
+		var app , performer , blog , post , blogId , postId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!' ,
+					customSchema: {
+						posts: {
+							extraProperties: true ,
+							properties: {
+								custom: { type: 'string' }
+							}
+						}
+					} ,
+					publicAccess: 'all'
+				} ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.post( '/Blogs/' + blogId + '/Posts/' , {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.'
+				} , null , { performer: performer } , function( error , rawDocument ) {
+					expect( error ).to.be.ok() ;
+					expect( error.name ).to.be( 'ValidatorError' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.post( '/Blogs/' + blogId + '/Posts/' , {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.' ,
+					custom: 12
+				} , null , { performer: performer } , function( error , rawDocument ) {
+					expect( error ).to.be.ok() ;
+					expect( error.name ).to.be( 'ValidatorError' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.post( '/Blogs/' + blogId + '/Posts/' , {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.' ,
+					custom: 'value'
+				} , null , { performer: performer } , function( error , rawDocument ) {
+					expect( error ).not.to.be.ok() ;
+					postId = rawDocument.id ;
+					//console.log( 'ID:' , id ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( object ) ;
+					expect( object.title ).to.be( 'My first post!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					expect( object.custom ).to.be( 'value' ) ;
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "altered schema should alter PUT" , function( done ) {
+		
+		var app , performer , blog , post , blogId , postId = '123456789612345678901234' ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!' ,
+					customSchema: {
+						posts: {
+							extraProperties: true ,
+							properties: {
+								custom: { type: 'string' }
+							}
+						}
+					} ,
+					publicAccess: 'all'
+				} ) ;
+				blogId = blog._id ;
+				blog.$.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.put( '/Blogs/' + blogId + '/Posts/' + postId , {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.'
+				} , null , { performer: performer } , function( error , rawDocument ) {
+					expect( error ).to.be.ok() ;
+					expect( error.name ).to.be( 'ValidatorError' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.put( '/Blogs/' + blogId + '/Posts/' + postId , {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.' ,
+					custom: 12
+				} , null , { performer: performer } , function( error , rawDocument ) {
+					expect( error ).to.be.ok() ;
+					expect( error.name ).to.be( 'ValidatorError' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.put( '/Blogs/' + blogId + '/Posts/' + postId , {
+					title: 'My first post!' ,
+					content: 'Blah blah blah.' ,
+					custom: 'value'
+				} , null , { performer: performer } , function( error , rawDocument ) {
+					expect( error ).not.to.be.ok() ;
+					postId = rawDocument.id ;
+					//console.log( 'ID:' , id ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( object ) ;
+					expect( object.title ).to.be( 'My first post!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					expect( object.custom ).to.be( 'value' ) ;
+					callback() ;
+				} ) ;
+			} ,
+		] )
+		.exec( done ) ;
+	} ) ;
+	
+	it( "altered schema should alter PATCH" , function( done ) {
+		
+		var app , performer , blog , post , blogId , postId ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!' ,
+					customSchema: {
+						posts: {
+							extraProperties: true ,
+							properties: {
+								custom: { type: 'string' }
+							}
+						}
+					} ,
 					publicAccess: 'all'
 				} ) ;
 				blogId = blog._id ;
@@ -4869,29 +5066,37 @@ describe( "Alter Schema" , function() {
 			function( callback ) {
 				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					console.log( object ) ;
-					/*
-					expect( object ).to.eql(
-						tree.extend(
-							{ deep: true } ,
-							app.root.children.blogs.children.posts.schema ,
-							{ properties: { custom: { type: 'string' } } }
-						)
-					) ;
-					*/
+					//console.log( object ) ;
+					expect( object.title ).to.be( 'My first post!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					expect( object.custom ).to.be( 'value' ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/SCHEMA' , { performer: performer } , function( error , object ) {
+				app.patch( '/Blogs/' + blogId + '/Posts/' + postId , {
+					custom: 12
+				} , null , { performer: performer } , function( error , rawDocument ) {
+					expect( error ).to.be.ok() ;
+					expect( error.name ).to.be( 'ValidatorError' ) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.patch( '/Blogs/' + blogId + '/Posts/' + postId , {
+					custom: 'value2'
+				} , null , { performer: performer } , function( error , rawDocument ) {
 					expect( error ).not.to.be.ok() ;
-					expect( object ).to.eql(
-						tree.extend(
-							{ deep: true } ,
-							app.root.children.blogs.children.posts.schema ,
-							{ properties: { custom: { type: 'string' } } }
-						)
-					) ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , function( error , object ) {
+					expect( error ).not.to.be.ok() ;
+					//console.log( object ) ;
+					expect( object.title ).to.be( 'My first post!' ) ;
+					expect( object.content ).to.be( 'Blah blah blah.' ) ;
+					expect( object.custom ).to.be( 'value2' ) ;
 					callback() ;
 				} ) ;
 			} ,
