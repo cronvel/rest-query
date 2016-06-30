@@ -4824,7 +4824,7 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 
 describe( "Alter Schema" , function() {
 	
-	it( "altered schema should affect the SCHEMA method output" , function( done ) {
+	it( "zzz altered schema should affect the SCHEMA method output" , function( done ) {
 		
 		var app , performer , blog , post , blogId , postId ;
 		
