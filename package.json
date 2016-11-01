@@ -1,8 +1,8 @@
 {
   "name": "rest-query",
-  "version": "0.33.14",
+  "version": "0.34.0",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=4.5.0"
   },
   "description": "The Awesome REST Framework!",
   "main": "lib/restQuery.js",
@@ -17,15 +17,17 @@
     "doormen": "^0.6.7",
     "error-status": "^1.8.2",
     "fs-kit": "^0.1.5",
-    "hash-kit": "^0.2.0",
+    "hash-kit": "^0.3.0",
+    "jshint": "^2.9.4",
     "json-kit": "^0.4.5",
-    "kung-fig": "^0.31.3",
+    "kung-fig": "^0.34.0",
     "logfella": "^0.3.44",
     "minimist": "^1.2.0",
-    "qs-kit": "^0.4.2",
+    "mongodb": "^2.2.11",
+    "qs-kit": "^0.5.0",
     "rest-query-shared": "^0.33.3",
-    "roots-db": "^0.13.19",
-    "server-kit": "^0.2.41",
+    "roots-db": "^0.13.20",
+    "server-kit": "^0.3.0",
     "string-kit": "^0.5.11",
     "token-kit": "^0.1.4",
     "tree-kit": "^0.5.26"
@@ -38,7 +40,7 @@
     "smart-preprocessor": "^0.2.0"
   },
   "scripts": {
-    "test": "mocha -R dot"
+    "test": "tea-time -R dot"
   },
   "repository": {
     "type": "git",
