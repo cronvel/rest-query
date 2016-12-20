@@ -53,6 +53,13 @@
   "bugs": {
     "url": "https://github.com/cronvel/rest-query/issues"
   },
+  "config": {
+    "tea-time": {
+      "coverDir": [
+        "lib"
+      ]
+    }
+  },
   "copyright": {
     "title": "Rest Query",
     "years": [
