@@ -3556,7 +3556,7 @@ describe( "Token creation" , function() {
 		.exec( done ) ;
 	} ) ;
 	
-	it( "POST /Users/REVOKE-ALL-TOKENS should revoke the all tokens, i.e. remove them from the user document" , function( done ) {
+	it( "POST /Users/REVOKE-ALL-TOKENS should revoke all tokens, i.e. remove them from the user document" , function( done ) {
 		
 		var app , id , performer , tokenPerformer , tokenPerformerArg , token , tokenPerformer2 , token2 ;
 		
