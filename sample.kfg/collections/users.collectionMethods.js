@@ -12,10 +12,9 @@ module.exports = {
 		
 		if ( ! incomingDocument )
 		{
-			callback( undefined , { done: "nothing" , cause: "this is a GET request" } ) ;
-			return ;
+			return { done: "nothing" , cause: "this is a GET request" } ;
 		}
 		
-		callback( undefined , { done: "something" , to: incomingDocument.to } ) ;
+		return { done: "something" , to: incomingDocument.to } ;
 	}
 } ;

@@ -3,34 +3,42 @@
 var restQuery = require( '../../lib/restQuery.js' ) ;
 var log = require( 'logfella' ).global.use( 'blogs-hooks' ) ;
 
+var Promise = require( 'seventh' ) ;
+
 
 
 module.exports = {
 	
-	beforeCreate: function( context , callback ) {
+	beforeCreate: function( context ) {
 		log.debug( '>>>>>>>>>> beforeCreate, context: %I' , context ) ;
 		
-		context.input.performer.getUser( function( error , user ) {
-			log.debug( '>>>>>>>>>> beforeCreate, user: %I' , user ) ;
-			callback() ;
+		return new Promise( ( resolve , reject ) => {
+			context.input.performer.getUser( ( error , user ) => {
+				log.debug( '>>>>>>>>>> beforeCreate, user: %I' , user ) ;
+				resolve() ;
+			} ) ;
 		} ) ;
 	} ,
 	
-	beforeModify: function( context , callback ) {
+	beforeModify: function( context ) {
 		log.debug( '>>>>>>>>>> beforeModify, context: %I' , context ) ;
 		
-		context.input.performer.getUser( function( error , user ) {
-			log.debug( '>>>>>>>>>> beforeModify, user: %I' , user ) ;
-			callback() ;
+		return new Promise( ( resolve , reject ) => {
+			context.input.performer.getUser( ( error , user ) => {
+				log.debug( '>>>>>>>>>> beforeModify, user: %I' , user ) ;
+				resolve() ;
+			} ) ;
 		} ) ;
 	} ,
 	
-	beforeDelete: function( context , callback ) {
+	beforeDelete: function( context ) {
 		log.debug( '>>>>>>>>>> beforeDelete, context: %I' , context ) ;
 		
-		context.input.performer.getUser( function( error , user ) {
-			log.debug( '>>>>>>>>>> beforeDelete, user: %I' , user ) ;
-			callback() ;
+		return new Promise( ( resolve , reject ) => {
+			context.input.performer.getUser( ( error , user ) => {
+				log.debug( '>>>>>>>>>> beforeDelete, user: %I' , user ) ;
+				resolve() ;
+			} ) ;
 		} ) ;
-	} ,
+	}
 } ;
