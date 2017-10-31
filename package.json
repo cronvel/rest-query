@@ -24,17 +24,16 @@
     "minimist": "^1.2.0",
     "qs-kit": "^0.5.0",
     "rest-query-shared": "^0.33.4",
-    "roots-db": "^0.13.24",
+    "roots-db": "^0.14.0",
     "server-kit": "^0.5.0",
-    "string-kit": "^0.6.2",
+    "seventh": "^0.6.2",
+    "string-kit": "^0.6.3",
     "token-kit": "^0.1.4",
     "tree-kit": "^0.5.26"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "jshint": "^2.9.4",
-    "mocha": "^3.2.0",
-    "mongodb": "2.2.31",
+    "mongodb": "2.2.33",
     "smart-preprocessor": "^0.2.0"
   },
   "scripts": {

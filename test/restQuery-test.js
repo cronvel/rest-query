@@ -52,6 +52,8 @@ if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
 var log = Logfella.global.use( 'mocha' ) ;
 
 var async = require( 'async-kit' ) ;
+var Promise = require( 'seventh' ) ;
+
 var tree = require( 'tree-kit' ) ;
 var string = require( 'string-kit' ) ;
 var rootsDb = require( 'roots-db' ) ;
@@ -104,14 +106,13 @@ function getCliOptions()
 
 function clearCollection( collection , callback )
 {
-	collection.driver.rawInit( function( error ) {
-		if ( error ) { callback( error ) ; return ; }
-		collection.driver.raw.remove( function( error ) {
-			if ( ! collection.attachmentUrl ) { callback( error ) ; return ; }
-			
-			fsKit.deltree( collection.attachmentUrl , callback ) ;
-		} ) ;
-	} ) ;
+	collection.driver.rawInit()
+	.then( () => collection.driver.raw.remove() )
+	.then( () => {
+		if ( ! collection.attachmentUrl ) { return ; }
+		return Promise.promisify( fsKit.deltree , fsKit )( collection.attachmentUrl ) ;
+	} )
+	.callback( callback ) ;
 }
 
 
