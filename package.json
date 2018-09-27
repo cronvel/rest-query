@@ -16,15 +16,15 @@
     "async-kit": "^2.2.4",
     "doormen": "^0.7.25",
     "error-status": "^1.9.2",
-    "fs-kit": "^0.3.0",
+    "fs-kit": "^0.3.2",
     "hash-kit": "^0.3.2",
-    "json-kit": "^0.5.2",
+    "json-kit": "^0.5.4",
     "kung-fig": "^0.38.7",
     "logfella": "^1.0.9",
     "minimist": "^1.2.0",
     "qs-kit": "^0.5.1",
     "rest-query-shared": "^0.33.4",
-    "roots-db": "^0.14.1",
+    "roots-db": "^0.14.2",
     "server-kit": "^0.5.0",
     "seventh": "^0.7.17",
     "string-kit": "^0.8.13",
@@ -33,8 +33,7 @@
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "mongodb": "2.2.33",
-    "smart-preprocessor": "^0.2.0"
+    "mongodb": "2.2.33"
   },
   "scripts": {
     "test": "tea-time -R dot"

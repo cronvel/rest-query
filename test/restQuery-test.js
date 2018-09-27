@@ -33,16 +33,6 @@
 
 var cliOptions = getCliOptions() ;
 
-
-
-// Useless now?
-/*
-var smartPreprocessor = require( 'smart-preprocessor' ) ;
-var restQuery = cli['log-lib'] ?
-	smartPreprocessor.require( __dirname + '/../lib/restQuery.js' , { debug: true } ) :
-	require( '../lib/restQuery.js' ) ;
-*/
-
 var restQuery = require( '../lib/restQuery.js' ) ;
 
 var Logfella = require( 'logfella' ) ;
