@@ -63,7 +63,7 @@ var db ;
 
 
 // it flatten prototype chain, so a single object owns every property of its parents
-var protoflatten = tree.extend.bind( undefined , { deep: true , deepFilter: { blacklist: [ mongodb.ObjectID.prototype ] } } , null ) ;
+var protoflatten = tree.extend.bind( undefined , { deep: true , immutables: [ mongodb.ObjectID.prototype ] } , null ) ;
 
 
 
