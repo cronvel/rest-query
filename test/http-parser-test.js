@@ -24,8 +24,7 @@
 	SOFTWARE.
 */
 
-/* jshint unused:false */
-/* global describe, it, before, after */
+/* global describe, it, before, after, expect */
 
 "use strict" ;
 
@@ -35,7 +34,6 @@ var restQuery = require( '../lib/restQuery.js' ) ;
 
 var tree = require( 'tree-kit' ) ;
 var stream = require( 'stream' ) ;
-var expect = require( 'expect.js' ) ;
 
 
 
@@ -100,7 +98,7 @@ describe( "Parse HTTP request" , function() {
 		restQuery.httpModule.parseRequest( req , function( error , message ) {
 			
 			expect( error ).not.to.be.ok() ;
-			expect( message ).to.eql( {
+			expect( message ).to.equal( {
 				//path: '/' ,
 				path: [] ,
 				//type: 'json' ,
@@ -122,7 +120,7 @@ describe( "Parse HTTP request" , function() {
 		restQuery.httpModule.parseRequest( req , function( error , message ) {
 			
 			expect( error ).not.to.be.ok() ;
-			expect( message ).to.eql( {
+			expect( message ).to.equal( {
 				//path: '/path/to/json' ,
 				path: [
 					{
@@ -166,7 +164,7 @@ describe( "Parse HTTP request" , function() {
 		restQuery.httpModule.parseRequest( req , function( error , message ) {
 			
 			expect( error ).not.to.be.ok() ;
-			expect( message ).to.eql( {
+			expect( message ).to.equal( {
 				//path: '/' ,
 				path: [] ,
 				//type: 'json' ,

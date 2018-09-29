@@ -24,8 +24,7 @@
 	SOFTWARE.
 */
 
-/* jshint unused:false */
-/* global describe, it, before, after, beforeEach */
+/* global describe, it, before, after, beforeEach, expect */
 
 "use strict" ;
 
@@ -50,7 +49,6 @@ var rootsDb = require( 'roots-db' ) ;
 
 var mongodb = require( 'mongodb' ) ;
 
-var expect = require( 'expect.js' ) ;
 var doormen = require( 'doormen' ) ;
 
 var fsKit = require( 'fs-kit' ) ;
@@ -255,7 +253,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 			function( callback ) {
 				app.get( '/Blogs/' + id + '/.userAccess.' + randomId , { performer: performer } , function( error , access ) {
 					expect( error ).not.to.be.ok() ;
-					expect( access ).to.eql( { traverse: 1, read: 3 } ) ;
+					expect( access ).to.equal( { traverse: 1, read: 3 } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -298,7 +296,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life posted!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (posted!)' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -337,7 +335,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -412,7 +410,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now overwritten!' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -490,8 +488,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
-					expect( object.embedded ).to.eql( { a: 'A' , b: 'b' } ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.embedded ).to.equal( { a: 'A' , b: 'b' } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -533,8 +531,8 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
-					expect( object.embedded ).to.eql( { a: 'omg' , b: 'b' } ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.embedded ).to.equal( { a: 'omg' , b: 'b' } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -575,7 +573,7 @@ describe( "Basic queries of object of a top-level collection" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'Change dat title.' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -677,7 +675,7 @@ describe( "Basic queries of top-level collections" , function() {
 				app.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
 					
-					expect( batch ).to.be.eql( [] ) ;
+					expect( batch ).to.equal( [] ) ;
 					callback() ;
 				} ) ;
 			}
@@ -719,7 +717,7 @@ describe( "Basic queries of top-level collections" , function() {
 				app.get( '/Blogs' , { performer: performer } , function( error , batch ) {
 					expect( error ).not.to.be.ok() ;
 					
-					expect( batch ).to.be.eql( [
+					expect( batch ).to.equal( [
 						{
 							title: 'My wonderful life',
 							description: 'This is a supa blog!',
@@ -772,7 +770,7 @@ describe( "Built-in collection method: SCHEMA" , function() {
 				
 				app.get( '/Blogs/SCHEMA' , { performer: performer } , function( error , schema ) {
 					expect( error ).not.to.be.ok() ;
-					expect( schema ).to.be.eql( app.collectionNodes.blogs.schema ) ;
+					expect( schema ).to.equal( app.collectionNodes.blogs.schema ) ;
 					callback() ;
 				} ) ;
 			}
@@ -805,7 +803,7 @@ describe( "Built-in collection method: SCHEMA" , function() {
 				
 				app.get( '/Blogs/' + id + '/SCHEMA' , { performer: performer } , function( error , schema ) {
 					expect( error ).not.to.be.ok() ;
-					expect( schema ).to.be.eql( app.collectionNodes.blogs.schema ) ;
+					expect( schema ).to.equal( app.collectionNodes.blogs.schema ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1535,7 +1533,7 @@ describe( "Links" , function() {
 					expect( object.slugId ).to.be( 'joe-doe' ) ;
 					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
 					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -1547,7 +1545,7 @@ describe( "Links" , function() {
 					expect( object.lastName ).to.be( 'GODFATHER' ) ;
 					expect( object.slugId ).to.be( 'the-godfather' ) ;
 					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1605,7 +1603,7 @@ describe( "Links" , function() {
 					expect( object.lastName ).to.be( 'GODFATHER!' ) ;
 					expect( object.slugId ).to.be( 'dat-godfather' ) ;
 					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -1617,7 +1615,7 @@ describe( "Links" , function() {
 					expect( object.lastName ).to.be( 'GODFATHER!' ) ;
 					expect( object.slugId ).to.be( 'dat-godfather' ) ;
 					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1673,7 +1671,7 @@ describe( "Links" , function() {
 					expect( object.slugId ).to.be( 'joe-doe' ) ;
 					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
 					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -1699,7 +1697,7 @@ describe( "Links" , function() {
 					expect( object.lastName ).to.be( 'GODFATHER!' ) ;
 					expect( object.slugId ).to.be( 'the-godfather' ) ;
 					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1757,7 +1755,7 @@ describe( "Links" , function() {
 					expect( object.slugId ).to.be( 'joe-doe' ) ;
 					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
 					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -1775,7 +1773,7 @@ describe( "Links" , function() {
 					expect( object.lastName ).to.be( 'GODFATHER' ) ;
 					expect( object.slugId ).to.be( 'the-godfather' ) ;
 					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -1833,7 +1831,7 @@ describe( "Links" , function() {
 					expect( object.slugId ).to.be( 'joe-doe' ) ;
 					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
 					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2016,7 +2014,7 @@ describe( "Links" , function() {
 					expect( object.lastName ).to.be( 'Doe' ) ;
 					expect( object.slugId ).to.be( 'joe-doe' ) ;
 					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					
 					expect( object.father.firstName ).to.be( 'Big Joe' ) ;
 					expect( object.father.lastName ).to.be( 'Doe' ) ;
@@ -2124,7 +2122,7 @@ describe( "Multi-links" , function() {
 					has[ batch[ 0 ].firstName ] = true ;
 					has[ batch[ 1 ].firstName ] = true ;
 					has[ batch[ 2 ].firstName ] = true ;
-					expect( has ).to.eql( { Bobby: true , Jack: true , Joe: true } ) ;
+					expect( has ).to.equal( { Bobby: true , Jack: true , Joe: true } ) ;
 					
 					callback() ;
 				} ) ;
@@ -2232,7 +2230,7 @@ describe( "Multi-links" , function() {
 					has[ batch[ 0 ].firstName ] = true ;
 					has[ batch[ 1 ].firstName ] = true ;
 					has[ batch[ 2 ].firstName ] = true ;
-					expect( has ).to.eql( { Bobby: true , Jack: true , Joe: true } ) ;
+					expect( has ).to.equal( { Bobby: true , Jack: true , Joe: true } ) ;
 					
 					callback() ;
 				} ) ;
@@ -2443,7 +2441,7 @@ describe( "Users" , function() {
 					expect( object.password.hash ).to.be.a( 'string' ) ;
 					// check the password
 					expect( hash.password( "pw" , object.password.salt , object.password.algo ) ).to.be( object.password.hash ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -2493,7 +2491,7 @@ describe( "Users" , function() {
 					expect( object.password.hash ).to.be.a( 'string' ) ;
 					// check the password
 					expect( hash.password( "pw" , object.password.salt , object.password.algo ) ).to.be( object.password.hash ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2522,7 +2520,7 @@ describe( "Users" , function() {
 					expect( object.password.hash ).to.be.a( 'string' ) ;
 					// check the password
 					expect( hash.password( "pw2" , object.password.salt , object.password.algo ) ).to.be( object.password.hash ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -2589,7 +2587,7 @@ describe( "Slug usage" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -2663,7 +2661,7 @@ describe( "Slug usage" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					id = object.$.id ;
 					callback() ;
 				} ) ;
@@ -2776,7 +2774,7 @@ describe( "Auto collection" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2785,7 +2783,7 @@ describe( "Auto collection" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -2794,7 +2792,7 @@ describe( "Auto collection" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
 					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			}
@@ -2947,7 +2945,7 @@ describe( "Token creation" , function() {
 					agentId: "0123456789"
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( {
+					expect( response ).to.equal( {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
@@ -2960,7 +2958,7 @@ describe( "Token creation" , function() {
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
-					expect( tokenData ).to.eql( {
+					expect( tokenData ).to.equal( {
 						type: "header" ,
 						userId: id.toString() ,
 						agentId: "0123456789" ,
@@ -3174,7 +3172,7 @@ describe( "Token creation" , function() {
 					duration: duration
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( {
+					expect( response ).to.equal( {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
@@ -3187,7 +3185,7 @@ describe( "Token creation" , function() {
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
-					expect( tokenData ).to.eql( {
+					expect( tokenData ).to.equal( {
 						type: "header" ,
 						userId: id.toString() ,
 						agentId: "0123456789" ,
@@ -3222,7 +3220,7 @@ describe( "Token creation" , function() {
 					duration: duration
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( {
+					expect( response ).to.equal( {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
@@ -3235,7 +3233,7 @@ describe( "Token creation" , function() {
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
-					expect( tokenData ).to.eql( {
+					expect( tokenData ).to.equal( {
 						type: "header" ,
 						userId: id.toString() ,
 						agentId: "0123456789" ,
@@ -3271,7 +3269,7 @@ describe( "Token creation" , function() {
 					duration: duration
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( {
+					expect( response ).to.equal( {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
@@ -3284,7 +3282,7 @@ describe( "Token creation" , function() {
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
-					expect( tokenData ).to.eql( {
+					expect( tokenData ).to.equal( {
 						type: "header" ,
 						userId: id.toString() ,
 						agentId: "0123456789" ,
@@ -3345,7 +3343,7 @@ describe( "Token creation" , function() {
 					expect( error ).not.to.be.ok() ;
 					
 					//console.log( response ) ;
-					expect( response ).to.eql( {
+					expect( response ).to.equal( {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
@@ -3358,7 +3356,7 @@ describe( "Token creation" , function() {
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
-					expect( tokenData ).to.eql( {
+					expect( tokenData ).to.equal( {
 						type: "header" ,
 						userId: id.toString() ,
 						agentId: "0123456789" ,
@@ -3393,7 +3391,7 @@ describe( "Token creation" , function() {
 					expect( error ).not.to.be.ok() ;
 					
 					//console.log( response ) ;
-					expect( response ).to.eql( {
+					expect( response ).to.equal( {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
@@ -3407,7 +3405,7 @@ describe( "Token creation" , function() {
 					oldTokenNewExpirationTime = response.creationTime + 10000 ;
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
-					expect( tokenData ).to.eql( {
+					expect( tokenData ).to.equal( {
 						type: "header" ,
 						userId: id.toString() ,
 						agentId: "0123456789" ,
@@ -3473,7 +3471,7 @@ describe( "Token creation" , function() {
 					expect( error ).not.to.be.ok() ;
 					
 					//console.log( response ) ;
-					expect( response ).to.eql( {
+					expect( response ).to.equal( {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
@@ -3486,7 +3484,7 @@ describe( "Token creation" , function() {
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
-					expect( tokenData ).to.eql( {
+					expect( tokenData ).to.equal( {
 						type: "header" ,
 						userId: id.toString() ,
 						agentId: "0123456789" ,
@@ -3582,7 +3580,7 @@ describe( "Token creation" , function() {
 					expect( error ).not.to.be.ok() ;
 					
 					//console.log( response ) ;
-					expect( response ).to.eql( {
+					expect( response ).to.equal( {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
@@ -3595,7 +3593,7 @@ describe( "Token creation" , function() {
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
-					expect( tokenData ).to.eql( {
+					expect( tokenData ).to.equal( {
 						type: "header" ,
 						userId: id.toString() ,
 						agentId: "0123456789" ,
@@ -3628,7 +3626,7 @@ describe( "Token creation" , function() {
 					expect( error ).not.to.be.ok() ;
 					
 					//console.log( response ) ;
-					expect( response ).to.eql( {
+					expect( response ).to.equal( {
 						userId: id ,
 						token: response.token ,	// unpredictable
 						type: "header" ,
@@ -3641,7 +3639,7 @@ describe( "Token creation" , function() {
 					
 					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
 					
-					expect( tokenData ).to.eql( {
+					expect( tokenData ).to.equal( {
 						type: "header" ,
 						userId: id.toString() ,
 						agentId: "0123456789" ,
@@ -3921,7 +3919,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4005,7 +4003,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4474,7 +4472,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4484,7 +4482,7 @@ describe( "Access" , function() {
 					expect( error ).not.to.be.ok() ;
 					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
 					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.be.eql( { id: '/', collection: null } ) ;
+					expect( object.parent ).to.equal( { id: '/', collection: null } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4696,14 +4694,14 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 					to: 'toto'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( { done: "something" , to: "toto" } ) ;
+					expect( response ).to.equal( { done: "something" , to: "toto" } ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.get( '/SUPA-METHOD' , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( { done: "nothing" , cause: "this is a GET request" } ) ;
+					expect( response ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4728,14 +4726,14 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 					to: 'toto'
 				} , null , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( { done: "something" , to: "toto" } ) ;
+					expect( response ).to.equal( { done: "something" , to: "toto" } ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				app.get( '/Users/DO-SOMETHING' , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( { done: "nothing" , cause: "this is a GET request" } ) ;
+					expect( response ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4793,7 +4791,7 @@ describe( "Custom methods (POST to a METHOD)" , function() {
 			function( callback ) {
 				app.get( '/Users/' + userId + '/CHANGE-FIRST-NAME' , { performer: performer } , function( error , response ) {
 					expect( error ).not.to.be.ok() ;
-					expect( response ).to.eql( { done: "nothing" , cause: "this is a GET request" } ) ;
+					expect( response ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
 					callback() ;
 				} ) ;
 			} ,
@@ -4847,7 +4845,7 @@ describe( "Alter Schema" , function() {
 			function( callback ) {
 				app.get( '/Blogs/' + blogId + '/Posts/SCHEMA' , { performer: performer } , function( error , object ) {
 					expect( error ).not.to.be.ok() ;
-					expect( object ).to.eql(
+					expect( object ).to.equal(
 						tree.extend(
 							{ deep: true } ,
 							app.root.children.blogs.children.posts.schema ,
@@ -5138,9 +5136,9 @@ describe( "Misc" , function() {
 					app = a ;
 					performer = p ;
 					expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
-						.to.eql( { traverse: 1, read: 3, create: 1 } ) ;
+						.to.equal( { traverse: 1, read: 3, create: 1 } ) ;
 					expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
-						.to.eql( { read: 3 } ) ;
+						.to.equal( { read: 3 } ) ;
 					callback() ;
 				} ) ;
 			} ,

@@ -24,8 +24,7 @@
 	SOFTWARE.
 */
 
-/* jshint unused:false */
-/* global describe, it, before, after */
+/* global describe, it, before, after, expect */
 
 "use strict" ;
 
@@ -34,8 +33,6 @@
 var cli = getCliOptions() ;
 
 var restQuery = require( '../lib/restQuery.js' ) ;
-
-var expect = require( 'expect.js' ) ;
 
 var http = require( 'http' ) ;
 var childProcess = require( 'child_process' ) ;
@@ -307,7 +304,7 @@ describe( "Basics tests" , function() {
 					
 					var data = JSON.parse( response.body ) ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: "543bb877bd15489d0d7b0120",
 						title: "My website!",
 						description: "... about my wonderful life",
@@ -334,7 +331,7 @@ describe( "Basics tests" , function() {
 					
 					var data = JSON.parse( response.body ) ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: "543bb877bd15489d0d7b0120",
 						title: "My website!",
 						description: "... about my wonderful life",
@@ -414,7 +411,7 @@ describe( "Basics tests" , function() {
 					
 					var data = JSON.parse( response.body ) ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: postDocument.id,
 						title: "My website!",
 						description: "... about my wonderful life",
@@ -441,7 +438,7 @@ describe( "Basics tests" , function() {
 					
 					var data = JSON.parse( response.body ) ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: postDocument.id,
 						title: "My website!",
 						description: "... about my wonderful life",
@@ -532,7 +529,7 @@ describe( "Basics tests" , function() {
 					
 					var data = JSON.parse( response.body ) ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: "543bb877bd15489d0d7b0121",
 						title: "My *NEW* website!",
 						description: "... about my wonderful life",
@@ -559,7 +556,7 @@ describe( "Basics tests" , function() {
 					
 					var data = JSON.parse( response.body ) ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: "543bb877bd15489d0d7b0121",
 						title: "My *NEW* website!",
 						description: "... about my wonderful life",
@@ -746,7 +743,7 @@ describe( "Basics tests" , function() {
 					
 					data = data.sort( ( a , b ) => a._id < b._id ? -1 : 1 ) ;
 					
-					expect( data ).to.be.eql( [ 
+					expect( data ).to.equal( [ 
 						{
 							_id: "543bb877bd15489d0d7b0121",
 							title: "First post!",
@@ -862,7 +859,7 @@ describe( "Basics tests on users" , function() {
 					
 					var data = JSON.parse( response.body ) ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: "543bb877bd15489d0d7b0130",
 						firstName: "Joe",
 						lastName: "Doe2",
@@ -899,7 +896,7 @@ describe( "Basics tests on users" , function() {
 					//console.log( data.password ) ;
 					delete data.password ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: "543bb877bd15489d0d7b0130",
 						firstName: "Joe",
 						lastName: "Doe2",
@@ -1122,7 +1119,7 @@ describe( "Links population" , function() {
 					delete data.father.password ;
 					delete data.godfather.password ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: data._id,
 						firstName: "Joe",
 						lastName: "Doe",
@@ -1191,7 +1188,7 @@ describe( "Links population" , function() {
 					delete data.father.password ;
 					delete data.godfather.password ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: data._id,
 						firstName: "Joe",
 						lastName: "Doe",
@@ -1279,7 +1276,7 @@ describe( "Links population" , function() {
 					delete data.father.password ;
 					delete data.godfather.password ;
 					
-					expect( data ).to.be.eql( {
+					expect( data ).to.equal( {
 						_id: data._id,
 						firstName: "Joe",
 						lastName: "Doe",
@@ -1343,7 +1340,7 @@ describe( "Links population" , function() {
 						return a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ;
 					} ) ;
 					
-					expect( data ).to.be.eql( [
+					expect( data ).to.equal( [
 						{
 							_id: data[ 0 ]._id,
 							firstName: "Big Joe",
@@ -1444,7 +1441,7 @@ describe( "Links population" , function() {
 					delete data[ 1 ].godfather.password ;
 					delete data[ 2 ].password ;
 					
-					expect( data ).to.be.eql( [
+					expect( data ).to.equal( [
 						{
 							_id: data[ 0 ]._id,
 							firstName: "Big Joe",
@@ -1568,7 +1565,7 @@ describe( "Links population" , function() {
 					delete data[ 1 ].password ;
 					delete data[ 2 ].password ;
 					
-					expect( data ).to.be.eql( [
+					expect( data ).to.equal( [
 						{
 							_id: data[ 0 ]._id,
 							firstName: "Big Joe",
