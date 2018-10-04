@@ -111,8 +111,7 @@ function commonApp( callback )
 {
 	if ( currentApp ) { currentApp.shutdown() ; }
 	
-	//var app = restQuery.createApp( __dirname + '/../sample.json/main.json' , cliOptions ) ;
-	var app = restQuery.createApp( __dirname + '/../sample.kfg/main.kfg' , cliOptions ) ;
+	var app = new restQuery.App( __dirname + '/../sample.kfg/main.kfg' , cliOptions ) ;
 	
 	// Create a system performer
 	var performer = app.createPerformer( null , true ) ;
