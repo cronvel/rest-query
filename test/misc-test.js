@@ -40,37 +40,37 @@ var restQuery = require( '../lib/restQuery.js' ) ;	// jshint ignore:line
 
 
 
-describe( "doormen's restQuery specific" , function() {
+describe( "doormen's restQuery specific" , () => {
 
-	it( "restQuery.slug type checker" , function() {
-		
+	it( "restQuery.slug type checker" , () => {
+
 		doormen( { type: 'restQuery.slug' } , 'my-slug' ) ;
 		doormen.not( { type: 'restQuery.slug' } , 'Not-a-slug' ) ;
 	} ) ;
-	
-	it( "restQuery.randomSlug sanitizer" , function() {
-		
+
+	it( "restQuery.randomSlug sanitizer" , () => {
+
 		var slug = doormen( { type: 'restQuery.slug' , sanitize: 'restQuery.randomSlug' } , null ) ;
 		//console.log( slug ) ;
 	} ) ;
 } ) ;
 
 
-describe( "KFG and JSON conformance" , function() {
+describe( "KFG and JSON conformance" , () => {
 
-	it( "KFG and JSON should create the same config" , function() {
+	it( "KFG and JSON should create the same config" , () => {
 		var kfg = kungFig.load( __dirname + '/../sample.kfg/main.kfg' ) ;
 		//console.error( JSON.stringify( kfg , null , '\t' ) ) ;
 		//console.error( string.inspect( {style:'color',depth: 10} , kfg ) ) ;
 		//var kfg2 = kungFig.reduce( kfg , { port: 7777 } ) ;
 		//console.error( string.inspect( {style:'color',depth: 10} , kfg2 ) ) ;
-		
+
 		var json = kungFig.load( __dirname + '/../sample.json/main.json' ) ;
 		//console.error( JSON.stringify( json , null , '\t' ) ) ;
 		//console.error( string.inspect( {style:'color',depth: 10} , json ) ) ;
-		
+
 		doormen.equals( JSON.stringify( kfg ) , JSON.stringify( json ) ) ;
-		
+
 		// /!\ Doormen fails on this test /!\
 		//doormen.equals( kfg , json ) ;
 		return ;

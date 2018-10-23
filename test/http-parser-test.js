@@ -39,20 +39,19 @@ var stream = require( 'stream' ) ;
 
 
 
-			/* Utils */
+/* Utils */
 
 
 
 // r: httpRequest part that overwrite defaults
 // body: the faked body
-function fakeHttpRequest( r , body )
-{
+function fakeHttpRequest( r , body ) {
 	//var req = stream.Duplex() ;
 	var req = stream.PassThrough() ;
-	
+
 	if ( ! r || typeof r !== 'object' ) { r = {} ; }
 	if ( ! body || typeof body !== 'string' ) { body = '' ; }
-	
+
 	tree.extend( { deep: true } , req , {
 		method: "GET" ,
 		url: "/" ,
@@ -68,15 +67,14 @@ function fakeHttpRequest( r , body )
 			"cache-control": "max-age=0"
 		}
 	} , r ) ;
-	
-	if ( body.length )
-	{
+
+	if ( body.length ) {
 		req.write( body ) ;
 		req.headers['content-length'] = '' + body.length ;
 	}
-	
+
 	req.end() ;
-	
+
 	return req ;
 }
 
@@ -84,19 +82,19 @@ function fakeHttpRequest( r , body )
 
 
 
-			/* Tests */
+/* Tests */
 
 
-	
 
-describe( "Parse HTTP request" , function() {
-	
-	it( "should parse a fake GET on /" , function( done ) {
-		
+
+describe( "Parse HTTP request" , () => {
+
+	it( "should parse a fake GET on /" , ( done ) => {
+
 		var req = fakeHttpRequest() ;
-		
-		restQuery.httpModule.parseRequest( req , function( error , message ) {
-			
+
+		restQuery.httpModule.parseRequest( req , ( error , message ) => {
+
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.equal( {
 				//path: '/' ,
@@ -108,17 +106,17 @@ describe( "Parse HTTP request" , function() {
 				pTier: 3 ,
 				query: {}
 			} ) ;
-			
+
 			done() ;
 		} ) ;
 	} ) ;
-	
-	it( "should parse a fake GET with path and query string" , function( done ) {
-		
+
+	it( "should parse a fake GET with path and query string" , ( done ) => {
+
 		var req = fakeHttpRequest( { url: "/path/to/json?populate=group" } ) ;
-		
-		restQuery.httpModule.parseRequest( req , function( error , message ) {
-			
+
+		restQuery.httpModule.parseRequest( req , ( error , message ) => {
+
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.equal( {
 				//path: '/path/to/json' ,
@@ -152,17 +150,17 @@ describe( "Parse HTTP request" , function() {
 				pTier: 3 ,
 				query: { populate: 'group' }
 			} ) ;
-			
+
 			done() ;
 		} ) ;
 	} ) ;
-	
-	it( "should parse a fake POST with a body" , function( done ) {
-		
+
+	it( "should parse a fake POST with a body" , ( done ) => {
+
 		var req = fakeHttpRequest( { method: 'POST' } , '{"a":"simple","json":"file"}' ) ;
-		
-		restQuery.httpModule.parseRequest( req , function( error , message ) {
-			
+
+		restQuery.httpModule.parseRequest( req , ( error , message ) => {
+
 			expect( error ).not.to.be.ok() ;
 			expect( message ).to.equal( {
 				//path: '/' ,
@@ -173,13 +171,13 @@ describe( "Parse HTTP request" , function() {
 				tier: 3 ,
 				pTier: 3 ,
 				query: {} ,
-				data: { a: 'simple', json: 'file' }
+				data: { a: 'simple' , json: 'file' }
 			} ) ;
-			
+
 			done() ;
 		} ) ;
 	} ) ;
-	
+
 	it( "Content-Type: application/x-www-form-urlencoded support test" ) ;
 } ) ;
 

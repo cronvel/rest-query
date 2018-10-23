@@ -52,7 +52,7 @@ var db ;
 
 
 
-			/* Utils */
+/* Utils */
 
 
 
@@ -62,60 +62,53 @@ var protoflatten = tree.extend.bind( undefined , { deep: true , immutables: [ mo
 
 
 // Return options while trying to avoid mocha's parameters
-function getCliOptions()
-{
+function getCliOptions() {
 	var i , max = 0 ;
-	
-	for ( i = 2 ; i < process.argv.length ; i ++ )
-	{
-		if ( process.argv[ i ].match( /\*|.+\.js/ ) )
-		{
+
+	for ( i = 2 ; i < process.argv.length ; i ++ ) {
+		if ( process.argv[ i ].match( /\*|.+\.js/ ) ) {
 			max = i ;
 		}
 	}
-	
+
 	return require( 'minimist' )( process.argv.slice( max + 1 ) ) ;
 }
 
 
 
-function debug()
-{
-	if ( cli.log ) { console.log.apply( console , arguments ) ; }
+function debug() {
+	if ( cli.log ) { console.log( ... arguments ) ; }
 }
 
 
 
 // clear DB: remove every item, so we can safely test
-function clearDB( callback )
-{
+function clearDB( callback ) {
 	async.parallel( [
 		[ clearCollection , 'blogs' ] ,
 		[ clearCollection , 'posts' ] ,
 		[ clearCollection , 'comments' ] ,
 		[ clearCollection , 'users' ]
 	] )
-	.exec( callback ) ;
+		.exec( callback ) ;
 }
 
 
 
-function clearCollection( collectionName , callback )
-{
+function clearCollection( collectionName , callback ) {
 	var collection = db.collection( collectionName ) ;
 	collection.remove( callback ) ;
-	collection.remove( function( error ) {
+	collection.remove( ( error ) => {
 		if ( ! collection.attachmentUrl ) { callback( error ) ; return ; }
-		
+
 		fsKit.deltree( collection.attachmentUrl , callback ) ;
 	} ) ;
 }
 
 
 
-function connect( callback )
-{
-	mongodb.MongoClient.connect( dbUrl , function( error , db_ ) {
+function connect( callback ) {
+	mongodb.MongoClient.connect( dbUrl , ( error , db_ ) => {
 		if ( error ) { callback( error ) ; return ; }
 		db = db_ ;
 		callback() ;
@@ -124,27 +117,26 @@ function connect( callback )
 
 
 
-function runApp( maybeCallback )
-{
+function runApp( maybeCallback ) {
 	appProcess = childProcess.spawn( __dirname + '/../bin/restquery' , [
 		//__dirname + '/../sample.json/main.json' ,
 		__dirname + '/../sample.kfg/main.kfg' ,
 		'--port' , appPort ,
 		'--buildIndexes'
 	] ) ;
-	
-	appProcess.stdout.on( 'data' , function( data ) {
+
+	appProcess.stdout.on( 'data' , ( data ) => {
 		//console.log( "[appProcess STDOUT] " , data.toString() ) ;
 	} ) ;
-	
-	appProcess.stderr.on( 'data' , function( data ) {
+
+	appProcess.stderr.on( 'data' , ( data ) => {
 		//console.log( "[appProcess STDERR] " , data.toString() ) ;
 	} ) ;
-	
-	appProcess.on( 'exit' , function( code ) {
+
+	appProcess.on( 'exit' , ( code ) => {
 		console.log( '[appProcess exit] ' + code ) ;
 	} ) ;
-	
+
 	// Okay, we have no way to know if the app is ready, except to send it command,
 	// it's way out of the scope of this test suite, so we just hope it is ready after few ms
 	setTimeout( maybeCallback , 1000 ) ;
@@ -152,36 +144,34 @@ function runApp( maybeCallback )
 
 
 
-function killApp( maybeCallback )
-{
+function killApp( maybeCallback ) {
 	appProcess.kill( 'SIGKILL' ) ;
-	
+
 	// Expect the app to be killed within 100ms
 	setTimeout( maybeCallback , 100 ) ;
 }
 
 
 
-function requester( query , callback )
-{
+function requester( query , callback ) {
 	query = tree.extend( null , { hostname: 'localhost' , port: appPort } , query ) ;
-	
+
 	if ( query.body ) { query.headers['Content-Length'] = query.body.length ; }
-	
-	var request = http.request( query , function( response ) {
-		
+
+	var request = http.request( query , ( response ) => {
+
 		var body = '' ;
-		
+
 		//console.log( '[requester] STATUS: ' + response.statusCode ) ;
 		//console.log( '[requester] HEADERS: ' + JSON.stringify( response.headers ) ) ;
 		response.setEncoding( 'utf8' ) ;
-		
-		response.on( 'data', function ( chunk ) {
+
+		response.on( 'data' , ( chunk ) => {
 			body += chunk.toString() ;
 			//console.log( '[requester] BODY: ' + chunk ) ;
 		} ) ;
-		
-		response.on( 'end' , function() {
+
+		response.on( 'end' , () => {
 			//console.log( 'END' ) ;
 			callback( undefined , {
 				httpVersion: response.httpVersion ,
@@ -191,12 +181,12 @@ function requester( query , callback )
 			} ) ;
 		} ) ;
 	} ) ;
-	
-	request.on( 'error' , function( error ) {
+
+	request.on( 'error' , ( error ) => {
 		//console.log( '[requester] problem with request: ' + error.message ) ;
 		callback( error ) ;
 	} ) ;
-	
+
 	// Write .body... erf... to request body
 	if ( query.body ) {
 		//console.log( "BODY to send:" , query.body ) ;
@@ -209,17 +199,17 @@ function requester( query , callback )
 
 
 
-			/* Hooks */
+/* Hooks */
 
 
 
-before( function( done ) {
+before( ( done ) => {
 	async.parallel( [ connect , runApp ] ).exec( done ) ;
 } ) ;
 
 
 
-after( function( done ) {
+after( ( done ) => {
 	killApp( done ) ;
 } ) ;
 
@@ -231,14 +221,14 @@ beforeEach( clearDB ) ;
 
 
 
-			/* Tests */
+/* Tests */
 
 
 
-describe( "Basics tests" , function() {
-	
-	it( "GET on an unexistant blog" , function( done ) {
-		
+describe( "Basics tests" , () => {
+
+	it( "GET on an unexistant blog" , ( done ) => {
+
 		var getQuery = {
 			method: 'GET' ,
 			path: '/Blogs/111111111111111111111111' ,
@@ -246,21 +236,21 @@ describe( "Basics tests" , function() {
 				Host: 'localhost'
 			}
 		} ;
-		
-		requester( getQuery , function( error , response ) {
-			
+
+		requester( getQuery , ( error , response ) => {
+
 			expect( error ).not.to.be.ok() ;
 			expect( response.status ).to.be( 404 ) ;
 			expect( response.body ).not.to.be.ok() ;
-			
+
 			//console.log( "Response:" , response ) ;
-			
+
 			done() ;
 		} ) ;
 	} ) ;
-	
-	it( "PUT then GET on a blog" , function( done ) {
-		
+
+	it( "PUT then GET on a blog" , ( done ) => {
+
 		var putQuery = {
 			method: 'PUT' ,
 			path: '/Blogs/543bb877bd15489d0d7b0120' ,
@@ -269,12 +259,12 @@ describe( "Basics tests" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				title: "My website!",
-				description: "... about my wonderful life",
+				title: "My website!" ,
+				description: "... about my wonderful life" ,
 				publicAccess: { traverse: 1 , read: 4 , create: 1 }
 			} )
 		} ;
-		
+
 		var getQuery = {
 			method: 'GET' ,
 			path: '/Blogs/543bb877bd15489d0d7b0120' ,
@@ -282,82 +272,82 @@ describe( "Basics tests" , function() {
 				Host: 'localhost'
 			}
 		} ;
-		
+
 		async.series( [
 			function( callback ) {
-				requester( putQuery , function( error , response ) {
-					
+				requester( putQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data ).to.equal( {
-						_id: "543bb877bd15489d0d7b0120",
-						title: "My website!",
-						description: "... about my wonderful life",
-						slugId: data.slugId,	// Cannot be predicted
+						_id: "543bb877bd15489d0d7b0120" ,
+						title: "My website!" ,
+						description: "... about my wonderful life" ,
+						slugId: data.slugId ,	// Cannot be predicted
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
-						},
+						}
 					} ) ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				getQuery.path += "?tier=4" ;
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data ).to.equal( {
-						_id: "543bb877bd15489d0d7b0120",
-						title: "My website!",
-						description: "... about my wonderful life",
-						slugId: data.slugId,	// Cannot be predicted
+						_id: "543bb877bd15489d0d7b0120" ,
+						title: "My website!" ,
+						description: "... about my wonderful life" ,
+						slugId: data.slugId ,	// Cannot be predicted
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
-						},
-						userAccess: {},
-						groupAccess: {},
-						publicAccess: { traverse: 1, read: 4, create: 1 } ,
+						} ,
+						userAccess: {} ,
+						groupAccess: {} ,
+						publicAccess: { traverse: 1 , read: 4 , create: 1 }
 					} ) ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			}
 		] )
-		.exec( done ) ;
+			.exec( done ) ;
 	} ) ;
-	
-	it( "POST then GET on a blog" , function( done ) {
-		
+
+	it( "POST then GET on a blog" , ( done ) => {
+
 		var postDocument ;
-		
+
 		var postQuery = {
 			method: 'POST' ,
 			path: '/Blogs' ,
@@ -366,12 +356,12 @@ describe( "Basics tests" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				title: "My website!",
+				title: "My website!" ,
 				description: "... about my wonderful life" ,
 				publicAccess: { traverse: 1 , read: 4 , create: 1 }
 			} )
 		} ;
-		
+
 		var getQuery = {
 			method: 'GET' ,
 			path: '/Blogs/' ,	// this should be completed with the ID after the POST
@@ -379,90 +369,90 @@ describe( "Basics tests" , function() {
 				Host: 'localhost'
 			}
 		} ;
-		
+
 		async.series( [
 			function( callback ) {
-				requester( postQuery , function( error , response ) {
-					
+				requester( postQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					postDocument = JSON.parse( response.body ) ;
-					
+
 					expect( typeof postDocument.id ).to.be( 'string' ) ;
 					expect( postDocument.id.length ).to.be( 24 ) ;
-					
+
 					//console.log( response.headers.location ) ;
 					expect( response.headers.location ).to.be( appProto + '://localhost:' + appPort + '/Blogs/' + postDocument.id ) ;
-					
+
 					getQuery.path += postDocument.id ;
-					
+
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data ).to.equal( {
-						_id: postDocument.id,
-						title: "My website!",
-						description: "... about my wonderful life",
-						slugId: data.slugId,	// Cannot be predicted
+						_id: postDocument.id ,
+						title: "My website!" ,
+						description: "... about my wonderful life" ,
+						slugId: data.slugId ,	// Cannot be predicted
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
 						}
 					} ) ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				getQuery.path += "?tier=4" ;
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data ).to.equal( {
-						_id: postDocument.id,
-						title: "My website!",
-						description: "... about my wonderful life",
-						slugId: data.slugId,	// Cannot be predicted
+						_id: postDocument.id ,
+						title: "My website!" ,
+						description: "... about my wonderful life" ,
+						slugId: data.slugId ,	// Cannot be predicted
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
 						} ,
-						userAccess: {},
-						groupAccess: {},
-						publicAccess: { traverse: 1, read: 4 , create: 1 }
+						userAccess: {} ,
+						groupAccess: {} ,
+						publicAccess: { traverse: 1 , read: 4 , create: 1 }
 					} ) ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			}
 		] )
-		.exec( done ) ;
+			.exec( done ) ;
 	} ) ;
-	
-	it( "PUT, PATCH then GET on a blog" , function( done ) {
-		
+
+	it( "PUT, PATCH then GET on a blog" , ( done ) => {
+
 		var putQuery = {
 			method: 'PUT' ,
 			path: '/Blogs/543bb877bd15489d0d7b0121' ,
@@ -471,12 +461,14 @@ describe( "Basics tests" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				title: "My website!",
-				description: "... about my wonderful life",
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 }
+				title: "My website!" ,
+				description: "... about my wonderful life" ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				}
 			} )
 		} ;
-		
+
 		var patchQuery = {
 			method: 'PATCH' ,
 			path: '/Blogs/543bb877bd15489d0d7b0121' ,
@@ -485,11 +477,11 @@ describe( "Basics tests" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				title: "My *NEW* website!",
+				title: "My *NEW* website!" ,
 				description: "... about my wonderful life"
 			} )
 		} ;
-		
+
 		var getQuery = {
 			method: 'GET' ,
 			path: '/Blogs/543bb877bd15489d0d7b0121' ,
@@ -497,91 +489,93 @@ describe( "Basics tests" , function() {
 				Host: 'localhost'
 			}
 		} ;
-		
+
 		async.series( [
 			function( callback ) {
-				requester( putQuery , function( error , response ) {
-					
+				requester( putQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( patchQuery , function( error , response ) {
-					
+				requester( patchQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data ).to.equal( {
-						_id: "543bb877bd15489d0d7b0121",
-						title: "My *NEW* website!",
-						description: "... about my wonderful life",
-						slugId: data.slugId,	// Cannot be predicted
+						_id: "543bb877bd15489d0d7b0121" ,
+						title: "My *NEW* website!" ,
+						description: "... about my wonderful life" ,
+						slugId: data.slugId ,	// Cannot be predicted
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
 						}
 					} ) ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				getQuery.path += "?tier=4" ;
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data ).to.equal( {
-						_id: "543bb877bd15489d0d7b0121",
-						title: "My *NEW* website!",
-						description: "... about my wonderful life",
-						slugId: data.slugId,	// Cannot be predicted
+						_id: "543bb877bd15489d0d7b0121" ,
+						title: "My *NEW* website!" ,
+						description: "... about my wonderful life" ,
+						slugId: data.slugId ,	// Cannot be predicted
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
-						},
-						userAccess: {},
-						groupAccess: {},
-						publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+						} ,
+						userAccess: {} ,
+						groupAccess: {} ,
+						publicAccess: {
+							traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+						}
 					} ) ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			}
 		] )
-		.exec( done ) ;
-		
+			.exec( done ) ;
+
 	} ) ;
-	
-	it( "PUT, DELETE then GET on a blog" , function( done ) {
-		
+
+	it( "PUT, DELETE then GET on a blog" , ( done ) => {
+
 		var putQuery = {
 			method: 'PUT' ,
 			path: '/Blogs/543bb877bd15489d0d7b0122' ,
@@ -590,12 +584,14 @@ describe( "Basics tests" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				title: "My website!",
-				description: "... about my wonderful life",
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 }
+				title: "My website!" ,
+				description: "... about my wonderful life" ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				}
 			} )
 		} ;
-		
+
 		var deleteQuery = {
 			method: 'DELETE' ,
 			path: '/Blogs/543bb877bd15489d0d7b0122' ,
@@ -604,7 +600,7 @@ describe( "Basics tests" , function() {
 				"Content-Type": 'application/json'
 			}
 		} ;
-		
+
 		var getQuery = {
 			method: 'GET' ,
 			path: '/Blogs/543bb877bd15489d0d7b0122' ,
@@ -612,47 +608,47 @@ describe( "Basics tests" , function() {
 				Host: 'localhost'
 			}
 		} ;
-		
+
 		async.series( [
 			function( callback ) {
-				requester( putQuery , function( error , response ) {
-					
+				requester( putQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( deleteQuery , function( error , response ) {
-					
+				requester( deleteQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 404 ) ;
 					expect( response.body ).not.to.be.ok() ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			}
 		] )
-		.exec( done ) ;
-		
+			.exec( done ) ;
+
 	} ) ;
-	
-	it( "Multiple PUT then GET on the whole blog collection" , function( done ) {
-		
+
+	it( "Multiple PUT then GET on the whole blog collection" , ( done ) => {
+
 		var putQuery1 = {
 			method: 'PUT' ,
 			path: '/Blogs/543bb877bd15489d0d7b0121' ,
@@ -661,11 +657,11 @@ describe( "Basics tests" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				title: "First post!",
+				title: "First post!" ,
 				description: "Everything started with that."
 			} )
 		} ;
-		
+
 		var putQuery2 = {
 			method: 'PUT' ,
 			path: '/Blogs/543bb877bd15489d0d7b0122' ,
@@ -674,11 +670,11 @@ describe( "Basics tests" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				title: "About",
+				title: "About" ,
 				description: "About this blog."
 			} )
 		} ;
-		
+
 		var putQuery3 = {
 			method: 'PUT' ,
 			path: '/Blogs/543bb877bd15489d0d7b0123' ,
@@ -687,11 +683,11 @@ describe( "Basics tests" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				title: "10 things about nothing",
+				title: "10 things about nothing" ,
 				description: "10 things you should know... or not..."
 			} )
 		} ;
-		
+
 		var getQuery = {
 			method: 'GET' ,
 			path: '/Blogs/' ,
@@ -699,99 +695,99 @@ describe( "Basics tests" , function() {
 				Host: 'localhost'
 			}
 		} ;
-		
+
 		async.series( [
 			function( callback ) {
-				requester( putQuery1 , function( error , response ) {
-					
+				requester( putQuery1 , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( putQuery2 , function( error , response ) {
-					
+				requester( putQuery2 , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( putQuery3 , function( error , response ) {
-					
+				requester( putQuery3 , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					data = data.sort( ( a , b ) => a._id < b._id ? -1 : 1 ) ;
-					
-					expect( data ).to.equal( [ 
+
+					expect( data ).to.equal( [
 						{
-							_id: "543bb877bd15489d0d7b0121",
-							title: "First post!",
-							description: "Everything started with that.",
-							slugId: data[ 0 ].slugId,	// Cannot be predicted
+							_id: "543bb877bd15489d0d7b0121" ,
+							title: "First post!" ,
+							description: "Everything started with that." ,
+							slugId: data[ 0 ].slugId ,	// Cannot be predicted
 							parent: {
-								collection: null,
+								collection: null ,
 								id: '/'
-							},
+							}
 						} ,
 						{
-							_id: "543bb877bd15489d0d7b0122",
-							title: "About",
-							description: "About this blog.",
-							slugId: data[ 1 ].slugId,	// Cannot be predicted
+							_id: "543bb877bd15489d0d7b0122" ,
+							title: "About" ,
+							description: "About this blog." ,
+							slugId: data[ 1 ].slugId ,	// Cannot be predicted
 							parent: {
-								collection: null,
+								collection: null ,
 								id: '/'
-							},
+							}
 						} ,
 						{
-							_id: "543bb877bd15489d0d7b0123",
-							title: "10 things about nothing",
-							description: "10 things you should know... or not...",
-							slugId: data[ 2 ].slugId,	// Cannot be predicted
+							_id: "543bb877bd15489d0d7b0123" ,
+							title: "10 things about nothing" ,
+							description: "10 things you should know... or not..." ,
+							slugId: data[ 2 ].slugId ,	// Cannot be predicted
 							parent: {
-								collection: null,
+								collection: null ,
 								id: '/'
-							},
-						} ,
+							}
+						}
 					] ) ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
-			} ,
+			}
 		] )
-		.exec( done ) ;
+			.exec( done ) ;
 	} ) ;
 } ) ;
 
 
 
-describe( "Basics tests on users" , function() {
-	
-	it( "GET on an unexistant user" , function( done ) {
-		
+describe( "Basics tests on users" , () => {
+
+	it( "GET on an unexistant user" , ( done ) => {
+
 		var getQuery = {
 			method: 'GET' ,
 			path: '/Users/111111111111111111111111' ,
@@ -799,21 +795,21 @@ describe( "Basics tests on users" , function() {
 				Host: 'localhost'
 			}
 		} ;
-		
-		requester( getQuery , function( error , response ) {
-			
+
+		requester( getQuery , ( error , response ) => {
+
 			expect( error ).not.to.be.ok() ;
 			expect( response.status ).to.be( 404 ) ;
 			expect( response.body ).not.to.be.ok() ;
-			
+
 			//console.log( "Response:" , response ) ;
-			
+
 			done() ;
 		} ) ;
 	} ) ;
-	
-	it( "PUT then GET on a user" , function( done ) {
-		
+
+	it( "PUT then GET on a user" , ( done ) => {
+
 		var putQuery = {
 			method: 'PUT' ,
 			path: '/Users/543bb877bd15489d0d7b0130' ,
@@ -822,14 +818,14 @@ describe( "Basics tests on users" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				firstName: "Joe",
-				lastName: "Doe2",
-				email: "joe.doe2@gmail.com",
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
 				password: "pw" ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 }
 			} )
 		} ;
-		
+
 		var getQuery = {
 			method: 'GET' ,
 			path: '/Users/543bb877bd15489d0d7b0130' ,
@@ -837,96 +833,96 @@ describe( "Basics tests on users" , function() {
 				Host: 'localhost'
 			}
 		} ;
-		
+
 		async.series( [
 			function( callback ) {
-				requester( putQuery , function( error , response ) {
-					
+				requester( putQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data ).to.equal( {
-						_id: "543bb877bd15489d0d7b0130",
-						firstName: "Joe",
-						lastName: "Doe2",
-						email: "joe.doe2@gmail.com",
-						login: "joe.doe2@gmail.com",
-						groups: [],
-						slugId: data.slugId,	// Cannot be predicted
+						_id: "543bb877bd15489d0d7b0130" ,
+						firstName: "Joe" ,
+						lastName: "Doe2" ,
+						email: "joe.doe2@gmail.com" ,
+						login: "joe.doe2@gmail.com" ,
+						groups: [] ,
+						slugId: data.slugId ,	// Cannot be predicted
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
 						}
 					} ) ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
 				getQuery.path += "?tier=5" ;
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data.password ).to.be.an( 'object' ) ;
 					expect( data.password.algo ).to.be.a( 'string' ) ;
 					expect( data.password.salt ).to.be.a( 'string' ) ;
 					expect( data.password.hash ).to.be.a( 'string' ) ;
 					//console.log( data.password ) ;
 					delete data.password ;
-					
+
 					expect( data ).to.equal( {
-						_id: "543bb877bd15489d0d7b0130",
-						firstName: "Joe",
-						lastName: "Doe2",
-						email: "joe.doe2@gmail.com",
-						login: "joe.doe2@gmail.com",
-						isApiKey: false,
-						groups: [],
-						token: {},
-						slugId: data.slugId,	// Cannot be predicted
-						userAccess: {},
-						groupAccess: {},
-						publicAccess: { traverse: 1, read: 5 , create: 1 } ,
+						_id: "543bb877bd15489d0d7b0130" ,
+						firstName: "Joe" ,
+						lastName: "Doe2" ,
+						email: "joe.doe2@gmail.com" ,
+						login: "joe.doe2@gmail.com" ,
+						isApiKey: false ,
+						groups: [] ,
+						token: {} ,
+						slugId: data.slugId ,	// Cannot be predicted
+						userAccess: {} ,
+						groupAccess: {} ,
+						publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
 						}
 					} ) ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			}
 		] )
-		.exec( done ) ;
-		
+			.exec( done ) ;
+
 	} ) ;
-	
-	it( "PUT, DELETE then GET on a user" , function( done ) {
-		
+
+	it( "PUT, DELETE then GET on a user" , ( done ) => {
+
 		var putQuery = {
 			method: 'PUT' ,
 			path: '/Users/543bb877bd15489d0d7b0132' ,
@@ -935,14 +931,16 @@ describe( "Basics tests on users" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				firstName: "John",
-				lastName: "Doe",
-				email: "john.doe@gmail.com",
-				password: "pw",
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 }
+				firstName: "John" ,
+				lastName: "Doe" ,
+				email: "john.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				}
 			} )
 		} ;
-		
+
 		var deleteQuery = {
 			method: 'DELETE' ,
 			path: '/Users/543bb877bd15489d0d7b0132' ,
@@ -951,7 +949,7 @@ describe( "Basics tests on users" , function() {
 				"Content-Type": 'application/json'
 			}
 		} ;
-		
+
 		var getQuery = {
 			method: 'GET' ,
 			path: '/Users/543bb877bd15489d0d7b0132' ,
@@ -959,63 +957,63 @@ describe( "Basics tests on users" , function() {
 				Host: 'localhost'
 			}
 		} ;
-		
+
 		async.series( [
 			function( callback ) {
-				requester( putQuery , function( error , response ) {
-					
+				requester( putQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( deleteQuery , function( error , response ) {
-					
+				requester( deleteQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					//console.log( "Response:" , response ) ;
 					callback() ;
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( getQuery , function( error , response ) {
-					
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 404 ) ;
 					expect( response.body ).not.to.be.ok() ;
-					
+
 					//console.log( "Response:" , response ) ;
-					
+
 					callback() ;
 				} ) ;
 			}
 		] )
-		.exec( done ) ;
-		
+			.exec( done ) ;
+
 	} ) ;
-	
+
 } ) ;
 
 
 
-describe( "Attachment" , function() {
-	
+describe( "Attachment" , () => {
+
 	it( "Attachment tests..." ) ;
-	
+
 } ) ;
 
 
 
-describe( "Links population" , function() {
-	
-	it( "GET on document and collection + populate links" , function( done ) {
-		
+describe( "Links population" , () => {
+
+	it( "GET on document and collection + populate links" , ( done ) => {
+
 		var u1 , u2 , u3 ;
-		
+
 		var postQuery1 = {
 			method: 'POST' ,
 			path: '/Users' ,
@@ -1024,14 +1022,14 @@ describe( "Links population" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				firstName: "Big Joe",
-				lastName: "Doe",
-				email: "big.joe.doe@gmail.com",
-				password: "pw",
+				firstName: "Big Joe" ,
+				lastName: "Doe" ,
+				email: "big.joe.doe@gmail.com" ,
+				password: "pw" ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 }
 			} )
 		} ;
-		
+
 		var postQuery2 = {
 			method: 'POST' ,
 			path: '/Users' ,
@@ -1040,21 +1038,21 @@ describe( "Links population" , function() {
 				"Content-Type": 'application/json'
 			} ,
 			body: JSON.stringify( {
-				firstName: "THE",
-				lastName: "GODFATHER",
-				email: "godfather@gmail.com",
-				password: "pw",
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 }
 			} )
 		} ;
-		
+
 		var postQuery3 , getQuery ;
-		
-		
+
+
 		async.series( [
 			function( callback ) {
-				requester( postQuery1 , function( error , response ) {
-					
+				requester( postQuery1 , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
 					u1 = JSON.parse( response.body ).id ;
@@ -1062,8 +1060,8 @@ describe( "Links population" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				requester( postQuery2 , function( error , response ) {
-					
+				requester( postQuery2 , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
 					u2 = JSON.parse( response.body ).id ;
@@ -1071,7 +1069,7 @@ describe( "Links population" , function() {
 				} ) ;
 			} ,
 			function( callback ) {
-				
+
 				postQuery3 = {
 					method: 'POST' ,
 					path: '/Users' ,
@@ -1080,18 +1078,18 @@ describe( "Links population" , function() {
 						"Content-Type": 'application/json'
 					} ,
 					body: JSON.stringify( {
-						firstName: "Joe",
-						lastName: "Doe",
-						email: "joe.doe@gmail.com",
-						password: "pw",
-						father: u1,
-						godfather: u2,
+						firstName: "Joe" ,
+						lastName: "Doe" ,
+						email: "joe.doe@gmail.com" ,
+						password: "pw" ,
+						father: u1 ,
+						godfather: u2 ,
 						publicAccess: { traverse: 1 , read: 5 , create: 1 }
 					} )
 				} ;
-				
-				requester( postQuery3 , function( error , response ) {
-					
+
+				requester( postQuery3 , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 201 ) ;
 					u3 = JSON.parse( response.body ).id ;
@@ -1106,59 +1104,59 @@ describe( "Links population" , function() {
 						Host: 'localhost'
 					}
 				} ;
-				
-				requester( getQuery , function( error , response ) {
-					
+
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					delete data.father.password ;
 					delete data.godfather.password ;
-					
+
 					expect( data ).to.equal( {
-						_id: data._id,
-						firstName: "Joe",
-						lastName: "Doe",
-						email: "joe.doe@gmail.com",
-						login: "joe.doe@gmail.com",
-						slugId: data.slugId,	// Cannot be predicted
-						groups: [],
+						_id: data._id ,
+						firstName: "Joe" ,
+						lastName: "Doe" ,
+						email: "joe.doe@gmail.com" ,
+						login: "joe.doe@gmail.com" ,
+						slugId: data.slugId ,	// Cannot be predicted
+						groups: [] ,
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
-						},
+						} ,
 						father: {
-							_id: data.father._id,
-							firstName: "Big Joe",
-							lastName: "Doe",
-							email: "big.joe.doe@gmail.com",
-							login: "big.joe.doe@gmail.com",
-							slugId: data.father.slugId,
-							groups: [],
+							_id: data.father._id ,
+							firstName: "Big Joe" ,
+							lastName: "Doe" ,
+							email: "big.joe.doe@gmail.com" ,
+							login: "big.joe.doe@gmail.com" ,
+							slugId: data.father.slugId ,
+							groups: [] ,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
-						},
+							}
+						} ,
 						godfather: {
-							_id: data.godfather._id,
-							firstName: "THE",
-							lastName: "GODFATHER",
-							email: "godfather@gmail.com",
-							login: "godfather@gmail.com",
-							slugId: data.godfather.slugId,
-							groups: [],
+							_id: data.godfather._id ,
+							firstName: "THE" ,
+							lastName: "GODFATHER" ,
+							email: "godfather@gmail.com" ,
+							login: "godfather@gmail.com" ,
+							slugId: data.godfather.slugId ,
+							groups: [] ,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
+							}
 						}
 					} ) ;
-					
+
 					callback() ;
 				} ) ;
 			} ,
@@ -1170,16 +1168,16 @@ describe( "Links population" , function() {
 						Host: 'localhost'
 					}
 				} ;
-				
-				requester( getQuery , function( error , response ) {
-					
+
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data.password ).to.be.an( 'object' ) ;
 					expect( data.password.algo ).to.be.a( 'string' ) ;
 					expect( data.password.salt ).to.be.a( 'string' ) ;
@@ -1187,66 +1185,66 @@ describe( "Links population" , function() {
 					delete data.password ;
 					delete data.father.password ;
 					delete data.godfather.password ;
-					
+
 					expect( data ).to.equal( {
-						_id: data._id,
-						firstName: "Joe",
-						lastName: "Doe",
-						email: "joe.doe@gmail.com",
-						login: "joe.doe@gmail.com",
-						slugId: data.slugId,	// Cannot be predicted
-						groups: [],
+						_id: data._id ,
+						firstName: "Joe" ,
+						lastName: "Doe" ,
+						email: "joe.doe@gmail.com" ,
+						login: "joe.doe@gmail.com" ,
+						slugId: data.slugId ,	// Cannot be predicted
+						groups: [] ,
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
-						},
-						isApiKey: false,
-						token: {},
+						} ,
+						isApiKey: false ,
+						token: {} ,
 						publicAccess: {
-							create: 1,
-							read: 5,
+							create: 1 ,
+							read: 5 ,
 							traverse: 1
-						},
-						userAccess: {},
-						groupAccess: {},
+						} ,
+						userAccess: {} ,
+						groupAccess: {} ,
 						father: {
-							_id: data.father._id,
-							firstName: "Big Joe",
-							lastName: "Doe",
-							email: "big.joe.doe@gmail.com",
-							login: "big.joe.doe@gmail.com",
-							isApiKey: false,
-							slugId: data.father.slugId,
-							groups: [],
-							token: {},
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, create: 1 },
+							_id: data.father._id ,
+							firstName: "Big Joe" ,
+							lastName: "Doe" ,
+							email: "big.joe.doe@gmail.com" ,
+							login: "big.joe.doe@gmail.com" ,
+							isApiKey: false ,
+							slugId: data.father.slugId ,
+							groups: [] ,
+							token: {} ,
+							userAccess: {} ,
+							groupAccess: {} ,
+							publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
-						},
+							}
+						} ,
 						godfather: {
-							_id: data.godfather._id,
-							firstName: "THE",
-							lastName: "GODFATHER",
-							email: "godfather@gmail.com",
-							login: "godfather@gmail.com",
-							isApiKey: false,
-							slugId: data.godfather.slugId,
-							groups: [],
-							token: {},
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, create: 1 },
+							_id: data.godfather._id ,
+							firstName: "THE" ,
+							lastName: "GODFATHER" ,
+							email: "godfather@gmail.com" ,
+							login: "godfather@gmail.com" ,
+							isApiKey: false ,
+							slugId: data.godfather.slugId ,
+							groups: [] ,
+							token: {} ,
+							userAccess: {} ,
+							groupAccess: {} ,
+							publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
+							}
 						}
 					} ) ;
-					
+
 					callback() ;
 				} ) ;
 			} ,
@@ -1258,16 +1256,16 @@ describe( "Links population" , function() {
 						Host: 'localhost'
 					}
 				} ;
-				
-				requester( getQuery , function( error , response ) {
-					
+
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
+
 					expect( data.password ).to.be.an( 'object' ) ;
 					expect( data.password.algo ).to.be.a( 'string' ) ;
 					expect( data.password.salt ).to.be.a( 'string' ) ;
@@ -1275,46 +1273,46 @@ describe( "Links population" , function() {
 					delete data.password ;
 					delete data.father.password ;
 					delete data.godfather.password ;
-					
+
 					expect( data ).to.equal( {
-						_id: data._id,
-						firstName: "Joe",
-						lastName: "Doe",
-						email: "joe.doe@gmail.com",
-						login: "joe.doe@gmail.com",
-						slugId: data.slugId,	// Cannot be predicted
-						groups: [],
+						_id: data._id ,
+						firstName: "Joe" ,
+						lastName: "Doe" ,
+						email: "joe.doe@gmail.com" ,
+						login: "joe.doe@gmail.com" ,
+						slugId: data.slugId ,	// Cannot be predicted
+						groups: [] ,
 						parent: {
-							collection: null,
+							collection: null ,
 							id: '/'
-						},
-						isApiKey: false,
-						token: {},
+						} ,
+						isApiKey: false ,
+						token: {} ,
 						publicAccess: {
-							create: 1,
-							read: 5,
+							create: 1 ,
+							read: 5 ,
 							traverse: 1
-						},
-						userAccess: {},
-						groupAccess: {},
+						} ,
+						userAccess: {} ,
+						groupAccess: {} ,
 						father: {
-							_id: data.father._id,
-							login: "big.joe.doe@gmail.com",
+							_id: data.father._id ,
+							login: "big.joe.doe@gmail.com" ,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
-						},
+							}
+						} ,
 						godfather: {
-							_id: data.godfather._id,
-							login: "godfather@gmail.com",
+							_id: data.godfather._id ,
+							login: "godfather@gmail.com" ,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
+							}
 						}
 					} ) ;
-					
+
 					callback() ;
 				} ) ;
 			} ,
@@ -1326,90 +1324,90 @@ describe( "Links population" , function() {
 						Host: 'localhost'
 					}
 				} ;
-				
-				requester( getQuery , function( error , response ) {
-					
+
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
-					data.sort( function( a , b ) {
+
+					data.sort( ( a , b ) => {
 						return a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ;
 					} ) ;
-					
+
 					expect( data ).to.equal( [
 						{
-							_id: data[ 0 ]._id,
-							firstName: "Big Joe",
-							lastName: "Doe",
-							email: "big.joe.doe@gmail.com",
-							login: "big.joe.doe@gmail.com",
-							slugId: data[ 0 ].slugId,
-							groups: [],
+							_id: data[ 0 ]._id ,
+							firstName: "Big Joe" ,
+							lastName: "Doe" ,
+							email: "big.joe.doe@gmail.com" ,
+							login: "big.joe.doe@gmail.com" ,
+							slugId: data[ 0 ].slugId ,
+							groups: [] ,
 							//father: null, godfather: null,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
-						},
-						{
-							_id: data[ 1 ]._id,
-							firstName: "Joe",
-							lastName: "Doe",
-							email: "joe.doe@gmail.com",
-							login: "joe.doe@gmail.com",
-							slugId: data[ 1 ].slugId,	// Cannot be predicted
-							groups: [],
-							parent: {
-								collection: null,
-								id: '/'
-							},
-							father: {
-								_id: data[ 0 ]._id,
-								firstName: "Big Joe",
-								lastName: "Doe",
-								email: "big.joe.doe@gmail.com",
-								login: "big.joe.doe@gmail.com",
-								slugId: data[ 0 ].slugId,
-								groups: [],
-								parent: {
-									collection: null,
-									id: "/"
-								},
-							},
-							godfather: {
-								_id: data[ 2 ]._id,
-								firstName: "THE",
-								lastName: "GODFATHER",
-								email: "godfather@gmail.com",
-								login: "godfather@gmail.com",
-								slugId: data[ 2 ].slugId,
-								groups: [],
-								parent: {
-									collection: null,
-									id: "/"
-								},
 							}
-						},
+						} ,
 						{
-							_id: data[ 2 ]._id,
-							firstName: "THE",
-							lastName: "GODFATHER",
-							email: "godfather@gmail.com",
-							login: "godfather@gmail.com",
-							slugId: data[ 2 ].slugId,
-							groups: [],
+							_id: data[ 1 ]._id ,
+							firstName: "Joe" ,
+							lastName: "Doe" ,
+							email: "joe.doe@gmail.com" ,
+							login: "joe.doe@gmail.com" ,
+							slugId: data[ 1 ].slugId ,	// Cannot be predicted
+							groups: [] ,
+							parent: {
+								collection: null ,
+								id: '/'
+							} ,
+							father: {
+								_id: data[ 0 ]._id ,
+								firstName: "Big Joe" ,
+								lastName: "Doe" ,
+								email: "big.joe.doe@gmail.com" ,
+								login: "big.joe.doe@gmail.com" ,
+								slugId: data[ 0 ].slugId ,
+								groups: [] ,
+								parent: {
+									collection: null ,
+									id: "/"
+								}
+							} ,
+							godfather: {
+								_id: data[ 2 ]._id ,
+								firstName: "THE" ,
+								lastName: "GODFATHER" ,
+								email: "godfather@gmail.com" ,
+								login: "godfather@gmail.com" ,
+								slugId: data[ 2 ].slugId ,
+								groups: [] ,
+								parent: {
+									collection: null ,
+									id: "/"
+								}
+							}
+						} ,
+						{
+							_id: data[ 2 ]._id ,
+							firstName: "THE" ,
+							lastName: "GODFATHER" ,
+							email: "godfather@gmail.com" ,
+							login: "godfather@gmail.com" ,
+							slugId: data[ 2 ].slugId ,
+							groups: [] ,
 							//father: null, godfather: null,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
+							}
 						}
 					] ) ;
-					
+
 					callback() ;
 				} ) ;
 			} ,
@@ -1421,124 +1419,124 @@ describe( "Links population" , function() {
 						Host: 'localhost'
 					}
 				} ;
-				
-				requester( getQuery , function( error , response ) {
-					
+
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
-					data.sort( function( a , b ) {
+
+					data.sort( ( a , b ) => {
 						return a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ;
 					} ) ;
-					
+
 					delete data[ 0 ].password ;
 					delete data[ 1 ].password ;
 					delete data[ 1 ].father.password ;
 					delete data[ 1 ].godfather.password ;
 					delete data[ 2 ].password ;
-					
+
 					expect( data ).to.equal( [
 						{
-							_id: data[ 0 ]._id,
-							firstName: "Big Joe",
-							lastName: "Doe",
-							email: "big.joe.doe@gmail.com",
-							login: "big.joe.doe@gmail.com",
-							isApiKey: false,
-							slugId: data[ 0 ].slugId,
-							groups: [],
+							_id: data[ 0 ]._id ,
+							firstName: "Big Joe" ,
+							lastName: "Doe" ,
+							email: "big.joe.doe@gmail.com" ,
+							login: "big.joe.doe@gmail.com" ,
+							isApiKey: false ,
+							slugId: data[ 0 ].slugId ,
+							groups: [] ,
 							//father: null, godfather: null,
-							token: {},
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, create: 1 },
+							token: {} ,
+							userAccess: {} ,
+							groupAccess: {} ,
+							publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
-						},
-						{
-							_id: data[ 1 ]._id,
-							firstName: "Joe",
-							lastName: "Doe",
-							email: "joe.doe@gmail.com",
-							login: "joe.doe@gmail.com",
-							isApiKey: false,
-							slugId: data[ 1 ].slugId,	// Cannot be predicted
-							groups: [],
-							token: {},
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, create: 1 },
-							parent: {
-								collection: null,
-								id: '/'
-							},
-							father: {
-								_id: data[ 0 ]._id,
-								firstName: "Big Joe",
-								lastName: "Doe",
-								email: "big.joe.doe@gmail.com",
-								login: "big.joe.doe@gmail.com",
-								isApiKey: false,
-								slugId: data[ 0 ].slugId,
-								groups: [],
-								token: {},
-								userAccess: {},
-								groupAccess: {},
-								publicAccess: { traverse: 1, read: 5, create: 1 },
-								parent: {
-									collection: null,
-									id: "/"
-								},
-							},
-							godfather: {
-								_id: data[ 2 ]._id,
-								firstName: "THE",
-								lastName: "GODFATHER",
-								email: "godfather@gmail.com",
-								login: "godfather@gmail.com",
-								isApiKey: false,
-								slugId: data[ 2 ].slugId,
-								groups: [],
-								token: {},
-								userAccess: {},
-								groupAccess: {},
-								publicAccess: { traverse: 1, read: 5, create: 1 },
-								parent: {
-									collection: null,
-									id: "/"
-								},
 							}
-						},
+						} ,
 						{
-							_id: data[ 2 ]._id,
-							firstName: "THE",
-							lastName: "GODFATHER",
-							email: "godfather@gmail.com",
-							login: "godfather@gmail.com",
-							isApiKey: false,
-							slugId: data[ 2 ].slugId,
-							groups: [],
-							//father: null, godfather: null,
-							token: {},
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, create: 1 },
+							_id: data[ 1 ]._id ,
+							firstName: "Joe" ,
+							lastName: "Doe" ,
+							email: "joe.doe@gmail.com" ,
+							login: "joe.doe@gmail.com" ,
+							isApiKey: false ,
+							slugId: data[ 1 ].slugId ,	// Cannot be predicted
+							groups: [] ,
+							token: {} ,
+							userAccess: {} ,
+							groupAccess: {} ,
+							publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 							parent: {
-								collection: null,
+								collection: null ,
+								id: '/'
+							} ,
+							father: {
+								_id: data[ 0 ]._id ,
+								firstName: "Big Joe" ,
+								lastName: "Doe" ,
+								email: "big.joe.doe@gmail.com" ,
+								login: "big.joe.doe@gmail.com" ,
+								isApiKey: false ,
+								slugId: data[ 0 ].slugId ,
+								groups: [] ,
+								token: {} ,
+								userAccess: {} ,
+								groupAccess: {} ,
+								publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+								parent: {
+									collection: null ,
+									id: "/"
+								}
+							} ,
+							godfather: {
+								_id: data[ 2 ]._id ,
+								firstName: "THE" ,
+								lastName: "GODFATHER" ,
+								email: "godfather@gmail.com" ,
+								login: "godfather@gmail.com" ,
+								isApiKey: false ,
+								slugId: data[ 2 ].slugId ,
+								groups: [] ,
+								token: {} ,
+								userAccess: {} ,
+								groupAccess: {} ,
+								publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+								parent: {
+									collection: null ,
+									id: "/"
+								}
+							}
+						} ,
+						{
+							_id: data[ 2 ]._id ,
+							firstName: "THE" ,
+							lastName: "GODFATHER" ,
+							email: "godfather@gmail.com" ,
+							login: "godfather@gmail.com" ,
+							isApiKey: false ,
+							slugId: data[ 2 ].slugId ,
+							groups: [] ,
+							//father: null, godfather: null,
+							token: {} ,
+							userAccess: {} ,
+							groupAccess: {} ,
+							publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+							parent: {
+								collection: null ,
 								id: "/"
-							},
+							}
 						}
 					] ) ;
-					
+
 					callback() ;
 				} ) ;
-			},
+			} ,
 			function( callback ) {
 				getQuery = {
 					method: 'GET' ,
@@ -1547,105 +1545,105 @@ describe( "Links population" , function() {
 						Host: 'localhost'
 					}
 				} ;
-				
-				requester( getQuery , function( error , response ) {
-					
+
+				requester( getQuery , ( error , response ) => {
+
 					expect( error ).not.to.be.ok() ;
 					expect( response.status ).to.be( 200 ) ;
-					
+
 					expect( response.body ).to.be.ok() ;
-					
+
 					var data = JSON.parse( response.body ) ;
-					
-					data.sort( function( a , b ) {
+
+					data.sort( ( a , b ) => {
 						return a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ;
 					} ) ;
-					
+
 					delete data[ 0 ].password ;
 					delete data[ 1 ].password ;
 					delete data[ 2 ].password ;
-					
+
 					expect( data ).to.equal( [
 						{
-							_id: data[ 0 ]._id,
-							firstName: "Big Joe",
-							lastName: "Doe",
-							email: "big.joe.doe@gmail.com",
-							login: "big.joe.doe@gmail.com",
-							isApiKey: false,
-							slugId: data[ 0 ].slugId,
-							groups: [],
+							_id: data[ 0 ]._id ,
+							firstName: "Big Joe" ,
+							lastName: "Doe" ,
+							email: "big.joe.doe@gmail.com" ,
+							login: "big.joe.doe@gmail.com" ,
+							isApiKey: false ,
+							slugId: data[ 0 ].slugId ,
+							groups: [] ,
 							//father: null, godfather: null,
-							token: {},
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, create: 1 },
+							token: {} ,
+							userAccess: {} ,
+							groupAccess: {} ,
+							publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 							parent: {
-								collection: null,
+								collection: null ,
 								id: "/"
-							},
-						},
-						{
-							_id: data[ 1 ]._id,
-							firstName: "Joe",
-							lastName: "Doe",
-							email: "joe.doe@gmail.com",
-							login: "joe.doe@gmail.com",
-							isApiKey: false,
-							slugId: data[ 1 ].slugId,	// Cannot be predicted
-							groups: [],
-							token: {},
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, create: 1 },
-							parent: {
-								collection: null,
-								id: '/'
-							},
-							father: {
-								_id: data[ 0 ]._id,
-								login: "big.joe.doe@gmail.com",
-								parent: {
-									collection: null,
-									id: "/"
-								},
-							},
-							godfather: {
-								_id: data[ 2 ]._id,
-								login: "godfather@gmail.com",
-								parent: {
-									collection: null,
-									id: "/"
-								},
 							}
-						},
+						} ,
 						{
-							_id: data[ 2 ]._id,
-							firstName: "THE",
-							lastName: "GODFATHER",
-							email: "godfather@gmail.com",
-							login: "godfather@gmail.com",
-							isApiKey: false,
-							slugId: data[ 2 ].slugId,
-							groups: [],
-							//father: null, godfather: null,
-							token: {},
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, create: 1 },
+							_id: data[ 1 ]._id ,
+							firstName: "Joe" ,
+							lastName: "Doe" ,
+							email: "joe.doe@gmail.com" ,
+							login: "joe.doe@gmail.com" ,
+							isApiKey: false ,
+							slugId: data[ 1 ].slugId ,	// Cannot be predicted
+							groups: [] ,
+							token: {} ,
+							userAccess: {} ,
+							groupAccess: {} ,
+							publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 							parent: {
-								collection: null,
+								collection: null ,
+								id: '/'
+							} ,
+							father: {
+								_id: data[ 0 ]._id ,
+								login: "big.joe.doe@gmail.com" ,
+								parent: {
+									collection: null ,
+									id: "/"
+								}
+							} ,
+							godfather: {
+								_id: data[ 2 ]._id ,
+								login: "godfather@gmail.com" ,
+								parent: {
+									collection: null ,
+									id: "/"
+								}
+							}
+						} ,
+						{
+							_id: data[ 2 ]._id ,
+							firstName: "THE" ,
+							lastName: "GODFATHER" ,
+							email: "godfather@gmail.com" ,
+							login: "godfather@gmail.com" ,
+							isApiKey: false ,
+							slugId: data[ 2 ].slugId ,
+							groups: [] ,
+							//father: null, godfather: null,
+							token: {} ,
+							userAccess: {} ,
+							groupAccess: {} ,
+							publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+							parent: {
+								collection: null ,
 								id: "/"
-							},
+							}
 						}
 					] ) ;
-					
+
 					callback() ;
 				} ) ;
 			}
 		] )
-		.exec( done ) ;
-		
+			.exec( done ) ;
+
 	} ) ;
 } ) ;
-	
+
