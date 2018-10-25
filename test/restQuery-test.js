@@ -747,6 +747,145 @@ describe( "Basic queries of top-level collections" , function() {
 		] )
 		.exec( done ) ;
 	} ) ;
+
+	it( "GET on a collection with items, with skip, limit and sort" , function( done ) {
+		
+		var app , performer , blog , id1 , id2 , id3 ;
+		
+		async.series( [
+			function( callback ) {
+				commonApp( function( error , a , p ) {
+					app = a ;
+					performer = p ;
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'My wonderful life' ,
+					description: 'This is a supa blog!' ,
+					publicAccess: 'all'
+				} ) ;
+				id1 = blog._id ;
+				blog.$.save( callback ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'YAB' ,
+					description: 'Yet Another Blog' ,
+					publicAccess: 'all'
+				} ) ;
+				id2 = blog._id ;
+				blog.$.save( callback ) ;
+			} ,
+			function( callback ) {
+				blog = app.root.children.blogs.collection.createDocument( {
+					title: 'Third' ,
+					description: 'The Third' ,
+					publicAccess: 'all'
+				} ) ;
+				id3 = blog._id ;
+				blog.$.save( callback ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 } } } , function( error , batch ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( batch ).to.equal( [
+						{
+							title: 'My wonderful life',
+							description: 'This is a supa blog!',
+							_id: id1,
+							//embedded: undefined,
+							parent: { id: '/', collection: null },
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+							slugId: batch[ 0 ].slugId		// cannot be predicted
+						} ,
+						{
+							title: 'YAB' ,
+							description: 'Yet Another Blog' ,
+							_id: id2,
+							//embedded: undefined,
+							parent: { id: '/', collection: null },
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+							slugId: batch[ 1 ].slugId		// cannot be predicted
+						}
+					] ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Blogs' , { performer: performer , input: { query: { skip: 1 } } } , function( error , batch ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( batch ).to.equal( [
+						{
+							title: 'YAB' ,
+							description: 'Yet Another Blog' ,
+							_id: id2,
+							//embedded: undefined,
+							parent: { id: '/', collection: null },
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+							slugId: batch[ 0 ].slugId		// cannot be predicted
+						} ,
+						{
+							title: 'Third' ,
+							description: 'The Third' ,
+							_id: id3,
+							//embedded: undefined,
+							parent: { id: '/', collection: null },
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+							slugId: batch[ 1 ].slugId		// cannot be predicted
+						}
+					] ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 1 } } } } , function( error , batch ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( batch ).to.equal( [
+						{
+							title: 'My wonderful life',
+							description: 'This is a supa blog!',
+							_id: id1,
+							//embedded: undefined,
+							parent: { id: '/', collection: null },
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+							slugId: batch[ 0 ].slugId		// cannot be predicted
+						} ,
+						{
+							title: 'Third' ,
+							description: 'The Third' ,
+							_id: id3,
+							//embedded: undefined,
+							parent: { id: '/', collection: null },
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+							slugId: batch[ 1 ].slugId		// cannot be predicted
+						}
+					] ) ;
+					
+					callback() ;
+				} ) ;
+			}
+		] )
+		.exec( done ) ;
+	} ) ;
 } ) ;
 
 
