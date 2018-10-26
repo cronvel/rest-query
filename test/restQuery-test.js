@@ -748,7 +748,7 @@ describe( "Basic queries of top-level collections" , function() {
 		.exec( done ) ;
 	} ) ;
 
-	it( "GET on a collection with items, with skip, limit and sort" , function( done ) {
+	it( "GET on a collection with items, with special query: skip, limit, sort and filter" , function( done ) {
 		
 		var app , performer , blog , id1 , id2 , id3 ;
 		
@@ -877,6 +877,27 @@ describe( "Basic queries of top-level collections" , function() {
 							groupAccess: {},
 							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
 							slugId: batch[ 1 ].slugId		// cannot be predicted
+						}
+					] ) ;
+					
+					callback() ;
+				} ) ;
+			} ,
+			function( callback ) {
+				app.get( '/Blogs' , { performer: performer , input: { query: { filter: { title: 'Third' } } } } , function( error , batch ) {
+					expect( error ).not.to.be.ok() ;
+					
+					expect( batch ).to.equal( [
+						{
+							title: 'Third' ,
+							description: 'The Third' ,
+							_id: id3,
+							//embedded: undefined,
+							parent: { id: '/', collection: null },
+							userAccess: {},
+							groupAccess: {},
+							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+							slugId: batch[ 0 ].slugId		// cannot be predicted
 						}
 					] ) ;
 					
