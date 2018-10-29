@@ -104,7 +104,7 @@ describe( "Parse HTTP request" , () => {
 				method: 'get' ,
 				tier: 3 ,
 				pTier: 3 ,
-				query: {}
+				query: { limit: 1000 }
 			} ) ;
 
 			done() ;
@@ -148,7 +148,7 @@ describe( "Parse HTTP request" , () => {
 				method: 'get' ,
 				tier: 3 ,
 				pTier: 3 ,
-				query: { populate: 'group' }
+				query: {  limit: 1000 , populate: 'group' }
 			} ) ;
 
 			done() ;
@@ -170,8 +170,8 @@ describe( "Parse HTTP request" , () => {
 				method: 'post' ,
 				tier: 3 ,
 				pTier: 3 ,
-				query: {} ,
-				data: { a: 'simple' , json: 'file' }
+				query: { limit: 1000 } ,
+				data: { a: 'simple', json: 'file' }
 			} ) ;
 
 			done() ;
