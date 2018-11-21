@@ -25,5 +25,10 @@ module.exports = {
 				resolve() ;
 			} ) ;
 		} ) ;
+	} ,
+
+	afterCreateToken: function( context ) {
+		log.debug( '>>>>>>>>>> afterCreateToken, context: %I' , context ) ;
+		return Promise.resolved ;
 	}
 } ;
