@@ -25,7 +25,7 @@ There are few differences between a classical event (i.e.: the observer pattern)
 
 
 
-Whatever the hook, they are always functions of the form: `function( hookContext , callback )`.
+Whatever the hook, they are always functions of the form: `function( hookContext )` returning a `Promise` that resolve once completed.
 
 Inside a hook, the `this` context is always the current `restQuery.App` instance.
 
@@ -35,12 +35,11 @@ Inside a hook, the `this` context is always the current `restQuery.App` instance
 
 App hooks are executed when the restQuery app is at different stage of execution.
 
-The hook is a function of the form: `function( hookContext , callback )`, where:
+The hook is a function of the form: `function( hookContext )`, where:
 
 * hookContext `Object` this object is currently empty
 
-* callback `Function( error )` this is the completion callback, the current restQuery stage will wait for the hook to trigger
-	its callback to continue, however if the hook call its callback with an error, the restQuery app will be aborted.
+The current restQuery stage will wait for the `Promise`'s hook to resolve to continue, if it rejects the restQuery app will be aborted.
 
 
 
@@ -55,13 +54,12 @@ are finished and just before restQuery starts accepting request.
 
 Document hooks are executed when a user issue a request on a document.
 
-The hook is a function of the form: `function( hookContext , callback )`, where:
+The hook is a function of the form: `function( hookContext )`, where:
 
 * hookContext `Object` an object containing various information on the current request to be processed,
 	see [*Common context*](#ref.common-context)
 
-* callback `Function(error)` this is the completion callback, the request processing will wait for the hook to trigger its callback
-	to continue, however if the hook call its callback with an error, the request will be aborted.
+The request processing will wait for the `Promise`'s hook to resolve to continue, if it rejects the request will be aborted.
 
 
 
@@ -71,8 +69,7 @@ When:
 
 * a POST request creating a new document (not POST request executing a method)
 * a PUT request creating a new document or overwriting a whole document
-* executed before the document is inserted, if it fails (i.e. trigger its callback with an error),
-	the document creation is aborted
+* executed before the document is inserted, if it rejects the document creation is aborted
 
 The `context.incomingDocument` contains the document about to be created: it can be altered by the hook.
 
@@ -114,8 +111,7 @@ When:
 
 * a PATCH request on a document or a document part
 * a PUT request on a subpart of a document (it's internally transformed into a PATCH request)
-* executed before the document is modified, if it fails (i.e. trigger its callback with an error),
-	the modification is aborted
+* executed before the document is modified, if it rejects the modification is aborted
 
 The `context.incomingPatch` contains the patch about to be issued: it can be altered by the hook.
 
@@ -144,8 +140,7 @@ The `context.objectNode` contains the patched *objectNode*.
 When:
 
 * a DELETE request deleting a document
-* executed before the document is modified, if it fails (i.e. trigger its callback with an error),
-	the document will not be deleted
+* executed before the document is modified, if it rejects the document will not be deleted
 
 The `context.existingDocument` is always set, and contains the document about to be deleted.
 
@@ -166,6 +161,37 @@ The `context.objectNode` contains the removed *objectNode*, it can be useful to 
 to modify or traverse it (e.g. access its children).
 
 
+
+### Specific Document hooks
+
+Specific hooks are for special collections like `Users`.
+
+
+
+#### *beforeCreateToken*
+
+When:
+
+* the createToken method is invoked on a user
+* executed before the token is created, if it rejects the token creation is aborted
+
+The `context.incomingDocument` contains the connection document: it can be altered by the hook.
+
+**BETA**, not well specified yet.
+
+
+
+#### *afterCreateToken*
+
+When:
+
+* the createToken method is invoked on a user
+* executed after the token creation
+
+The `context.document` contains the user for which the token is created.
+The `context.token` contains the token.
+
+**BETA**, not well specified yet.
 
 
 

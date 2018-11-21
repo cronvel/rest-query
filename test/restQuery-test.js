@@ -32,13 +32,13 @@
 
 var cliOptions = getCliOptions() ;
 
-var restQuery = require( '../lib/restQuery.js' ) ;
+var restQuery = require( '..' ) ;
 
 var Logfella = require( 'logfella' ) ;
 
 if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
 if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
-var log = Logfella.global.use( 'mocha' ) ;
+var log = Logfella.global.use( 'unit-test' ) ;
 
 var async = require( 'async-kit' ) ;
 var Promise = require( 'seventh' ) ;
@@ -5311,7 +5311,4 @@ describe( "Misc" , function() {
 	it( "Test --buildIndexes" ) ;
 	it( "Test --initDb <filepath>" ) ;
 } ) ;
-
-
-
 
