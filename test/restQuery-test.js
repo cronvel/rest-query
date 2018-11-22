@@ -160,6 +160,13 @@ describe( "App config" , () => {
 
 describe( "Basic queries of object of a top-level collection" , () => {
 
+	it( "GET on the root object" , async () => {
+		debugger ;
+		var { app , performer } = await commonApp() ;
+		var object = await app.get( '/' , { performer: performer } ) ;
+		console.log( object ) ;
+	} ) ;
+	
 	it( "GET on an unexisting item" , ( done ) => {
 		var app , performer , blog , id ;
 
@@ -5316,7 +5323,6 @@ describe( "Misc" , () => {
 	} ) ;
 
 	it( "Test CORS" ) ;
-	it( "Test rootObject" ) ;
 
 	it( "Test --buildIndexes" ) ;
 	it( "Test --initDb <filepath>" ) ;
