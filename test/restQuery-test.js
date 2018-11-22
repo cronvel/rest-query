@@ -120,8 +120,25 @@ async function commonApp() {
 		clearCollection( app.collectionNodes.comments.collection )
 	] ) ;
 	
-	await app.buildIndexes() ;
+	try {
+		await app.buildIndexes() ;
+	}
+	catch ( error ) {
+		debugger ;
+		throw error ;
+	}
+	
 	return { app , performer } ;
+}
+
+
+
+// Legacy
+function _commonApp( callback ) {
+	commonApp().then(
+		v => callback( undefined , v.app , v.performer ) ,
+		error => callback( error )
+	) ;
 }
 
 
@@ -148,7 +165,9 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 		async.series( [
 			function( callback ) {
-				commonApp( ( error , a , p ) => {
+				debugger ;
+				_commonApp( ( error , a , p ) => {
+					debugger ;
 					app = a ;
 					performer = p ;
 					callback() ;
