@@ -108,7 +108,7 @@ function clearCollection( collectionName , callback ) {
 
 
 function connect( callback ) {
-	mongodb.MongoClient.connect( dbUrl , ( error , db_ ) => {
+	mongodb.MongoClient.connect( dbUrl , { useNewUrlParser: true } , ( error , db_ ) => {
 		if ( error ) { callback( error ) ; return ; }
 		db = db_ ;
 		callback() ;
