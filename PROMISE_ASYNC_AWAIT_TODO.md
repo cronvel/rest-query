@@ -4,7 +4,7 @@
 OK	App.js
 OK?	httpModule.js
 OK?	Performer.js
-.	Node.js
+OK?	Node.js
 .	ObjectNode.js
 .	CollectionNode.js
 .	UsersCollectionNode.js
@@ -17,10 +17,10 @@ OK?	Performer.js
 ## Usage Overview
 
 OK	GET root
-.	GET doc
+OK	GET doc
 .	GET collection
 .	GET attachment
-.	POST a doc on a collection
+OK	POST a doc on a collection
 .	POST doc+attachment with multipart body
 .	POST on doc to built-in method
 .	POST on doc to userland method
@@ -31,7 +31,6 @@ OK	GET root
 .	PATCH doc
 .	DELETE doc
 .	token creation
-.	auth
 .	scheduler
 .	scheduler userland worker
 
@@ -40,5 +39,6 @@ OK	GET root
 ## Features
 
 .	link/multi-link
-
+.	nested docs
+.	access/rights
 

@@ -14,16 +14,12 @@ module.exports = {
 		
 		if ( ! context.incomingDocument.login ) { context.incomingDocument.login = context.incomingDocument.email ; }
 		
-		if ( ! context.incomingDocument.slugId )
-		{
+		if ( ! context.incomingDocument.slugId ) {
 			context.incomingDocument.slugId = restQuery.slugify( context.incomingDocument.firstName + '-' + context.incomingDocument.lastName ) ;
 		}
 		
-		return new Promise( ( resolve , reject ) => {
-			context.input.performer.getUser( ( error , user ) => {
-				log.debug( '>>>>>>>>>> beforeCreate, user: %I' , user ) ;
-				resolve() ;
-			} ) ;
+		return context.input.performer.getUser().then( user => {
+			log.debug( '>>>>>>>>>> beforeCreate, user: %I' , user ) ;
 		} ) ;
 	} ,
 

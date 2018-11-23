@@ -45,6 +45,7 @@ var Promise = require( 'seventh' ) ;
 
 var tree = require( 'tree-kit' ) ;
 var string = require( 'string-kit' ) ;
+var ErrorStatus = require( 'error-status' ) ;
 var rootsDb = require( 'roots-db' ) ;
 
 var mongodb = require( 'mongodb' ) ;
@@ -173,7 +174,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 	
 	it( "GET on an unexisting item" , async () => {
 		var { app , performer } = await commonApp() ;
-		expect( () => app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( { type: 'notFound' , httpStatus: 404 } ) ;
+		await expect( () => app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "GET on a regular item" , async () => {
@@ -186,98 +187,58 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		} ) ;
 		
 		await blog.save() ;
-		
 		var response = await app.get( '/Blogs/' + blog.getId() , { performer: performer } ) ;
-		
-		console.log( response.output.data ) ;
-		
 		expect( response.output.data ).to.partially.equal( { title: 'My wonderful life' , description: 'This is a supa blog!' } ) ;
 	} ) ;
 
-	it( "GET on a property of a regular item" , ( done ) => {
+	it( "GET on a property of a regular item" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id , randomId = new mongodb.ObjectID() ;
+		var randomId = new mongodb.ObjectID() ,
+			userAccess = {} ;
+		
+		userAccess[ randomId ] = 'read' ;	// Random unexistant ID
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ randomId ] = 'read' ;	// Random unexistant ID
-
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all' ,
-					userAccess: userAccess
-				} ) ;
-				id = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + id + '/.title' , { performer: performer } , ( error , title ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( title ).to.be( 'My wonderful life' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + id + '/.userAccess.' + randomId , { performer: performer } , ( error , access ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( access ).to.equal( { traverse: 1 , read: 3 } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all' ,
+			userAccess: userAccess
+		} ) ;
+		
+		await blog.save() ;
+		
+		var response = await app.get( '/Blogs/' + blog.getId() + '/.title' , { performer: performer } ) ;
+		expect( response.output.data ).to.be( 'My wonderful life' ) ;
+		
+		response = await app.get( '/Blogs/' + blog.getId() + '/.userAccess.' + randomId , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { traverse: 1 , read: 3 } ) ;
 	} ) ;
 
-	it( "POST then GET" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+	it( "POST then GET" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response = await app.post(
+			'/Blogs' ,
+			{
+				title: 'My wonderful life posted!!!' ,
+				description: 'This is a supa blog! (posted!)' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				//try {
-				app.post( '/Blogs' , {
-					title: 'My wonderful life posted!!!' ,
-					description: 'This is a supa blog! (posted!)' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).not.to.be.ok() ;
-					id = rawDocument.id ;
-					//console.log( 'ID:' , id ) ;
-					callback() ;
-				} ) ;
-				//} catch ( error ) { console.log( '##############' ) ; }
-			} ,
-			function( callback ) {
-				//app.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.get( '/Posts/' , function( error , object ) {
-				//app.get( '/Blogs/' , function( error , object ) {
-				app.get( '/Blogs/' + id , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life posted!!!' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! (posted!)' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		var id = response.output.data.id.toString() ;
+		expect( id ).to.be.a( 'string' ) ;
+		expect( id ).to.have.length.of( 24 ) ;
+		
+		response = await app.get( '/Blogs/' + id , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life posted!!!' ,
+			description: 'This is a supa blog! (posted!)' ,
+			parent: { id: '/' , collection: null }
+		} )
 	} ) ;
 
 	it( "PUT then GET" , ( done ) => {
