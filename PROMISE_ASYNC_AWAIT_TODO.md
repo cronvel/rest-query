@@ -16,12 +16,16 @@ OK?	Performer.js
 
 ## Usage Overview
 
-OK?	GET doc
+OK	GET root
+.	GET doc
+.	GET collection
 .	GET attachment
-.	POST doc
+.	POST a doc on a collection
 .	POST doc+attachment with multipart body
-.	POST to built-in method
-.	POST to userland method
+.	POST on doc to built-in method
+.	POST on doc to userland method
+.	POST on collection to built-in method
+.	POST on collection to userland method
 .	PUT doc
 .	PUT attachment
 .	PATCH doc
@@ -30,5 +34,11 @@ OK?	GET doc
 .	auth
 .	scheduler
 .	scheduler userland worker
+
+
+
+## Features
+
+.	link/multi-link
 
 

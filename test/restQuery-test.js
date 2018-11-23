@@ -161,73 +161,37 @@ describe( "App config" , () => {
 describe( "Basic queries of object of a top-level collection" , () => {
 
 	it( "GET on the root object" , async () => {
-		debugger ;
 		var { app , performer } = await commonApp() ;
-		var object = await app.get( '/' , { performer: performer } ) ;
-		console.log( object ) ;
+		var response = await app.get( '/' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( {
+			bob: 'dans le geth\'',
+			userAccess: {},
+			groupAccess: {},
+			publicAccess: { traverse: 1, read: 3, create: 1 }
+		} ) ;
 	} ) ;
 	
-	it( "GET on an unexisting item" , ( done ) => {
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				debugger ;
-				_commonApp( ( error , a , p ) => {
-					debugger ;
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/111111111111111111111111' , { performer: performer } , ( error , object ) => {
-
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					expect( error.httpStatus ).to.be( 404 ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+	it( "GET on an unexisting item" , async () => {
+		var { app , performer } = await commonApp() ;
+		expect( () => app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
-	it( "GET on a regular item" , ( done ) => {
+	it( "GET on a regular item" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				id = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//app.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.get( '/Posts/' , function( error , object ) {
-				//app.get( '/Blogs/' , function( error , object ) {
-				app.get( '/Blogs/' + id , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life' ) ;
-					expect( object.description ).to.be( 'This is a supa blog!' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await blog.save() ;
+		
+		var response = await app.get( '/Blogs/' + blog.getId() , { performer: performer } ) ;
+		
+		console.log( response.output.data ) ;
+		
+		expect( response.output.data ).to.partially.equal( { title: 'My wonderful life' , description: 'This is a supa blog!' } ) ;
 	} ) ;
 
 	it( "GET on a property of a regular item" , ( done ) => {
