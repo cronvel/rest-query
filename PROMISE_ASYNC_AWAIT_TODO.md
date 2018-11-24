@@ -26,10 +26,10 @@ OK	POST a doc on a collection
 .	POST on doc to userland method
 .	POST on collection to built-in method
 .	POST on collection to userland method
-.	PUT doc
+OK	PUT doc
 .	PUT attachment
-.	PATCH doc
-.	DELETE doc
+OK	PATCH doc
+OK	DELETE doc
 .	token creation
 .	scheduler
 .	scheduler userland worker

@@ -358,114 +358,49 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		} ) ;
 	} ) ;
 
-	it( "PUT, then PUT (overwrite) on a property, then GET" , ( done ) => {
+	it( "PUT, then PUT (overwrite) on a property, then GET" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				title: 'My wonderful life 3!!!' ,
+				description: 'This is a supa blog! (x3)' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/.title' , "Change dat title." , null , { performer: performer } ) ;
+		
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 3!!!' ,
-					description: 'This is a supa blog! (x3)' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/.title' , "Change dat title." , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'Change dat title.' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'Change dat title.' ,
+			description: 'This is a supa blog! (x3)' ,
+			parent: { id: '/' , collection: null } ,
+		} ) ;
 	} ) ;
 
-	it( "DELETE on an unexisting item" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.delete( '/Blogs/111111111111111111111111' , { performer: performer } , ( error , object ) => {
-
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					expect( error.httpStatus ).to.be( 404 ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+	it( "DELETE on an unexisting item" , async () => {
+		var { app , performer } = await commonApp() ;
+		await expect( () => app.delete( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound', httpStatus: 404 } ) ;
 	} ) ;
 
-	it( "PUT, then DELETE, then GET" , ( done ) => {
+	it( "PUT, then DELETE, then GET" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				//app.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.get( '/Posts/' , function( error , object ) {
-				//app.get( '/Blogs/' , function( error , object ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					expect( error.httpStatus ).to.be( 404 ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound', httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "DELETE on a property of an object" ) ;
@@ -476,259 +411,181 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 describe( "Basic queries of top-level collections" , () => {
 
-	it( "GET on an empty collection" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-
-				app.get( '/Blogs' , { performer: performer } , ( error , batch ) => {
-					expect( error ).not.to.be.ok() ;
-
-					expect( batch ).to.equal( [] ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+	it( "GET on an empty collection" , async () => {
+		var { app , performer } = await commonApp() ;
+		var response = await app.get( '/Blogs' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( [] ) ;
 	} ) ;
 
-	it( "GET on a collection with items" , ( done ) => {
+	it( "GET on a collection with items" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id1 , id2 ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await blog.save() ;
+		
+		var blog2 = app.root.children.blogs.collection.createDocument( {
+			title: 'YAB' ,
+			description: 'Yet Another Blog' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await blog.save() ;
+		
+		var response = await app.get( '/Blogs' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'My wonderful life' ,
+				description: 'This is a supa blog!' ,
+				_id: id1 ,
+				//embedded: undefined,
+				parent: { id: '/' , collection: null } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				} ,
+				slugId: batch[ 0 ].slugId		// cannot be predicted
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				id1 = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'YAB' ,
-					description: 'Yet Another Blog' ,
-					publicAccess: 'all'
-				} ) ;
-				id2 = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs' , { performer: performer } , ( error , batch ) => {
-					expect( error ).not.to.be.ok() ;
-
-					expect( batch ).to.equal( [
-						{
-							title: 'My wonderful life' ,
-							description: 'This is a supa blog!' ,
-							_id: id1 ,
-							//embedded: undefined,
-							parent: { id: '/' , collection: null } ,
-							userAccess: {} ,
-							groupAccess: {} ,
-							publicAccess: {
-								traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
-							} ,
-							slugId: batch[ 0 ].slugId		// cannot be predicted
-						} ,
-						{
-							title: 'YAB' ,
-							description: 'Yet Another Blog' ,
-							_id: id2 ,
-							//embedded: undefined,
-							parent: { id: '/' , collection: null } ,
-							userAccess: {} ,
-							groupAccess: {} ,
-							publicAccess: {
-								traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
-							} ,
-							slugId: batch[ 1 ].slugId		// cannot be predicted
-						}
-					] ) ;
-
-					callback() ;
-				} ) ;
+			{
+				title: 'YAB' ,
+				description: 'Yet Another Blog' ,
+				_id: id2 ,
+				//embedded: undefined,
+				parent: { id: '/' , collection: null } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				} ,
+				slugId: batch[ 1 ].slugId		// cannot be predicted
 			}
-		] )
-			.exec( done ) ;
+		] ) ;
 	} ) ;
 
-	it( "GET on a collection with items, with special query: skip, limit, sort and filter" , function( done ) {
+	it( "GET on a collection with items, with special query: skip, limit, sort and filter" , async () => {
+		var { app , performer } = await commonApp() ;
 		
-		var app , performer , blog , id1 , id2 , id3 ;
+		var blog1 = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
 		
-		async.series( [
-			function( callback ) {
-				commonApp( function( error , a , p ) {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		await blog1.save() ;
+		
+		var blog2 = app.root.children.blogs.collection.createDocument( {
+			title: 'YAB' ,
+			description: 'Yet Another Blog' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await blog2.save() ;
+		
+		var blog3 = app.root.children.blogs.collection.createDocument( {
+			title: 'Third' ,
+			description: 'The Third' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await blog3.save() ;
+		
+		var response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'My wonderful life',
+				description: 'This is a supa blog!',
+				_id: id1,
+				//embedded: undefined,
+				parent: { id: '/', collection: null },
+				userAccess: {},
+				groupAccess: {},
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				slugId: batch[ 0 ].slugId		// cannot be predicted
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				id1 = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'YAB' ,
-					description: 'Yet Another Blog' ,
-					publicAccess: 'all'
-				} ) ;
-				id2 = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'Third' ,
-					description: 'The Third' ,
-					publicAccess: 'all'
-				} ) ;
-				id3 = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 } } } , function( error , batch ) {
-					expect( error ).not.to.be.ok() ;
-					
-					expect( batch ).to.equal( [
-						{
-							title: 'My wonderful life',
-							description: 'This is a supa blog!',
-							_id: id1,
-							//embedded: undefined,
-							parent: { id: '/', collection: null },
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-							slugId: batch[ 0 ].slugId		// cannot be predicted
-						} ,
-						{
-							title: 'YAB' ,
-							description: 'Yet Another Blog' ,
-							_id: id2,
-							//embedded: undefined,
-							parent: { id: '/', collection: null },
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-							slugId: batch[ 1 ].slugId		// cannot be predicted
-						}
-					] ) ;
-					
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs' , { performer: performer , input: { query: { skip: 1 } } } , function( error , batch ) {
-					expect( error ).not.to.be.ok() ;
-					
-					expect( batch ).to.equal( [
-						{
-							title: 'YAB' ,
-							description: 'Yet Another Blog' ,
-							_id: id2,
-							//embedded: undefined,
-							parent: { id: '/', collection: null },
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-							slugId: batch[ 0 ].slugId		// cannot be predicted
-						} ,
-						{
-							title: 'Third' ,
-							description: 'The Third' ,
-							_id: id3,
-							//embedded: undefined,
-							parent: { id: '/', collection: null },
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-							slugId: batch[ 1 ].slugId		// cannot be predicted
-						}
-					] ) ;
-					
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 1 } } } } , function( error , batch ) {
-					expect( error ).not.to.be.ok() ;
-					
-					expect( batch ).to.equal( [
-						{
-							title: 'My wonderful life',
-							description: 'This is a supa blog!',
-							_id: id1,
-							//embedded: undefined,
-							parent: { id: '/', collection: null },
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-							slugId: batch[ 0 ].slugId		// cannot be predicted
-						} ,
-						{
-							title: 'Third' ,
-							description: 'The Third' ,
-							_id: id3,
-							//embedded: undefined,
-							parent: { id: '/', collection: null },
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-							slugId: batch[ 1 ].slugId		// cannot be predicted
-						}
-					] ) ;
-					
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs' , { performer: performer , input: { query: { filter: { title: 'Third' } } } } , function( error , batch ) {
-					expect( error ).not.to.be.ok() ;
-					
-					expect( batch ).to.equal( [
-						{
-							title: 'Third' ,
-							description: 'The Third' ,
-							_id: id3,
-							//embedded: undefined,
-							parent: { id: '/', collection: null },
-							userAccess: {},
-							groupAccess: {},
-							publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-							slugId: batch[ 0 ].slugId		// cannot be predicted
-						}
-					] ) ;
-					
-					callback() ;
-				} ) ;
+			{
+				title: 'YAB' ,
+				description: 'Yet Another Blog' ,
+				_id: id2,
+				//embedded: undefined,
+				parent: { id: '/', collection: null },
+				userAccess: {},
+				groupAccess: {},
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				slugId: batch[ 1 ].slugId		// cannot be predicted
 			}
-		] )
-		.exec( done ) ;
+		] ) ;
+		
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { skip: 1 } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'YAB' ,
+				description: 'Yet Another Blog' ,
+				_id: id2,
+				//embedded: undefined,
+				parent: { id: '/', collection: null },
+				userAccess: {},
+				groupAccess: {},
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				slugId: batch[ 0 ].slugId		// cannot be predicted
+			} ,
+			{
+				title: 'Third' ,
+				description: 'The Third' ,
+				_id: id3,
+				//embedded: undefined,
+				parent: { id: '/', collection: null },
+				userAccess: {},
+				groupAccess: {},
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				slugId: batch[ 1 ].slugId		// cannot be predicted
+			}
+		] ) ;
+		
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 1 } } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'My wonderful life',
+				description: 'This is a supa blog!',
+				_id: id1,
+				//embedded: undefined,
+				parent: { id: '/', collection: null },
+				userAccess: {},
+				groupAccess: {},
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				slugId: batch[ 0 ].slugId		// cannot be predicted
+			} ,
+			{
+				title: 'Third' ,
+				description: 'The Third' ,
+				_id: id3,
+				//embedded: undefined,
+				parent: { id: '/', collection: null },
+				userAccess: {},
+				groupAccess: {},
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				slugId: batch[ 1 ].slugId		// cannot be predicted
+			}
+		] ) ;
+		
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { filter: { title: 'Third' } } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'Third' ,
+				description: 'The Third' ,
+				_id: id3,
+				//embedded: undefined,
+				parent: { id: '/', collection: null },
+				userAccess: {},
+				groupAccess: {},
+				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				slugId: batch[ 0 ].slugId		// cannot be predicted
+			}
+		] ) ;
 	} ) ;
 } ) ;
 
