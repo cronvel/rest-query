@@ -619,669 +619,381 @@ describe( "Built-in collection method: SCHEMA" , () => {
 
 describe( "Queries of nested object" , () => {
 
-	it( "GET on an unexisting nested item" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get(
-					'/Blogs/111111111111111111111111/Posts/111111111111111111111111' ,
-					{ performer: performer } ,
-					( error , object ) => {
-
-						expect( error ).to.be.ok() ;
-						expect( error.type ).to.be( 'notFound' ) ;
-						expect( error.httpStatus ).to.be( 404 ) ;
-						callback() ;
-					}
-				) ;
-			}
-		] )
-			.exec( done ) ;
+	it( "GET on an unexisting nested item" , async () => {
+		var { app , performer } = await commonApp() ;
+		await expect( () => app.get( '/Blogs/111111111111111111111111/Posts/111111111111111111111111' , { performer: performer } ) )
+			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
-	it( "GET on a regular nested item" , ( done ) => {
-
-		var app , performer , blog , post , blogId , postId ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs' , id: blogId } ,
-					publicAccess: 'all'
-				} ) ;
-				postId = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My first post!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+	it( "GET on a regular nested item" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var blog = await app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await blog.save() ;
+		
+		var post = await app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My first post!' ,
+			content: 'Blah blah blah.' ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await post.save() ;
+		
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + post.getId() , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My first post!' ,
+			content: 'Blah blah blah.'
+		} ) ;
 	} ) ;
 
-	it( "GET on an existed nested item with bad ancestry chain" , ( done ) => {
+	it( "GET on an existed nested item with bad ancestry chain" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , anotherBlog , post , blogId , anotherBlogId , postId ;
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await blog.save() ;
+		
+		var anotherBlog = app.root.children.blogs.collection.createDocument( {
+			title: 'Another blog' ,
+			description: 'Oh yeah' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await anotherBlog.save() ;
+		
+		var post = app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My second post!' ,
+			content: 'Blah blah blah.' ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				anotherBlog = app.root.children.blogs.collection.createDocument( {
-					title: 'Another blog' ,
-					description: 'Oh yeah' ,
-					publicAccess: 'all'
-				} ) ;
-				anotherBlogId = anotherBlog._id ;
-				anotherBlog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My second post!' ,
-					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs' , id: blogId } ,
-					publicAccess: 'all'
-				} ) ;
-				postId = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My second post!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					expect( error.httpStatus ).to.be( 404 ) ;
-					expect( object ).to.be( undefined ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		await post.save() ;
+		
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + post.getId() , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My second post!' ,
+			content: 'Blah blah blah.'
+		} ) ;
+		
+		await expect( () => app.get( '/Blogs/' + anotherBlog.getId() + '/Posts/' + post.getId() , { performer: performer } ) )
+			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
-	it( "GET on a regular nested² item" , ( done ) => {
+	it( "GET on a regular nested² item" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , post , comment , blogId , postId , commentId ;
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs' , id: blogId } ,
-					publicAccess: 'all'
-				} ) ;
-				postId = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
-					title: 'nope!' ,
-					content: 'First!' ,
-					parent: { collection: 'posts' , id: postId } ,
-					publicAccess: 'all'
-				} ) ;
-				commentId = comment._id ;
-				//console.log( "commentId: " , commentId ) ;
-				comment.$.save( callback ) ;
-			} ,
-			/*
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				comment = app.root.children.blogs.children.posts.children.comments.collection.get( commentId , function( error , doc ) {
-					//console.log( string.inspect( { style: 'color' , proto: true } , doc ) ) ;
-					callback() ;
-				} ) ;
-			} ,
-			//*/
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'nope!' ) ;
-					expect( object.content ).to.be( 'First!' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		await blog.save() ;
+		
+		var post = app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My first post!' ,
+			content: 'Blah blah blah.' ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post.save() ;
+		
+		var comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
+			title: 'nope!' ,
+			content: 'First!' ,
+			parent: { collection: 'posts' , id: post.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await comment.save() ;
+
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + post.getId() + '/Comments/' + comment.getId() , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( { title: 'nope!' , content : 'First!' } ) ;
 	} ) ;
 
-	it( "GET on a regular nested² item with bad ancestry chain" , ( done ) => {
+	it( "GET on a regular nested² item with bad ancestry chain" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
 
-		var app , performer ,
-			blog , anotherBlog , post , anotherPost , comment ,
-			blogId , anotherBlogId , postId , anotherPostId , commentId ;
+		await blog.save() ;
+		
+		var anotherBlog = app.root.children.blogs.collection.createDocument( {
+			title: 'Another blog' ,
+			description: 'Oh yeah' ,
+			publicAccess: 'all'
+		} ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				anotherBlog = app.root.children.blogs.collection.createDocument( {
-					title: 'Another blog' ,
-					description: 'Oh yeah' ,
-					publicAccess: 'all'
-				} ) ;
-				anotherBlogId = anotherBlog._id ;
-				anotherBlog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs' , id: blogId } ,
-					publicAccess: 'all'
-				} ) ;
-				postId = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				anotherPost = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My second post!' ,
-					content: 'Blih blih blih.' ,
-					parent: { collection: 'blogs' , id: blogId } ,
-					publicAccess: 'all'
-				} ) ;
-				anotherPostId = anotherPost._id ;
-				//console.log( "postId: " , postId ) ;
-				anotherPost.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
-					title: 'nope!' ,
-					content: 'First!' ,
-					parent: { collection: 'posts' , id: postId } ,
-					publicAccess: 'all'
-				} ) ;
-				commentId = comment._id ;
-				//console.log( "commentId: " , commentId ) ;
-				comment.$.save( callback ) ;
-			} ,
-			/*
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				comment = app.root.children.blogs.children.posts.children.comments.collection.get( commentId , function( error , doc ) {
-					//console.log( string.inspect( { style: 'color' , proto: true } , doc ) ) ;
-					callback() ;
-				} ) ;
-			} ,
-			//*/
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'nope!' ) ;
-					expect( object.content ).to.be( 'First!' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + anotherBlogId + '/Posts/' + postId + '/Comments/' + commentId , { performer: performer } , ( error , object ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					expect( error.httpStatus ).to.be( 404 ) ;
-					expect( object ).to.be( undefined ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + anotherPostId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My second post!' ) ;
-					expect( object.content ).to.be( 'Blih blih blih.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + anotherPostId + '/Comments/' + commentId , { performer: performer } , ( error , object ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					expect( error.httpStatus ).to.be( 404 ) ;
-					expect( object ).to.be( undefined ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		await anotherBlog.save() ;
+		
+		var post = app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My first post!' ,
+			content: 'Blah blah blah.' ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post.save() ;
+		
+		var anotherPost = app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My second post!' ,
+			content: 'Blih blih blih.' ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await anotherPost.save() ;
+		
+		var comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
+			title: 'nope!' ,
+			content: 'First!' ,
+			parent: { collection: 'posts' , id: post.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await comment.save() ;
+		
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + post.getId() + '/Comments/' + comment.getId() , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( { title: 'nope!' , content: 'First!' } ) ;
+		
+		await expect( () => app.get( '/Blogs/' + anotherBlog.getId() + '/Posts/' + post.getId() + '/Comments/' + comment.getId() , { performer: performer } ) )
+			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
+		
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + anotherPost.getId() , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( { title: 'My second post!' , content: 'Blih blih blih.' } ) ;
+		
+		await expect( () => app.get( '/Blogs/' + blog.getId() + '/Posts/' + anotherPost.getId() + '/Comments/' + comment.getId() , { performer: performer } ) )
+			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
-	it( "GET a nested collection" , ( done ) => {
+	it( "GET a nested collection" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
 
-		var app , performer , blog , anotherBlog , post , blogId , anotherBlogId , postId1 , postId2 , postId3 , postIdAlt ;
+		await blog.save() ;
+		
+		var anotherBlog = app.root.children.blogs.collection.createDocument( {
+			title: 'Another blog' ,
+			description: 'Oh yeah' ,
+			publicAccess: 'all'
+		} ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		await anotherBlog.save() ;
+		
+		var post1 = app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My first post!' ,
+			content: 'Blah blah blah.' ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post1.save() ;
+		
+		var post2 = app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My second post!' ,
+			content: 'Hi ho!' ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post2.save() ;
+		
+		var postAlt = app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My alternate post!' ,
+			content: 'It does not belong to the same blog!' ,
+			parent: { collection: 'blogs' , id: anotherBlog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await postAlt.save() ;
+		
+		var post3 = app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My third post!' ,
+			content: 'Yay!' ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post3.save() ;
+		
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer } ) ;
+		
+		expect( response.output.data ).to.have.length( 3 ) ;
+		
+		expect( response.output.data ).to.partially.equal( [
+			{
+				title: 'My first post!' ,
+				content: 'Blah blah blah.' ,
+				parent: { collection: 'blogs' }
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
+			{
+				title: 'My second post!' ,
+				content: 'Hi ho!' ,
+				parent: { collection: 'blogs' }
 			} ,
-			function( callback ) {
-				anotherBlog = app.root.children.blogs.collection.createDocument( {
-					title: 'Another blog' ,
-					description: 'Oh yeah' ,
-					publicAccess: 'all'
-				} ) ;
-				anotherBlogId = anotherBlog._id ;
-				anotherBlog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs' , id: blogId } ,
-					publicAccess: 'all'
-				} ) ;
-				postId1 = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My second post!' ,
-					content: 'Hi ho!' ,
-					parent: { collection: 'blogs' , id: blogId } ,
-					publicAccess: 'all'
-				} ) ;
-				postId2 = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My alternate post!' ,
-					content: 'It does not belong to the same blog!' ,
-					parent: { collection: 'blogs' , id: anotherBlogId } ,
-					publicAccess: 'all'
-				} ) ;
-				postIdAlt = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My third post!' ,
-					content: 'Yay!' ,
-					parent: { collection: 'blogs' , id: blogId } ,
-					publicAccess: 'all'
-				} ) ;
-				postId3 = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts' , { performer: performer } , ( error , batch ) => {
-
-					var i ;
-
-					expect( error ).not.to.be.ok() ;
-
-					// MongoID and expect() do not coop well together... -_-'
-					// We have to check properties one by one...
-
-					expect( batch.length ).to.be( 3 ) ;
-
-					expect( batch[ 0 ].title ).to.be( 'My first post!' ) ;
-					expect( batch[ 0 ].content ).to.be( 'Blah blah blah.' ) ;
-					expect( batch[ 0 ].parent.collection ).to.be( 'blogs' ) ;
-					expect( batch[ 0 ].parent.id.toString() ).to.be( blogId.toString() ) ;
-
-					expect( batch[ 1 ].title ).to.be( 'My second post!' ) ;
-					expect( batch[ 1 ].content ).to.be( 'Hi ho!' ) ;
-					expect( batch[ 1 ].parent.collection ).to.be( 'blogs' ) ;
-					expect( batch[ 1 ].parent.id.toString() ).to.be( blogId.toString() ) ;
-
-					expect( batch[ 2 ].title ).to.be( 'My third post!' ) ;
-					expect( batch[ 2 ].content ).to.be( 'Yay!' ) ;
-					expect( batch[ 2 ].parent.collection ).to.be( 'blogs' ) ;
-					expect( batch[ 2 ].parent.id.toString() ).to.be( blogId.toString() ) ;
-
-					callback() ;
-				} ) ;
+			{
+				title: 'My third post!' ,
+				content: 'Yay!' ,
+				parent: { collection: 'blogs' }
 			}
-		] )
-			.exec( done ) ;
+		] ) ;
+
+		// MongoID and expect() do not coop well together, we have to check those properties one by one...
+		expect( response.output.data[ 0 ].parent.id.toString() ).to.be( blog.getId().toString() ) ;
+		expect( response.output.data[ 1 ].parent.id.toString() ).to.be( blog.getId().toString() ) ;
+		expect( response.output.data[ 2 ].parent.id.toString() ).to.be( blog.getId().toString() ) ;
 	} ) ;
 
-	it( "POST on nested object should set the parent property correctly" , ( done ) => {
+	it( "POST on nested object should set the parent property correctly" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
 
-		var app , performer , blog , post , blogId , postId ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		await blog.save() ;
+		
+		var response = await app.post( '/Blogs/' + blog.getId() + '/Posts' ,
+			{
+				title: 'My first post!!!' ,
+				content: 'Blah blah blah...' ,
+				parent: 'should not overwrite' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			/*
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs', id: blogId }
-				} ) ;
-				postId = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			*/
-			function( callback ) {
-				app.post(
-					'/Blogs/' + blogId + '/Posts' ,
-					{
-						title: 'My first post!!!' ,
-						content: 'Blah blah blah...' ,
-						parent: 'should not overwrite' ,
-						publicAccess: 'all'
-					} ,
-					null ,
-					{ performer: performer } ,
-					( error , rawDocument ) => {
-						expect( error ).not.to.be.ok() ;
-						postId = rawDocument.id ;
-						callback() ;
-					}
-				) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My first post!!!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah...' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					expect( object.parent.id.toString() ).to.be( blogId.toString() ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		var postId = response.output.data.id ;
+		
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My first post!!!' ,
+			content: 'Blah blah blah...' ,
+			parent: { collection: 'blogs' }
+		} ) ;
+		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
 	} ) ;
 
-	it( "PUT on nested object should set the parent property correctly, same for PUT in overwrite mode" , ( done ) => {
-
-		var app , performer , blog , post , blogId , postId = '5437f8f6c41d00910ec9a5d8' ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+	it( "PUT on nested object should set the parent property correctly, same for PUT in overwrite mode" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await blog.save() ;
+		
+		var postId = '5437f8f6c41d00910ec9a5d8' ;
+		var response = await app.put( '/Blogs/' + blog.getId() + '/Posts/' + postId ,
+			{
+				title: 'My first post!!!' ,
+				content: 'Blah blah blah...' ,
+				parent: 'should not overwrite' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
+			null , { performer: performer }
+		) ;
+		
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My first post!!!' ,
+			content: 'Blah blah blah...' ,
+			parent: { collection: 'blogs' }
+		} ) ;
+		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
+		
+		response = await app.put( '/Blogs/' + blog.getId() + '/Posts/' + postId ,
+			{
+				title: 'My first post???' ,
+				content: 'Blah?' ,
+				parent: 'should not overwrite' ,
+				publicAccess: 'all'
 			} ,
-			/*
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs', id: blogId }
-				} ) ;
-				postId = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			*/
-			function( callback ) {
-				app.put(
-					'/Blogs/' + blogId + '/Posts/' + postId ,
-					{
-						title: 'My first post!!!' ,
-						content: 'Blah blah blah...' ,
-						parent: 'should not overwrite' ,
-						publicAccess: 'all'
-					} ,
-					null , { performer: performer } ,
-					( error , object ) => {
-						expect( error ).not.to.be.ok() ;
-						callback() ;
-					}
-				) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My first post!!!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah...' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					expect( object.parent.id.toString() ).to.be( blogId.toString() ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put(
-					'/Blogs/' + blogId + '/Posts/' + postId ,
-					{
-						title: 'My first post???' ,
-						content: 'Blah?' ,
-						parent: 'should not overwrite' ,
-						publicAccess: 'all'
-					} ,
-					null , { performer: performer } ,
-					( error , object ) => {
-						expect( error ).not.to.be.ok() ;
-						callback() ;
-					}
-				) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My first post???' ) ;
-					expect( object.content ).to.be( 'Blah?' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					expect( object.parent.id.toString() ).to.be( blogId.toString() ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null , { performer: performer }
+		) ;
+		
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My first post???' ,
+			content: 'Blah?' ,
+			parent: { collection: 'blogs' }
+		} ) ;
+		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
 	} ) ;
 
-	it( "PUT on an existed, nested item, with bad ancestry chain" , ( done ) => {
+	it( "PUT on an existed, nested item, with bad ancestry chain" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , anotherBlog , post , blogId , anotherBlogId , postId ;
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		await blog.save() ;
+		
+		var anotherBlog = app.root.children.blogs.collection.createDocument( {
+			title: 'Another blog' ,
+			description: 'Oh yeah' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await anotherBlog.save() ;
+		
+		var post = app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'My second post!' ,
+			content: 'Blah blah blah.' ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post.save() ;
+		
+		// Ancestry mismatch
+		await expect( () => app.put( '/Blogs/' + anotherBlog.getId() + '/Posts/' + post.getId() ,
+			{
+				title: 'My edited post!' ,
+				content: 'Plop.' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				anotherBlog = app.root.children.blogs.collection.createDocument( {
-					title: 'Another blog' ,
-					description: 'Oh yeah' ,
-					publicAccess: 'all'
-				} ) ;
-				anotherBlogId = anotherBlog._id ;
-				anotherBlog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				//console.log( string.inspect( { style: 'color' } , app.root.children ) ) ;
-				post = app.root.children.blogs.children.posts.collection.createDocument( {
-					title: 'My second post!' ,
-					content: 'Blah blah blah.' ,
-					parent: { collection: 'blogs' , id: blogId } ,
-					publicAccess: 'all'
-				} ) ;
-				postId = post._id ;
-				//console.log( "postId: " , postId ) ;
-				post.$.save( callback ) ;
-			} ,
-			// Ancestry mismatch
-			function( callback ) {
-				app.put(
-					'/Blogs/' + anotherBlogId + '/Posts/' + postId ,
-					{
-						title: 'My edited post!' ,
-						content: 'Plop.' ,
-						publicAccess: 'all'
-					} ,
-					null , { performer: performer } ,
-					( error , object ) => {
-						expect( error ).to.be.ok() ;
-						expect( error.type ).to.be( 'badRequest' ) ;
-						expect( error.httpStatus ).to.be( 400 ) ;
-						expect( error.message ).to.be( 'Ambigous PUT request: this ID exists but is the child of another parent.' ) ;
-						expect( object ).to.be( undefined ) ;
-						callback() ;
-					}
-				) ;
-			} ,
-			// Should not be edited
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My second post!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah.' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					expect( object.parent.id.toString() ).to.be( blogId.toString() ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null , { performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'badRequest' , httpStatus: 400 , message: 'Ambigous PUT request: this ID exists but is the child of another parent.' } ) ;
+
+		// Should not be edited
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + post.getId() , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My second post!' ,
+			content: 'Blah blah blah.' ,
+			parent: { collection: 'blogs' }
+		} ) ;
+		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
 	} ) ;
-
 } ) ;
 
 
@@ -2207,49 +1919,34 @@ describe( "Users" , () => {
 
 	it( "POST then GET" ) ;
 
-	it( "PUT then GET" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+	it( "PUT then GET" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response = await app.put( '/Users/5437f846e41d0e910ec9a5d8' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw"
 			} ,
-			function( callback ) {
-				app.put( '/Users/5437f846e41d0e910ec9a5d8' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw"
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.firstName ).to.be( 'Joe' ) ;
-					expect( object.lastName ).to.be( 'Doe' ) ;
-					expect( object.slugId ).to.be( 'joe-doe' ) ;
-					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
-					//console.log( object.password ) ;
-					expect( object.password ).to.be.an( 'object' ) ;
-					expect( object.password.algo ).to.be( 'sha512' ) ;
-					expect( object.password.salt ).to.be.a( 'string' ) ;
-					expect( object.password.hash ).to.be.a( 'string' ) ;
-					// check the password
-					expect( hash.password( "pw" , object.password.salt , object.password.algo ) ).to.be( object.password.hash ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( { 
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			slugId: 'joe-doe' ,
+			email: 'joe.doe@gmail.com' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+
+		expect( response.output.data.password ).to.be.an( 'object' ) ;
+		expect( response.output.data.password.algo ).to.be( 'sha512' ) ;
+		expect( response.output.data.password.salt ).to.be.a( 'string' ) ;
+		expect( response.output.data.password.hash ).to.be.a( 'string' ) ;
+		// check the password
+		expect( hash.password( "pw" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
 	} ) ;
 
 	it( "PUT, then PUT (overwrite), then GET" ) ;

@@ -5,10 +5,10 @@ OK	App.js
 OK?	httpModule.js
 OK?	Performer.js
 OK?	Node.js
-.	ObjectNode.js
-.	CollectionNode.js
-.	UsersCollectionNode.js
-.	GroupsCollectionNode.js
+OK?	ObjectNode.js
+OK?	CollectionNode.js
+WIP	UsersCollectionNode.js
+OK	GroupsCollectionNode.js
 .	Scheduler.js
 .	ScheduledTasksCollectionNode.js
 
@@ -18,7 +18,7 @@ OK?	Node.js
 
 OK	GET root
 OK	GET doc
-.	GET collection
+OK	GET collection
 .	GET attachment
 OK	POST a doc on a collection
 .	POST doc+attachment with multipart body
@@ -30,7 +30,7 @@ OK	PUT doc
 .	PUT attachment
 OK	PATCH doc
 OK	DELETE doc
-.	token creation
+WIP	token creation
 .	scheduler
 .	scheduler userland worker
 
@@ -39,7 +39,7 @@ OK	DELETE doc
 ## Features
 
 .	link/multi-link
-.	nested docs
+OK	nested docs
 .	access/rights
 OK	Schema
 
