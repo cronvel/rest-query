@@ -241,43 +241,25 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		} )
 	} ) ;
 
-	it( "PUT then GET" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+	it( "PUT then GET" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				//app.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.get( '/Posts/' , function( error , object ) {
-				//app.get( '/Blogs/' , function( error , object ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 2!!!' ,
+			description: 'This is a supa blog! (x2)' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 	} ) ;
 
 	it( "Test of the test: test helper commonApp() should clean previously created items" , ( done ) => {
