@@ -420,13 +420,13 @@ describe( "Basic queries of top-level collections" , () => {
 	it( "GET on a collection with items" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var blog = app.root.children.blogs.collection.createDocument( {
+		var blog1 = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
 			publicAccess: 'all'
 		} ) ;
 		
-		await blog.save() ;
+		await blog1.save() ;
 		
 		var blog2 = app.root.children.blogs.collection.createDocument( {
 			title: 'YAB' ,
@@ -434,14 +434,14 @@ describe( "Basic queries of top-level collections" , () => {
 			publicAccess: 'all'
 		} ) ;
 		
-		await blog.save() ;
+		await blog2.save() ;
 		
 		var response = await app.get( '/Blogs' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( [
 			{
 				title: 'My wonderful life' ,
 				description: 'This is a supa blog!' ,
-				_id: id1 ,
+				_id: blog1.getId() ,
 				//embedded: undefined,
 				parent: { id: '/' , collection: null } ,
 				userAccess: {} ,
@@ -449,12 +449,12 @@ describe( "Basic queries of top-level collections" , () => {
 				publicAccess: {
 					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
 				} ,
-				slugId: batch[ 0 ].slugId		// cannot be predicted
+				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
 			{
 				title: 'YAB' ,
 				description: 'Yet Another Blog' ,
-				_id: id2 ,
+				_id: blog2.getId() ,
 				//embedded: undefined,
 				parent: { id: '/' , collection: null } ,
 				userAccess: {} ,
@@ -462,7 +462,7 @@ describe( "Basic queries of top-level collections" , () => {
 				publicAccess: {
 					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
 				} ,
-				slugId: batch[ 1 ].slugId		// cannot be predicted
+				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
 		] ) ;
 	} ) ;
@@ -499,24 +499,24 @@ describe( "Basic queries of top-level collections" , () => {
 			{
 				title: 'My wonderful life',
 				description: 'This is a supa blog!',
-				_id: id1,
+				_id: blog1.getId(),
 				//embedded: undefined,
 				parent: { id: '/', collection: null },
 				userAccess: {},
 				groupAccess: {},
 				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-				slugId: batch[ 0 ].slugId		// cannot be predicted
+				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
 			{
 				title: 'YAB' ,
 				description: 'Yet Another Blog' ,
-				_id: id2,
+				_id: blog2.getId(),
 				//embedded: undefined,
 				parent: { id: '/', collection: null },
 				userAccess: {},
 				groupAccess: {},
 				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-				slugId: batch[ 1 ].slugId		// cannot be predicted
+				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
 		] ) ;
 		
@@ -525,24 +525,24 @@ describe( "Basic queries of top-level collections" , () => {
 			{
 				title: 'YAB' ,
 				description: 'Yet Another Blog' ,
-				_id: id2,
+				_id: blog2.getId(),
 				//embedded: undefined,
 				parent: { id: '/', collection: null },
 				userAccess: {},
 				groupAccess: {},
 				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-				slugId: batch[ 0 ].slugId		// cannot be predicted
+				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
 			{
 				title: 'Third' ,
 				description: 'The Third' ,
-				_id: id3,
+				_id: blog3.getId(),
 				//embedded: undefined,
 				parent: { id: '/', collection: null },
 				userAccess: {},
 				groupAccess: {},
 				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-				slugId: batch[ 1 ].slugId		// cannot be predicted
+				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
 		] ) ;
 		
@@ -551,24 +551,24 @@ describe( "Basic queries of top-level collections" , () => {
 			{
 				title: 'My wonderful life',
 				description: 'This is a supa blog!',
-				_id: id1,
+				_id: blog1.getId(),
 				//embedded: undefined,
 				parent: { id: '/', collection: null },
 				userAccess: {},
 				groupAccess: {},
 				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-				slugId: batch[ 0 ].slugId		// cannot be predicted
+				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
 			{
 				title: 'Third' ,
 				description: 'The Third' ,
-				_id: id3,
+				_id: blog3.getId(),
 				//embedded: undefined,
 				parent: { id: '/', collection: null },
 				userAccess: {},
 				groupAccess: {},
 				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-				slugId: batch[ 1 ].slugId		// cannot be predicted
+				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
 		] ) ;
 		
@@ -577,13 +577,13 @@ describe( "Basic queries of top-level collections" , () => {
 			{
 				title: 'Third' ,
 				description: 'The Third' ,
-				_id: id3,
+				_id: blog3.getId(),
 				//embedded: undefined,
 				parent: { id: '/', collection: null },
 				userAccess: {},
 				groupAccess: {},
 				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
-				slugId: batch[ 0 ].slugId		// cannot be predicted
+				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			}
 		] ) ;
 	} ) ;
@@ -593,61 +593,25 @@ describe( "Basic queries of top-level collections" , () => {
 
 describe( "Built-in collection method: SCHEMA" , () => {
 
-	it( "should get the schema of the schema" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-
-				app.get( '/Blogs/SCHEMA' , { performer: performer } , ( error , schema ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( schema ).to.equal( app.collectionNodes.blogs.schema ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+	it( "should get the schema of the collection" , async () => {
+		var { app , performer } = await commonApp() ;
+		var response = await app.get( '/Blogs/SCHEMA' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( app.collectionNodes.blogs.schema ) ;
 	} ) ;
 
-	it( "should get the schema of the schema" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} ) ;
-				id = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-
-				app.get( '/Blogs/' + id + '/SCHEMA' , { performer: performer } , ( error , schema ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( schema ).to.equal( app.collectionNodes.blogs.schema ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+	it( "should get the schema of the object" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+		
+		await blog.save() ;
+		
+		var response = await app.get( '/Blogs/' + blog.getId() + '/SCHEMA' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( app.collectionNodes.blogs.schema ) ;
 	} ) ;
 } ) ;
 

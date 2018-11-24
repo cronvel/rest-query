@@ -41,6 +41,7 @@ OK	DELETE doc
 .	link/multi-link
 .	nested docs
 .	access/rights
+OK	Schema
 
 
 
