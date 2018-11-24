@@ -262,201 +262,100 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		} ) ;
 	} ) ;
 
-	it( "Test of the test: test helper commonApp() should clean previously created items" , ( done ) => {
+	it( "PUT, then PUT (overwrite), then GET" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var response = app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 3!!!' ,
+				description: 'This is a supa blog! (x3)' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				// Same ID than in previous test
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					expect( error.httpStatus ).to.be( 404 ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 3!!!' ,
+				description: 'This is a supa blog! Now overwritten!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 3!!!' ,
+			description: 'This is a supa blog! Now overwritten!' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 	} ) ;
 
-	it( "PUT, then PUT (overwrite), then GET" , ( done ) => {
+	it( "PATCH on an unexisting item" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 3!!!' ,
-					description: 'This is a supa blog! (x3)' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 3!!!' ,
-					description: 'This is a supa blog! Now overwritten!' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				//app.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.get( '/Posts/' , function( error , object ) {
-				//app.get( '/Blogs/' , function( error , object ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! Now overwritten!' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		await expect( () => app.patch( '/Blogs/111111111111111111111111' , { description: 'Oh yeah!' } , null , { performer: performer } ) )
+			.to.reject( ErrorStatus , { type: 'notFound', httpStatus: 404 } ) ;
 	} ) ;
 
-	it( "PATCH on an unexisting item" , ( done ) => {
+	it( "PUT, then PATCH, then GET (featuring embedded data)" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				title: 'My wonderful life 3!!!' ,
+				description: 'This is a supa blog! (x3)' ,
+				embedded: { a: 'a' , b: 'b' } ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.patch( '/Blogs/111111111111111111111111' , {
-					description: 'Oh yeah!'
-				} , null , { performer: performer } , ( error , object ) => {
-
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					expect( error.httpStatus ).to.be( 404 ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				description: 'This is a supa blog! Now patched!' ,
+				"embedded.a": 'A' ,
+				parent: "should not overwrite" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 3!!!' ,
+			description: 'This is a supa blog! Now patched!' ,
+			embedded: { a: 'A' , b: 'b' } ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 	} ) ;
 
-	it( "PUT, then PATCH, then GET (featuring embedded data)" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+	it( "PUT, then PATCH on a property, then GET (featuring embedded data)" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				title: 'My wonderful life 3!!!' ,
+				description: 'This is a supa blog! (x3)' ,
+				embedded: { a: 'a' , b: 'b' } ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 3!!!' ,
-					description: 'This is a supa blog! (x3)' ,
-					embedded: { a: 'a' , b: 'b' } ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					description: 'This is a supa blog! Now patched!' ,
-					"embedded.a": 'A' ,
-					parent: "should not overwrite" ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				//app.get( '/' , function( error , object ) {
-				//app.get( '/Blogs/my-blog/Posts/my-first-article/Comment/1' ) ;
-				//app.get( '/Posts/' , function( error , object ) {
-				//app.get( '/Blogs/' , function( error , object ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! Now patched!' ) ;
-					expect( object.embedded ).to.equal( { a: 'A' , b: 'b' } ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
-	} ) ;
-
-	it( "PUT, then PATCH on a property, then GET (featuring embedded data)" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 3!!!' ,
-					description: 'This is a supa blog! (x3)' ,
-					embedded: { a: 'a' , b: 'b' } ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/.embedded' , { a: 'omg' } , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life 3!!!' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! (x3)' ) ;
-					expect( object.embedded ).to.equal( { a: 'omg' , b: 'b' } ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/.embedded' , { a: 'omg' } , null , { performer: performer } ) ;
+		
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 3!!!' ,
+			description: 'This is a supa blog! (x3)' ,
+			embedded: { a: 'omg' , b: 'b' } ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 	} ) ;
 
 	it( "PUT, then PUT (overwrite) on a property, then GET" , ( done ) => {
@@ -5208,6 +5107,33 @@ describe( "Client error management" , () => {
 
 
 describe( "Misc" , () => {
+
+	it( "Test of the test: test helper commonApp() should clean previously created items" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 2!!!' ,
+			description: 'This is a supa blog! (x2)' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+		
+		// It should reset
+		( { app , performer } = await commonApp() ) ;
+		
+		// Same ID than in the previous request
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound', httpStatus: 404 } ) ;
+	} ) ;
 
 	it( "Shema's 'defaultPublicAccess'" , ( done ) => {
 

@@ -42,3 +42,10 @@ OK	POST a doc on a collection
 .	nested docs
 .	access/rights
 
+
+
+## Misc TODO list
+
+.	change all [array].concat(element) to ES6 [ ... array , element ]
+
+
