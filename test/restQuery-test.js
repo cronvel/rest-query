@@ -2411,227 +2411,159 @@ describe( "Auto collection" , () => {
 
 describe( "Token creation" , () => {
 
-	it( "login, a.k.a. token creation using POST /Users/CREATE-TOKEN" , ( done ) => {
+	it( "login, a.k.a. token creation using POST /Users/CREATE-TOKEN" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , id , token ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var response = await app.post( '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fisher" ,
-					email: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					id = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		var id = response.output.data.id ;
+		expect( id ).to.be.an( 'objectId' ) ;
+		
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response ).to.equal( {
-						userId: id ,
-						token: response.token ,	// unpredictable
-						type: "header" ,
-						agentId: "0123456789" ,
-						creationTime: response.creationTime ,	// not predictable at all
-						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900000
-					} ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response.output.data ).to.equal( {
+			userId: id ,
+			token: response.output.data.token ,	// unpredictable
+			type: "header" ,
+			agentId: "0123456789" ,
+			creationTime: response.output.data.creationTime ,	// not predictable at all
+			expirationTime: response.output.data.expirationTime ,	// not predictable at all
+			duration: 900000
+		} ) ;
+		expect( response.output.data.token.length ).to.be( 44 ) ;
+		
+		var tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
 
-					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+		expect( tokenData ).to.equal( {
+			type: "header" ,
+			userId: id.toString() ,
+			agentId: "0123456789" ,
+			expirationTime: response.output.data.expirationTime ,
+			//increment: tokenData.increment ,	// unpredictable
+			securityCode: tokenData.securityCode	// unpredictable
+		} ) ;
 
-					expect( tokenData ).to.equal( {
-						type: "header" ,
-						userId: id.toString() ,
-						agentId: "0123456789" ,
-						expirationTime: response.expirationTime ,
-						//increment: tokenData.increment ,	// unpredictable
-						securityCode: tokenData.securityCode	// unpredictable
-					} ) ;
+		var token = response.output.data.token ;
 
-					token = response.token ;
-
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Should found the token in the user document
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response.token[ token ] ).to.be.ok() ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// Should found the token in the user document
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		expect( response.output.data.token[ token ] ).to.be.ok() ;
 	} ) ;
 
-	it( "token creation using a bad login should fail" , ( done ) => {
+	it( "token creation using a bad login should fail" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var response = await app.post( '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fisher" ,
-					email: "bobby.fisher@gmail.com" ,
-					password: "pw"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					id = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		await expect( () => app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "wrong@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "wrong@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.httpStatus ).to.be( 401 ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
 	} ) ;
 
-	it( "token creation using a bad password should fail" , ( done ) => {
+	it( "token creation using a bad password should fail" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var response = await app.post( '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fisher" ,
-					email: "bobby.fisher@gmail.com" ,
-					password: "pw"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					id = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		await expect( () => app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "bad pw" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "bad pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.httpStatus ).to.be( 401 ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
 	} ) ;
 
-	it( "using domain-restricted users: POST /Blogs/id/Users/CREATE-TOKEN" , ( done ) => {
+	it( "using domain-restricted users: POST /Blogs/id/Users/CREATE-TOKEN" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blogId , id ;
+		var response = await app.post( '/Blogs' , {
+				title: 'My wonderful life' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		var blogId = response.output.data.id ;
+		
+		response = await app.post( '/Blogs/' + blogId + '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		var id = response.output.data.id ;
+		
+		response = await app.post( '/Blogs/' + blogId + '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response.output.data.userId.toString() ).to.be( id.toString() ) ;
+		expect( response.output.data.token.length ).to.be( 44 ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		// Should not works globally!
+		await expect( () => app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Blogs' , {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					blogId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Blogs/' + blogId + '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fisher" ,
-					email: "bobby.fisher@gmail.com" ,
-					password: "pw"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					id = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Blogs/' + blogId + '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response.userId.toString() ).to.be( id.toString() ) ;
-					expect( response.token.length ).to.be( 44 ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Should not works globally!
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).to.be.ok() ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
 	} ) ;
 
 	it( "POST /Users/CREATE-TOKEN action should cleanup outdated tokens" , ( done ) => {
