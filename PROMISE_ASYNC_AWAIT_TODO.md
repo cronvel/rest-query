@@ -48,5 +48,5 @@ OK	Schema
 ## Misc TODO list
 
 .	change all [array].concat(element) to ES6 [ ... array , element ]
-
+.	remove most call to roots-db Document's .stage(), since it's automatic now
 

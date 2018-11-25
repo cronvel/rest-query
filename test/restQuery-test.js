@@ -2566,177 +2566,140 @@ describe( "Token creation" , () => {
 		) ).to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
 	} ) ;
 
-	it( "POST /Users/CREATE-TOKEN action should cleanup outdated tokens" , ( done ) => {
+	it( "POST /Users/CREATE-TOKEN action should cleanup outdated tokens" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response , id , duration , token , tokenData , newTokenData ;
 
-		var app , performer , id , token , duration ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		// Create the user
+		response = await app.post( '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fisher" ,
-					email: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					id = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		id = response.output.data.id ;
+		expect( id ).to.be.an( 'objectId' ) ;
+		
+		duration = 300 ;
+
+		// Create the token to test garbage collection on
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789" ,
+				duration: duration
 			} ,
-			function( callback ) {
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response.output.data ).to.equal( {
+			userId: id ,
+			token: response.output.data.token ,	// unpredictable
+			type: "header" ,
+			agentId: "0123456789" ,
+			creationTime: response.output.data.creationTime ,	// not predictable at all
+			expirationTime: response.output.data.expirationTime ,	// not predictable at all
+			duration: duration
+		} ) ;
+		expect( response.output.data.token.length ).to.be( 44 ) ;
 
-				duration = 300 ;
+		tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
 
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789" ,
-					duration: duration
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response ).to.equal( {
-						userId: id ,
-						token: response.token ,	// unpredictable
-						type: "header" ,
-						agentId: "0123456789" ,
-						creationTime: response.creationTime ,	// not predictable at all
-						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: duration
-					} ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+		expect( tokenData ).to.equal( {
+			type: "header" ,
+			userId: id.toString() ,
+			agentId: "0123456789" ,
+			expirationTime: response.output.data.expirationTime ,
+			//increment: tokenData.increment ,	// unpredictable
+			securityCode: tokenData.securityCode	// unpredictable
+		} ) ;
 
-					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+		token = response.output.data.token ;
 
-					expect( tokenData ).to.equal( {
-						type: "header" ,
-						userId: id.toString() ,
-						agentId: "0123456789" ,
-						expirationTime: response.expirationTime ,
-						//increment: tokenData.increment ,	// unpredictable
-						securityCode: tokenData.securityCode	// unpredictable
-					} ) ;
+		// Should found the token in the user document
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		expect( response.output.data.token[ token ] ).to.be.ok() ;
 
-					token = response.token ;
+		duration = 100000 ;
 
-					callback() ;
-				} ) ;
+		// Create a new token: the first should still be there after that
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789" ,
+				duration: duration
 			} ,
-			function( callback ) {
-				// Should be there
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( response ) ;
-					expect( response.token[ token ] ).to.be.ok() ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response.output.data ).to.equal( {
+			userId: id ,
+			token: response.output.data.token ,	// unpredictable
+			type: "header" ,
+			agentId: "0123456789" ,
+			creationTime: response.output.data.creationTime ,	// not predictable at all
+			expirationTime: response.output.data.expirationTime ,	// not predictable at all
+			duration: duration
+		} ) ;
+		expect( response.output.data.token.length ).to.be( 44 ) ;
+
+		newTokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
+
+		expect( newTokenData ).to.equal( {
+			type: "header" ,
+			userId: id.toString() ,
+			agentId: "0123456789" ,
+			expirationTime: response.output.data.expirationTime ,
+			//increment: tokenData.increment ,	// unpredictable
+			securityCode: newTokenData.securityCode	// unpredictable
+		} ) ;
+
+		// First token should still be there
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		expect( response.output.data.token[ token ] ).to.be.ok() ;
+
+		// Wait so the first token will not be here anymore
+		await Promise.resolveTimeout( 310 ) ;
+
+		duration = 100000 ;
+
+		// Create again a new token: the first should be garbage collected now
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789" ,
+				duration: duration
 			} ,
-			function( callback ) {
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response.output.data ).to.equal( {
+			userId: id ,
+			token: response.output.data.token ,	// unpredictable
+			type: "header" ,
+			agentId: "0123456789" ,
+			creationTime: response.output.data.creationTime ,	// not predictable at all
+			expirationTime: response.output.data.expirationTime ,	// not predictable at all
+			duration: duration
+		} ) ;
+		expect( response.output.data.token.length ).to.be( 44 ) ;
 
-				duration = 100000 ;
-
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789" ,
-					duration: duration
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response ).to.equal( {
-						userId: id ,
-						token: response.token ,	// unpredictable
-						type: "header" ,
-						agentId: "0123456789" ,
-						creationTime: response.creationTime ,	// not predictable at all
-						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: duration
-					} ) ;
-					expect( response.token.length ).to.be( 44 ) ;
-
-					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
-
-					expect( tokenData ).to.equal( {
-						type: "header" ,
-						userId: id.toString() ,
-						agentId: "0123456789" ,
-						expirationTime: response.expirationTime ,
-						//increment: tokenData.increment ,	// unpredictable
-						securityCode: tokenData.securityCode	// unpredictable
-					} ) ;
-
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Should still be there
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( token , response ) ;
-					expect( response.token[ token ] ).to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				setTimeout( callback , 310 ) ;
-			} ,
-			function( callback ) {
-
-				duration = 100000 ;
-
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789" ,
-					duration: duration
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response ).to.equal( {
-						userId: id ,
-						token: response.token ,	// unpredictable
-						type: "header" ,
-						agentId: "0123456789" ,
-						creationTime: response.creationTime ,	// not predictable at all
-						expirationTime: response.expirationTime ,
-						duration: duration
-					} ) ;
-					expect( response.token.length ).to.be( 44 ) ;
-
-					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
-
-					expect( tokenData ).to.equal( {
-						type: "header" ,
-						userId: id.toString() ,
-						agentId: "0123456789" ,
-						expirationTime: response.expirationTime ,
-						//increment: tokenData.increment ,	// unpredictable
-						securityCode: tokenData.securityCode	// unpredictable
-					} ) ;
-
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Should have been garbage collected
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( response ) ;
-					expect( response.token[ token ] ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// The first token should have been garbage collected
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		//log.error( "%Y" , response.output.data ) ;
+		expect( response.output.data.token[ token ] ).not.to.be.ok() ;
 	} ) ;
 
 	it( "POST /Users/REGENERATE-TOKEN should generate a new token using an existing one that will have its TTL shortened" , ( done ) => {
