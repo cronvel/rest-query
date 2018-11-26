@@ -1169,328 +1169,229 @@ describe( "Links" , () => {
 
 	it( "PUT through a link" ) ;
 
-	it( "PATCH on a link" , ( done ) => {
+	it( "PATCH on a link" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id , userId , godfatherId ;
+		var response , userId , godfatherId ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "THE" ,
-					lastName: "GODFATHER" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					godfatherId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all" ,
-					godfather: godfatherId
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
 
-					expect( object.firstName ).to.be( 'Joe' ) ;
-					expect( object.lastName ).to.be( 'Doe' ) ;
-					expect( object.slugId ).to.be( 'joe-doe' ) ;
-					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
-					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
+		response = await app.put( '/Users/' + userId + '/~godfather' , {
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.patch( '/Users/' + userId + '/~godfather' , { firstName: 'Da' } , null , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
 
-					expect( object.firstName ).to.be( 'Da' ) ;
-					expect( object.lastName ).to.be( 'GODFATHER' ) ;
-					expect( object.slugId ).to.be( 'the-godfather' ) ;
-					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		response = await app.patch( '/Users/' + userId + '/~godfather' , { firstName: 'Da' } , null , { performer: performer } ) ;
+		
+		// Check that the godfather has been modified
+		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'Da' ,
+			lastName: 'GODFATHER' ,
+			slugId: 'the-godfather' ,
+			email: 'godfather@gmail.com' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 	} ) ;
 
 	it( "PATCH through a link" ) ;
 
-	it( "DELETE on a link" , ( done ) => {
+	it( "DELETE on a link" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response , userId , godfatherId ;
 
-		var app , performer , blog , id , userId , godfatherId ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		response = await app.put( '/Users/' + userId + '/~godfather' , {
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "THE" ,
-					lastName: "GODFATHER" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					godfatherId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all" ,
-					godfather: godfatherId
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
 
-					expect( object.firstName ).to.be( 'Joe' ) ;
-					expect( object.lastName ).to.be( 'Doe' ) ;
-					expect( object.slugId ).to.be( 'joe-doe' ) ;
-					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
-					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.delete( '/Users/' + userId + '/~godfather' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , ( error , object ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + godfatherId , { performer: performer } , ( error , object ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// Just check it exists
+		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+
+		// Check that the user has the godfather
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			parent: { id: '/' , collection: null } ,
+			godfather: { _id: godfatherId }
+		} ) ;
+		
+		// Delete the godfather now
+		response = await app.delete( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+
+		await expect( () => app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) )
+			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
+
+		await expect( () => app.get( '/Users/' + godfatherId , { performer: performer } ) )
+			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
+
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			parent: { id: '/' , collection: null } ,
+			godfather: null
+		} ) ;
 	} ) ;
 
 	it( "DELETE through a link" ) ;
 
-	it( "POST on a link should fail (it doesn't make sense)" , ( done ) => {
+	it( "POST on a link should fail (it doesn't make sense)" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id , userId , godfatherId ;
+		var response , userId , godfatherId ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		// POST when the link don't exist should be a 'not found'
+		await expect( () => app.post( '/Users/' + userId + '/~godfather' , {
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
+			null ,
+			{ performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 
-			// POST when the link does not exist
-			function( callback ) {
-				app.post( '/Users/' + userId + '/~godfather' , {
-					firstName: "DAT" ,
-					lastName: "GODFATHER!" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} ,
-				null ,
-				{ performer: performer } ,
-				( error , response ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					callback() ;
-				} ) ;
+		response = await app.put( '/Users/' + userId + '/~godfather' , {
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
 
-
-			function( callback ) {
-				app.put( '/Users/' + userId + '/~godfather' , {
-					firstName: "DAT" ,
-					lastName: "GODFATHER!" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} ,
-				null , { performer: performer } ,
-				( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					godfatherId = response.id ;
-					callback() ;
-				} ) ;
+		// POST when the link exist should be a 'bad request'
+		await expect( () => app.post( '/Users/' + userId + '/~godfather' , {
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-
-
-			// POST when the link exist
-			function( callback ) {
-				app.post( '/Users/' + userId + '/~godfather' , {
-					firstName: "DAT" ,
-					lastName: "GODFATHER!" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} ,
-				null ,
-				{ performer: performer } ,
-				( error , response ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'badRequest' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
 	} ) ;
 
 	it( "POST through a link" ) ;
 
-	it( "GET + populate links" , ( done ) => {
+	it( "GET + populate links" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response , fatherId , userId , godfatherId ;
 
-		var app , performer , blog , id , userId , fatherId , godfatherId ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Big Joe" ,
-					lastName: "Doe" ,
-					email: "big-joe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					fatherId = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		response = await app.put( '/Users/' + userId + '/~father' , {
+				firstName: "Big Joe" ,
+				lastName: "Doe" ,
+				email: "big-joe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "THE" ,
-					lastName: "GODFATHER" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					godfatherId = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		fatherId = response.output.data.id ;
+
+		response = await app.put( '/Users/' + userId + '/~godfather' , {
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all" ,
-					father: fatherId ,
-					godfather: godfatherId
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
+
+		response = await app.get( '/Users/' + userId , { performer: performer , query: { populate: [ 'father' , 'godfather' ] } } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			parent: { id: '/' , collection: null } ,
+			father: {
+				_id: fatherId ,
+				firstName: "Big Joe" ,
+				lastName: "Doe" ,
+				email: "big-joe@gmail.com"
 			} ,
-			function( callback ) {
-				var context = {
-					performer: performer ,
-					query: {
-						populate: [ 'father' , 'godfather' ]
-					}
-				} ;
-
-				app.get( '/Users/' + userId , context , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-
-					expect( object.firstName ).to.be( 'Joe' ) ;
-					expect( object.lastName ).to.be( 'Doe' ) ;
-					expect( object.slugId ).to.be( 'joe-doe' ) ;
-					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-
-					expect( object.father.firstName ).to.be( 'Big Joe' ) ;
-					expect( object.father.lastName ).to.be( 'Doe' ) ;
-					expect( object.father.email ).to.be( 'big-joe@gmail.com' ) ;
-
-					expect( object.godfather.firstName ).to.be( 'THE' ) ;
-					expect( object.godfather.lastName ).to.be( 'GODFATHER' ) ;
-					expect( object.godfather.email ).to.be( 'godfather@gmail.com' ) ;
-
-					callback() ;
-				} ) ;
+			godfather: {
+				_id: godfatherId ,
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com"
 			}
-		] )
-			.exec( done ) ;
+		} ) ;
 	} ) ;
 
 } ) ;
@@ -2943,177 +2844,153 @@ describe( "Access" , () => {
 
 	// Create the users for the test
 
-	beforeEach( ( done ) => {
+	beforeEach( async () => {
+		( { app , performer } = await commonApp() ) ;
+		notConnectedPerformer = app.createPerformer() ;
+		
+		var response = await app.post( '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		authorizedId = response.output.data.id ;
+		
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response.output.data.userId.toString() ).to.be( authorizedId.toString() ) ;
+		
+		authorizedPerformer = app.createPerformer( {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ) ;
+		
+		response = await app.post( '/Users' , {
+				firstName: "Groupy" ,
+				lastName: "Groups" ,
+				email: "groupy@gmail.com" ,
+				password: "groupy"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		authorizedByGroupId = response.output.data.id ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					notConnectedPerformer = app.createPerformer() ;
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "groupy@gmail.com" ,
+				password: "groupy" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fisher" ,
-					email: "bobby.fisher@gmail.com" ,
-					password: "pw"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					authorizedId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response.output.data.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
 
-					authorizedPerformer = app.createPerformer( {
-						type: "header" ,
-						userId: response.userId ,
-						token: response.token ,
-						agentId: "0123456789"
-					} ) ;
+		authorizedByGroupPerformer = app.createPerformer( {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ) ;
 
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users' , {
+				firstName: "not" ,
+				lastName: "enough" ,
+				email: "not-enough@gmail.com" ,
+				password: "notenough"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Groupy" ,
-					lastName: "Groups" ,
-					email: "groupy@gmail.com" ,
-					password: "groupy"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					authorizedByGroupId = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		notEnoughAuthorizedId = response.output.data.id ;
+		
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "not-enough@gmail.com" ,
+				password: "notenough" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "groupy@gmail.com" ,
-					password: "groupy" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response.output.data.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
 
-					authorizedByGroupPerformer = app.createPerformer( {
-						type: "header" ,
-						userId: response.userId ,
-						token: response.token ,
-						agentId: "0123456789"
-					} ) ;
+		notEnoughAuthorizedPerformer = app.createPerformer( {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ) ;
 
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users' , {
+				firstName: "Peon" ,
+				lastName: "Peon" ,
+				email: "peon@gmail.com" ,
+				password: "peon"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "not" ,
-					lastName: "enough" ,
-					email: "not-enough@gmail.com" ,
-					password: "notenough"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					notEnoughAuthorizedId = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		unauthorizedId = response.output.data.id ;
+		
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "peon@gmail.com" ,
+				password: "peon" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "not-enough@gmail.com" ,
-					password: "notenough" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response.output.data.userId.toString() ).to.be( unauthorizedId.toString() ) ;
+		
+		unauthorizedPerformer = app.createPerformer( {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ) ;
 
-					notEnoughAuthorizedPerformer = app.createPerformer( {
-						type: "header" ,
-						userId: response.userId ,
-						token: response.token ,
-						agentId: "0123456789"
-					} ) ;
+		response = await app.post( '/Groups' , {
+				name: "unauthorized group" ,
+				users: [ notEnoughAuthorizedId , authorizedByGroupId ]
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		unauthorizedGroupId = response.output.data.id ;
 
-					callback() ;
-				} ) ;
+		response = await app.post( '/Groups' , {
+				name: "authorized group" ,
+				users: [ authorizedByGroupId ]
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Peon" ,
-					lastName: "Peon" ,
-					email: "peon@gmail.com" ,
-					password: "peon"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					unauthorizedId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "peon@gmail.com" ,
-					password: "peon" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response.userId.toString() ).to.be( unauthorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 44 ) ;
-
-					unauthorizedPerformer = app.createPerformer( {
-						type: "header" ,
-						userId: response.userId ,
-						token: response.token ,
-						agentId: "0123456789"
-					} ) ;
-
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Groups' , {
-					name: "unauthorized group" ,
-					users: [ notEnoughAuthorizedId , authorizedByGroupId ]
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					unauthorizedGroupId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Groups' , {
-					name: "authorized group" ,
-					users: [ authorizedByGroupId ]
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					authorizedGroupId = response.id ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		authorizedGroupId = response.output.data.id ;
 	} ) ;
 
 	it( "GET a restricted resource performed by various connected and non-connected users" , ( done ) => {
