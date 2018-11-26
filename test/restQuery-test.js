@@ -2702,403 +2702,281 @@ describe( "Token creation" , () => {
 		expect( response.output.data.token[ token ] ).not.to.be.ok() ;
 	} ) ;
 
-	it( "POST /Users/REGENERATE-TOKEN should generate a new token using an existing one that will have its TTL shortened" , ( done ) => {
+	it( "POST /Users/REGENERATE-TOKEN should generate a new token using an existing one that will have its TTL shortened" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , oldTokenPerformer , id , oldToken , newToken , oldTokenOldExpirationTime , oldTokenNewExpirationTime ;
+		var response , oldTokenPerformer , id , oldToken , newToken , oldTokenOldExpirationTime , oldTokenNewExpirationTime ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		// Create the user
+		response = await app.post( '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fisher" ,
-					email: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					id = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		id = response.output.data.id ;
+		expect( id ).to.be.an( 'objectId' ) ;
+
+		// Create the token
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
 
-					//console.log( response ) ;
-					expect( response ).to.equal( {
-						userId: id ,
-						token: response.token ,	// unpredictable
-						type: "header" ,
-						agentId: "0123456789" ,
-						creationTime: response.creationTime ,	// not predictable at all
-						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900000
-					} ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+		expect( response.output.data ).to.equal( {
+			userId: id ,
+			token: response.output.data.token ,	// unpredictable
+			type: "header" ,
+			agentId: "0123456789" ,
+			creationTime: response.output.data.creationTime ,	// not predictable at all
+			expirationTime: response.output.data.expirationTime ,	// not predictable at all
+			duration: 900000
+		} ) ;
+		expect( response.output.data.token.length ).to.be( 44 ) ;
+		
+		var tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
 
-					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+		expect( tokenData ).to.equal( {
+			type: "header" ,
+			userId: id.toString() ,
+			agentId: "0123456789" ,
+			expirationTime: response.output.data.expirationTime ,
+			//increment: tokenData.increment ,	// unpredictable
+			securityCode: tokenData.securityCode	// unpredictable
+		} ) ;
 
-					expect( tokenData ).to.equal( {
-						type: "header" ,
-						userId: id.toString() ,
-						agentId: "0123456789" ,
-						expirationTime: response.expirationTime ,
-						//increment: tokenData.increment ,	// unpredictable
-						securityCode: tokenData.securityCode	// unpredictable
-					} ) ;
+		oldTokenOldExpirationTime = response.output.data.expirationTime ;
+		oldToken = response.output.data.token ;
 
-					oldTokenOldExpirationTime = response.expirationTime ;
-					oldToken = response.token ;
+		oldTokenPerformer = app.createPerformer( {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ) ;
 
-					oldTokenPerformer = app.createPerformer( {
-						type: "header" ,
-						userId: response.userId ,
-						token: response.token ,
-						agentId: "0123456789"
-					} ) ;
+		// Should found the token in the user document
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		expect( response.output.data.token[ oldToken ] ).to.be.ok() ;
+		
+		// Regenerate token
+		response = await app.post( '/Users/REGENERATE-TOKEN' , {} , null , { performer: oldTokenPerformer } ) ;
+		
+		expect( response.output.data ).to.equal( {
+			userId: id ,
+			token: response.output.data.token ,	// unpredictable
+			type: "header" ,
+			agentId: "0123456789" ,
+			creationTime: response.output.data.creationTime ,	// not predictable at all
+			expirationTime: response.output.data.expirationTime ,	// not predictable at all
+			duration: 900000
+		} ) ;
+		expect( response.output.data.token.length ).to.be( 44 ) ;
 
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( response ) ;
-					expect( response.token[ oldToken ] ).to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users/REGENERATE-TOKEN' , {} , null , { performer: oldTokenPerformer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
+		oldTokenNewExpirationTime = response.output.data.creationTime + 10000 ;
+		var tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
 
-					//console.log( response ) ;
-					expect( response ).to.equal( {
-						userId: id ,
-						token: response.token ,	// unpredictable
-						type: "header" ,
-						agentId: "0123456789" ,
-						creationTime: response.creationTime ,	// not predictable at all
-						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900000
-					} ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+		expect( tokenData ).to.equal( {
+			type: "header" ,
+			userId: id.toString() ,
+			agentId: "0123456789" ,
+			expirationTime: response.output.data.expirationTime ,
+			//increment: tokenData.increment ,	// unpredictable
+			securityCode: tokenData.securityCode	// unpredictable
+		} ) ;
 
-					oldTokenNewExpirationTime = response.creationTime + 10000 ;
-					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+		newToken = response.output.data.token ;
 
-					expect( tokenData ).to.equal( {
-						type: "header" ,
-						userId: id.toString() ,
-						agentId: "0123456789" ,
-						expirationTime: response.expirationTime ,
-						//increment: tokenData.increment ,	// unpredictable
-						securityCode: tokenData.securityCode	// unpredictable
-					} ) ;
-
-					newToken = response.token ;
-
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// the old token should have been garbage collected
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( response ) ;
-					expect( response.token[ oldToken ] ).to.be.ok() ;
-					expect( response.token[ oldToken ].expirationTime ).not.to.be( oldTokenOldExpirationTime ) ;
-					expect( response.token[ oldToken ].expirationTime ).to.be.within( oldTokenNewExpirationTime - 200 , oldTokenNewExpirationTime + 200 ) ;
-					expect( response.token[ newToken ] ).to.be.ok() ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// Check the old token
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		expect( response.output.data.token[ oldToken ] ).to.be.ok() ;
+		expect( response.output.data.token[ oldToken ].expirationTime ).not.to.be( oldTokenOldExpirationTime ) ;
+		expect( response.output.data.token[ oldToken ].expirationTime ).to.be.within( oldTokenNewExpirationTime - 200 , oldTokenNewExpirationTime + 200 ) ;
+		expect( response.output.data.token[ newToken ] ).to.be.ok() ;
 	} ) ;
 
-	it( "POST /Users/REVOKE-TOKEN should revoke the current token, i.e. remove it from the user document" , ( done ) => {
+	it( "POST /Users/REVOKE-TOKEN should revoke the current token, i.e. remove it from the user document" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , tokenPerformer , tokenPerformerArg , id , token ;
+		var response , tokenPerformer , tokenPerformerArg , id , token ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		// Create the user
+		response = await app.post( '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fisher" ,
-					email: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					id = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		id = response.output.data.id ;
+		expect( id ).to.be.an( 'objectId' ) ;
+
+		// Create the token
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
 
-					//console.log( response ) ;
-					expect( response ).to.equal( {
-						userId: id ,
-						token: response.token ,	// unpredictable
-						type: "header" ,
-						agentId: "0123456789" ,
-						creationTime: response.creationTime ,	// not predictable at all
-						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900000
-					} ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+		expect( response.output.data ).to.equal( {
+			userId: id ,
+			token: response.output.data.token ,	// unpredictable
+			type: "header" ,
+			agentId: "0123456789" ,
+			creationTime: response.output.data.creationTime ,	// not predictable at all
+			expirationTime: response.output.data.expirationTime ,	// not predictable at all
+			duration: 900000
+		} ) ;
+		expect( response.output.data.token.length ).to.be( 44 ) ;
+		
+		var tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
 
-					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+		expect( tokenData ).to.equal( {
+			type: "header" ,
+			userId: id.toString() ,
+			agentId: "0123456789" ,
+			expirationTime: response.output.data.expirationTime ,
+			//increment: tokenData.increment ,	// unpredictable
+			securityCode: tokenData.securityCode	// unpredictable
+		} ) ;
+		
+		token = response.output.data.token ;
 
-					expect( tokenData ).to.equal( {
-						type: "header" ,
-						userId: id.toString() ,
-						agentId: "0123456789" ,
-						expirationTime: response.expirationTime ,
-						//increment: tokenData.increment ,	// unpredictable
-						securityCode: tokenData.securityCode	// unpredictable
-					} ) ;
+		tokenPerformerArg = {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ;
 
-					token = response.token ;
+		tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 
-					tokenPerformerArg = {
-						type: "header" ,
-						userId: response.userId ,
-						token: response.token ,
-						agentId: "0123456789"
-					} ;
+		// Should found the token in the user document
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		expect( response.output.data.token[ token ] ).to.be.ok() ;
 
-					tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( response ) ;
-					expect( response.token[ token ] ).to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( response ) ;
-					expect( response.token[ token ] ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// We recreate a new performer, or the test will fail: it will use a cached user.
-				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
-				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
+		// Revoke the token now
+		response = await app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } ) ;
+		
+		// Should not found the token anymore
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		expect( response.output.data.token[ token ] ).not.to.be.ok() ;
+		
+		// We recreate a new performer, or the test will fail: it will use a cached user.
+		// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
+		tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 
-				app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , ( error , response ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.message ).to.be( 'Token not found.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		await expect( () => app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } ) )
+			.to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Token not found.' } ) ;
 	} ) ;
 
-	it( "POST /Users/REVOKE-ALL-TOKENS should revoke all tokens, i.e. remove them from the user document" , ( done ) => {
+	it( "POST /Users/REVOKE-ALL-TOKENS should revoke all tokens, i.e. remove them from the user document" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response , id , tokenPerformer , tokenPerformerArg , token , tokenPerformer2 , token2 ;
 
-		var app , id , performer , tokenPerformer , tokenPerformerArg , token , tokenPerformer2 , token2 ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		// Create the user
+		response = await app.post( '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fisher" ,
-					email: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					doormen( { type: 'objectId' } , response.id ) ;
-					id = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		id = response.output.data.id ;
+		expect( id ).to.be.an( 'objectId' ) ;
+
+		// Create the token #1
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
 
-					//console.log( response ) ;
-					expect( response ).to.equal( {
-						userId: id ,
-						token: response.token ,	// unpredictable
-						type: "header" ,
-						agentId: "0123456789" ,
-						creationTime: response.creationTime ,	// not predictable at all
-						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900000
-					} ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+		token = response.output.data.token ;
 
-					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+		tokenPerformerArg = {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ;
 
-					expect( tokenData ).to.equal( {
-						type: "header" ,
-						userId: id.toString() ,
-						agentId: "0123456789" ,
-						expirationTime: response.expirationTime ,
-						//increment: tokenData.increment ,	// unpredictable
-						securityCode: tokenData.securityCode	// unpredictable
-					} ) ;
+		tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 
-					token = response.token ;
-
-					tokenPerformerArg = {
-						type: "header" ,
-						userId: response.userId ,
-						token: response.token ,
-						agentId: "0123456789"
-					} ;
-
-					tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
-
-					callback() ;
-				} ) ;
+		// Create the token #2
+		response = await app.post( '/Users/CREATE-TOKEN' , {
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
 			} ,
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
 
-					//console.log( response ) ;
-					expect( response ).to.equal( {
-						userId: id ,
-						token: response.token ,	// unpredictable
-						type: "header" ,
-						agentId: "0123456789" ,
-						creationTime: response.creationTime ,	// not predictable at all
-						expirationTime: response.expirationTime ,	// not predictable at all
-						duration: 900000
-					} ) ;
-					expect( response.token.length ).to.be( 44 ) ;
+		token2 = response.output.data.token ;
 
-					var tokenData = app.collectionNodes.users.extractFromToken( response.token ) ;
+		tokenPerformerArg = {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ;
 
-					expect( tokenData ).to.equal( {
-						type: "header" ,
-						userId: id.toString() ,
-						agentId: "0123456789" ,
-						expirationTime: response.expirationTime ,
-						//increment: tokenData.increment ,	// unpredictable
-						securityCode: tokenData.securityCode	// unpredictable
-					} ) ;
+		tokenPerformer2 = app.createPerformer( tokenPerformerArg ) ;
 
-					token2 = response.token ;
+		// Should found both tokens in the user document
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		expect( response.output.data.token[ token ] ).to.be.ok() ;
+		expect( response.output.data.token[ token2 ] ).to.be.ok() ;
 
-					tokenPerformer2 = app.createPerformer( {
-						type: "header" ,
-						userId: response.userId ,
-						token: response.token ,
-						agentId: "0123456789"
-					} ) ;
 
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( response ) ;
-					expect( response.token[ token ] ).to.be.ok() ;
-					expect( response.token[ token2 ] ).to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users/REVOKE-ALL-TOKENS' , {} , null , { performer: tokenPerformer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + id , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( response ) ;
-					expect( response.token[ token ] ).not.to.be.ok() ;
-					expect( response.token[ token2 ] ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// We recreate a new performer, or the test will fail: it will use a cached user.
-				// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
-				tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
+		// Revoke ALL tokens now
+		response = await app.post( '/Users/REVOKE-ALL-TOKENS' , {} , null , { performer: tokenPerformer } ) ;
 
-				app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } , ( error , response ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.message ).to.be( 'Token not found.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer2 } , ( error , response ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.message ).to.be( 'Token not found.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// Should not found either token in the user document
+		response = await app.get( '/Users/' + id , { performer: performer } ) ;
+		expect( response.output.data.token[ token ] ).not.to.be.ok() ;
+		expect( response.output.data.token[ token2 ] ).not.to.be.ok() ;
+
+		// We recreate a new performer, or the test will fail: it will use a cached user.
+		// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
+		tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
+
+		await expect( () => app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } ) )
+			.to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Token not found.' } ) ;
+
+		await expect( () => app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer2 } ) )
+			.to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Token not found.' } ) ;
 	} ) ;
 
 	it( "'Too many tokens'" ) ;
