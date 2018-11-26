@@ -1000,224 +1000,172 @@ describe( "Queries of nested object" , () => {
 
 describe( "Links" , () => {
 
-	it( "GET on a link" , ( done ) => {
-
-		var app , performer , blog , id , userId , godfatherId ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+	it( "GET on a link" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response , godfatherId , userId ;
+		
+		response = await app.post( '/Users' , {
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "THE" ,
-					lastName: "GODFATHER" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					godfatherId = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
+		
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all" ,
+				godfather: godfatherId
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all" ,
-					godfather: godfatherId
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
 
-					expect( object.firstName ).to.be( 'Joe' ) ;
-					expect( object.lastName ).to.be( 'Doe' ) ;
-					expect( object.slugId ).to.be( 'joe-doe' ) ;
-					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
-					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-
-					expect( object.firstName ).to.be( 'THE' ) ;
-					expect( object.lastName ).to.be( 'GODFATHER' ) ;
-					expect( object.slugId ).to.be( 'the-godfather' ) ;
-					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			slugId: 'joe-doe' ,
+			email: 'joe.doe@gmail.com' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+		expect( response.output.data.godfather._id.toString() ).to.be( godfatherId.toString() ) ;
+		
+		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'THE' ,
+			lastName: 'GODFATHER' ,
+			slugId: 'the-godfather' ,
+			email: 'godfather@gmail.com' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 	} ) ;
 
 	it( "GET through a link" ) ;
 
-	it( "PUT (create) on a link" , ( done ) => {
+	it( "PUT (create) on a link" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id , userId , godfatherId ;
+		var response , userId , godfatherId ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Users/' + userId + '/~godfather' , {
-					firstName: "DAT" ,
-					lastName: "GODFATHER!" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} ,
-				null , { performer: performer } ,
-				( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					godfatherId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
 
-					expect( object.firstName ).to.be( 'DAT' ) ;
-					expect( object.lastName ).to.be( 'GODFATHER!' ) ;
-					expect( object.slugId ).to.be( 'dat-godfather' ) ;
-					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
+		response = await app.put( '/Users/' + userId + '/~godfather' , {
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.get( '/Users/' + godfatherId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
+		
+		// Get it using a link
+		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'THE' ,
+			lastName: 'GODFATHER' ,
+			slugId: 'the-godfather' ,
+			email: 'godfather@gmail.com' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 
-					expect( object.firstName ).to.be( 'DAT' ) ;
-					expect( object.lastName ).to.be( 'GODFATHER!' ) ;
-					expect( object.slugId ).to.be( 'dat-godfather' ) ;
-					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// Direct get
+		response = await app.get( '/Users/' + godfatherId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'THE' ,
+			lastName: 'GODFATHER' ,
+			slugId: 'the-godfather' ,
+			email: 'godfather@gmail.com' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 	} ) ;
 
-	it( "PUT (overwrite) on a link" , ( done ) => {
+	it( "PUT (overwrite) on a link" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id , userId , godfatherId ;
+		var response , userId , godfatherId , godfatherId2 ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "THE" ,
-					lastName: "GODFATHER" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					godfatherId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all" ,
-					godfather: godfatherId
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
 
-					expect( object.firstName ).to.be( 'Joe' ) ;
-					expect( object.lastName ).to.be( 'Doe' ) ;
-					expect( object.slugId ).to.be( 'joe-doe' ) ;
-					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
-					expect( object.godfather.toString() ).to.be( godfatherId.toString() ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
+		response = await app.put( '/Users/' + userId + '/~godfather' , {
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.put( '/Users/' + userId + '/~godfather' , {
-					firstName: "DAT" ,
-					lastName: "GODFATHER!" ,
-					email: "godfather@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} ,
-				null , { performer: performer } ,
-				( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId + '/~godfather' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
 
-					expect( object.firstName ).to.be( 'DAT' ) ;
-					expect( object.lastName ).to.be( 'GODFATHER!' ) ;
-					expect( object.slugId ).to.be( 'the-godfather' ) ;
-					expect( object.email ).to.be( 'godfather@gmail.com' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// Check the godfather
+		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'THE' ,
+			lastName: 'GODFATHER' ,
+			slugId: 'the-godfather' ,
+			email: 'godfather@gmail.com' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+		
+		// Overwrite with another godfather
+		response = await app.put( '/Users/' + userId + '/~godfather' , {
+				firstName: "DAT" ,
+				lastName: "GODFATHER!?" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		log.error( "%Y" , response.output ) ;
+		godfatherId2 = response.output.data.id ;
+
+		// Check the godfather2
+		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'DAT' ,
+			lastName: 'GODFATHER!?' ,
+			slugId: 'the-godfather' ,
+			email: 'godfather@gmail.com' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+		expect( response.output.data.godfather._id.toString() ).to.be( godfatherId2.toString() ) ;
+		expect( godfatherId.toString() ).to.be( godfatherId2.toString() ) ;
 	} ) ;
 
 	it( "PUT through a link" ) ;
