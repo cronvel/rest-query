@@ -1502,97 +1502,82 @@ describe( "Multi-links" , () => {
 			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
-	it( "POST on a multi-link should create a new resource and add it to the current link's array" , ( done ) => {
-		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
+	it( "POST on a multi-link should create a new resource and add it to the current link's array" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId1 = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId1 = response.output.data.id ;
+		
+		log.error( "bob" ) ;
+		response = await app.post( '/Users' , {
+				firstName: "Not In" ,
+				lastName: "Dagroup" ,
+				email: "notindagroup@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Not In" ,
-					lastName: "Dagroup" ,
-					email: "notindagroup@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId4 = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId4 = response.output.data.id ;
+		
+		log.error( "aabob" ) ;
+		response = await app.post( '/Groups' , {
+				name: "The Group" ,
+				users: [ userId1 , userId2 , userId3 ] ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Groups' , {
-					name: "The Group" ,
-					users: [ userId1 ] ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					groupId = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		groupId = response.output.data.id ;
+		
+		log.error( "before post on multi link" ) ;
+		response = await app.post( '/Groups/' + groupId + '/~~users' , {
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Groups/' + groupId + '/~~users' , {
-					firstName: "Jack" ,
-					lastName: "Wallace" ,
-					email: "jack.wallace@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId2 = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId2 = response.output.data.id ;
+		
+		log.error( "after" ) ;
+		response = await app.post( '/Groups/' + groupId + '/~~users' , {
+				firstName: "Bobby" ,
+				lastName: "Fischer" ,
+				email: "bobby.fischer@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Groups/' + groupId + '/~~users' , {
-					firstName: "Bobby" ,
-					lastName: "Fischer" ,
-					email: "bobby.fischer@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId3 = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , ( error , batch ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( batch ) ;
-					expect( batch ).to.have.length( 3 ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId3 = response.output.data.id ;
 
-					var has = {} ;
-					has[ batch[ 0 ].firstName ] = true ;
-					has[ batch[ 1 ].firstName ] = true ;
-					has[ batch[ 2 ].firstName ] = true ;
-					expect( has ).to.equal( { Bobby: true , Jack: true , Joe: true } ) ;
+		response = await app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } ) ;
+		batch = response.output.data ;
 
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		var has = {} ;
+		has[ batch[ 0 ].firstName ] = true ;
+		has[ batch[ 1 ].firstName ] = true ;
+		has[ batch[ 2 ].firstName ] = true ;
+		expect( has ).to.equal( { Bobby: true , Jack: true , Joe: true } ) ;
 	} ) ;
 
 	it( "POST through a multi-link" ) ;
