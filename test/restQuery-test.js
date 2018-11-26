@@ -1036,9 +1036,9 @@ describe( "Links" , () => {
 			lastName: 'Doe' ,
 			slugId: 'joe-doe' ,
 			email: 'joe.doe@gmail.com' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: null } ,
+			godfather: { _id: godfatherId }
 		} ) ;
-		expect( response.output.data.godfather._id.toString() ).to.be( godfatherId.toString() ) ;
 		
 		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
@@ -1400,113 +1400,106 @@ describe( "Links" , () => {
 
 describe( "Multi-links" , () => {
 
-	it( "GET on and through a multi-link" , ( done ) => {
+	it( "GET on and through a multi-link" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
 
-		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId1 = response.output.data.id ;
+		
+		response = await app.post( '/Users' , {
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId2 = response.output.data.id ;
+		
+		response = await app.post( '/Users' , {
+				firstName: "Bobby" ,
+				lastName: "Fischer" ,
+				email: "bobby.fischer@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId3 = response.output.data.id ;
+		
+		response = await app.post( '/Users' , {
+				firstName: "Not In" ,
+				lastName: "Dagroup" ,
+				email: "notindagroup@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId4 = response.output.data.id ;
+		
+		response = await app.post( '/Groups' , {
+				name: "The Group" ,
+				users: [ userId1 , userId2 , userId3 ] ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		groupId = response.output.data.id ;
+		
+		response = await app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } ) ;
+		batch = response.output.data ;
+		expect( batch ).to.have.length( 3 ) ;
+		
+		var has = {} ;
+		has[ batch[ 0 ].firstName ] = true ;
+		has[ batch[ 1 ].firstName ] = true ;
+		has[ batch[ 2 ].firstName ] = true ;
+		expect( has ).to.equal( { Bobby: true , Jack: true , Joe: true } ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId1 = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Jack" ,
-					lastName: "Wallace" ,
-					email: "jack.wallace@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId2 = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Bobby" ,
-					lastName: "Fischer" ,
-					email: "bobby.fischer@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId3 = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Not In" ,
-					lastName: "Dagroup" ,
-					email: "notindagroup@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId4 = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Groups' , {
-					name: "The Group" ,
-					users: [ userId1 , userId2 , userId3 ] ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					groupId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , ( error , batch ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( batch ) ;
-					expect( batch ).to.have.length( 3 ) ;
-
-					var has = {} ;
-					has[ batch[ 0 ].firstName ] = true ;
-					has[ batch[ 1 ].firstName ] = true ;
-					has[ batch[ 2 ].firstName ] = true ;
-					expect( has ).to.equal( { Bobby: true , Jack: true , Joe: true } ) ;
-
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , ( error , document ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( document._id.toString() ).to.be( userId1.toString() ) ;
-					expect( document.email ).to.be( 'joe.doe@gmail.com' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Groups/' + groupId + '/~~users/' + userId4 , { performer: performer } , ( error , document ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		response = await app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: userId1 ,
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			email: 'joe.doe@gmail.com'
+		} ) ;
+		
+		response = await app.get( '/Groups/' + groupId + '/~~users/' + userId2 , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: userId2 ,
+			firstName: 'Jack' ,
+			lastName: 'Wallace' ,
+			email: 'jack.wallace@gmail.com'
+		} ) ;
+		
+		response = await app.get( '/Groups/' + groupId + '/~~users/' + userId3 , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: userId3 ,
+			firstName: 'Bobby' ,
+			lastName: 'Fischer' ,
+			email: 'bobby.fischer@gmail.com'
+		} ) ;
+		
+		await expect( () => app.get( '/Groups/' + groupId + '/~~users/' + userId4 , { performer: performer } ) )
+			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "POST on a multi-link should create a new resource and add it to the current link's array" , ( done ) => {
