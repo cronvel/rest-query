@@ -1152,7 +1152,6 @@ describe( "Links" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		log.error( "%Y" , response.output ) ;
 		godfatherId2 = response.output.data.id ;
 
 		// Check the godfather2
@@ -1164,7 +1163,7 @@ describe( "Links" , () => {
 			email: 'godfather@gmail.com' ,
 			parent: { id: '/' , collection: null }
 		} ) ;
-		expect( response.output.data.godfather._id.toString() ).to.be( godfatherId2.toString() ) ;
+		expect( response.output.data._id.toString() ).to.be( godfatherId2.toString() ) ;
 		expect( godfatherId.toString() ).to.be( godfatherId2.toString() ) ;
 	} ) ;
 
