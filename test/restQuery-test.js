@@ -2872,8 +2872,10 @@ describe( "Access" , () => {
 		} ) ;
 
 		response = await app.post( '/Groups' ,
-			{			name: "unauthorized group" ,
-				users: [ notEnoughAuthorizedId , authorizedByGroupId ] } ,
+			{
+				name: "unauthorized group" ,
+				users: [ notEnoughAuthorizedId , authorizedByGroupId ]
+			} ,
 			null ,
 			{ performer: performer }
 		) ;
@@ -2881,8 +2883,10 @@ describe( "Access" , () => {
 		unauthorizedGroupId = response.output.data.id ;
 
 		response = await app.post( '/Groups' ,
-			{			name: "authorized group" ,
-				users: [ authorizedByGroupId ] } ,
+			{
+				name: "authorized group" ,
+				users: [ authorizedByGroupId ]
+			} ,
 			null ,
 			{ performer: performer }
 		) ;
@@ -2892,6 +2896,23 @@ describe( "Access" , () => {
 
 
 
+	it( "Check that groups are correctly initialized" , async () => {
+		var groups ;
+		
+		//authorizedByGroupPerformer.reset() ;
+		
+		groups = await authorizedByGroupPerformer.getGroups() ;
+		expect( groups ).to.be.partially.like( [
+			{ _id: unauthorizedGroupId , name: "unauthorized group" } ,
+			{ _id: authorizedGroupId , name: "authorized group" }
+		] ) ;
+
+		groups = await notEnoughAuthorizedPerformer.getGroups() ;
+		expect( groups ).to.be.partially.like( [
+			{ _id: unauthorizedGroupId , name: "unauthorized group" }
+		] ) ;
+	} ) ;
+	
 	it( "GET a restricted resource performed by various connected and non-connected users" , async () => {
 		var response , userAccess ;
 
@@ -3046,542 +3067,376 @@ describe( "Access" , () => {
 		expect( titles ).to.contain( 'Public' , 'Selective' ) ;
 	} ) ;
 
-	it( "PUT (overwrite) a restricted resource performed by various connected and non-connected users" , ( done ) => {
+	it( "PUT (overwrite) a restricted resource performed by various connected and non-connected users" , async () => {
+		var response , userAccess ;
+		
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
+		userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
+		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
+		
+		// By the authorized user
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: "I've changed my mind!" ,
+				description: 'Seriously!' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// Non-connected user
+		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" , description: 'Seriously!' } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
 
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
+		// User not listed in specific rights
+		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" , description: 'Seriously!' } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
-
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: "I've changed my mind!" ,
-					description: 'Seriously!' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: "I cant do that!" ,
-					description: 'Seriously!'
-				} , null , { performer: notConnectedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: "I cant do that!" ,
-					description: 'Seriously!'
-				} , null , { performer: unauthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: "I cant do that!" ,
-					description: 'Seriously!'
-				} , null , { performer: notEnoughAuthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// User listed, but with too low rights
+		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" , description: 'Seriously!' } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
 
-	it( "PATCH a restricted resource performed by various connected and non-connected users" , ( done ) => {
+	it( "PATCH a restricted resource performed by various connected and non-connected users" , async () => {
+		var response , userAccess ;
 
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
+		userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
 
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
 			} ,
-			function( callback ) {
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: "I've changed my mind!"
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: "I cant do that!"
-				} , null , { performer: notConnectedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: "I cant do that!"
-				} , null , { performer: unauthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: "I cant do that!"
-				} , null , { performer: notEnoughAuthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// By the authorized user
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I've changed my mind!" } , null , { performer: authorizedPerformer } ) ;
+		
+		// Non-connected user
+		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		// User listed, but with too low rights
+		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
 
-	it( "DELETE a restricted resource performed by various connected and non-connected users" , ( done ) => {
+	it( "DELETE a restricted resource performed by various connected and non-connected users" , async () => {
+		var response , userAccess ;
+		
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'all' ;	// Minimal right that pass
+		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
 
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'all' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
+		// Non-connected user
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
 
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// User not listed in specific rights
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		// User listed, but with too low rights
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		// By the authorized user
+		response = await app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
 	} ) ;
 
-	it( "PUT (create) into a restricted resource performed by various connected and non-connected users" , ( done ) => {
-
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
-
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+	it( "PUT (create) into a restricted resource performed by various connected and non-connected users" , async () => {
+		var response , userAccess ;
+		
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass
+		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
 			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: 'Put one' ,
-					content: 'Blah blah blah...' ,
-					publicAccess: 'read'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{
+				title: 'Put one' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'read'
 			} ,
-			function( callback ) {
-				// Non-connected user
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d1' , {
-					title: 'Put two' ,
-					content: 'Blah blah blah...' ,
-					publicAccess: 'read'
-				} , null , { performer: notConnectedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// Non-connected user
+		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d1' ,
+			{
+				title: 'Put two' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'read'
 			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d2' , {
-					title: 'Put three' ,
-					content: 'Blah blah blah...' ,
-					publicAccess: 'read'
-				} , null , { performer: unauthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: notConnectedPerformer }
+		) ).to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
+		
+		// User not listed in specific rights
+		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d2' ,
+			{
+				title: 'Put three' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'read'
 			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d3' , {
-					title: 'Put four' ,
-					content: 'Blah blah blah...' ,
-					publicAccess: 'read'
-				} , null , { performer: notEnoughAuthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: unauthorizedPerformer }
+		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		// User listed, but with too low rights
+		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d3' ,
+			{
+				title: 'Put four' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'read'
+			} ,
+			null ,
+			{ performer: notEnoughAuthorizedPerformer }
+		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
 
-	it( "POST into a restricted resource performed by various connected and non-connected users" , ( done ) => {
+	it( "POST into a restricted resource performed by various connected and non-connected users" , async () => {
+		var response , userAccess ;
+		
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass
+		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// By the authorized user
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
+			{
+				title: 'Post one' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'read'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
 
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
+		// Non-connected user
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
+			{
+				title: 'Post two' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'read'
+			} ,
+			null ,
+			{ performer: notConnectedPerformer }
+		) ).to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
+		
+		// User not listed in specific rights
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
+			{
+				title: 'Post three' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'read'
+			} ,
+			null ,
+			{ performer: unauthorizedPerformer }
+		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+		// User listed, but with too low rights
+		 await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
+		 	{
+				title: 'Post four' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'read'
 			} ,
-			function( callback ) {
-				app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
-					title: 'Post one' ,
-					content: 'Blah blah blah...' ,
-					publicAccess: 'read'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
-					title: 'Post two' ,
-					content: 'Blah blah blah...' ,
-					publicAccess: 'read'
-				} , null , { performer: notConnectedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
-					title: 'Post three' ,
-					content: 'Blah blah blah...' ,
-					publicAccess: 'read'
-				} , null , { performer: unauthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , {
-					title: 'Post four' ,
-					content: 'Blah blah blah...' ,
-					publicAccess: 'read'
-				} , null , { performer: notEnoughAuthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: notEnoughAuthorizedPerformer }
+		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
 
-	it( "Access by groups" , ( done ) => {
-
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'read' ;
-				//userAccess[ authorizedByGroupId ] = 'passThrough' ;
-
-				var groupAccess = {} ;
-				groupAccess[ authorizedGroupId ] = 'read' ;
-
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					groupAccess: groupAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+	it( "Access by groups" , async () => {
+		var response , userAccess , groupAccess ;
+		
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'read' ;
+		//userAccess[ authorizedByGroupId ] = 'passThrough' ;
+		
+		groupAccess = {} ;
+		groupAccess[ authorizedGroupId ] = 'read' ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				groupAccess: groupAccess ,
+				publicAccess: 'none'
 			} ,
-			function( callback ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User authorized by its group
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedByGroupPerformer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , ( error , object ) => {
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// By the authorized user
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 2!!!' ,
+			description: 'This is a supa blog! (x2)'
+		} ) ;
 
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } , ( error , object ) => {
+		// User authorized by its group
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedByGroupPerformer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 2!!!' ,
+			description: 'This is a supa blog! (x2)'
+		} ) ;
 
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , ( error , object ) => {
+		// Non-connected user
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
 
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// User not listed in specific rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		// User listed, but with too low rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
 
-	it( "PATCH of nested resource with inheritance" , ( done ) => {
+	it( "PATCH of nested resource with inheritance" , async () => {
+		var response , userAccess , groupAccess ;
+		
+		userAccess = {} ;
+		
+		userAccess[ authorizedId ] = {
+			read: 4 ,
+			write: 4 ,
+			create: 1 ,
+			inheritance: {
+				read: 4 ,
+				write: 4
+			}
+		} ;
 
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
+		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
 
-				userAccess[ authorizedId ] = {
-					read: 4 ,
-					write: 4 ,
-					create: 1 ,
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'passThrough'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{
+				title: 'A boring title' ,
+				content: 'Blah blah blah...'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// Authorized user
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I've changed my mind!" } , null , { performer: authorizedPerformer } ) ;
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.partially.equal( { title: "I've changed my mind!" } ) ;
+
+		// Non-connected user
+		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		
+		// Now give public access
+		response = app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				publicAccess: {
+					traverse: 1 ,
 					inheritance: {
 						read: 4 ,
 						write: 4
 					}
-				} ;
+				}
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
 
-				userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
-
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'passThrough'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+		// Non-connected user, it can edit it!
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
+				title: "I can do that!"
 			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: 'A boring title' ,
-					content: 'Blah blah blah...'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I've changed my mind!"
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
-					{ performer: authorizedPerformer } ,
-					( error , document ) => {
-						expect( error ).not.to.be.ok() ;
-						expect( document.title ).to.be( "I've changed my mind!" ) ;
-						callback() ;
-					}
-				) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: notConnectedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: unauthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can't do that!"
-				} , null , { performer: notEnoughAuthorizedPerformer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-
-			// Now give public access
-
-			function( callback ) {
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					publicAccess: {
-						traverse: 1 ,
-						inheritance: {
-							read: 4 ,
-							write: 4
-						}
-					}
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-					title: "I can do that!"
-				} , null , { performer: notConnectedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
-					{ performer: unauthorizedPerformer } ,
-					( error , document ) => {
-						expect( error ).not.to.be.ok() ;
-						expect( document.title ).to.be( "I can do that!" ) ;
-						callback() ;
-					}
-				) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: notConnectedPerformer }
+		) ;
+		
+		// User not listed in specific rights
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) ;
+		expect( response.output.data ).to.partially.equal( { title: "I can do that!" } ) ;
 	} ) ;
 
 	it( "More inheritance tests needed" ) ;
