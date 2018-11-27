@@ -1519,7 +1519,6 @@ describe( "Multi-links" , () => {
 		) ;
 		userId1 = response.output.data.id ;
 		
-		log.error( "bob" ) ;
 		response = await app.post( '/Users' , {
 				firstName: "Not In" ,
 				lastName: "Dagroup" ,
@@ -1532,19 +1531,16 @@ describe( "Multi-links" , () => {
 		) ;
 		userId4 = response.output.data.id ;
 		
-		log.error( "aabob" ) ;
 		response = await app.post( '/Groups' , {
 				name: "The Group" ,
-				users: [ userId1 , userId2 , userId3 ] ,
+				users: [ userId1 ] ,
 				publicAccess: "all"
 			} ,
 			null ,
 			{ performer: performer }
 		) ;
-		
 		groupId = response.output.data.id ;
 		
-		log.error( "before post on multi link" ) ;
 		response = await app.post( '/Groups/' + groupId + '/~~users' , {
 				firstName: "Jack" ,
 				lastName: "Wallace" ,
@@ -1557,7 +1553,6 @@ describe( "Multi-links" , () => {
 		) ;
 		userId2 = response.output.data.id ;
 		
-		log.error( "after" ) ;
 		response = await app.post( '/Groups/' + groupId + '/~~users' , {
 				firstName: "Bobby" ,
 				lastName: "Fischer" ,
@@ -1583,155 +1578,138 @@ describe( "Multi-links" , () => {
 	it( "POST through a multi-link" ) ;
 	it( "PUT through a multi-link" ) ;
 
-	it( "PATCH through a multi-link" , ( done ) => {
+	it( "PATCH through a multi-link" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
 
-		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId1 = response.output.data.id ;
+		
+		
+		response = await app.post( '/Users' , {
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId2 = response.output.data.id ;
+		
+		response = await app.post( '/Groups' , {
+				name: "The Group" ,
+				users: [ userId1 , userId2 ] ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		groupId = response.output.data.id ;
+		
+		response = await app.patch( '/Groups/' + groupId + '/~~users/' + userId1 , {
+				firstName: "Joey" ,
+				email: "joey.doe@gmail.com"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: userId1 ,
+			firstName: 'Joey' ,
+			email: 'joey.doe@gmail.com'
+		} )
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId1 = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Jack" ,
-					lastName: "Wallace" ,
-					email: "jack.wallace@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId2 = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Groups' , {
-					name: "The Group" ,
-					users: [ userId1 , userId2 ] ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					groupId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.patch(
-					'/Groups/' + groupId + '/~~users/' + userId1 ,
-					{ firstName: "Joey" , email: "joey.doe@gmail.com" } ,
-					null ,
-					{ performer: performer } ,
-					( error , document ) => {
-						expect( error ).not.to.be.ok() ;
-						callback() ;
-					}
-				) ;
-			} ,
-			function( callback ) {
-				app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , ( error , document ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( document._id.toString() ).to.be( userId1.toString() ) ;
-					expect( document.firstName ).to.be( 'Joey' ) ;
-					expect( document.email ).to.be( 'joey.doe@gmail.com' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		response = await app.get( '/Users/' + userId1 , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: userId1 ,
+			firstName: 'Joey' ,
+			email: 'joey.doe@gmail.com'
+		} )
 	} ) ;
 
-	it( "DELETE through a multi-link should remove the targeted link" , ( done ) => {
+	it( "DELETE through a multi-link should remove the targeted link" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
 
-		var app , performer , groupId , userId1 , userId2 , userId3 , userId4 ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId1 = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId1 = response.output.data.id ;
+		
+		
+		response = await app.post( '/Users' , {
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Jack" ,
-					lastName: "Wallace" ,
-					email: "jack.wallace@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId2 = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		userId2 = response.output.data.id ;
+		
+		response = await app.post( '/Groups' , {
+				name: "The Group" ,
+				users: [ userId1 , userId2 ] ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Groups' , {
-					name: "The Group" ,
-					users: [ userId1 , userId2 ] ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					groupId = response.id ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		groupId = response.output.data.id ;
+		
+		response = await app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } ) ;
+		batch = response.output.data ;
+		expect( batch ).to.have.length( 2 ) ;
+		expect( batch ).to.partially.equal( [
+			{
+				_id: userId1 ,
+				firstName: 'Joe' ,
+				lastName: 'Doe'
 			} ,
-			function( callback ) {
-				app.delete( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , ( error , document ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } , ( error , document ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } , ( error , batch ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( batch ) ;
-					expect( batch ).to.have.length( 1 ) ;
-					expect( batch[ 0 ]._id.toString()  ).to.be( userId2.toString() ) ;
-					expect( batch[ 0 ].firstName  ).to.be( 'Jack' ) ;
-					expect( batch[ 0 ].lastName  ).to.be( 'Wallace' ) ;
-					callback() ;
-				} ) ;
+			{
+				_id: userId2 ,
+				firstName: 'Jack' ,
+				lastName: 'Wallace'
 			}
-		] )
-			.exec( done ) ;
+		] ) ;
+		
+		response = await app.delete( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } ) ;
+		
+		await expect( () => app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } ) )
+			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
+		
+		response = await app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } ) ;
+		batch = response.output.data ;
+		expect( batch ).to.have.length( 1 ) ;
+		expect( batch ).to.partially.equal( [ {
+			_id: userId2 ,
+			firstName: 'Jack' ,
+			lastName: 'Wallace'
+		} ] ) ;
 	} ) ;
 } ) ;
 
@@ -1779,79 +1757,59 @@ describe( "Users" , () => {
 
 	it( "PATCH on an unexisting user" ) ;
 
-	it( "PUT, then PATCH, then GET" , ( done ) => {
+	it( "PUT, then PATCH, then GET" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
+		var response = await app.put( '/Users/5437f846e41d0e910ec9a5d8' , {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		response = await app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			slugId: 'joe-doe' ,
+			email: 'joe.doe@gmail.com' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+		
+		expect( response.output.data.password ).to.be.an( 'object' ) ;
+		expect( response.output.data.password.algo ).to.be( 'sha512' ) ;
+		expect( response.output.data.password.salt ).to.be.a( 'string' ) ;
+		expect( response.output.data.password.hash ).to.be.a( 'string' ) ;
+		// check the password
+		expect( hash.password( "pw" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
+
+		response = await app.patch( '/Users/5437f846e41d0e910ec9a5d8' , {
+				firstName: "Joey" ,
+				lastName: "Doe" ,
+				email: "joey.doe@gmail.com" ,
+				password: "pw2"
 			} ,
-			function( callback ) {
-				app.put( '/Users/5437f846e41d0e910ec9a5d8' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.firstName ).to.be( 'Joe' ) ;
-					expect( object.lastName ).to.be( 'Doe' ) ;
-					expect( object.slugId ).to.be( 'joe-doe' ) ;
-					expect( object.email ).to.be( 'joe.doe@gmail.com' ) ;
-					//console.log( object.password ) ;
-					expect( object.password ).to.be.an( 'object' ) ;
-					expect( object.password.algo ).to.be( 'sha512' ) ;
-					expect( object.password.salt ).to.be.a( 'string' ) ;
-					expect( object.password.hash ).to.be.a( 'string' ) ;
-					// check the password
-					expect( hash.password( "pw" , object.password.salt , object.password.algo ) ).to.be( object.password.hash ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.patch( '/Users/5437f846e41d0e910ec9a5d8' , {
-					firstName: "Joey" ,
-					lastName: "Doe" ,
-					email: "joey.doe@gmail.com" ,
-					password: "pw2"
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.firstName ).to.be( 'Joey' ) ;
-					expect( object.lastName ).to.be( 'Doe' ) ;
-					expect( object.slugId ).to.be( 'joe-doe' ) ;
-					expect( object.email ).to.be( 'joey.doe@gmail.com' ) ;
-					//console.log( object.password ) ;
-					expect( object.password ).to.be.an( 'object' ) ;
-					expect( object.password.algo ).to.be( 'sha512' ) ;
-					expect( object.password.salt ).to.be.a( 'string' ) ;
-					expect( object.password.hash ).to.be.a( 'string' ) ;
-					// check the password
-					expect( hash.password( "pw2" , object.password.salt , object.password.algo ) ).to.be( object.password.hash ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'Joey' ,
+			lastName: 'Doe' ,
+			email: 'joey.doe@gmail.com' ,
+		} ) ;
+		
+		expect( response.output.data.password ).to.be.an( 'object' ) ;
+		expect( response.output.data.password.algo ).to.be( 'sha512' ) ;
+		expect( response.output.data.password.salt ).to.be.a( 'string' ) ;
+		expect( response.output.data.password.hash ).to.be.a( 'string' ) ;
+		// check the password
+		expect( hash.password( "pw2" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
 	} ) ;
 
 	it( "DELETE on an unexisting user" ) ;
@@ -1884,80 +1842,48 @@ describe( "Groups" , () => {
 
 
 
-describe( "Slug usage" , () => {
+describe( "Slug usages" , () => {
 
-	it( "when 'slugGenerationProperty' is set on the schema (to an existing property), it should generate a slug from that property's value" , ( done ) => {
+	it( "when 'slugGenerationProperty' is set on the schema (to an existing property), it should generate a slug from that property's value" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life!!!' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
-					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!!' ,
+			slugId: 'my-wonderful-life' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 	} ) ;
 
-	it( "when a document will generate the same slugId, it should fail with a 409 - Conflict" , ( done ) => {
+	it( "when a document will generate the same slugId, it should fail with a 409 - Conflict" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.post( '/Blogs' , {
-					title: 'My wonderful life!!!' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+				title: 'My wonderful life!!!' ,
+				description: 'This is another supa blog!' ,
+				publicAccess: 'all'
 			} ,
-			function( callback ) {
-				app.post( '/Blogs' , {
-					title: 'My wonderful life!!!' ,
-					description: 'This is a supa blog 2!' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'conflict' ) ;
-					expect( error.code ).to.be( 'duplicateKey' ) ;
-					expect( error.httpStatus ).to.be( 409 ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ) .to.reject( ErrorStatus , { type: 'conflict' , code: 'duplicateKey' , httpStatus: 409 } ) ;
 	} ) ;
 
 	it( "the request URL should support slugId instead of ID (GET, PUT, PATCH, DELETE)" , ( done ) => {
