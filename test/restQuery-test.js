@@ -120,15 +120,15 @@ async function commonApp() {
 		clearCollection( app.collectionNodes.posts.collection ) ,
 		clearCollection( app.collectionNodes.comments.collection )
 	] ) ;
-	
+
 	try {
 		await app.buildIndexes() ;
 	}
 	catch ( error ) {
-		debugger ;
+
 		throw error ;
 	}
-	
+
 	return { app , performer } ;
 }
 
@@ -165,13 +165,13 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		var { app , performer } = await commonApp() ;
 		var response = await app.get( '/' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( {
-			bob: 'dans le geth\'',
-			userAccess: {},
-			groupAccess: {},
-			publicAccess: { traverse: 1, read: 3, create: 1 }
+			bob: 'dans le geth\'' ,
+			userAccess: {} ,
+			groupAccess: {} ,
+			publicAccess: { traverse: 1 , read: 3 , create: 1 }
 		} ) ;
 	} ) ;
-	
+
 	it( "GET on an unexisting item" , async () => {
 		var { app , performer } = await commonApp() ;
 		await expect( () => app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
@@ -185,7 +185,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'This is a supa blog!' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog.save() ;
 		var response = await app.get( '/Blogs/' + blog.getId() , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( { title: 'My wonderful life' , description: 'This is a supa blog!' } ) ;
@@ -196,7 +196,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 		var randomId = new mongodb.ObjectID() ,
 			userAccess = {} ;
-		
+
 		userAccess[ randomId ] = 'read' ;	// Random unexistant ID
 
 		var blog = app.root.children.blogs.collection.createDocument( {
@@ -205,19 +205,19 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			publicAccess: 'all' ,
 			userAccess: userAccess
 		} ) ;
-		
+
 		await blog.save() ;
-		
+
 		var response = await app.get( '/Blogs/' + blog.getId() + '/.title' , { performer: performer } ) ;
 		expect( response.output.data ).to.be( 'My wonderful life' ) ;
-		
+
 		response = await app.get( '/Blogs/' + blog.getId() + '/.userAccess.' + randomId , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( { traverse: 1 , read: 3 } ) ;
 	} ) ;
 
 	it( "POST then GET" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response = await app.post(
 			'/Blogs' ,
 			{
@@ -228,22 +228,22 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		var id = response.output.data.id.toString() ;
 		expect( id ).to.be.a( 'string' ) ;
 		expect( id ).to.have.length.of( 24 ) ;
-		
+
 		response = await app.get( '/Blogs/' + id , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life posted!!!' ,
 			description: 'This is a supa blog! (posted!)' ,
 			parent: { id: '/' , collection: null }
-		} )
+		} ) ;
 	} ) ;
 
 	it( "PUT then GET" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 2!!!' ,
@@ -274,7 +274,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 3!!!' ,
@@ -284,9 +284,9 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
-		
+
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life 3!!!' ,
 			description: 'This is a supa blog! Now overwritten!' ,
@@ -298,13 +298,14 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		var { app , performer } = await commonApp() ;
 
 		await expect( () => app.patch( '/Blogs/111111111111111111111111' , { description: 'Oh yeah!' } , null , { performer: performer } ) )
-			.to.reject( ErrorStatus , { type: 'notFound', httpStatus: 404 } ) ;
+			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "PUT, then PATCH, then GET (featuring embedded data)" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
 				title: 'My wonderful life 3!!!' ,
 				description: 'This is a supa blog! (x3)' ,
 				embedded: { a: 'a' , b: 'b' } ,
@@ -313,8 +314,9 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
-		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
 				description: 'This is a supa blog! Now patched!' ,
 				"embedded.a": 'A' ,
 				parent: "should not overwrite" ,
@@ -323,7 +325,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life 3!!!' ,
@@ -335,8 +337,9 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 	it( "PUT, then PATCH on a property, then GET (featuring embedded data)" , async () => {
 		var { app , performer } = await commonApp() ;
-		
-		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
+
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
 				title: 'My wonderful life 3!!!' ,
 				description: 'This is a supa blog! (x3)' ,
 				embedded: { a: 'a' , b: 'b' } ,
@@ -345,11 +348,11 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/.embedded' , { a: 'omg' } , null , { performer: performer } ) ;
-		
+
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
-		
+
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life 3!!!' ,
 			description: 'This is a supa blog! (x3)' ,
@@ -361,46 +364,44 @@ describe( "Basic queries of object of a top-level collection" , () => {
 	it( "PUT, then PUT (overwrite) on a property, then GET" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-				title: 'My wonderful life 3!!!' ,
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{			title: 'My wonderful life 3!!!' ,
 				description: 'This is a supa blog! (x3)' ,
-				publicAccess: 'all'
-			} ,
+				publicAccess: 'all' } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/.title' , "Change dat title." , null , { performer: performer } ) ;
-		
+
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
 
 		expect( response.output.data ).to.partially.equal( {
 			title: 'Change dat title.' ,
 			description: 'This is a supa blog! (x3)' ,
-			parent: { id: '/' , collection: null } ,
+			parent: { id: '/' , collection: null }
 		} ) ;
 	} ) ;
 
 	it( "DELETE on an unexisting item" , async () => {
 		var { app , performer } = await commonApp() ;
-		await expect( () => app.delete( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound', httpStatus: 404 } ) ;
+		await expect( () => app.delete( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "PUT, then DELETE, then GET" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-				title: 'My wonderful life 2!!!' ,
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{			title: 'My wonderful life 2!!!' ,
 				description: 'This is a supa blog! (x2)' ,
-				publicAccess: 'all'
-			} ,
+				publicAccess: 'all' } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
-		
-		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound', httpStatus: 404 } ) ;
+
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "DELETE on a property of an object" ) ;
@@ -425,17 +426,17 @@ describe( "Basic queries of top-level collections" , () => {
 			description: 'This is a supa blog!' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog1.save() ;
-		
+
 		var blog2 = app.root.children.blogs.collection.createDocument( {
 			title: 'YAB' ,
 			description: 'Yet Another Blog' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog2.save() ;
-		
+
 		var response = await app.get( '/Blogs' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( [
 			{
@@ -469,120 +470,134 @@ describe( "Basic queries of top-level collections" , () => {
 
 	it( "GET on a collection with items, with special query: skip, limit, sort and filter" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var blog1 = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog1.save() ;
-		
+
 		var blog2 = app.root.children.blogs.collection.createDocument( {
 			title: 'YAB' ,
 			description: 'Yet Another Blog' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog2.save() ;
-		
+
 		var blog3 = app.root.children.blogs.collection.createDocument( {
 			title: 'Third' ,
 			description: 'The Third' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog3.save() ;
-		
+
 		var response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 } } } ) ;
 		expect( response.output.data ).to.equal( [
 			{
-				title: 'My wonderful life',
-				description: 'This is a supa blog!',
-				_id: blog1.getId(),
+				title: 'My wonderful life' ,
+				description: 'This is a supa blog!' ,
+				_id: blog1.getId() ,
 				//embedded: undefined,
-				parent: { id: '/', collection: null },
-				userAccess: {},
-				groupAccess: {},
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				parent: { id: '/' , collection: null } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
 			{
 				title: 'YAB' ,
 				description: 'Yet Another Blog' ,
-				_id: blog2.getId(),
+				_id: blog2.getId() ,
 				//embedded: undefined,
-				parent: { id: '/', collection: null },
-				userAccess: {},
-				groupAccess: {},
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				parent: { id: '/' , collection: null } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
 		] ) ;
-		
+
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { skip: 1 } } } ) ;
 		expect( response.output.data ).to.equal( [
 			{
 				title: 'YAB' ,
 				description: 'Yet Another Blog' ,
-				_id: blog2.getId(),
+				_id: blog2.getId() ,
 				//embedded: undefined,
-				parent: { id: '/', collection: null },
-				userAccess: {},
-				groupAccess: {},
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				parent: { id: '/' , collection: null } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
 			{
 				title: 'Third' ,
 				description: 'The Third' ,
-				_id: blog3.getId(),
+				_id: blog3.getId() ,
 				//embedded: undefined,
-				parent: { id: '/', collection: null },
-				userAccess: {},
-				groupAccess: {},
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				parent: { id: '/' , collection: null } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
 		] ) ;
-		
+
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 1 } } } } ) ;
 		expect( response.output.data ).to.equal( [
 			{
-				title: 'My wonderful life',
-				description: 'This is a supa blog!',
-				_id: blog1.getId(),
+				title: 'My wonderful life' ,
+				description: 'This is a supa blog!' ,
+				_id: blog1.getId() ,
 				//embedded: undefined,
-				parent: { id: '/', collection: null },
-				userAccess: {},
-				groupAccess: {},
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				parent: { id: '/' , collection: null } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
 			{
 				title: 'Third' ,
 				description: 'The Third' ,
-				_id: blog3.getId(),
+				_id: blog3.getId() ,
 				//embedded: undefined,
-				parent: { id: '/', collection: null },
-				userAccess: {},
-				groupAccess: {},
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				parent: { id: '/' , collection: null } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
 		] ) ;
-		
+
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { filter: { title: 'Third' } } } } ) ;
 		expect( response.output.data ).to.equal( [
 			{
 				title: 'Third' ,
 				description: 'The Third' ,
-				_id: blog3.getId(),
+				_id: blog3.getId() ,
 				//embedded: undefined,
-				parent: { id: '/', collection: null },
-				userAccess: {},
-				groupAccess: {},
-				publicAccess: { traverse: 1, read: 5, write: 5, delete: 1, create: 1 },
+				parent: { id: '/' , collection: null } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			}
 		] ) ;
@@ -601,15 +616,15 @@ describe( "Built-in collection method: SCHEMA" , () => {
 
 	it( "should get the schema of the object" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var blog = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog.save() ;
-		
+
 		var response = await app.get( '/Blogs/' + blog.getId() + '/SCHEMA' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( app.collectionNodes.blogs.schema ) ;
 	} ) ;
@@ -627,24 +642,24 @@ describe( "Queries of nested object" , () => {
 
 	it( "GET on a regular nested item" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var blog = await app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog.save() ;
-		
+
 		var post = await app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My first post!' ,
 			content: 'Blah blah blah.' ,
 			parent: { collection: 'blogs' , id: blog.getId() } ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await post.save() ;
-		
+
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + post.getId() , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My first post!' ,
@@ -660,17 +675,17 @@ describe( "Queries of nested object" , () => {
 			description: 'This is a supa blog!' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog.save() ;
-		
+
 		var anotherBlog = app.root.children.blogs.collection.createDocument( {
 			title: 'Another blog' ,
 			description: 'Oh yeah' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await anotherBlog.save() ;
-		
+
 		var post = app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My second post!' ,
 			content: 'Blah blah blah.' ,
@@ -679,13 +694,13 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await post.save() ;
-		
+
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + post.getId() , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My second post!' ,
 			content: 'Blah blah blah.'
 		} ) ;
-		
+
 		await expect( () => app.get( '/Blogs/' + anotherBlog.getId() + '/Posts/' + post.getId() , { performer: performer } ) )
 			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
@@ -700,7 +715,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await blog.save() ;
-		
+
 		var post = app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My first post!' ,
 			content: 'Blah blah blah.' ,
@@ -709,7 +724,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await post.save() ;
-		
+
 		var comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
 			title: 'nope!' ,
 			content: 'First!' ,
@@ -720,12 +735,12 @@ describe( "Queries of nested object" , () => {
 		await comment.save() ;
 
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + post.getId() + '/Comments/' + comment.getId() , { performer: performer } ) ;
-		expect( response.output.data ).to.partially.equal( { title: 'nope!' , content : 'First!' } ) ;
+		expect( response.output.data ).to.partially.equal( { title: 'nope!' , content: 'First!' } ) ;
 	} ) ;
 
 	it( "GET on a regular nested² item with bad ancestry chain" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var blog = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
@@ -733,7 +748,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await blog.save() ;
-		
+
 		var anotherBlog = app.root.children.blogs.collection.createDocument( {
 			title: 'Another blog' ,
 			description: 'Oh yeah' ,
@@ -741,7 +756,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await anotherBlog.save() ;
-		
+
 		var post = app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My first post!' ,
 			content: 'Blah blah blah.' ,
@@ -750,7 +765,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await post.save() ;
-		
+
 		var anotherPost = app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My second post!' ,
 			content: 'Blih blih blih.' ,
@@ -759,32 +774,32 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await anotherPost.save() ;
-		
+
 		var comment = app.root.children.blogs.children.posts.children.comments.collection.createDocument( {
 			title: 'nope!' ,
 			content: 'First!' ,
 			parent: { collection: 'posts' , id: post.getId() } ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await comment.save() ;
-		
+
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + post.getId() + '/Comments/' + comment.getId() , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( { title: 'nope!' , content: 'First!' } ) ;
-		
+
 		await expect( () => app.get( '/Blogs/' + anotherBlog.getId() + '/Posts/' + post.getId() + '/Comments/' + comment.getId() , { performer: performer } ) )
 			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
-		
+
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + anotherPost.getId() , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( { title: 'My second post!' , content: 'Blih blih blih.' } ) ;
-		
+
 		await expect( () => app.get( '/Blogs/' + blog.getId() + '/Posts/' + anotherPost.getId() + '/Comments/' + comment.getId() , { performer: performer } ) )
 			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "GET a nested collection" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var blog = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
@@ -792,7 +807,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await blog.save() ;
-		
+
 		var anotherBlog = app.root.children.blogs.collection.createDocument( {
 			title: 'Another blog' ,
 			description: 'Oh yeah' ,
@@ -800,7 +815,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await anotherBlog.save() ;
-		
+
 		var post1 = app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My first post!' ,
 			content: 'Blah blah blah.' ,
@@ -809,7 +824,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await post1.save() ;
-		
+
 		var post2 = app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My second post!' ,
 			content: 'Hi ho!' ,
@@ -818,7 +833,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await post2.save() ;
-		
+
 		var postAlt = app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My alternate post!' ,
 			content: 'It does not belong to the same blog!' ,
@@ -827,7 +842,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await postAlt.save() ;
-		
+
 		var post3 = app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My third post!' ,
 			content: 'Yay!' ,
@@ -836,11 +851,11 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await post3.save() ;
-		
+
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer } ) ;
-		
+
 		expect( response.output.data ).to.have.length( 3 ) ;
-		
+
 		expect( response.output.data ).to.partially.equal( [
 			{
 				title: 'My first post!' ,
@@ -867,7 +882,7 @@ describe( "Queries of nested object" , () => {
 
 	it( "POST on nested object should set the parent property correctly" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var blog = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
@@ -875,7 +890,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await blog.save() ;
-		
+
 		var response = await app.post( '/Blogs/' + blog.getId() + '/Posts' ,
 			{
 				title: 'My first post!!!' ,
@@ -886,9 +901,9 @@ describe( "Queries of nested object" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		var postId = response.output.data.id ;
-		
+
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My first post!!!' ,
@@ -900,15 +915,15 @@ describe( "Queries of nested object" , () => {
 
 	it( "PUT on nested object should set the parent property correctly, same for PUT in overwrite mode" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var blog = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
 			publicAccess: 'all'
 		} ) ;
-		
+
 		await blog.save() ;
-		
+
 		var postId = '5437f8f6c41d00910ec9a5d8' ;
 		var response = await app.put( '/Blogs/' + blog.getId() + '/Posts/' + postId ,
 			{
@@ -919,7 +934,7 @@ describe( "Queries of nested object" , () => {
 			} ,
 			null , { performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My first post!!!' ,
@@ -927,7 +942,7 @@ describe( "Queries of nested object" , () => {
 			parent: { collection: 'blogs' }
 		} ) ;
 		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
-		
+
 		response = await app.put( '/Blogs/' + blog.getId() + '/Posts/' + postId ,
 			{
 				title: 'My first post???' ,
@@ -937,7 +952,7 @@ describe( "Queries of nested object" , () => {
 			} ,
 			null , { performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My first post???' ,
@@ -957,7 +972,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await blog.save() ;
-		
+
 		var anotherBlog = app.root.children.blogs.collection.createDocument( {
 			title: 'Another blog' ,
 			description: 'Oh yeah' ,
@@ -965,7 +980,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await anotherBlog.save() ;
-		
+
 		var post = app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'My second post!' ,
 			content: 'Blah blah blah.' ,
@@ -974,7 +989,7 @@ describe( "Queries of nested object" , () => {
 		} ) ;
 
 		await post.save() ;
-		
+
 		// Ancestry mismatch
 		await expect( () => app.put( '/Blogs/' + anotherBlog.getId() + '/Posts/' + post.getId() ,
 			{
@@ -1002,10 +1017,11 @@ describe( "Links" , () => {
 
 	it( "GET on a link" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response , godfatherId , userId ;
-		
-		response = await app.post( '/Users' , {
+
+		response = await app.post( '/Users' ,
+			{
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
@@ -1016,8 +1032,9 @@ describe( "Links" , () => {
 			{ performer: performer }
 		) ;
 		godfatherId = response.output.data.id ;
-		
-		response = await app.post( '/Users' , {
+
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1039,7 +1056,7 @@ describe( "Links" , () => {
 			parent: { id: '/' , collection: null } ,
 			godfather: { _id: godfatherId }
 		} ) ;
-		
+
 		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			firstName: 'THE' ,
@@ -1057,7 +1074,8 @@ describe( "Links" , () => {
 
 		var response , userId , godfatherId ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1069,7 +1087,8 @@ describe( "Links" , () => {
 		) ;
 		userId = response.output.data.id ;
 
-		response = await app.put( '/Users/' + userId + '/~godfather' , {
+		response = await app.put( '/Users/' + userId + '/~godfather' ,
+			{
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
@@ -1080,7 +1099,7 @@ describe( "Links" , () => {
 			{ performer: performer }
 		) ;
 		godfatherId = response.output.data.id ;
-		
+
 		// Get it using a link
 		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
@@ -1107,7 +1126,8 @@ describe( "Links" , () => {
 
 		var response , userId , godfatherId , godfatherId2 ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1119,7 +1139,8 @@ describe( "Links" , () => {
 		) ;
 		userId = response.output.data.id ;
 
-		response = await app.put( '/Users/' + userId + '/~godfather' , {
+		response = await app.put( '/Users/' + userId + '/~godfather' ,
+			{
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
@@ -1140,9 +1161,10 @@ describe( "Links" , () => {
 			email: 'godfather@gmail.com' ,
 			parent: { id: '/' , collection: null }
 		} ) ;
-		
+
 		// Overwrite with another godfather
-		response = await app.put( '/Users/' + userId + '/~godfather' , {
+		response = await app.put( '/Users/' + userId + '/~godfather' ,
+			{
 				firstName: "DAT" ,
 				lastName: "GODFATHER!?" ,
 				email: "godfather@gmail.com" ,
@@ -1174,7 +1196,8 @@ describe( "Links" , () => {
 
 		var response , userId , godfatherId ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1186,7 +1209,8 @@ describe( "Links" , () => {
 		) ;
 		userId = response.output.data.id ;
 
-		response = await app.put( '/Users/' + userId + '/~godfather' , {
+		response = await app.put( '/Users/' + userId + '/~godfather' ,
+			{
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
@@ -1199,7 +1223,7 @@ describe( "Links" , () => {
 		godfatherId = response.output.data.id ;
 
 		response = await app.patch( '/Users/' + userId + '/~godfather' , { firstName: 'Da' } , null , { performer: performer } ) ;
-		
+
 		// Check that the godfather has been modified
 		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
@@ -1215,10 +1239,11 @@ describe( "Links" , () => {
 
 	it( "DELETE on a link" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response , userId , godfatherId ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1230,7 +1255,8 @@ describe( "Links" , () => {
 		) ;
 		userId = response.output.data.id ;
 
-		response = await app.put( '/Users/' + userId + '/~godfather' , {
+		response = await app.put( '/Users/' + userId + '/~godfather' ,
+			{
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
@@ -1254,7 +1280,7 @@ describe( "Links" , () => {
 			parent: { id: '/' , collection: null } ,
 			godfather: { _id: godfatherId }
 		} ) ;
-		
+
 		// Delete the godfather now
 		response = await app.delete( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
 
@@ -1281,7 +1307,8 @@ describe( "Links" , () => {
 
 		var response , userId , godfatherId ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1294,7 +1321,8 @@ describe( "Links" , () => {
 		userId = response.output.data.id ;
 
 		// POST when the link don't exist should be a 'not found'
-		await expect( () => app.post( '/Users/' + userId + '/~godfather' , {
+		await expect( () => app.post( '/Users/' + userId + '/~godfather' ,
+			{
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
@@ -1305,7 +1333,8 @@ describe( "Links" , () => {
 			{ performer: performer }
 		) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 
-		response = await app.put( '/Users/' + userId + '/~godfather' , {
+		response = await app.put( '/Users/' + userId + '/~godfather' ,
+			{
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
@@ -1318,7 +1347,8 @@ describe( "Links" , () => {
 		godfatherId = response.output.data.id ;
 
 		// POST when the link exist should be a 'bad request'
-		await expect( () => app.post( '/Users/' + userId + '/~godfather' , {
+		await expect( () => app.post( '/Users/' + userId + '/~godfather' ,
+			{
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
@@ -1334,10 +1364,11 @@ describe( "Links" , () => {
 
 	it( "GET + populate links" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response , fatherId , userId , godfatherId ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1349,7 +1380,8 @@ describe( "Links" , () => {
 		) ;
 		userId = response.output.data.id ;
 
-		response = await app.put( '/Users/' + userId + '/~father' , {
+		response = await app.put( '/Users/' + userId + '/~father' ,
+			{
 				firstName: "Big Joe" ,
 				lastName: "Doe" ,
 				email: "big-joe@gmail.com" ,
@@ -1361,7 +1393,8 @@ describe( "Links" , () => {
 		) ;
 		fatherId = response.output.data.id ;
 
-		response = await app.put( '/Users/' + userId + '/~godfather' , {
+		response = await app.put( '/Users/' + userId + '/~godfather' ,
+			{
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
@@ -1402,10 +1435,11 @@ describe( "Multi-links" , () => {
 
 	it( "GET on and through a multi-link" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1416,8 +1450,9 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId1 = response.output.data.id ;
-		
-		response = await app.post( '/Users' , {
+
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Jack" ,
 				lastName: "Wallace" ,
 				email: "jack.wallace@gmail.com" ,
@@ -1428,8 +1463,9 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId2 = response.output.data.id ;
-		
-		response = await app.post( '/Users' , {
+
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fischer" ,
 				email: "bobby.fischer@gmail.com" ,
@@ -1440,8 +1476,9 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId3 = response.output.data.id ;
-		
-		response = await app.post( '/Users' , {
+
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Not In" ,
 				lastName: "Dagroup" ,
 				email: "notindagroup@gmail.com" ,
@@ -1452,22 +1489,21 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId4 = response.output.data.id ;
-		
-		response = await app.post( '/Groups' , {
-				name: "The Group" ,
+
+		response = await app.post( '/Groups' ,
+			{			name: "The Group" ,
 				users: [ userId1 , userId2 , userId3 ] ,
-				publicAccess: "all"
-			} ,
+				publicAccess: "all" } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		groupId = response.output.data.id ;
-		
+
 		response = await app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } ) ;
 		batch = response.output.data ;
 		expect( batch ).to.have.length( 3 ) ;
-		
+
 		var has = {} ;
 		has[ batch[ 0 ].firstName ] = true ;
 		has[ batch[ 1 ].firstName ] = true ;
@@ -1481,7 +1517,7 @@ describe( "Multi-links" , () => {
 			lastName: 'Doe' ,
 			email: 'joe.doe@gmail.com'
 		} ) ;
-		
+
 		response = await app.get( '/Groups/' + groupId + '/~~users/' + userId2 , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			_id: userId2 ,
@@ -1489,7 +1525,7 @@ describe( "Multi-links" , () => {
 			lastName: 'Wallace' ,
 			email: 'jack.wallace@gmail.com'
 		} ) ;
-		
+
 		response = await app.get( '/Groups/' + groupId + '/~~users/' + userId3 , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			_id: userId3 ,
@@ -1497,17 +1533,18 @@ describe( "Multi-links" , () => {
 			lastName: 'Fischer' ,
 			email: 'bobby.fischer@gmail.com'
 		} ) ;
-		
+
 		await expect( () => app.get( '/Groups/' + groupId + '/~~users/' + userId4 , { performer: performer } ) )
 			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "POST on a multi-link should create a new resource and add it to the current link's array" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1518,8 +1555,9 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId1 = response.output.data.id ;
-		
-		response = await app.post( '/Users' , {
+
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Not In" ,
 				lastName: "Dagroup" ,
 				email: "notindagroup@gmail.com" ,
@@ -1530,18 +1568,18 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId4 = response.output.data.id ;
-		
-		response = await app.post( '/Groups' , {
-				name: "The Group" ,
+
+		response = await app.post( '/Groups' ,
+			{			name: "The Group" ,
 				users: [ userId1 ] ,
-				publicAccess: "all"
-			} ,
+				publicAccess: "all" } ,
 			null ,
 			{ performer: performer }
 		) ;
 		groupId = response.output.data.id ;
-		
-		response = await app.post( '/Groups/' + groupId + '/~~users' , {
+
+		response = await app.post( '/Groups/' + groupId + '/~~users' ,
+			{
 				firstName: "Jack" ,
 				lastName: "Wallace" ,
 				email: "jack.wallace@gmail.com" ,
@@ -1552,8 +1590,9 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId2 = response.output.data.id ;
-		
-		response = await app.post( '/Groups/' + groupId + '/~~users' , {
+
+		response = await app.post( '/Groups/' + groupId + '/~~users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fischer" ,
 				email: "bobby.fischer@gmail.com" ,
@@ -1580,10 +1619,11 @@ describe( "Multi-links" , () => {
 
 	it( "PATCH through a multi-link" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1594,9 +1634,10 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId1 = response.output.data.id ;
-		
-		
-		response = await app.post( '/Users' , {
+
+
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Jack" ,
 				lastName: "Wallace" ,
 				email: "jack.wallace@gmail.com" ,
@@ -1607,46 +1648,45 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId2 = response.output.data.id ;
-		
-		response = await app.post( '/Groups' , {
-				name: "The Group" ,
+
+		response = await app.post( '/Groups' ,
+			{			name: "The Group" ,
 				users: [ userId1 , userId2 ] ,
-				publicAccess: "all"
-			} ,
+				publicAccess: "all" } ,
 			null ,
 			{ performer: performer }
 		) ;
 		groupId = response.output.data.id ;
-		
-		response = await app.patch( '/Groups/' + groupId + '/~~users/' + userId1 , {
-				firstName: "Joey" ,
-				email: "joey.doe@gmail.com"
-			} ,
+
+		response = await app.patch( '/Groups/' + groupId + '/~~users/' + userId1 ,
+			{			firstName: "Joey" ,
+				email: "joey.doe@gmail.com" } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			_id: userId1 ,
 			firstName: 'Joey' ,
 			email: 'joey.doe@gmail.com'
-		} )
+		} ) ;
 
 		response = await app.get( '/Users/' + userId1 , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			_id: userId1 ,
 			firstName: 'Joey' ,
 			email: 'joey.doe@gmail.com'
-		} )
+		} ) ;
 	} ) ;
 
 	it( "DELETE through a multi-link should remove the targeted link" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1657,9 +1697,10 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId1 = response.output.data.id ;
-		
-		
-		response = await app.post( '/Users' , {
+
+
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Jack" ,
 				lastName: "Wallace" ,
 				email: "jack.wallace@gmail.com" ,
@@ -1670,17 +1711,16 @@ describe( "Multi-links" , () => {
 			{ performer: performer }
 		) ;
 		userId2 = response.output.data.id ;
-		
-		response = await app.post( '/Groups' , {
-				name: "The Group" ,
+
+		response = await app.post( '/Groups' ,
+			{			name: "The Group" ,
 				users: [ userId1 , userId2 ] ,
-				publicAccess: "all"
-			} ,
+				publicAccess: "all" } ,
 			null ,
 			{ performer: performer }
 		) ;
 		groupId = response.output.data.id ;
-		
+
 		response = await app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } ) ;
 		batch = response.output.data ;
 		expect( batch ).to.have.length( 2 ) ;
@@ -1696,12 +1736,12 @@ describe( "Multi-links" , () => {
 				lastName: 'Wallace'
 			}
 		] ) ;
-		
+
 		response = await app.delete( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } ) ;
-		
+
 		await expect( () => app.get( '/Groups/' + groupId + '/~~users/' + userId1 , { performer: performer } ) )
 			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
-		
+
 		response = await app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } ) ;
 		batch = response.output.data ;
 		expect( batch ).to.have.length( 1 ) ;
@@ -1725,8 +1765,9 @@ describe( "Users" , () => {
 
 	it( "PUT then GET" , async () => {
 		var { app , performer } = await commonApp() ;
-		
-		var response = await app.put( '/Users/5437f846e41d0e910ec9a5d8' , {
+
+		var response = await app.put( '/Users/5437f846e41d0e910ec9a5d8' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1735,9 +1776,9 @@ describe( "Users" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } ) ;
-		expect( response.output.data ).to.partially.equal( { 
+		expect( response.output.data ).to.partially.equal( {
 			firstName: 'Joe' ,
 			lastName: 'Doe' ,
 			slugId: 'joe-doe' ,
@@ -1760,7 +1801,8 @@ describe( "Users" , () => {
 	it( "PUT, then PATCH, then GET" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.put( '/Users/5437f846e41d0e910ec9a5d8' , {
+		var response = await app.put( '/Users/5437f846e41d0e910ec9a5d8' ,
+			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -1779,7 +1821,7 @@ describe( "Users" , () => {
 			email: 'joe.doe@gmail.com' ,
 			parent: { id: '/' , collection: null }
 		} ) ;
-		
+
 		expect( response.output.data.password ).to.be.an( 'object' ) ;
 		expect( response.output.data.password.algo ).to.be( 'sha512' ) ;
 		expect( response.output.data.password.salt ).to.be.a( 'string' ) ;
@@ -1787,7 +1829,8 @@ describe( "Users" , () => {
 		// check the password
 		expect( hash.password( "pw" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
 
-		response = await app.patch( '/Users/5437f846e41d0e910ec9a5d8' , {
+		response = await app.patch( '/Users/5437f846e41d0e910ec9a5d8' ,
+			{
 				firstName: "Joey" ,
 				lastName: "Doe" ,
 				email: "joey.doe@gmail.com" ,
@@ -1796,14 +1839,14 @@ describe( "Users" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			firstName: 'Joey' ,
 			lastName: 'Doe' ,
-			email: 'joey.doe@gmail.com' ,
+			email: 'joey.doe@gmail.com'
 		} ) ;
-		
+
 		expect( response.output.data.password ).to.be.an( 'object' ) ;
 		expect( response.output.data.password.algo ).to.be( 'sha512' ) ;
 		expect( response.output.data.password.salt ).to.be.a( 'string' ) ;
@@ -1847,15 +1890,14 @@ describe( "Slug usages" , () => {
 	it( "when 'slugGenerationProperty' is set on the schema (to an existing property), it should generate a slug from that property's value" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-				title: 'My wonderful life!!!' ,
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{			title: 'My wonderful life!!!' ,
 				description: 'This is a supa blog!' ,
-				publicAccess: 'all'
-			} ,
+				publicAccess: 'all' } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
@@ -1867,130 +1909,102 @@ describe( "Slug usages" , () => {
 	it( "when a document will generate the same slugId, it should fail with a 409 - Conflict" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-				title: 'My wonderful life!!!' ,
+		var response = await app.post( '/Blogs' ,
+			{			title: 'My wonderful life!!!' ,
 				description: 'This is a supa blog!' ,
-				publicAccess: 'all'
-			} ,
+				publicAccess: 'all' } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
-		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-				title: 'My wonderful life!!!' ,
+
+		await expect( () => app.post( '/Blogs' ,
+			{			title: 'My wonderful life!!!' ,
 				description: 'This is another supa blog!' ,
-				publicAccess: 'all'
-			} ,
+				publicAccess: 'all' } ,
 			null ,
 			{ performer: performer }
-		) ) .to.reject( ErrorStatus , { type: 'conflict' , code: 'duplicateKey' , httpStatus: 409 } ) ;
+		) ).to.reject( ErrorStatus , { type: 'conflict' , code: 'duplicateKey' , httpStatus: 409 } ) ;
 	} ) ;
 
-	it( "the request URL should support slugId instead of ID (GET, PUT, PATCH, DELETE)" , ( done ) => {
+	it( "the request URL should support slugId instead of ID (GET, PUT, PATCH, DELETE)" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
+		var response = await app.post( '/Blogs' ,
+			{			title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all' } ,
+			null ,
+			{ performer: performer }
+		) ;
+		var blogId = response.output.data.id ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Blogs' , {
-					title: 'My wonderful life!!!' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/my-wonderful-life' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
-					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					id = object.$.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Blogs/my-wonderful-life' , {
-					title: 'New title!' ,
-					description: 'New description!' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + id , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'New title!' ) ;
-					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// It should not change its slug
-				app.get( '/Blogs/my-wonderful-life' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'New title!' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.patch( '/Blogs/my-wonderful-life' , {
-					title: 'A brand new title!'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + id , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'A brand new title!' ) ;
-					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// It should not change its slug
-				app.get( '/Blogs/my-wonderful-life' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'A brand new title!' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.delete( '/Blogs/my-wonderful-life' , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + id , { performer: performer } , ( error , object ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// It should not change its slug
-				app.get( '/Blogs/my-wonderful-life' , { performer: performer } , ( error , object ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'notFound' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		response = await app.get( '/Blogs/my-wonderful-life' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: blogId ,
+			title: 'My wonderful life!!!' ,
+			description: 'This is a supa blog!' ,
+			slugId: 'my-wonderful-life' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+
+		// Replace it
+		response = await app.put( '/Blogs/my-wonderful-life' ,
+			{			title: 'New title!' ,
+				description: 'New description!' ,
+				publicAccess: 'all' } ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		// So using the same slug, it should get the replacing document
+		response = await app.get( '/Blogs/my-wonderful-life' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: blogId ,
+			title: 'New title!' ,
+			description: 'New description!' ,
+			slugId: 'my-wonderful-life' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+
+		// So using the original ID, it should get the replacing document
+		response = await app.get( '/Blogs/' + blogId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: blogId ,
+			title: 'New title!' ,
+			description: 'New description!' ,
+			slugId: 'my-wonderful-life' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+
+		// Patch it
+		response = await app.patch( '/Blogs/my-wonderful-life' , { title: 'A brand new title!' } , null , { performer: performer } ) ;
+
+		// Get it using the slug
+		response = await app.get( '/Blogs/my-wonderful-life' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: blogId ,
+			title: 'A brand new title!' ,
+			description: 'New description!' ,
+			slugId: 'my-wonderful-life' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+
+		// Get it using the original ID
+		response = await app.get( '/Blogs/' + blogId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_id: blogId ,
+			title: 'A brand new title!' ,
+			description: 'New description!' ,
+			slugId: 'my-wonderful-life' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+
+		// Delete it
+		response = await app.delete( '/Blogs/my-wonderful-life' , { performer: performer } ) ;
+
+		// Both URL should fail
+		await expect( () => app.get( '/Blogs/' + blogId , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
+		await expect( () => app.get( '/Blogs/my-wonderful-life' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 } ) ;
@@ -1999,163 +2013,115 @@ describe( "Slug usages" , () => {
 
 describe( "Auto collection" , () => {
 
-	it( "Root auto collection" , ( done ) => {
+	it( "Root auto collection" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{			title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all' } ,
+			null ,
+			{ performer: performer }
+		) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life!!!' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
-					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/5437f846c41d0e910ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
-					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/my-wonderful-life' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life!!!' ) ;
-					expect( object.slugId ).to.be( 'my-wonderful-life' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!!' ,
+			slugId: 'my-wonderful-life' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+
+		response = await app.get( '/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!!' ,
+			slugId: 'my-wonderful-life' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
+
+		response = await app.get( '/my-wonderful-life' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!!' ,
+			slugId: 'my-wonderful-life' ,
+			parent: { id: '/' , collection: null }
+		} ) ;
 	} ) ;
 
-	it( "Collection's auto collection" , ( done ) => {
+	it( "Collection's auto collection" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{			title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all' } ,
+			null ,
+			{ performer: performer }
+		) ;
+		var blogId = response.output.data.id ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life!!!' ,
-					description: 'This is a supa blog!' ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , {
-					title: 'You know what?' ,
-					content: "I'm happy!" ,
-					publicAccess: 'all'
-				} , null , { performer: performer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'You know what?' ) ;
-					expect( object.slugId ).to.be( 'you-know-what' ) ;
-					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'You know what?' ) ;
-					expect( object.slugId ).to.be( 'you-know-what' ) ;
-					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'You know what?' ) ;
-					expect( object.slugId ).to.be( 'you-know-what' ) ;
-					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'You know what?' ) ;
-					expect( object.slugId ).to.be( 'you-know-what' ) ;
-					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/my-wonderful-life/you-know-what' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'You know what?' ) ;
-					expect( object.slugId ).to.be( 'you-know-what' ) ;
-					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/my-wonderful-life/Posts/you-know-what' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'You know what?' ) ;
-					expect( object.slugId ).to.be( 'you-know-what' ) ;
-					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/my-wonderful-life/you-know-what' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'You know what?' ) ;
-					expect( object.slugId ).to.be( 'you-know-what' ) ;
-					expect( object.parent.id.toString() ).to.be( '5437f846c41d0e910ec9a5d8' ) ;
-					expect( object.parent.collection ).to.be( 'blogs' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' ,
+			{			title: 'You know what?' ,
+				content: "I'm happy!" ,
+				publicAccess: 'all' } ,
+			null ,
+			{ performer: performer }
+		) ;
+		var postId = response.output.data.id ;
+
+		// With every collection names in the URL
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'You know what?' ,
+			slugId: 'you-know-what' ,
+			parent: { id: blogId , collection: 'blogs' }
+		} ) ;
+
+		// Without 'Posts' in the URL
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'You know what?' ,
+			slugId: 'you-know-what' ,
+			parent: { id: blogId , collection: 'blogs' }
+		} ) ;
+
+		// Without 'Blogs' in the URL
+		response = await app.get( '/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e9f0ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'You know what?' ,
+			slugId: 'you-know-what' ,
+			parent: { id: blogId , collection: 'blogs' }
+		} ) ;
+
+		// Without 'Blogs' and 'Posts' in the URL
+		response = await app.get( '/5437f846c41d0e910ec9a5d8/5437f846c41d0e9f0ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'You know what?' ,
+			slugId: 'you-know-what' ,
+			parent: { id: blogId , collection: 'blogs' }
+		} ) ;
+
+		// Without 'Posts' and using slugs
+		response = await app.get( '/Blogs/my-wonderful-life/you-know-what' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'You know what?' ,
+			slugId: 'you-know-what' ,
+			parent: { id: blogId , collection: 'blogs' }
+		} ) ;
+
+		// Without 'Blogs' and using slugs
+		response = await app.get( '/my-wonderful-life/Posts/you-know-what' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'You know what?' ,
+			slugId: 'you-know-what' ,
+			parent: { id: blogId , collection: 'blogs' }
+		} ) ;
+
+		// Without 'Blogs' and 'Posts' and using slugs
+		response = await app.get( '/my-wonderful-life/you-know-what' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'You know what?' ,
+			slugId: 'you-know-what' ,
+			parent: { id: blogId , collection: 'blogs' }
+		} ) ;
 	} ) ;
 } ) ;
 
@@ -2166,7 +2132,8 @@ describe( "Token creation" , () => {
 	it( "login, a.k.a. token creation using POST /Users/CREATE-TOKEN" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.post( '/Users' , {
+		var response = await app.post( '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fisher" ,
 				email: "bobby.fisher@gmail.com" ,
@@ -2176,11 +2143,12 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		var id = response.output.data.id ;
 		expect( id ).to.be.an( 'objectId' ) ;
-		
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2189,7 +2157,7 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			token: response.output.data.token ,	// unpredictable
@@ -2200,7 +2168,7 @@ describe( "Token creation" , () => {
 			duration: 900000
 		} ) ;
 		expect( response.output.data.token.length ).to.be( 44 ) ;
-		
+
 		var tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
 
 		expect( tokenData ).to.equal( {
@@ -2222,7 +2190,8 @@ describe( "Token creation" , () => {
 	it( "token creation using a bad login should fail" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.post( '/Users' , {
+		var response = await app.post( '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fisher" ,
 				email: "bobby.fisher@gmail.com" ,
@@ -2231,8 +2200,9 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
-		await expect( () => app.post( '/Users/CREATE-TOKEN' , {
+
+		await expect( () => app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "wrong@gmail.com" ,
 				password: "pw" ,
@@ -2246,7 +2216,8 @@ describe( "Token creation" , () => {
 	it( "token creation using a bad password should fail" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.post( '/Users' , {
+		var response = await app.post( '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fisher" ,
 				email: "bobby.fisher@gmail.com" ,
@@ -2255,8 +2226,9 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
-		await expect( () => app.post( '/Users/CREATE-TOKEN' , {
+
+		await expect( () => app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "bad pw" ,
@@ -2270,18 +2242,18 @@ describe( "Token creation" , () => {
 	it( "using domain-restricted users: POST /Blogs/id/Users/CREATE-TOKEN" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.post( '/Blogs' , {
-				title: 'My wonderful life' ,
+		var response = await app.post( '/Blogs' ,
+			{			title: 'My wonderful life' ,
 				description: 'This is a supa blog!' ,
-				publicAccess: 'all'
-			} ,
+				publicAccess: 'all' } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		var blogId = response.output.data.id ;
-		
-		response = await app.post( '/Blogs/' + blogId + '/Users' , {
+
+		response = await app.post( '/Blogs/' + blogId + '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fisher" ,
 				email: "bobby.fisher@gmail.com" ,
@@ -2290,10 +2262,11 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		var id = response.output.data.id ;
-		
-		response = await app.post( '/Blogs/' + blogId + '/Users/CREATE-TOKEN' , {
+
+		response = await app.post( '/Blogs/' + blogId + '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2302,12 +2275,13 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response.output.data.userId.toString() ).to.be( id.toString() ) ;
 		expect( response.output.data.token.length ).to.be( 44 ) ;
 
 		// Should not works globally!
-		await expect( () => app.post( '/Users/CREATE-TOKEN' , {
+		await expect( () => app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2320,11 +2294,12 @@ describe( "Token creation" , () => {
 
 	it( "POST /Users/CREATE-TOKEN action should cleanup outdated tokens" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response , id , duration , token , tokenData , newTokenData ;
 
 		// Create the user
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fisher" ,
 				email: "bobby.fisher@gmail.com" ,
@@ -2334,14 +2309,15 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		id = response.output.data.id ;
 		expect( id ).to.be.an( 'objectId' ) ;
-		
+
 		duration = 300 ;
 
 		// Create the token to test garbage collection on
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2351,7 +2327,7 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			token: response.output.data.token ,	// unpredictable
@@ -2383,7 +2359,8 @@ describe( "Token creation" , () => {
 		duration = 100000 ;
 
 		// Create a new token: the first should still be there after that
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2393,7 +2370,7 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			token: response.output.data.token ,	// unpredictable
@@ -2426,7 +2403,8 @@ describe( "Token creation" , () => {
 		duration = 100000 ;
 
 		// Create again a new token: the first should be garbage collected now
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2436,7 +2414,7 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			token: response.output.data.token ,	// unpredictable
@@ -2460,7 +2438,8 @@ describe( "Token creation" , () => {
 		var response , oldTokenPerformer , id , oldToken , newToken , oldTokenOldExpirationTime , oldTokenNewExpirationTime ;
 
 		// Create the user
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fisher" ,
 				email: "bobby.fisher@gmail.com" ,
@@ -2470,12 +2449,13 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		id = response.output.data.id ;
 		expect( id ).to.be.an( 'objectId' ) ;
 
 		// Create the token
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2495,7 +2475,7 @@ describe( "Token creation" , () => {
 			duration: 900000
 		} ) ;
 		expect( response.output.data.token.length ).to.be( 44 ) ;
-		
+
 		var tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
 
 		expect( tokenData ).to.equal( {
@@ -2520,10 +2500,10 @@ describe( "Token creation" , () => {
 		// Should found the token in the user document
 		response = await app.get( '/Users/' + id , { performer: performer } ) ;
 		expect( response.output.data.token[ oldToken ] ).to.be.ok() ;
-		
+
 		// Regenerate token
 		response = await app.post( '/Users/REGENERATE-TOKEN' , {} , null , { performer: oldTokenPerformer } ) ;
-		
+
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			token: response.output.data.token ,	// unpredictable
@@ -2536,7 +2516,7 @@ describe( "Token creation" , () => {
 		expect( response.output.data.token.length ).to.be( 44 ) ;
 
 		oldTokenNewExpirationTime = response.output.data.creationTime + 10000 ;
-		var tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
+		tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
 
 		expect( tokenData ).to.equal( {
 			type: "header" ,
@@ -2563,7 +2543,8 @@ describe( "Token creation" , () => {
 		var response , tokenPerformer , tokenPerformerArg , id , token ;
 
 		// Create the user
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fisher" ,
 				email: "bobby.fisher@gmail.com" ,
@@ -2573,12 +2554,13 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		id = response.output.data.id ;
 		expect( id ).to.be.an( 'objectId' ) ;
 
 		// Create the token
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2598,7 +2580,7 @@ describe( "Token creation" , () => {
 			duration: 900000
 		} ) ;
 		expect( response.output.data.token.length ).to.be( 44 ) ;
-		
+
 		var tokenData = app.collectionNodes.users.extractFromToken( response.output.data.token ) ;
 
 		expect( tokenData ).to.equal( {
@@ -2609,7 +2591,7 @@ describe( "Token creation" , () => {
 			//increment: tokenData.increment ,	// unpredictable
 			securityCode: tokenData.securityCode	// unpredictable
 		} ) ;
-		
+
 		token = response.output.data.token ;
 
 		tokenPerformerArg = {
@@ -2628,11 +2610,11 @@ describe( "Token creation" , () => {
 
 		// Revoke the token now
 		response = await app.post( '/Users/REVOKE-TOKEN' , {} , null , { performer: tokenPerformer } ) ;
-		
+
 		// Should not found the token anymore
 		response = await app.get( '/Users/' + id , { performer: performer } ) ;
 		expect( response.output.data.token[ token ] ).not.to.be.ok() ;
-		
+
 		// We recreate a new performer, or the test will fail: it will use a cached user.
 		// It's worth noting here that a new performer IS ACTUALLY CREATED for each request in real apps.
 		tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
@@ -2643,12 +2625,13 @@ describe( "Token creation" , () => {
 
 	it( "POST /Users/REVOKE-ALL-TOKENS should revoke all tokens, i.e. remove them from the user document" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response , id , tokenPerformer , tokenPerformerArg , token , tokenPerformer2 , token2 ;
 
 
 		// Create the user
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fisher" ,
 				email: "bobby.fisher@gmail.com" ,
@@ -2658,12 +2641,13 @@ describe( "Token creation" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		id = response.output.data.id ;
 		expect( id ).to.be.an( 'objectId' ) ;
 
 		// Create the token #1
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2685,7 +2669,8 @@ describe( "Token creation" , () => {
 		tokenPerformer = app.createPerformer( tokenPerformerArg ) ;
 
 		// Create the token #2
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2746,13 +2731,16 @@ describe( "Access" , () => {
 		unauthorizedId , unauthorizedPerformer ,
 		authorizedGroupId , unauthorizedGroupId ;
 
+
+
 	// Create the users for the test
 
 	beforeEach( async () => {
 		( { app , performer } = await commonApp() ) ;
 		notConnectedPerformer = app.createPerformer() ;
-		
-		var response = await app.post( '/Users' , {
+
+		var response = await app.post( '/Users' ,
+			{
 				firstName: "Bobby" ,
 				lastName: "Fisher" ,
 				email: "bobby.fisher@gmail.com" ,
@@ -2761,10 +2749,11 @@ describe( "Access" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		authorizedId = response.output.data.id ;
-		
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "bobby.fisher@gmail.com" ,
 				password: "pw" ,
@@ -2773,17 +2762,18 @@ describe( "Access" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response.output.data.userId.toString() ).to.be( authorizedId.toString() ) ;
-		
+
 		authorizedPerformer = app.createPerformer( {
 			type: "header" ,
 			userId: response.output.data.userId ,
 			token: response.output.data.token ,
 			agentId: "0123456789"
 		} ) ;
-		
-		response = await app.post( '/Users' , {
+
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Groupy" ,
 				lastName: "Groups" ,
 				email: "groupy@gmail.com" ,
@@ -2792,10 +2782,11 @@ describe( "Access" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		authorizedByGroupId = response.output.data.id ;
 
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "groupy@gmail.com" ,
 				password: "groupy" ,
@@ -2804,7 +2795,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response.output.data.userId.toString() ).to.be( authorizedByGroupId.toString() ) ;
 
 		authorizedByGroupPerformer = app.createPerformer( {
@@ -2814,7 +2805,8 @@ describe( "Access" , () => {
 			agentId: "0123456789"
 		} ) ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "not" ,
 				lastName: "enough" ,
 				email: "not-enough@gmail.com" ,
@@ -2823,10 +2815,11 @@ describe( "Access" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		notEnoughAuthorizedId = response.output.data.id ;
-		
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "not-enough@gmail.com" ,
 				password: "notenough" ,
@@ -2835,7 +2828,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response.output.data.userId.toString() ).to.be( notEnoughAuthorizedId.toString() ) ;
 
 		notEnoughAuthorizedPerformer = app.createPerformer( {
@@ -2845,7 +2838,8 @@ describe( "Access" , () => {
 			agentId: "0123456789"
 		} ) ;
 
-		response = await app.post( '/Users' , {
+		response = await app.post( '/Users' ,
+			{
 				firstName: "Peon" ,
 				lastName: "Peon" ,
 				email: "peon@gmail.com" ,
@@ -2854,10 +2848,11 @@ describe( "Access" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		unauthorizedId = response.output.data.id ;
-		
-		response = await app.post( '/Users/CREATE-TOKEN' , {
+
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
 				type: "header" ,
 				login: "peon@gmail.com" ,
 				password: "peon" ,
@@ -2866,9 +2861,9 @@ describe( "Access" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response.output.data.userId.toString() ).to.be( unauthorizedId.toString() ) ;
-		
+
 		unauthorizedPerformer = app.createPerformer( {
 			type: "header" ,
 			userId: response.output.data.userId ,
@@ -2876,241 +2871,179 @@ describe( "Access" , () => {
 			agentId: "0123456789"
 		} ) ;
 
-		response = await app.post( '/Groups' , {
-				name: "unauthorized group" ,
-				users: [ notEnoughAuthorizedId , authorizedByGroupId ]
-			} ,
+		response = await app.post( '/Groups' ,
+			{			name: "unauthorized group" ,
+				users: [ notEnoughAuthorizedId , authorizedByGroupId ] } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		unauthorizedGroupId = response.output.data.id ;
 
-		response = await app.post( '/Groups' , {
-				name: "authorized group" ,
-				users: [ authorizedByGroupId ]
-			} ,
+		response = await app.post( '/Groups' ,
+			{			name: "authorized group" ,
+				users: [ authorizedByGroupId ] } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		authorizedGroupId = response.output.data.id ;
 	} ) ;
 
-	it( "GET a restricted resource performed by various connected and non-connected users" , ( done ) => {
 
-		async.series( [
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass
-				userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass
 
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+	it( "GET a restricted resource performed by various connected and non-connected users" , async () => {
+		var response , userAccess ;
+
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass
+		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
 			} ,
-			function( callback ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } , ( error , object ) => {
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
 
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'Public access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } , ( error , object ) => {
+		// User listed and with enough rights
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 2!!!' ,
+			description: 'This is a supa blog! (x2)'
+		} ) ;
 
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } , ( error , object ) => {
+		// Non-connected user
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
 
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'forbidden' ) ;
-					expect( error.message ).to.be( 'Access forbidden.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// User not listed in specific rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		// User listed, but with too low rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
 
-	it( "GET a restricted resource performed by a token that has already expired should fail" , ( done ) => {
+	it( "GET a restricted resource performed by a token that has already expired should fail" , async () => {
+		var response , userAccess , expiredTokenPerformer ;
 
-		var expiredTokenPerformer ;
-
-		async.series( [
-			function( callback ) {
-				app.post( '/Users/CREATE-TOKEN' , {
-					type: "header" ,
-					login: "bobby.fisher@gmail.com" ,
-					password: "pw" ,
-					agentId: "0123456789" ,
-					duration: 0
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response.userId.toString() ).to.be( authorizedId.toString() ) ;
-					expect( response.token.length ).to.be( 44 ) ;
-
-					expiredTokenPerformer = app.createPerformer( {
-						type: "header" ,
-						userId: response.userId ,
-						token: response.token ,
-						agentId: "0123456789"
-					} ) ;
-
-					callback() ;
-				} ) ;
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789" ,
+				duration: 0
 			} ,
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass
+			null ,
+			{ performer: performer }
+		) ;
+		expect( response.output.data ).to.partially.equal( { userId: authorizedId } ) ;
 
-				app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , {
-					title: 'My wonderful life 2!!!' ,
-					description: 'This is a supa blog! (x2)' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object.title ).to.be( 'My wonderful life 2!!!' ) ;
-					expect( object.description ).to.be( 'This is a supa blog! (x2)' ) ;
-					expect( object.parent ).to.equal( { id: '/' , collection: null } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Expired token
-				app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: expiredTokenPerformer } , ( error , object ) => {
+		expiredTokenPerformer = app.createPerformer( {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ) ;
+		
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass
 
-					expect( error ).to.be.ok() ;
-					expect( error.type ).to.be( 'unauthorized' ) ;
-					expect( error.message ).to.be( 'This token has already expired.' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 2!!!' ,
+			description: 'This is a supa blog! (x2)'
+		} ) ;
+
+		// Expired token
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: expiredTokenPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'This token has already expired.' } ) ;
 	} ) ;
 
-	it( "GET a collection having restricted resources, performed by various connected and non-connected users" , ( done ) => {
+	it( "GET a collection having restricted resources, performed by various connected and non-connected users" , async () => {
+		var response , userAccess , batch , titles ;
 
-		async.series( [
-			function( callback ) {
-				app.post( '/Blogs' , {
-					title: 'Public' ,
-					description: 'This is public' ,
-					publicAccess: 'read'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+		response = await app.post( '/Blogs' ,
+			{
+				title: 'Public' ,
+				description: 'This is public' ,
+				publicAccess: 'read'
 			} ,
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'read' ;
-				userAccess[ notEnoughAuthorizedId ] = 'read' ;
-
-				app.post( '/Blogs' , {
-					title: 'Selective' ,
-					description: 'This is selective' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'read' ;
+		userAccess[ notEnoughAuthorizedId ] = 'read' ;
+		
+		response = await app.post( '/Blogs' ,
+			{
+				title: 'Selective' ,
+				description: 'This is selective' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
 			} ,
-			function( callback ) {
-				var userAccess = {} ;
-				userAccess[ authorizedId ] = 'read' ;
-				userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;
-
-				app.post( '/Blogs' , {
-					title: 'Closed' ,
-					description: 'This is closed' ,
-					userAccess: userAccess ,
-					publicAccess: 'none'
-				} , null , { performer: authorizedPerformer } , ( error ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		userAccess = {} ;
+		userAccess[ authorizedId ] = 'read' ;
+		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;
+		
+		response = await app.post( '/Blogs' ,
+			{
+				title: 'Closed' ,
+				description: 'This is closed' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
 			} ,
-			function( callback ) {
-				app.get( '/Blogs/' , { performer: authorizedPerformer } , ( error , batch ) => {
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// User that can see everything
+		response = await app.get( '/Blogs/' , { performer: authorizedPerformer } ) ;
+		titles = response.output.data.map( e => e.title ) ;
+		expect( titles ).to.have.length( 3 ) ;
+		expect( titles ).to.contain( 'Public' , 'Selective' , 'Closed' ) ;
+		
+		// Non-connected user
+		response = await app.get( '/Blogs/' , { performer: notConnectedPerformer } ) ;
+		titles = response.output.data.map( e => e.title ) ;
+		expect( titles ).to.have.length( 1 ) ;
+		expect( titles ).to.contain( 'Public' ) ;
 
-					expect( error ).not.to.be.ok() ;
-					//console.log( batch ) ;
-					expect( batch.length ).to.be( 3 ) ;
-
-					var titles = [ batch[ 0 ].title , batch[ 1 ].title , batch[ 2 ].title ] ;
-
-					expect( titles ).to.contain( 'Public' ) ;
-					expect( titles ).to.contain( 'Selective' ) ;
-					expect( titles ).to.contain( 'Closed' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// Non-connected user
-				app.get( '/Blogs/' , { performer: notConnectedPerformer } , ( error , batch ) => {
-
-					expect( error ).not.to.be.ok() ;
-					expect( batch.length ).to.be( 1 ) ;
-					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User not listed in specific rights
-				app.get( '/Blogs/' , { performer: unauthorizedPerformer } , ( error , batch ) => {
-
-					expect( batch.length ).to.be( 1 ) ;
-					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				// User listed, but with too low rights
-				app.get( '/Blogs/' , { performer: notEnoughAuthorizedPerformer } , ( error , batch ) => {
-
-					expect( batch.length ).to.be( 2 ) ;
-					expect( batch[ 0 ].title ).to.be( 'Public' ) ;
-					expect( batch[ 1 ].title ).to.be( 'Selective' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		// User not listed in specific rights
+		response = await app.get( '/Blogs/' , { performer: unauthorizedPerformer } ) ;
+		titles = response.output.data.map( e => e.title ) ;
+		expect( titles ).to.have.length( 1 ) ;
+		expect( titles ).to.contain( 'Public' ) ;
+		
+		// User listed, but with too low rights
+		response = await app.get( '/Blogs/' , { performer: notEnoughAuthorizedPerformer } ) ;
+		titles = response.output.data.map( e => e.title ) ;
+		expect( titles ).to.have.length( 2 ) ;
+		expect( titles ).to.contain( 'Public' , 'Selective' ) ;
 	} ) ;
 
 	it( "PUT (overwrite) a restricted resource performed by various connected and non-connected users" , ( done ) => {
@@ -4139,19 +4072,19 @@ describe( "Misc" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life 2!!!' ,
 			description: 'This is a supa blog! (x2)' ,
 			parent: { id: '/' , collection: null }
 		} ) ;
-		
+
 		// It should reset
 		( { app , performer } = await commonApp() ) ;
-		
+
 		// Same ID than in the previous request
-		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound', httpStatus: 404 } ) ;
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "Shema's 'defaultPublicAccess'" , ( done ) => {
