@@ -39,7 +39,6 @@ var childProcess = require( 'child_process' ) ;
 var mongodb = require( 'mongodb' ) ;
 
 
-var async = require( 'async-kit' ) ;
 var Promise = require( 'seventh' ) ;
 var tree = require( 'tree-kit' ) ;
 var fsKit = require( 'fs-kit' ) ;
