@@ -134,16 +134,6 @@ async function commonApp() {
 
 
 
-// Legacy
-function _commonApp( callback ) {
-	commonApp().then(
-		v => callback( undefined , v.app , v.performer ) ,
-		error => callback( error )
-	) ;
-}
-
-
-
 
 
 /* Tests */
@@ -2917,8 +2907,8 @@ describe( "Access" , () => {
 		var response , userAccess ;
 
 		userAccess = {} ;
-		userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass
-		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass
+		userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass the check
+		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass the check
 		
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -2975,7 +2965,7 @@ describe( "Access" , () => {
 		} ) ;
 		
 		userAccess = {} ;
-		userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass
+		userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass the check
 
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -3071,8 +3061,8 @@ describe( "Access" , () => {
 		var response , userAccess ;
 		
 		userAccess = {} ;
-		userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
-		userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
+		userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass the check
+		userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass the check
 		
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -3086,8 +3076,8 @@ describe( "Access" , () => {
 		) ;
 		
 		userAccess = {} ;
-		userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass
-		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
+		userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass the check
+		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass the check
 		
 		// By the authorized user
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
@@ -3118,8 +3108,8 @@ describe( "Access" , () => {
 		var response , userAccess ;
 
 		userAccess = {} ;
-		userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass
-		userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass
+		userAccess[ authorizedId ] = 'readCreateModify' ;	// Minimal right that pass the check
+		userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass the check
 
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -3152,8 +3142,8 @@ describe( "Access" , () => {
 		var response , userAccess ;
 		
 		userAccess = {} ;
-		userAccess[ authorizedId ] = 'all' ;	// Minimal right that pass
-		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
+		userAccess[ authorizedId ] = 'all' ;	// Minimal right that pass the check
+		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass the check
 		
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -3186,8 +3176,8 @@ describe( "Access" , () => {
 		var response , userAccess ;
 		
 		userAccess = {} ;
-		userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass
-		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
+		userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass the check
+		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass the check
 		
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -3248,8 +3238,8 @@ describe( "Access" , () => {
 		var response , userAccess ;
 		
 		userAccess = {} ;
-		userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass
-		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass
+		userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass the check
+		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass the check
 		
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -3371,7 +3361,7 @@ describe( "Access" , () => {
 			}
 		} ;
 
-		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass
+		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass the check
 
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -3412,7 +3402,7 @@ describe( "Access" , () => {
 		
 		
 		// Now give public access
-		response = app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				publicAccess: {
 					traverse: 1 ,
@@ -3427,9 +3417,8 @@ describe( "Access" , () => {
 		) ;
 
 		// Non-connected user, it can edit it!
-		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , {
-				title: "I can do that!"
-			} ,
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{ title: "I can do that!" } ,
 			null ,
 			{ performer: notConnectedPerformer }
 		) ;
@@ -3466,134 +3455,73 @@ describe( "Hooks" , () => {
 
 describe( "Custom methods (POST to a METHOD)" , () => {
 
-	it( "Custom root object method" , ( done ) => {
+	it( "Custom root object method" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
+		var response = await app.post( '/SUPA-METHOD' , { to: 'toto' } , null , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { done: "something" , to: "toto" } ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/SUPA-METHOD' , {
-					to: 'toto'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response ).to.equal( { done: "something" , to: "toto" } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/SUPA-METHOD' , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		response = await app.get( '/SUPA-METHOD' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
 	} ) ;
 
-	it( "Custom collection method" , ( done ) => {
+	it( "Custom collection method" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users/DO-SOMETHING' , {
-					to: 'toto'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response ).to.equal( { done: "something" , to: "toto" } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/DO-SOMETHING' , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+		var response = await app.post( '/Users/DO-SOMETHING' , { to: 'toto' } , null , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { done: "something" , to: "toto" } ) ;
+		
+		response = await app.get( '/Users/DO-SOMETHING' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
 	} ) ;
 
-	it( "Custom object method" , ( done ) => {
+	it( "Custom object method" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , userId ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
 			} ,
-			function( callback ) {
-				app.post( '/Users' , {
-					firstName: "Joe" ,
-					lastName: "Doe" ,
-					email: "joe.doe@gmail.com" ,
-					password: "pw" ,
-					publicAccess: "all"
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					userId = response.id ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' , {
-					lastName: 'Toto'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response.done ).to.be( 'nothing' ) ;
-					expect( response.to.firstName ).to.be( 'Joe' ) ;
-					expect( response.to.lastName ).to.be( 'Doe' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' , {
-					firstName: 'Toto'
-				} , null , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response.done ).to.be( 'something' ) ;
-					expect( response.to.firstName ).to.be( 'Toto' ) ;
-					expect( response.to.lastName ).to.be( 'Doe' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId + '/CHANGE-FIRST-NAME' , { performer: performer } , ( error , response ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( response ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Users/' + userId , { performer: performer } , ( error , user ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( user.firstName ).to.be( 'Toto' ) ;
-					expect( user.lastName ).to.be( 'Doe' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		var userId = response.output.data.id ;
+		
+		response = await app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' ,
+			{ lastName: 'Toto' } ,
+			null ,
+			{ performer: performer }
+		) ;
+		expect( response.output.data ).to.be.partially.like( {
+			done: 'nothing' ,
+			to: { firstName: 'Joe' , lastName: 'Doe' }
+		} ) ;
+		
+		response = await app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' ,
+			{ firstName: 'Toto' } ,
+			null ,
+			{ performer: performer }
+		) ;
+		expect( response.output.data ).to.be.partially.like( {
+			done: 'something' ,
+			to: { firstName: 'Toto' , lastName: 'Doe' }
+		} ) ;
+		
+		response = await app.get( '/Users/' + userId + '/CHANGE-FIRST-NAME' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( {
+			done: 'nothing' ,
+			cause: "this is a GET request"
+		} ) ;
+		
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			firstName: 'Toto' ,
+			lastName: 'Doe'
+		} ) ;
 	} ) ;
 } ) ;
 
@@ -3602,284 +3530,188 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 
 describe( "Alter Schema" , () => {
 
-	it( "altered schema should alter the SCHEMA method output" , ( done ) => {
+	it( "altered schema should alter the SCHEMA method output" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , post , blogId , postId ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			customSchema: {
+				posts: {
+					extraProperties: true ,
+					properties: {
+						custom: { type: 'string' }
+					}
+				}
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					customSchema: {
-						posts: {
-							extraProperties: true ,
-							properties: {
-								custom: { type: 'string' }
-							}
-						}
-					} ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/SCHEMA' , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					expect( object ).to.equal(
-						tree.extend(
-							{ deep: true } ,
-							app.root.children.blogs.children.posts.schema ,
-							{ properties: { custom: { type: 'string' } } }
-						)
-					) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			publicAccess: 'all'
+		} ) ;
+		await blog.save() ;
+		
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/SCHEMA' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal(
+			tree.extend( { deep: true } , app.root.children.blogs.children.posts.schema , { properties: { custom: { type: 'string' } } } )
+		) ;
 	} ) ;
 
-	it( "altered schema should alter POST" , ( done ) => {
+	it( "altered schema should alter POST" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , post , blogId , postId ;
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			customSchema: {
+				posts: {
+					extraProperties: true ,
+					properties: {
+						custom: { type: 'string' }
+					}
+				}
+			} ,
+			publicAccess: 'all'
+		} ) ;
+		await blog.save() ;
+		
+		await expect( () => app.post( '/Blogs/' + blog.getId() + '/Posts/' ,
+			{
+				title: 'My first post!' ,
+				content: 'Blah blah blah.'
+			} ,
+			null ,
+			{ performer: performer }
+		) ).to.reject( doormen.ValidatorError , { name: 'ValidatorError' } ) ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		await expect( () => app.post( '/Blogs/' + blog.getId() + '/Posts/' ,
+			{
+				title: 'My first post!' ,
+				content: 'Blah blah blah.' ,
+				custom: 12
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					customSchema: {
-						posts: {
-							extraProperties: true ,
-							properties: {
-								custom: { type: 'string' }
-							}
-						}
-					} ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
+			null ,
+			{ performer: performer }
+		) ).to.reject( doormen.ValidatorError , { name: 'ValidatorError' } ) ;
+		
+		var response = await app.post( '/Blogs/' + blog.getId() + '/Posts/' ,
+			{
+				title: 'My first post!' ,
+				content: 'Blah blah blah.' ,
+				custom: 'value'
 			} ,
-			function( callback ) {
-				app.post( '/Blogs/' + blogId + '/Posts/' , {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.'
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.name ).to.be( 'ValidatorError' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Blogs/' + blogId + '/Posts/' , {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					custom: 12
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.name ).to.be( 'ValidatorError' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.post( '/Blogs/' + blogId + '/Posts/' , {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					custom: 'value'
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).not.to.be.ok() ;
-					postId = rawDocument.id ;
-					//console.log( 'ID:' , id ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( object ) ;
-					expect( object.title ).to.be( 'My first post!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah.' ) ;
-					expect( object.custom ).to.be( 'value' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		var postId = response.output.data.id ;
+		
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			title: 'My first post!' ,
+			content: 'Blah blah blah.' ,
+			custom: 'value'
+		} ) ;
 	} ) ;
 
-	it( "altered schema should alter PUT" , ( done ) => {
+	it( "altered schema should alter PUT" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , post , blogId , postId = '123456789612345678901234' ;
+		var response , postId = '123456789612345678901234' ;
 
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var blog = await app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			customSchema: {
+				posts: {
+					extraProperties: true ,
+					properties: {
+						custom: { type: 'string' }
+					}
+				}
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					customSchema: {
-						posts: {
-							extraProperties: true ,
-							properties: {
-								custom: { type: 'string' }
-							}
-						}
-					} ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
+			publicAccess: 'all'
+		} ) ;
+		await blog.save() ;
+		
+		await expect( () => app.put( '/Blogs/' + blog.getId() + '/Posts/' + postId ,
+			{
+				title: 'My first post!' ,
+				content: 'Blah blah blah.'
 			} ,
-			function( callback ) {
-				app.put( '/Blogs/' + blogId + '/Posts/' + postId , {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.'
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.name ).to.be( 'ValidatorError' ) ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ).to.reject( doormen.ValidatorError , { name: 'ValidatorError' } ) ;
+
+		await expect( () => app.put( '/Blogs/' + blog.getId() + '/Posts/' + postId ,
+			{
+				title: 'My first post!' ,
+				content: 'Blah blah blah.' ,
+				custom: 12
 			} ,
-			function( callback ) {
-				app.put( '/Blogs/' + blogId + '/Posts/' + postId , {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					custom: 12
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.name ).to.be( 'ValidatorError' ) ;
-					callback() ;
-				} ) ;
+			null ,
+			{ performer: performer }
+		) ).to.reject( doormen.ValidatorError , { name: 'ValidatorError' } ) ;
+
+		response = await app.put( '/Blogs/' + blog.getId() + '/Posts/' + postId ,
+			{
+				title: 'My first post!' ,
+				content: 'Blah blah blah.' ,
+				custom: 'value'
 			} ,
-			function( callback ) {
-				app.put( '/Blogs/' + blogId + '/Posts/' + postId , {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					custom: 'value'
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).not.to.be.ok() ;
-					postId = rawDocument.id ;
-					//console.log( 'ID:' , id ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( object ) ;
-					expect( object.title ).to.be( 'My first post!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah.' ) ;
-					expect( object.custom ).to.be( 'value' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			title: 'My first post!' ,
+			content: 'Blah blah blah.' ,
+			custom: 'value'
+		} ) ;
 	} ) ;
 
-	it( "altered schema should alter PATCH" , ( done ) => {
+	it( "altered schema should alter PATCH" , async () => {
+		var { app , performer } = await commonApp() ;
 
-		var app , performer , blog , post , blogId , postId ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					callback() ;
-				} ) ;
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			customSchema: {
+				posts: {
+					extraProperties: true ,
+					properties: {
+						custom: { type: 'string' }
+					}
+				}
 			} ,
-			function( callback ) {
-				blog = app.root.children.blogs.collection.createDocument( {
-					title: 'My wonderful life' ,
-					description: 'This is a supa blog!' ,
-					customSchema: {
-						posts: {
-							extraProperties: true ,
-							properties: {
-								custom: { type: 'string' }
-							}
-						}
-					} ,
-					publicAccess: 'all'
-				} ) ;
-				blogId = blog._id ;
-				blog.$.save( callback ) ;
+			publicAccess: 'all'
+		} ) ;
+		await blog.save() ;
+		
+		var response = await app.post( '/Blogs/' + blog.getId() + '/Posts/' , {
+				title: 'My first post!' ,
+				content: 'Blah blah blah.' ,
+				custom: 'value'
 			} ,
-			function( callback ) {
-				app.post( '/Blogs/' + blogId + '/Posts/' , {
-					title: 'My first post!' ,
-					content: 'Blah blah blah.' ,
-					custom: 'value'
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).not.to.be.ok() ;
-					postId = rawDocument.id ;
-					//console.log( 'ID:' , id ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( object ) ;
-					expect( object.title ).to.be( 'My first post!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah.' ) ;
-					expect( object.custom ).to.be( 'value' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.patch( '/Blogs/' + blogId + '/Posts/' + postId , {
-					custom: 12
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).to.be.ok() ;
-					expect( error.name ).to.be( 'ValidatorError' ) ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.patch( '/Blogs/' + blogId + '/Posts/' + postId , {
-					custom: 'value2'
-				} , null , { performer: performer } , ( error , rawDocument ) => {
-					expect( error ).not.to.be.ok() ;
-					callback() ;
-				} ) ;
-			} ,
-			function( callback ) {
-				app.get( '/Blogs/' + blogId + '/Posts/' + postId , { performer: performer } , ( error , object ) => {
-					expect( error ).not.to.be.ok() ;
-					//console.log( object ) ;
-					expect( object.title ).to.be( 'My first post!' ) ;
-					expect( object.content ).to.be( 'Blah blah blah.' ) ;
-					expect( object.custom ).to.be( 'value2' ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+			null ,
+			{ performer: performer }
+		) ;
+		var postId = response.output.data.id ;
+		
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			title: 'My first post!' ,
+			content: 'Blah blah blah.' ,
+			custom: 'value'
+		} ) ;
+		
+		await expect( () => app.patch( '/Blogs/' + blog.getId() + '/Posts/' + postId , { custom: 12 } , null , { performer: performer } ) )
+			.to.reject( doormen.ValidatorError , { name: 'ValidatorError' } ) ;
+			
+		response = await app.patch( '/Blogs/' + blog.getId() + '/Posts/' + postId , { custom: 'value2' } , null , { performer: performer } ) ;
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			title: 'My first post!' ,
+			content: 'Blah blah blah.' ,
+			custom: 'value2'
+		} ) ;
 	} ) ;
 } ) ;
 
@@ -3942,24 +3774,12 @@ describe( "Misc" , () => {
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
-	it( "Shema's 'defaultPublicAccess'" , ( done ) => {
-
-		var app , performer , blog , id ;
-
-		async.series( [
-			function( callback ) {
-				commonApp( ( error , a , p ) => {
-					app = a ;
-					performer = p ;
-					expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
-						.to.equal( { traverse: 1 , read: 3 , create: 1 } ) ;
-					expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
-						.to.equal( { read: 3 } ) ;
-					callback() ;
-				} ) ;
-			}
-		] )
-			.exec( done ) ;
+	it( "Shema's 'defaultPublicAccess'" , async () => {
+		var { app , performer } = await commonApp() ;
+		expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
+			.to.equal( { traverse: 1 , read: 3 , create: 1 } ) ;
+		expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
+			.to.equal( { read: 3 } ) ;
 	} ) ;
 
 	it( "Test CORS" ) ;
