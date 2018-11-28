@@ -30,7 +30,7 @@
 
 
 
-var restQuery = require( '../lib/restQuery.js' ) ;
+var restQuery = require( '..' ) ;
 
 var tree = require( 'tree-kit' ) ;
 var stream = require( 'stream' ) ;
@@ -89,96 +89,74 @@ function fakeHttpRequest( r , body ) {
 
 describe( "Parse HTTP request" , () => {
 
-	it( "should parse a fake GET on /" , ( done ) => {
-
+	it( "should parse a fake GET on /" , async () => {
 		var req = fakeHttpRequest() ;
-
-		restQuery.httpModule.parseRequest( req , ( error , message ) => {
-
-			expect( error ).not.to.be.ok() ;
-			expect( message ).to.equal( {
-				//path: '/' ,
-				path: [] ,
-				//type: 'json' ,
-				host: 'localhost' ,
-				method: 'get' ,
-				tier: 3 ,
-				pTier: 3 ,
-				query: { limit: 1000 }
-			} ) ;
-
-			done() ;
+		var message = await restQuery.httpModule.parseRequest( req ) ;
+		expect( message ).to.equal( {
+			//path: '/' ,
+			path: [] ,
+			//type: 'json' ,
+			host: 'localhost' ,
+			method: 'get' ,
+			tier: 3 ,
+			pTier: 3 ,
+			query: { limit: 1000 }
 		} ) ;
 	} ) ;
 
-	it( "should parse a fake GET with path and query string" , ( done ) => {
-
+	it( "should parse a fake GET with path and query string" , async () => {
 		var req = fakeHttpRequest( { url: "/path/to/json?populate=group" } ) ;
-
-		restQuery.httpModule.parseRequest( req , ( error , message ) => {
-
-			expect( error ).not.to.be.ok() ;
-			expect( message ).to.equal( {
-				//path: '/path/to/json' ,
-				path: [
-					{
-						identifier: "path" ,
-						isCollection: false ,
-						isDocument: true ,
-						value: "path" ,
-						type: "slugId"
-					} ,
-					{
-						identifier: "to" ,
-						isCollection: false ,
-						isDocument: true ,
-						value: "to" ,
-						type: "slugId"
-					} ,
-					{
-						identifier: "json" ,
-						isCollection: false ,
-						isDocument: true ,
-						value: "json" ,
-						type: "slugId"
-					}
-				] ,
-				//type: 'json' ,
-				host: 'localhost' ,
-				method: 'get' ,
-				tier: 3 ,
-				pTier: 3 ,
-				query: {  limit: 1000 , populate: 'group' }
-			} ) ;
-
-			done() ;
+		var message = await restQuery.httpModule.parseRequest( req ) ;
+		expect( message ).to.equal( {
+			//path: '/path/to/json' ,
+			path: [
+				{
+					identifier: "path" ,
+					isCollection: false ,
+					isDocument: true ,
+					value: "path" ,
+					type: "slugId"
+				} ,
+				{
+					identifier: "to" ,
+					isCollection: false ,
+					isDocument: true ,
+					value: "to" ,
+					type: "slugId"
+				} ,
+				{
+					identifier: "json" ,
+					isCollection: false ,
+					isDocument: true ,
+					value: "json" ,
+					type: "slugId"
+				}
+			] ,
+			//type: 'json' ,
+			host: 'localhost' ,
+			method: 'get' ,
+			tier: 3 ,
+			pTier: 3 ,
+			query: {  limit: 1000 , populate: 'group' }
 		} ) ;
 	} ) ;
 
-	it( "should parse a fake POST with a body" , ( done ) => {
-
+	it( "should parse a fake POST with a body" , async () => {
 		var req = fakeHttpRequest( { method: 'POST' } , '{"a":"simple","json":"file"}' ) ;
-
-		restQuery.httpModule.parseRequest( req , ( error , message ) => {
-
-			expect( error ).not.to.be.ok() ;
-			expect( message ).to.equal( {
-				//path: '/' ,
-				path: [] ,
-				//type: 'json' ,
-				host: 'localhost' ,
-				method: 'post' ,
-				tier: 3 ,
-				pTier: 3 ,
-				query: { limit: 1000 } ,
-				data: { a: 'simple', json: 'file' }
-			} ) ;
-
-			done() ;
+		var message = await restQuery.httpModule.parseRequest( req ) ;
+		expect( message ).to.equal( {
+			//path: '/' ,
+			path: [] ,
+			//type: 'json' ,
+			host: 'localhost' ,
+			method: 'post' ,
+			tier: 3 ,
+			pTier: 3 ,
+			query: { limit: 1000 } ,
+			data: { a: 'simple', json: 'file' }
 		} ) ;
 	} ) ;
 
 	it( "Content-Type: application/x-www-form-urlencoded support test" ) ;
 } ) ;
-
 

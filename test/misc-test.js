@@ -24,7 +24,6 @@
 	SOFTWARE.
 */
 
-/* jshint unused:false */
 /* global describe, it, before, after, beforeEach */
 
 "use strict" ;
@@ -36,26 +35,26 @@ var kungFig = require( 'kung-fig' ) ;
 var string = require( 'string-kit' ) ;
 
 // restQuery will extend doormen, so it should be loaded
-var restQuery = require( '../lib/restQuery.js' ) ;	// jshint ignore:line
+var restQuery = require( '..' ) ;
 
 
 
 describe( "doormen's restQuery specific" , () => {
 
 	it( "restQuery.slug type checker" , () => {
-
 		doormen( { type: 'restQuery.slug' } , 'my-slug' ) ;
 		doormen.not( { type: 'restQuery.slug' } , 'Not-a-slug' ) ;
 	} ) ;
 
 	it( "restQuery.randomSlug sanitizer" , () => {
-
 		var slug = doormen( { type: 'restQuery.slug' , sanitize: 'restQuery.randomSlug' } , null ) ;
 		//console.log( slug ) ;
 	} ) ;
 } ) ;
 
 
+// JSON will be dropped soon...
+/*
 describe( "KFG and JSON conformance" , () => {
 
 	it( "KFG and JSON should create the same config" , () => {
@@ -76,3 +75,4 @@ describe( "KFG and JSON conformance" , () => {
 		return ;
 	} ) ;
 } ) ;
+*/

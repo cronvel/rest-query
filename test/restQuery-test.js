@@ -40,7 +40,6 @@ if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = f
 if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
 var log = Logfella.global.use( 'unit-test' ) ;
 
-var async = require( 'async-kit' ) ;
 var Promise = require( 'seventh' ) ;
 
 var tree = require( 'tree-kit' ) ;
@@ -54,8 +53,6 @@ var doormen = require( 'doormen' ) ;
 
 var fsKit = require( 'fs-kit' ) ;
 var hash = require( 'hash-kit' ) ;
-
-
 
 
 
