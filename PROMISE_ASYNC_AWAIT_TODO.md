@@ -2,15 +2,15 @@
 ## File Overview
 
 OK	App.js
-OK?	httpModule.js
-OK?	Performer.js
-OK?	Node.js
-OK?	ObjectNode.js
-OK?	CollectionNode.js
-WIP	UsersCollectionNode.js
+OK	httpModule.js
+OK	Performer.js
+OK	Node.js
+OK	ObjectNode.js
+OK	CollectionNode.js
+OK	UsersCollectionNode.js
 OK	GroupsCollectionNode.js
-.	Scheduler.js
-.	ScheduledTasksCollectionNode.js
+OK?	Scheduler.js
+OK	ScheduledTasksCollectionNode.js
 
 
 
@@ -22,25 +22,25 @@ OK	GET collection
 .	GET attachment
 OK	POST a doc on a collection
 .	POST doc+attachment with multipart body
-.	POST on doc to built-in method
-.	POST on doc to userland method
-.	POST on collection to built-in method
-.	POST on collection to userland method
+OK	POST on doc to built-in method
+OK	POST on doc to userland method
+OK	POST on collection to built-in method
+OK	POST on collection to userland method
 OK	PUT doc
 .	PUT attachment
 OK	PATCH doc
 OK	DELETE doc
-WIP	token creation
-.	scheduler
+OK	token creation
+WIP	scheduler
 .	scheduler userland worker
 
 
 
 ## Features
 
-.	link/multi-link
+OK	link/multi-link
 OK	nested docs
-.	access/rights
+OK	access/rights
 OK	Schema
 
 

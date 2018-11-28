@@ -1,18 +1,17 @@
 
 
 
-var restQuery = require( '../lib/restQuery.js' ) ;
+var restQuery = require( '..' ) ;
+var Promise = require( 'seventh' ) ;
 var log = restQuery.log.global.use( 'workers' ) ;
 
 
 
 module.exports = {
-	
-	mail: function mail( context , scheduledTask , callback ) {
-		
+	mail: function( context , scheduledTask ) {
 		log.info( "Received a new 'mail' task: %I" , scheduledTask.data ) ;
 		//console.log( context ) ;
-		callback() ;
+		return Promise.resolved ;
 	}
 } ;
                                             
