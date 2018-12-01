@@ -7,7 +7,7 @@
 This is the common object format passed to hook, custom method and as the third argument of the request callback.
 Usual properties are:
                                                     
-* input `Object` contains data that have been passed as input (e.g. by a HTTP client, or by an internal call), where:
+* input `Object` contains data that have been passed as input (e.g. by a HTTP client), where:
 	
 	* method `string` the original method used (i.e. the lower-cased HTTP method)
 	* pathParts `Array` the fully parsed path to the resource
@@ -16,9 +16,10 @@ Usual properties are:
 	* document `Object` (optional) the given document, if any (e.g. the body of a HTTP PUT request)
 	* attachmentStreams `Object` (optional) the given binary stream, if any (e.g. a part of a multipart body of a HTTP PUT request)
 
-* output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client,
-	or to an internal callback), where:
+* output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client
+	or to a hook, etc), where:
 	
+	* data `object` or `Stream` the data that is the response of the request
 	* httpStatus (optional) `number` a particular HTTP status that may overide the default one
 	* meta `Object` (optional) meta-data of the document, common meta data:
 		

@@ -1,6 +1,20 @@
 
 
 
+
+
+
+
+# This is DEPRECATED
+
+
+
+
+
+
+
+
+
 User scope
 ==========
 
@@ -16,27 +30,6 @@ Global users belong to root (i.e. '/').
 Users restricted to a container belong to it:
 
 ### They can't operate outside of their parent! ###
-
-
-
-
-
-
-
-
-
-
-
-# This is not up to date with the access management refacto!!!
-
-
-
-
-
-
-
-
-
 
 
 

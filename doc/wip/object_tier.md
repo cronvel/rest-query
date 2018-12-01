@@ -1,6 +1,35 @@
 
 
 
+
+
+* Tier 1: Identification
+	* id/_id
+	* slug
+	* title
+	* email/login
+* Tier 2: Content
+	* all content, but a field can have an array of label
+* Tier 3: System
+	* RestQuery user's password hash
+	* RestQuery's cache
+	* RestQuery's user and group accesses
+	* any internal/system data your app needs
+
+Accesses are set using methods.
+
+
+
+
+
+
+ OLD
+=====
+
+
+
+
+
 Think of a book. Each tier is a part of it.
 
 
