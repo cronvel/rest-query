@@ -1,7 +1,7 @@
 
 
 
-var restQuery = require( '../lib/restQuery.js' ) ;
+var restQuery = require( '../../lib/restQuery.js' ) ;
 var log = restQuery.log.global.use( 'root-methods' ) ;
 
 var Promise = require( 'seventh' ) ;

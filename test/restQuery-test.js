@@ -118,13 +118,8 @@ async function commonApp() {
 		clearCollection( app.collectionNodes.comments.collection )
 	] ) ;
 
-	try {
-		await app.buildIndexes() ;
-	}
-	catch ( error ) {
-
-		throw error ;
-	}
+	await app.buildIndexes() ;
+	await app.loadSystemDocuments() ;
 
 	return { app , performer } ;
 }
@@ -151,8 +146,10 @@ describe( "Basic queries of object of a top-level collection" , () => {
 	it( "GET on the root object" , async () => {
 		var { app , performer } = await commonApp() ;
 		var response = await app.get( '/' , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( {
-			bob: 'dans le geth\'' ,
+		expect( response.output.data ).to.partially.equal( {
+			name: '/' ,
+			title: 'Root' ,
+			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
 			publicAccess: { traverse: 1 , read: 3 , create: 1 }
@@ -167,6 +164,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 	it( "GET on a regular item" , async () => {
 		var { app , performer } = await commonApp() ;
 
+		log.error( "app.root.children: %Y" , app.root.children ) ;
 		var blog = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,

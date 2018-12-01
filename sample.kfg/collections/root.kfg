@@ -1,0 +1,15 @@
+restQueryType: root
+path: /root
+extraProperties: true
+properties:
+	title:
+		type: string
+		default: Root
+	description:
+		type: string
+		default: Root object
+	embedded:
+		optional: true
+		type: strictObject
+autoCollection: blogs
+objectMethods: @@root.objectMethods.js
