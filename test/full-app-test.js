@@ -88,6 +88,7 @@ function debug() {
 // clear DB: remove every item, so we can safely test
 function clearDB() {
 	return Promise.all( [
+		clearCollection( 'root' ) ,
 		clearCollection( 'blogs' ) ,
 		clearCollection( 'posts' ) ,
 		clearCollection( 'comments' ) ,
