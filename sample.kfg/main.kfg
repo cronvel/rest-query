@@ -7,11 +7,6 @@ collections:
 	posts: @@collections/posts.kfg
 	comments: @@collections/comments.kfg
 
-# DEPRECATED
-#rootAutoCollection: blogs
-#rootObject: @@rootObject.kfg
-#rootMethods: @@rootMethods.js
-
 tree:
 	users: null
 	groups: null

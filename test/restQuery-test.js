@@ -111,6 +111,7 @@ async function commonApp() {
 	currentApp = app ;
 
 	await Promise.all( [
+		clearCollection( app.collectionNodes.root.collection ) ,
 		clearCollection( app.collectionNodes.users.collection ) ,
 		clearCollection( app.collectionNodes.groups.collection ) ,
 		clearCollection( app.collectionNodes.blogs.collection ) ,
@@ -118,7 +119,9 @@ async function commonApp() {
 		clearCollection( app.collectionNodes.comments.collection )
 	] ) ;
 
+	// Sometime .buildIndexes() is really slow (more than 2 seconds) on new mongoDB
 	await app.buildIndexes() ;
+	
 	await app.loadSystemDocuments() ;
 
 	return { app , performer } ;
@@ -145,6 +148,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 	it( "GET on the root object" , async () => {
 		var { app , performer } = await commonApp() ;
+		
 		var response = await app.get( '/' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			name: '/' ,
@@ -156,6 +160,57 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		} ) ;
 	} ) ;
 
+	it( "POST on the root object should fail just like on any object" , async () => {
+		var { app , performer } = await commonApp() ;
+		await expect( () => app.put( '/' ,
+			{
+				name: '/' ,
+				title: 'Root' ,
+				description: 'A wonderful website'
+			} ,
+			null ,
+			{ performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
+	} ) ;
+
+	it( "PUT on the root object should always fail" , async () => {
+		var { app , performer } = await commonApp() ;
+		await expect( () => app.put( '/' ,
+			{
+				name: '/' ,
+				title: 'Root' ,
+				description: 'A wonderful website'
+			} ,
+			null ,
+			{ performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
+	} ) ;
+
+	it( "PATCH on the root object" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		var response = await app.patch( '/' ,
+			{ description: 'A wonderful website' } ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			name: '/' ,
+			title: 'Root' ,
+			description: 'A wonderful website' ,
+			userAccess: {} ,
+			groupAccess: {} ,
+			publicAccess: { traverse: 1 , read: 3 , create: 1 }
+		} ) ;
+	} ) ;
+
+	it( "DELETE on the root object should always fail" , async () => {
+		var { app , performer } = await commonApp() ;
+		await expect( () => app.delete( '/' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
+	} ) ;
+
 	it( "GET on an unexisting item" , async () => {
 		var { app , performer } = await commonApp() ;
 		await expect( () => app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
@@ -164,7 +219,6 @@ describe( "Basic queries of object of a top-level collection" , () => {
 	it( "GET on a regular item" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		log.error( "app.root.children: %Y" , app.root.children ) ;
 		var blog = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
@@ -222,7 +276,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life posted!!!' ,
 			description: 'This is a supa blog! (posted!)' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -243,7 +297,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life 2!!!' ,
 			description: 'This is a supa blog! (x2)' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -275,7 +329,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life 3!!!' ,
 			description: 'This is a supa blog! Now overwritten!' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -316,7 +370,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			title: 'My wonderful life 3!!!' ,
 			description: 'This is a supa blog! Now patched!' ,
 			embedded: { a: 'A' , b: 'b' } ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -342,7 +396,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			title: 'My wonderful life 3!!!' ,
 			description: 'This is a supa blog! (x3)' ,
 			embedded: { a: 'omg' , b: 'b' } ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -364,7 +418,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'Change dat title.' ,
 			description: 'This is a supa blog! (x3)' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -429,7 +483,7 @@ describe( "Basic queries of top-level collections" , () => {
 				description: 'This is a supa blog!' ,
 				_id: blog1.getId() ,
 				//embedded: undefined,
-				parent: { id: '/' , collection: null } ,
+				parent: { id: '/' , collection: 'root' } ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
@@ -442,7 +496,7 @@ describe( "Basic queries of top-level collections" , () => {
 				description: 'Yet Another Blog' ,
 				_id: blog2.getId() ,
 				//embedded: undefined,
-				parent: { id: '/' , collection: null } ,
+				parent: { id: '/' , collection: 'root' } ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
@@ -487,7 +541,7 @@ describe( "Basic queries of top-level collections" , () => {
 				description: 'This is a supa blog!' ,
 				_id: blog1.getId() ,
 				//embedded: undefined,
-				parent: { id: '/' , collection: null } ,
+				parent: { id: '/' , collection: 'root' } ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
@@ -500,7 +554,7 @@ describe( "Basic queries of top-level collections" , () => {
 				description: 'Yet Another Blog' ,
 				_id: blog2.getId() ,
 				//embedded: undefined,
-				parent: { id: '/' , collection: null } ,
+				parent: { id: '/' , collection: 'root' } ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
@@ -517,7 +571,7 @@ describe( "Basic queries of top-level collections" , () => {
 				description: 'Yet Another Blog' ,
 				_id: blog2.getId() ,
 				//embedded: undefined,
-				parent: { id: '/' , collection: null } ,
+				parent: { id: '/' , collection: 'root' } ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
@@ -530,7 +584,7 @@ describe( "Basic queries of top-level collections" , () => {
 				description: 'The Third' ,
 				_id: blog3.getId() ,
 				//embedded: undefined,
-				parent: { id: '/' , collection: null } ,
+				parent: { id: '/' , collection: 'root' } ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
@@ -547,7 +601,7 @@ describe( "Basic queries of top-level collections" , () => {
 				description: 'This is a supa blog!' ,
 				_id: blog1.getId() ,
 				//embedded: undefined,
-				parent: { id: '/' , collection: null } ,
+				parent: { id: '/' , collection: 'root' } ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
@@ -560,7 +614,7 @@ describe( "Basic queries of top-level collections" , () => {
 				description: 'The Third' ,
 				_id: blog3.getId() ,
 				//embedded: undefined,
-				parent: { id: '/' , collection: null } ,
+				parent: { id: '/' , collection: 'root' } ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
@@ -577,7 +631,7 @@ describe( "Basic queries of top-level collections" , () => {
 				description: 'The Third' ,
 				_id: blog3.getId() ,
 				//embedded: undefined,
-				parent: { id: '/' , collection: null } ,
+				parent: { id: '/' , collection: 'root' } ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
@@ -1038,7 +1092,7 @@ describe( "Links" , () => {
 			lastName: 'Doe' ,
 			slugId: 'joe-doe' ,
 			email: 'joe.doe@gmail.com' ,
-			parent: { id: '/' , collection: null } ,
+			parent: { id: '/' , collection: 'root' } ,
 			godfather: { _id: godfatherId }
 		} ) ;
 
@@ -1048,7 +1102,7 @@ describe( "Links" , () => {
 			lastName: 'GODFATHER' ,
 			slugId: 'the-godfather' ,
 			email: 'godfather@gmail.com' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -1092,7 +1146,7 @@ describe( "Links" , () => {
 			lastName: 'GODFATHER' ,
 			slugId: 'the-godfather' ,
 			email: 'godfather@gmail.com' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		// Direct get
@@ -1102,7 +1156,7 @@ describe( "Links" , () => {
 			lastName: 'GODFATHER' ,
 			slugId: 'the-godfather' ,
 			email: 'godfather@gmail.com' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -1144,7 +1198,7 @@ describe( "Links" , () => {
 			lastName: 'GODFATHER' ,
 			slugId: 'the-godfather' ,
 			email: 'godfather@gmail.com' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		// Overwrite with another godfather
@@ -1168,7 +1222,7 @@ describe( "Links" , () => {
 			lastName: 'GODFATHER!?' ,
 			slugId: 'the-godfather' ,
 			email: 'godfather@gmail.com' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 		expect( response.output.data._id.toString() ).to.be( godfatherId2.toString() ) ;
 		expect( godfatherId.toString() ).to.be( godfatherId2.toString() ) ;
@@ -1216,7 +1270,7 @@ describe( "Links" , () => {
 			lastName: 'GODFATHER' ,
 			slugId: 'the-godfather' ,
 			email: 'godfather@gmail.com' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -1262,7 +1316,7 @@ describe( "Links" , () => {
 			firstName: "Joe" ,
 			lastName: "Doe" ,
 			email: "joe.doe@gmail.com" ,
-			parent: { id: '/' , collection: null } ,
+			parent: { id: '/' , collection: 'root' } ,
 			godfather: { _id: godfatherId }
 		} ) ;
 
@@ -1280,7 +1334,7 @@ describe( "Links" , () => {
 			firstName: "Joe" ,
 			lastName: "Doe" ,
 			email: "joe.doe@gmail.com" ,
-			parent: { id: '/' , collection: null } ,
+			parent: { id: '/' , collection: 'root' } ,
 			godfather: null
 		} ) ;
 	} ) ;
@@ -1396,7 +1450,7 @@ describe( "Links" , () => {
 			firstName: "Joe" ,
 			lastName: "Doe" ,
 			email: "joe.doe@gmail.com" ,
-			parent: { id: '/' , collection: null } ,
+			parent: { id: '/' , collection: 'root' } ,
 			father: {
 				_id: fatherId ,
 				firstName: "Big Joe" ,
@@ -1768,7 +1822,7 @@ describe( "Users" , () => {
 			lastName: 'Doe' ,
 			slugId: 'joe-doe' ,
 			email: 'joe.doe@gmail.com' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		expect( response.output.data.password ).to.be.an( 'object' ) ;
@@ -1804,7 +1858,7 @@ describe( "Users" , () => {
 			lastName: 'Doe' ,
 			slugId: 'joe-doe' ,
 			email: 'joe.doe@gmail.com' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		expect( response.output.data.password ).to.be.an( 'object' ) ;
@@ -1887,7 +1941,7 @@ describe( "Slug usages" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			slugId: 'my-wonderful-life' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -1929,7 +1983,7 @@ describe( "Slug usages" , () => {
 			title: 'My wonderful life!!!' ,
 			description: 'This is a supa blog!' ,
 			slugId: 'my-wonderful-life' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		// Replace it
@@ -1948,7 +2002,7 @@ describe( "Slug usages" , () => {
 			title: 'New title!' ,
 			description: 'New description!' ,
 			slugId: 'my-wonderful-life' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		// So using the original ID, it should get the replacing document
@@ -1958,7 +2012,7 @@ describe( "Slug usages" , () => {
 			title: 'New title!' ,
 			description: 'New description!' ,
 			slugId: 'my-wonderful-life' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		// Patch it
@@ -1971,7 +2025,7 @@ describe( "Slug usages" , () => {
 			title: 'A brand new title!' ,
 			description: 'New description!' ,
 			slugId: 'my-wonderful-life' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		// Get it using the original ID
@@ -1981,7 +2035,7 @@ describe( "Slug usages" , () => {
 			title: 'A brand new title!' ,
 			description: 'New description!' ,
 			slugId: 'my-wonderful-life' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		// Delete it
@@ -2013,21 +2067,21 @@ describe( "Auto collection" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			slugId: 'my-wonderful-life' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		response = await app.get( '/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			slugId: 'my-wonderful-life' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		response = await app.get( '/my-wonderful-life' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			slugId: 'my-wonderful-life' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
 
@@ -3759,7 +3813,7 @@ describe( "Misc" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life 2!!!' ,
 			description: 'This is a supa blog! (x2)' ,
-			parent: { id: '/' , collection: null }
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
 
 		// It should reset

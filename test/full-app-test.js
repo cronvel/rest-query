@@ -285,7 +285,7 @@ describe( "Basics tests" , () => {
 			description: "... about my wonderful life" ,
 			slugId: data.slugId ,	// Cannot be predicted
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			}
 		} ) ;
@@ -303,7 +303,7 @@ describe( "Basics tests" , () => {
 			description: "... about my wonderful life" ,
 			slugId: data.slugId ,	// Cannot be predicted
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			} ,
 			userAccess: {} ,
@@ -358,7 +358,7 @@ describe( "Basics tests" , () => {
 			description: "... about my wonderful life" ,
 			slugId: data.slugId ,	// Cannot be predicted
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			}
 		} ) ;
@@ -375,7 +375,7 @@ describe( "Basics tests" , () => {
 			description: "... about my wonderful life" ,
 			slugId: data.slugId ,	// Cannot be predicted
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			} ,
 			userAccess: {} ,
@@ -441,7 +441,7 @@ describe( "Basics tests" , () => {
 			description: "... about my wonderful life" ,
 			slugId: data.slugId ,	// Cannot be predicted
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			}
 		} ) ;
@@ -459,7 +459,7 @@ describe( "Basics tests" , () => {
 			description: "... about my wonderful life" ,
 			slugId: data.slugId ,	// Cannot be predicted
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			} ,
 			userAccess: {} ,
@@ -594,7 +594,7 @@ describe( "Basics tests" , () => {
 				description: "Everything started with that." ,
 				slugId: data[ 0 ].slugId ,	// Cannot be predicted
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: '/'
 				}
 			} ,
@@ -604,7 +604,7 @@ describe( "Basics tests" , () => {
 				description: "About this blog." ,
 				slugId: data[ 1 ].slugId ,	// Cannot be predicted
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: '/'
 				}
 			} ,
@@ -614,7 +614,7 @@ describe( "Basics tests" , () => {
 				description: "10 things you should know... or not..." ,
 				slugId: data[ 2 ].slugId ,	// Cannot be predicted
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: '/'
 				}
 			}
@@ -686,7 +686,7 @@ describe( "Basics tests on users" , () => {
 			groups: {} ,
 			slugId: data.slugId ,	// Cannot be predicted
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			}
 		} ) ;
@@ -718,7 +718,7 @@ describe( "Basics tests on users" , () => {
 			groupAccess: {} ,
 			publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			}
 		} ) ;
@@ -874,7 +874,7 @@ describe( "Links population" , () => {
 			slugId: data.slugId ,	// Cannot be predicted
 			groups: {} ,
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			} ,
 			father: {
@@ -886,7 +886,7 @@ describe( "Links population" , () => {
 				slugId: data.father.slugId ,
 				groups: {} ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			} ,
@@ -899,7 +899,7 @@ describe( "Links population" , () => {
 				slugId: data.godfather.slugId ,
 				groups: {} ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			}
@@ -933,7 +933,7 @@ describe( "Links population" , () => {
 			slugId: data.slugId ,	// Cannot be predicted
 			groups: {} ,
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			} ,
 			isApiKey: false ,
@@ -959,7 +959,7 @@ describe( "Links population" , () => {
 				groupAccess: {} ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			} ,
@@ -977,7 +977,7 @@ describe( "Links population" , () => {
 				groupAccess: {} ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			}
@@ -1011,7 +1011,7 @@ describe( "Links population" , () => {
 			slugId: data.slugId ,	// Cannot be predicted
 			groups: {} ,
 			parent: {
-				collection: null ,
+				collection: 'root' ,
 				id: '/'
 			} ,
 			isApiKey: false ,
@@ -1027,7 +1027,7 @@ describe( "Links population" , () => {
 				_id: data.father._id ,
 				login: "big.joe.doe@gmail.com" ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			} ,
@@ -1035,7 +1035,7 @@ describe( "Links population" , () => {
 				_id: data.godfather._id ,
 				login: "godfather@gmail.com" ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			}
@@ -1065,7 +1065,7 @@ describe( "Links population" , () => {
 				groups: {} ,
 				//father: null, godfather: null,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			} ,
@@ -1078,7 +1078,7 @@ describe( "Links population" , () => {
 				slugId: data[ 1 ].slugId ,	// Cannot be predicted
 				groups: {} ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: '/'
 				} ,
 				father: {
@@ -1090,7 +1090,7 @@ describe( "Links population" , () => {
 					slugId: data[ 0 ].slugId ,
 					groups: {} ,
 					parent: {
-						collection: null ,
+						collection: 'root' ,
 						id: "/"
 					}
 				} ,
@@ -1103,7 +1103,7 @@ describe( "Links population" , () => {
 					slugId: data[ 2 ].slugId ,
 					groups: {} ,
 					parent: {
-						collection: null ,
+						collection: 'root' ,
 						id: "/"
 					}
 				}
@@ -1118,7 +1118,7 @@ describe( "Links population" , () => {
 				groups: {} ,
 				//father: null, godfather: null,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			}
@@ -1158,7 +1158,7 @@ describe( "Links population" , () => {
 				groupAccess: {} ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			} ,
@@ -1176,7 +1176,7 @@ describe( "Links population" , () => {
 				groupAccess: {} ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: '/'
 				} ,
 				father: {
@@ -1193,7 +1193,7 @@ describe( "Links population" , () => {
 					groupAccess: {} ,
 					publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 					parent: {
-						collection: null ,
+						collection: 'root' ,
 						id: "/"
 					}
 				} ,
@@ -1211,7 +1211,7 @@ describe( "Links population" , () => {
 					groupAccess: {} ,
 					publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 					parent: {
-						collection: null ,
+						collection: 'root' ,
 						id: "/"
 					}
 				}
@@ -1231,7 +1231,7 @@ describe( "Links population" , () => {
 				groupAccess: {} ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			}
@@ -1269,7 +1269,7 @@ describe( "Links population" , () => {
 				groupAccess: {} ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			} ,
@@ -1287,14 +1287,14 @@ describe( "Links population" , () => {
 				groupAccess: {} ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: '/'
 				} ,
 				father: {
 					_id: data[ 0 ]._id ,
 					login: "big.joe.doe@gmail.com" ,
 					parent: {
-						collection: null ,
+						collection: 'root' ,
 						id: "/"
 					}
 				} ,
@@ -1302,7 +1302,7 @@ describe( "Links population" , () => {
 					_id: data[ 2 ]._id ,
 					login: "godfather@gmail.com" ,
 					parent: {
-						collection: null ,
+						collection: 'root' ,
 						id: "/"
 					}
 				}
@@ -1322,7 +1322,7 @@ describe( "Links population" , () => {
 				groupAccess: {} ,
 				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
 				parent: {
-					collection: null ,
+					collection: 'root' ,
 					id: "/"
 				}
 			}
