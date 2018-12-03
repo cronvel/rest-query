@@ -156,7 +156,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: 1 , read: 3 , create: 1 }
+			publicAccess: { traverse: true , read: ['content'] , create: true }
 		} ) ;
 	} ) ;
 
@@ -202,7 +202,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'A wonderful website' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: 1 , read: 3 , create: 1 }
+			publicAccess: { traverse: true , read: ['content'] , create: true }
 		} ) ;
 	} ) ;
 
@@ -3826,7 +3826,7 @@ describe( "Misc" , () => {
 	it( "Shema's 'defaultPublicAccess'" , async () => {
 		var { app , performer } = await commonApp() ;
 		expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
-			.to.equal( { traverse: 1 , read: 3 , create: 1 } ) ;
+			.to.equal( { traverse: true , read: ['content'] , create: true } ) ;
 		expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
 			.to.equal( { read: 3 } ) ;
 	} ) ;

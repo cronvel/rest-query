@@ -1,6 +1,6 @@
 path: /comments
 defaultPublicAccess:
-	read: 3
+	read: content
 properties:
 	title:
 		type: string
