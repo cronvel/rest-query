@@ -213,8 +213,8 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 	it( "GET on an unexisting item" , async () => {
 		var { app , performer } = await commonApp() ;
-		await app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ;
-		//await expect( () => app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
+		//await app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ;
+		await expect( () => app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
 	it( "GET on a regular item" , async () => {
