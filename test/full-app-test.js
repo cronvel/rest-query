@@ -259,7 +259,7 @@ describe( "Basics tests" , () => {
 			body: JSON.stringify( {
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
-				publicAccess: { traverse: 1 , read: 4 , create: 1 }
+				publicAccess: { traverse: true , read: true , create: true }
 			} )
 		} ;
 
@@ -309,7 +309,7 @@ describe( "Basics tests" , () => {
 			} ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: 1 , read: 4 , create: 1 }
+			publicAccess: { traverse: true , read: true , create: true }
 		} ) ;
 	} ) ;
 
@@ -326,7 +326,7 @@ describe( "Basics tests" , () => {
 			body: JSON.stringify( {
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
-				publicAccess: { traverse: 1 , read: 4 , create: 1 }
+				publicAccess: { traverse: true , read: true , create: true }
 			} )
 		} ;
 
@@ -381,7 +381,7 @@ describe( "Basics tests" , () => {
 			} ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: 1 , read: 4 , create: 1 }
+			publicAccess: { traverse: true , read: true , create: true }
 		} ) ;
 		//console.log( "Response:" , response ) ;
 	} ) ;
@@ -399,8 +399,8 @@ describe( "Basics tests" , () => {
 			body: JSON.stringify( {
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
-				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					publicAccess: {
+					traverse: true , read: true , write: true , delete: true , create: true
 				}
 			} )
 		} ;
@@ -466,7 +466,7 @@ describe( "Basics tests" , () => {
 			userAccess: {} ,
 			groupAccess: {} ,
 			publicAccess: {
-				traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+				traverse: true , read: true , write: true , delete: true , create: true
 			}
 		} ) ;
 		//console.log( "Response:" , response ) ;
@@ -486,7 +486,7 @@ describe( "Basics tests" , () => {
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , create: true
 				}
 			} )
 		} ;
@@ -658,7 +658,7 @@ describe( "Basics tests on users" , () => {
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
 				password: "pw" ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 }
+				publicAccess: { traverse: true , read: true , create: true }
 			} )
 		} ;
 
@@ -717,7 +717,7 @@ describe( "Basics tests on users" , () => {
 			slugId: data.slugId ,	// Cannot be predicted
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+			publicAccess: { traverse: true , read: true , create: true } ,
 			parent: {
 				collection: 'root' ,
 				id: '/'
@@ -742,7 +742,7 @@ describe( "Basics tests on users" , () => {
 				email: "john.doe@gmail.com" ,
 				password: "pw" ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , create: true
 				}
 			} )
 		} ;
@@ -800,7 +800,7 @@ describe( "Links population" , () => {
 				lastName: "Doe" ,
 				email: "big.joe.doe@gmail.com" ,
 				password: "pw" ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 }
+				publicAccess: { traverse: true , read: true , create: true }
 			} )
 		} ;
 
@@ -816,7 +816,7 @@ describe( "Links population" , () => {
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
 				password: "pw" ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 }
+				publicAccess: { traverse: true , read: true , create: true }
 			} )
 		} ;
 
@@ -844,7 +844,7 @@ describe( "Links population" , () => {
 				password: "pw" ,
 				father: u1 ,
 				godfather: u2 ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 }
+				publicAccess: { traverse: true , read: true , create: true }
 			} )
 		} ;
 
@@ -940,9 +940,9 @@ describe( "Links population" , () => {
 			isApiKey: false ,
 			token: {} ,
 			publicAccess: {
-				create: 1 ,
-				read: 5 ,
-				traverse: 1
+				create: true ,
+				read: true ,
+				traverse: true
 			} ,
 			userAccess: {} ,
 			groupAccess: {} ,
@@ -958,7 +958,7 @@ describe( "Links population" , () => {
 				token: {} ,
 				userAccess: {} ,
 				groupAccess: {} ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+				publicAccess: { traverse: true , read: true , create: true } ,
 				parent: {
 					collection: 'root' ,
 					id: "/"
@@ -976,7 +976,7 @@ describe( "Links population" , () => {
 				token: {} ,
 				userAccess: {} ,
 				groupAccess: {} ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+				publicAccess: { traverse: true , read: true , create: true } ,
 				parent: {
 					collection: 'root' ,
 					id: "/"
@@ -1018,9 +1018,9 @@ describe( "Links population" , () => {
 			isApiKey: false ,
 			token: {} ,
 			publicAccess: {
-				create: 1 ,
-				read: 5 ,
-				traverse: 1
+				create: true ,
+				read: true ,
+				traverse: true
 			} ,
 			userAccess: {} ,
 			groupAccess: {} ,
@@ -1157,7 +1157,7 @@ describe( "Links population" , () => {
 				token: {} ,
 				userAccess: {} ,
 				groupAccess: {} ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+				publicAccess: { traverse: true , read: true , create: true } ,
 				parent: {
 					collection: 'root' ,
 					id: "/"
@@ -1175,7 +1175,7 @@ describe( "Links population" , () => {
 				token: {} ,
 				userAccess: {} ,
 				groupAccess: {} ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+				publicAccess: { traverse: true , read: true , create: true } ,
 				parent: {
 					collection: 'root' ,
 					id: '/'
@@ -1192,7 +1192,7 @@ describe( "Links population" , () => {
 					token: {} ,
 					userAccess: {} ,
 					groupAccess: {} ,
-					publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+					publicAccess: { traverse: true , read: true , create: true } ,
 					parent: {
 						collection: 'root' ,
 						id: "/"
@@ -1210,7 +1210,7 @@ describe( "Links population" , () => {
 					token: {} ,
 					userAccess: {} ,
 					groupAccess: {} ,
-					publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+					publicAccess: { traverse: true , read: true , create: true } ,
 					parent: {
 						collection: 'root' ,
 						id: "/"
@@ -1230,7 +1230,7 @@ describe( "Links population" , () => {
 				token: {} ,
 				userAccess: {} ,
 				groupAccess: {} ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+				publicAccess: { traverse: true , read: true , create: true } ,
 				parent: {
 					collection: 'root' ,
 					id: "/"
@@ -1268,7 +1268,7 @@ describe( "Links population" , () => {
 				token: {} ,
 				userAccess: {} ,
 				groupAccess: {} ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+				publicAccess: { traverse: true , read: true , create: true } ,
 				parent: {
 					collection: 'root' ,
 					id: "/"
@@ -1286,7 +1286,7 @@ describe( "Links population" , () => {
 				token: {} ,
 				userAccess: {} ,
 				groupAccess: {} ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+				publicAccess: { traverse: true , read: true , create: true } ,
 				parent: {
 					collection: 'root' ,
 					id: '/'
@@ -1321,7 +1321,7 @@ describe( "Links population" , () => {
 				token: {} ,
 				userAccess: {} ,
 				groupAccess: {} ,
-				publicAccess: { traverse: 1 , read: 5 , create: 1 } ,
+				publicAccess: { traverse: true , read: true , create: true } ,
 				parent: {
 					collection: 'root' ,
 					id: "/"

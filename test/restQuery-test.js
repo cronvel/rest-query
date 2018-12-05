@@ -3480,7 +3480,46 @@ describe( "Access" , () => {
 
 	it( "more inheritance tests needed" ) ;
 	it( "fine-grained access" ) ;
-	it( "document properties filtering" ) ;
+
+	it( "document properties filtering" , async () => {
+		var response , userAccess ;
+
+		userAccess = {} ;
+		userAccess[ authorizedId ] = { read: ['content'] } ;	// Minimal right that pass the check
+		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass the check
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'none'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+
+		// User listed and with enough rights
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life 2!!!' ,
+			description: 'This is a supa blog! (x2)'
+		} ) ;
+		log.fatal( "%Y" , response.output.data ) ;
+
+		return ;
+		// Non-connected user
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		// User listed, but with too low rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+	} ) ;
 } ) ;
 
 

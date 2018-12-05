@@ -98,8 +98,6 @@ describe( "Parse HTTP request" , () => {
 			//type: 'json' ,
 			host: 'localhost' ,
 			method: 'get' ,
-			tier: 3 ,
-			pTier: 3 ,
 			query: { limit: 1000 }
 		} ) ;
 	} ) ;
@@ -135,8 +133,6 @@ describe( "Parse HTTP request" , () => {
 			//type: 'json' ,
 			host: 'localhost' ,
 			method: 'get' ,
-			tier: 3 ,
-			pTier: 3 ,
 			query: {  limit: 1000 , populate: 'group' }
 		} ) ;
 	} ) ;
@@ -150,8 +146,6 @@ describe( "Parse HTTP request" , () => {
 			//type: 'json' ,
 			host: 'localhost' ,
 			method: 'post' ,
-			tier: 3 ,
-			pTier: 3 ,
 			query: { limit: 1000 } ,
 			data: { a: 'simple', json: 'file' }
 		} ) ;
