@@ -156,7 +156,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: ['content'] , create: true }
+			publicAccess: { traverse: true , read: ['id','content'] , create: true }
 		} ) ;
 	} ) ;
 
@@ -202,7 +202,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'A wonderful website' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: ['content'] , create: true }
+			publicAccess: { traverse: true , read: ['id','content'] , create: true }
 		} ) ;
 	} ) ;
 
@@ -213,7 +213,6 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 	it( "GET on an unexisting item" , async () => {
 		var { app , performer } = await commonApp() ;
-		//await app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ;
 		await expect( () => app.get( '/Blogs/111111111111111111111111' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 
@@ -252,7 +251,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		expect( response.output.data ).to.be( 'My wonderful life' ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/.userAccess.' + randomId , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( { traverse: 1 , read: 3 } ) ;
+		expect( response.output.data ).to.equal( { traverse: true , read: ['id','content'] } ) ;
 	} ) ;
 
 	it( "POST then GET" , async () => {
@@ -432,7 +431,8 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		var { app , performer } = await commonApp() ;
 
 		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
-			{			title: 'My wonderful life 2!!!' ,
+			{
+				title: 'My wonderful life 2!!!' ,
 				description: 'This is a supa blog! (x2)' ,
 				publicAccess: 'all' } ,
 			null ,
@@ -488,7 +488,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
@@ -501,7 +501,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
@@ -546,7 +546,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
@@ -559,7 +559,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
@@ -576,7 +576,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
@@ -589,7 +589,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
@@ -606,7 +606,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
@@ -619,7 +619,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
@@ -636,7 +636,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: 1 , read: 5 , write: 5 , delete: 1 , create: 1
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			}
@@ -3177,15 +3177,15 @@ describe( "Access" , () => {
 		
 		// Non-connected user
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" } , null , { performer: notConnectedPerformer } ) )
-			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public patch forbidden.' } ) ;
 
 		// User not listed in specific rights
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" } , null , { performer: unauthorizedPerformer } ) )
-			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
 		
 		// User listed, but with too low rights
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" } , null , { performer: notEnoughAuthorizedPerformer } ) )
-			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
 	} ) ;
 
 	it( "DELETE a restricted resource performed by various connected and non-connected users" , async () => {
@@ -3402,12 +3402,12 @@ describe( "Access" , () => {
 		userAccess = {} ;
 		
 		userAccess[ authorizedId ] = {
-			read: 4 ,
-			write: 4 ,
-			create: 1 ,
+			read: true ,
+			write: true ,
+			create: true ,
 			inheritance: {
-				read: 4 ,
-				write: 4
+				read: true ,
+				write: true
 			}
 		} ;
 
@@ -3440,25 +3440,25 @@ describe( "Access" , () => {
 
 		// Non-connected user
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notConnectedPerformer } ) )
-			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public patch forbidden.' } ) ;
 
 		// User not listed in specific rights
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: unauthorizedPerformer } ) )
-			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
 
 		// User listed, but with too low rights
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notEnoughAuthorizedPerformer } ) )
-			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
 		
 		
 		// Now give public access
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				publicAccess: {
-					traverse: 1 ,
+					traverse: true ,
 					inheritance: {
-						read: 4 ,
-						write: 4
+						read: true ,
+						write: true
 					}
 				}
 			} ,
@@ -3478,7 +3478,9 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.partially.equal( { title: "I can do that!" } ) ;
 	} ) ;
 
-	it( "More inheritance tests needed" ) ;
+	it( "more inheritance tests needed" ) ;
+	it( "fine-grained access" ) ;
+	it( "document properties filtering" ) ;
 } ) ;
 
 
@@ -3827,9 +3829,9 @@ describe( "Misc" , () => {
 	it( "Shema's 'defaultPublicAccess'" , async () => {
 		var { app , performer } = await commonApp() ;
 		expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
-			.to.equal( { traverse: true , read: ['content'] , create: true } ) ;
+			.to.equal( { traverse: true , read: ['id','content'] , create: true } ) ;
 		expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
-			.to.equal( { read: 3 } ) ;
+			.to.equal( { read: ['id','content'] } ) ;
 	} ) ;
 
 	it( "Test CORS" ) ;
