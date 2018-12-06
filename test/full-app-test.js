@@ -291,7 +291,7 @@ describe( "Basics tests" , () => {
 			}
 		} ) ;
 		
-		getQuery.path += "?tier=4" ;
+		getQuery.path += "?access=all" ;
 		response = await requester( getQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
 		expect( response.body ).to.be.ok() ;
@@ -364,7 +364,7 @@ describe( "Basics tests" , () => {
 			}
 		} ) ;
 		
-		getQuery.path += "?tier=4" ;
+		getQuery.path += "?access=all" ;
 		
 		response = await requester( getQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
@@ -448,7 +448,7 @@ describe( "Basics tests" , () => {
 		} ) ;
 		//console.log( "Response:" , response ) ;
 
-		getQuery.path += "?tier=4" ;
+		getQuery.path += "?access=all" ;
 		
 		response = await requester( getQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
@@ -684,7 +684,7 @@ describe( "Basics tests on users" , () => {
 			lastName: "Doe2" ,
 			email: "joe.doe2@gmail.com" ,
 			login: "joe.doe2@gmail.com" ,
-			groups: {} ,
+			//groups: {} ,
 			slugId: data.slugId ,	// Cannot be predicted
 			parent: {
 				collection: 'root' ,
@@ -692,7 +692,7 @@ describe( "Basics tests on users" , () => {
 			}
 		} ) ;
 		
-		getQuery.path += "?tier=5" ;
+		getQuery.path += "?access=all" ;
 		
 		response = await requester( getQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
@@ -873,7 +873,7 @@ describe( "Links population" , () => {
 			email: "joe.doe@gmail.com" ,
 			login: "joe.doe@gmail.com" ,
 			slugId: data.slugId ,	// Cannot be predicted
-			groups: {} ,
+			//groups: {} ,
 			parent: {
 				collection: 'root' ,
 				id: '/'
@@ -885,7 +885,7 @@ describe( "Links population" , () => {
 				email: "big.joe.doe@gmail.com" ,
 				login: "big.joe.doe@gmail.com" ,
 				slugId: data.father.slugId ,
-				groups: {} ,
+				//groups: {} ,
 				parent: {
 					collection: 'root' ,
 					id: "/"
@@ -898,7 +898,7 @@ describe( "Links population" , () => {
 				email: "godfather@gmail.com" ,
 				login: "godfather@gmail.com" ,
 				slugId: data.godfather.slugId ,
-				groups: {} ,
+				//groups: {} ,
 				parent: {
 					collection: 'root' ,
 					id: "/"
@@ -908,7 +908,7 @@ describe( "Links population" , () => {
 		
 		getQuery = {
 			method: 'GET' ,
-			path: '/Users/' + u3 + '?populate=[father,godfather]&tier=5&pTier=5' ,
+			path: '/Users/' + u3 + '?populate=[father,godfather]&access=all&pAccess=all' ,
 			headers: {
 				Host: 'localhost'
 			}
@@ -986,7 +986,7 @@ describe( "Links population" , () => {
 		
 		getQuery = {
 			method: 'GET' ,
-			path: '/Users/' + u3 + '?populate=[father,godfather]&tier=5&pTier=1' ,
+			path: '/Users/' + u3 + '?populate=[father,godfather]&access=all&pAccess=id' ,
 			headers: {
 				Host: 'localhost'
 			}
@@ -1127,7 +1127,7 @@ describe( "Links population" , () => {
 
 		getQuery = {
 			method: 'GET' ,
-			path: '/Users?populate=[father,godfather]&tier=5&pTier=5' ,
+			path: '/Users?populate=[father,godfather]&access=all&pAccess=all' ,
 			headers: {
 				Host: 'localhost'
 			}
@@ -1240,7 +1240,7 @@ describe( "Links population" , () => {
 
 		getQuery = {
 			method: 'GET' ,
-			path: '/Users?populate=[father,godfather]&tier=5&pTier=1' ,
+			path: '/Users?populate=[father,godfather]&access=all&pAccess=id' ,
 			headers: {
 				Host: 'localhost'
 			}
