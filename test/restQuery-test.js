@@ -3505,9 +3505,7 @@ describe( "Access" , () => {
 			title: 'My wonderful life 2!!!' ,
 			description: 'This is a supa blog! (x2)'
 		} ) ;
-		log.fatal( "%Y" , response.output.data ) ;
 
-		return ;
 		// Non-connected user
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;

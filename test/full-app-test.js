@@ -1063,7 +1063,7 @@ describe( "Links population" , () => {
 				email: "big.joe.doe@gmail.com" ,
 				login: "big.joe.doe@gmail.com" ,
 				slugId: data[ 0 ].slugId ,
-				groups: {} ,
+				//groups: {} ,
 				//father: null, godfather: null,
 				parent: {
 					collection: 'root' ,
@@ -1077,7 +1077,7 @@ describe( "Links population" , () => {
 				email: "joe.doe@gmail.com" ,
 				login: "joe.doe@gmail.com" ,
 				slugId: data[ 1 ].slugId ,	// Cannot be predicted
-				groups: {} ,
+				//groups: {} ,
 				parent: {
 					collection: 'root' ,
 					id: '/'
@@ -1089,7 +1089,7 @@ describe( "Links population" , () => {
 					email: "big.joe.doe@gmail.com" ,
 					login: "big.joe.doe@gmail.com" ,
 					slugId: data[ 0 ].slugId ,
-					groups: {} ,
+					//groups: {} ,
 					parent: {
 						collection: 'root' ,
 						id: "/"
@@ -1102,7 +1102,7 @@ describe( "Links population" , () => {
 					email: "godfather@gmail.com" ,
 					login: "godfather@gmail.com" ,
 					slugId: data[ 2 ].slugId ,
-					groups: {} ,
+					//groups: {} ,
 					parent: {
 						collection: 'root' ,
 						id: "/"
@@ -1116,7 +1116,7 @@ describe( "Links population" , () => {
 				email: "godfather@gmail.com" ,
 				login: "godfather@gmail.com" ,
 				slugId: data[ 2 ].slugId ,
-				groups: {} ,
+				//groups: {} ,
 				//father: null, godfather: null,
 				parent: {
 					collection: 'root' ,

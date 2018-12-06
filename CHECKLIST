@@ -1,0 +1,17 @@
+
+Uncertain features:
+
+.	Scheduler + userland worker
+.	Attachment
+.	populate security model
+.	restrictedAccess (on collection's schema) is deactivated, should it be removed or refactored?
+.	filter/skip/limit/filter check, security and so on
+
+
+
+Misc:
+
+.	change all [array].concat(element) to ES6 [ ... array , element ]
+.	hook and non-hoot context: move 'performer' and 'access' outside of 'input'? make them top-level?
+.	remove ownKeys handler in RootsDB
+
