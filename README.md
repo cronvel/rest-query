@@ -195,29 +195,6 @@ The `context.token` contains the token.
 
 
 
-## Request callback
-
-All request accept a callback of the form: `function( error , response , responseContext )`.
-
-* error: if set, then the request has not been performed, for various reasons, e.g.
-	* an application error (internal error)
-	* the user performing the action is not authorized
-	* the request does not make any sense
-	* the requested resources does not exist
-	* and so on...
-
-* response `Object` it is the response to the request, it depends on the kind of request, it can be:
-	* a document
-	* a batch of documents
-	* a response object (not a document, but an object with insightful information about what happend, e.g. the ID of
-		a resource created by a POST request)
-	* a binary stream to send back to the client
-	
-* responseContext `Object` an object containing various information on the current request to be processed,     
-	see [*Common context*](#ref.common-context)
-
-
-
 
 <a name="ref.common-context"></a>
 ## Common context
@@ -225,7 +202,7 @@ All request accept a callback of the form: `function( error , response , respons
 This is the common object format passed to hook, custom method and as the third argument of the request callback.
 Usual properties are:
                                                     
-* input `Object` contains data that have been passed as input (e.g. by a HTTP client, or by an internal call), where:
+* input `Object` contains data that have been passed as input (e.g. by a HTTP client), where:
 	
 	* method `string` the original method used (i.e. the lower-cased HTTP method)
 	* pathParts `Array` the fully parsed path to the resource
@@ -234,9 +211,10 @@ Usual properties are:
 	* document `Object` (optional) the given document, if any (e.g. the body of a HTTP PUT request)
 	* attachmentStreams `Object` (optional) the given binary stream, if any (e.g. a part of a multipart body of a HTTP PUT request)
 
-* output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client,
-	or to an internal callback), where:
+* output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client
+	or to a hook, etc), where:
 	
+	* data `object` or `Stream` the data that is the response of the request
 	* httpStatus (optional) `number` a particular HTTP status that may overide the default one
 	* meta `Object` (optional) meta-data of the document, common meta data:
 		
@@ -262,14 +240,12 @@ Usual properties are:
 
 ## Workers
 
-A worker is a function of the form: `function( scheduledTask , workerContext , callback )`.
+A worker is a function of the form: `function( scheduledTask , workerContext )`.
 
 * scheduledTask `Object` it is a document of the ScheduledTask collection, that triggered the worker, userland code may
 	store custom data into the `scheduledTask.data` object.
 	
 * workerContext `Object` currently unused (this is an empty object `{}`)
-
-* callback `Function( error )` a completion callback, **if error is set, the task is not removed**: it will be retried!
 
 The *this* context is the instance of `App`.
 
