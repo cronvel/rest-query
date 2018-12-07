@@ -9,6 +9,16 @@ Uncertain features:
 
 
 
+Refacto:
+
+.	Populate should not be done on primary request
+		--> for single doc, use `document.populate()` afterward, so populate rules and rights are checked before eventually useless DB round-trip
+		--> for multi docs, use `new Population()`, `document.preparePopulate()` and `world.populate()` afterward, so:
+			- documents can be filtered out of the batch early (when there is no access granted to them)
+			- some rules and rights can be checked first before the big `world.populate()`
+
+
+
 Misc:
 
 .	change all [array].concat(element) to ES6 [ ... array , element ]

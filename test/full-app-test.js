@@ -1026,6 +1026,7 @@ describe( "Links population" , () => {
 			groupAccess: {} ,
 			father: {
 				_id: data.father._id ,
+				slugId: "big-joe-doe" ,
 				login: "big.joe.doe@gmail.com" ,
 				parent: {
 					collection: 'root' ,
@@ -1034,6 +1035,7 @@ describe( "Links population" , () => {
 			} ,
 			godfather: {
 				_id: data.godfather._id ,
+				slugId: "the-godfather" ,
 				login: "godfather@gmail.com" ,
 				parent: {
 					collection: 'root' ,
@@ -1294,6 +1296,7 @@ describe( "Links population" , () => {
 				father: {
 					_id: data[ 0 ]._id ,
 					login: "big.joe.doe@gmail.com" ,
+					slugId: "big-joe-doe" ,
 					parent: {
 						collection: 'root' ,
 						id: "/"
@@ -1301,6 +1304,7 @@ describe( "Links population" , () => {
 				} ,
 				godfather: {
 					_id: data[ 2 ]._id ,
+					slugId: "the-godfather" ,
 					login: "godfather@gmail.com" ,
 					parent: {
 						collection: 'root' ,
