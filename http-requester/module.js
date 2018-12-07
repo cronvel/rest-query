@@ -1,8 +1,8 @@
 /*
 	The Cedric's Swiss Knife (CSK) - CSK HTTP Requester
 
-	Copyright (c) 2015 - 2016 Cédric Ronvel 
-	
+	Copyright (c) 2015 - 2016 Cédric Ronvel
+
 	The MIT License (MIT)
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +24,7 @@
 	SOFTWARE.
 */
 
-// Test of modules
+"use strict" ;
 
 
 
@@ -37,56 +37,49 @@ exports.init = function init( api_ ) { api = api_ ; } ;
 var commands = exports.commands = {} ;
 
 
-commands.login = function ( args , query , callback )
-{
+
+// login <login> <password>
+commands.login = function( args , query , callback ) {
 	api.emulate( [
-			'Content-Type: application/json' ,
-			'body ' + JSON.stringify( { login: args[ 0 ] , password: args[ 1 ] , type: 'header' } ) ,
-			'post /Users/CREATE-TOKEN' ,
-		] ,
-		function() {
-			var token ;
-			
-			try {
-				token = JSON.parse( api.lastResponse().body ).token ;
-			}
-			catch ( error ) {
-				api.term( "%E\n" ) ;
-				callback() ;
-				return ;
-			}
-			
-			api.emulate( 'X-Token: ' + token , callback ) ;
+		'Content-Type: application/json' ,
+		'body ' + JSON.stringify( { login: args[ 0 ] , password: args[ 1 ] , type: 'header' } ) ,
+		'post /Users/CREATE-TOKEN'
+	] ,
+	() => {
+		var token ;
+
+		try {
+			token = JSON.parse( api.lastResponse().body ).token ;
 		}
+		catch ( error ) {
+			api.term( "%E\n" ) ;
+			callback() ;
+			return ;
+		}
+
+		api.emulate( 'X-Token: ' + token , callback ) ;
+	}
 	) ;
 } ;
 
 
 
-commands.createUser = function ( args , query , callback )
-{
-	var firstName , lastName , tmp ;
-	
-	tmp = args[ 0 ].split( '@' )[ 0 ].split( '.' ) ;
-	
-	firstName = tmp[ 0 ] || 'Robert' ;
-	firstName = firstName[ 0 ].toUpperCase() + firstName.slice( 1 ) ;
-	
-	lastName = tmp[ 1 ] || 'Polson' ;
-	lastName = lastName[ 0 ].toUpperCase() + lastName.slice( 1 ) ;
-	
-	api.emulate( [
-			'Content-Type: application/json' ,
-			'body ' + JSON.stringify( {
-				email: args[ 0 ] ,
-				password: args[ 1 ] ,
-				firstName: firstName ,
-				lastName: lastName ,
-			} ) ,
-			'post /Users' ,
-		] ,
-		callback
-	) ;
-} ; 
+// createUser <login> <password> <email> <firstName> <lastName>
+commands.createUser = function( args , query , callback ) {
+	var data = {
+		login: args[ 0 ] ,
+		password: args[ 1 ] ,
+		email: args[ 2 ] ,
+		firstName: args[ 3 ] ,
+		lastName: args[ 4 ]
+	} ;
 
+	api.emulate( [
+		'Content-Type: application/json' ,
+		'body ' + JSON.stringify( data ) ,
+		'post /Users'
+	] ,
+	callback
+	) ;
+} ;
 
