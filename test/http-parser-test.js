@@ -99,12 +99,14 @@ describe( "Parse HTTP request" , () => {
 			//type: 'json' ,
 			host: 'localhost' ,
 			method: 'get' ,
-			query: { limit: 1000 }
+			query: {
+				//limit: 1000
+			}
 		} ) ;
 	} ) ;
 
 	it( "should parse a fake GET with path and query string" , async () => {
-		var req = fakeHttpRequest( { url: "/path/to/json?populate=group" } ) ;
+		var req = fakeHttpRequest( { url: "/path/to/json?populate=group&.prop.$lt=20&.prop.$gt=10" } ) ;
 		var message = await restQuery.httpModule.parseRequest( req ) ;
 		
 		expect( message ).to.equal( {
@@ -135,7 +137,13 @@ describe( "Parse HTTP request" , () => {
 			//type: 'json' ,
 			host: 'localhost' ,
 			method: 'get' ,
-			query: {  limit: 1000 , populate: 'group' }
+			query: {
+				//limit: 1000 ,
+				populate: [ 'group' ] ,
+				filter: {
+					prop: { $lt: 20 , $gt: 10 }
+				}
+			}
 		} ) ;
 	} ) ;
 
@@ -149,7 +157,9 @@ describe( "Parse HTTP request" , () => {
 			//type: 'json' ,
 			host: 'localhost' ,
 			method: 'post' ,
-			query: { limit: 1000 } ,
+			query: {
+				//limit: 1000
+			} ,
 			data: { a: 'simple', json: 'file' }
 		} ) ;
 	} ) ;
