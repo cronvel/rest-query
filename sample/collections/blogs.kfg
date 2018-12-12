@@ -15,3 +15,6 @@ alterSchemaProperty: customSchema
 hooks: @@blogs.hooks.js 
 slugGenerationProperty: title 
 autoCollection: posts
+
+# allow filter and sort on unindexed properties
+unindexedQueries: true

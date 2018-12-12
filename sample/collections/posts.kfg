@@ -13,4 +13,8 @@ slugGenerationProperty: title
 indexes:
 	-	properties:
 			content: text
+	-	properties:
+			title: 1
+	-	properties:
+			date: 1
 
