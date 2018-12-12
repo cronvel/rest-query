@@ -106,7 +106,7 @@ describe( "Parse HTTP request" , () => {
 	} ) ;
 
 	it( "should parse a fake GET with path and query string" , async () => {
-		var req = fakeHttpRequest( { url: "/path/to/json?populate=group&.prop.$lt=20&.prop.$gt=10&search=toto" } ) ;
+		var req = fakeHttpRequest( { url: "/path/to/json?populate=group&.prop.$lt=20&.prop.$gt=10&.prop2=bob&search=toto" } ) ;
 		var message = await restQuery.httpModule.parseRequest( req ) ;
 		
 		expect( message ).to.equal( {
@@ -141,7 +141,8 @@ describe( "Parse HTTP request" , () => {
 				//limit: 1000 ,
 				populate: [ 'group' ] ,
 				filter: {
-					prop: { $lt: 20 , $gt: 10 }
+					prop: { $lt: 20 , $gt: 10 } ,
+					prop2: "bob"
 				} ,
 				search: 'toto'
 			}
