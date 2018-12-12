@@ -1,9 +1,0 @@
-{
-	"path": "/posts" ,
-	"extraProperties": true ,
-	"properties": {
-		"title": { "type": "string" },
-		"content": { "type": "string" }
-	} ,
-	"slugGenerationProperty": "title"
-}

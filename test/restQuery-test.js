@@ -103,7 +103,7 @@ var currentApp ;
 async function commonApp() {
 	if ( currentApp ) { currentApp.shutdown() ; }
 
-	var app = new restQuery.App( __dirname + '/../sample.kfg/main.kfg' , cliOptions ) ;
+	var app = new restQuery.App( __dirname + '/../sample/main.kfg' , cliOptions ) ;
 
 	// Create a system performer
 	var performer = app.createPerformer( null , true ) ;
@@ -595,8 +595,9 @@ describe( "Basic queries of top-level collections" , () => {
 			}
 		] ) ;
 
-		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 1 } } } } ) ;
-		expect( response.output.data ).to.equal( [
+
+		// ascendant sorting
+		var expected = [
 			{
 				title: 'My wonderful life' ,
 				description: 'This is a supa blog!' ,
@@ -608,7 +609,7 @@ describe( "Basic queries of top-level collections" , () => {
 				publicAccess: {
 					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
-				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
+				slugId: blog1.slugId
 			} ,
 			{
 				title: 'Third' ,
@@ -621,41 +622,38 @@ describe( "Basic queries of top-level collections" , () => {
 				publicAccess: {
 					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
-				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
+				slugId: blog3.slugId
 			}
-		] ) ;
+		] ;
 
-	} ) ;
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 1 } } } } ) ;
+		expect( response.output.data ).to.equal( expected ) ;
 
-	it( "GET on a collection with items, with special query: filter" , async () => {
-		var { app , performer } = await commonApp() ;
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: '1' } } } } ) ;
+		expect( response.output.data ).to.equal( expected ) ;
 
-		var blog1 = app.root.children.blogs.collection.createDocument( {
-			title: 'My wonderful life' ,
-			description: 'This is a supa blog!' ,
-			publicAccess: 'all'
-		} ) ;
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'asc' } } } } ) ;
+		expect( response.output.data ).to.equal( expected ) ;
 
-		await blog1.save() ;
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'ascendant' } } } } ) ;
+		expect( response.output.data ).to.equal( expected ) ;
 
-		var blog2 = app.root.children.blogs.collection.createDocument( {
-			title: 'YAB' ,
-			description: 'Yet Another Blog' ,
-			publicAccess: 'all'
-		} ) ;
 
-		await blog2.save() ;
-
-		var blog3 = app.root.children.blogs.collection.createDocument( {
-			title: 'Third' ,
-			description: 'The Third' ,
-			publicAccess: 'all'
-		} ) ;
-
-		await blog3.save() ;
-
-		var response = await app.get( '/Blogs' , { performer: performer , input: { query: { filter: { title: 'Third' } } } } ) ;
-		expect( response.output.data ).to.equal( [
+		// descendant sorting
+		var expected = [
+			{
+				title: 'YAB' ,
+				description: 'Yet Another Blog' ,
+				_id: blog2.getId() ,
+				//embedded: undefined,
+				parent: { id: '/' , collection: 'root' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: blog2.slugId
+			} ,
 			{
 				title: 'Third' ,
 				description: 'The Third' ,
@@ -667,10 +665,222 @@ describe( "Basic queries of top-level collections" , () => {
 				publicAccess: {
 					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
 				} ,
-				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
+				slugId: blog3.slugId
+			}
+		] ;
+
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: -1 } } } } ) ;
+		expect( response.output.data ).to.equal( expected ) ;
+
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: '-1' } } } } ) ;
+		expect( response.output.data ).to.equal( expected ) ;
+		
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'desc' } } } } ) ;
+		expect( response.output.data ).to.equal( expected ) ;
+
+		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'descendant' } } } } ) ;
+		expect( response.output.data ).to.equal( expected ) ;
+	} ) ;
+
+	it( "GET on a collection with items, with special query: filter and (text) search" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog.save() ;
+
+		var post1 = await app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'First post' ,
+			content: 'First post content.' ,
+			date: new Date( '2018-12-12' ) ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post1.save() ;
+
+		var post2 = await app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'Second post' ,
+			content: 'Second post content.' ,
+			date: new Date( '2018-12-14' ) ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post2.save() ;
+
+		var post3 = await app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'Third post' ,
+			content: 'Third post content.' ,
+			date: new Date( '2018-12-16' ) ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post3.save() ;
+
+		// Perfect match
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { title: 'Third post' } } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'Third post' ,
+				content: 'Third post content.' ,
+				date: post3.date ,
+				_id: post3.getId() ,
+				//embedded: undefined,
+				parent: { id: blog.getId() , collection: 'blogs' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: post3.slugId
+			}
+		] ) ;
+
+		// Date matching without needs for sanitizing
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { date: post3.date } } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'Third post' ,
+				content: 'Third post content.' ,
+				date: post3.date ,
+				_id: post3.getId() ,
+				//embedded: undefined,
+				parent: { id: blog.getId() , collection: 'blogs' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: post3.slugId
+			}
+		] ) ;
+
+		// Date matching with sanitizing needed
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { date: '2018-12-16' } } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'Third post' ,
+				content: 'Third post content.' ,
+				date: post3.date ,
+				_id: post3.getId() ,
+				//embedded: undefined,
+				parent: { id: blog.getId() , collection: 'blogs' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: post3.slugId
+			}
+		] ) ;
+
+		// $gte and Date
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { date: { $gte: post2.date } } } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'Second post' ,
+				content: 'Second post content.' ,
+				date: post2.date ,
+				_id: post2.getId() ,
+				//embedded: undefined,
+				parent: { id: blog.getId() , collection: 'blogs' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: post2.slugId
+			} ,
+			{
+				title: 'Third post' ,
+				content: 'Third post content.' ,
+				date: post3.date ,
+				_id: post3.getId() ,
+				//embedded: undefined,
+				parent: { id: blog.getId() , collection: 'blogs' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: post3.slugId
+			}
+		] ) ;
+
+		// search
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { search: 'second' } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'Second post' ,
+				content: 'Second post content.' ,
+				date: post2.date ,
+				_id: post2.getId() ,
+				//embedded: undefined,
+				parent: { id: blog.getId() , collection: 'blogs' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: post2.slugId
+			}
+		] ) ;
+
+		// search
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { search: 'content' } } } ) ;
+		expect( response.output.data ).to.equal( [
+			{
+				title: 'Third post' ,
+				content: 'Third post content.' ,
+				date: post3.date ,
+				_id: post3.getId() ,
+				//embedded: undefined,
+				parent: { id: blog.getId() , collection: 'blogs' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: post3.slugId
+			} ,
+			{
+				title: 'Second post' ,
+				content: 'Second post content.' ,
+				date: post2.date ,
+				_id: post2.getId() ,
+				//embedded: undefined,
+				parent: { id: blog.getId() , collection: 'blogs' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: post2.slugId
+			} ,
+			{
+				title: 'First post' ,
+				content: 'First post content.' ,
+				date: post1.date ,
+				_id: post1.getId() ,
+				//embedded: undefined,
+				parent: { id: blog.getId() , collection: 'blogs' } ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: {
+					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				} ,
+				slugId: post1.slugId
 			}
 		] ) ;
 	} ) ;
+
+	it( "Extensive filter testing" ) ;
 } ) ;
 
 

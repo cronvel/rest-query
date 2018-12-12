@@ -118,8 +118,7 @@ function connect() {
 
 function runApp() {
 	appProcess = childProcess.spawn( __dirname + '/../bin/restquery' , [
-		//__dirname + '/../sample.json/main.json' ,
-		__dirname + '/../sample.kfg/main.kfg' ,
+		__dirname + '/../sample/main.kfg' ,
 		'--port' , appPort ,
 		'--buildIndexes'
 	] ) ;

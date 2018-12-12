@@ -5,4 +5,12 @@ properties:
 		type: string
 	content:
 		type: string
+	date:
+		type: date
+		sanitize: toDate
+		optional: true
 slugGenerationProperty: title
+indexes:
+	-	properties:
+			content: text
+
