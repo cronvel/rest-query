@@ -508,7 +508,7 @@ describe( "Basic queries of top-level collections" , () => {
 		] ) ;
 	} ) ;
 
-	it( "GET on a collection with items, with special query: skip, limit, sort and filter" , async () => {
+	it( "GET on a collection with items, with special query: skip, limit and sort" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var blog1 = app.root.children.blogs.collection.createDocument( {
@@ -625,7 +625,36 @@ describe( "Basic queries of top-level collections" , () => {
 			}
 		] ) ;
 
-		response = await app.get( '/Blogs' , { performer: performer , input: { query: { filter: { title: 'Third' } } } } ) ;
+	} ) ;
+
+	it( "GET on a collection with items, with special query: filter" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var blog1 = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog1.save() ;
+
+		var blog2 = app.root.children.blogs.collection.createDocument( {
+			title: 'YAB' ,
+			description: 'Yet Another Blog' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog2.save() ;
+
+		var blog3 = app.root.children.blogs.collection.createDocument( {
+			title: 'Third' ,
+			description: 'The Third' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog3.save() ;
+
+		var response = await app.get( '/Blogs' , { performer: performer , input: { query: { filter: { title: 'Third' } } } } ) ;
 		expect( response.output.data ).to.equal( [
 			{
 				title: 'Third' ,
