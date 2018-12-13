@@ -158,6 +158,8 @@ Specific hooks are for special collections like `Users`.
 
 #### *beforeCreateToken*
 
+For documents of collection: Users
+
 When:
 
 * the createToken method is invoked on a user
@@ -170,6 +172,8 @@ The `context.incomingDocument` contains the connection document: it can be alter
 
 
 #### *afterCreateToken*
+
+For documents of collection: Users
 
 When:
 
