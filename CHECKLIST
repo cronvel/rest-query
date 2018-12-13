@@ -5,9 +5,9 @@ Uncertain features:
 .	Attachment
 .	populate security model
 .	restrictedAccess (on collection's schema) is deactivated, should it be removed or refactored?
-.	filter/skip/limit/filter check, security and so on
+.	'skip' denial of service possibilities
 .	API Key user are not working anymore
-.	filter and sort in query use the collection schema, not the altered one
+.	'filter' and 'sort' in query use the collection schema, not the altered one
 
 
 
@@ -24,6 +24,5 @@ Refacto:
 Misc:
 
 .	change all [array].concat(element) to ES6 [ ... array , element ]
-.	hook and non-hoot context: move 'performer' and 'access' outside of 'input'? make them top-level?
 .	remove ownKeys handler in RootsDB
 
