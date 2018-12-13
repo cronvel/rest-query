@@ -9,14 +9,14 @@ var Promise = require( 'seventh' ) ;
 
 module.exports = {
 	
-	doSomething: function( pathParts , incomingDocument , attachmentStreams , context ) {
-		log.debug( '>>>>>>>>>> doSomething, context: %I' , arguments ) ;
+	doSomething: context => {
+		log.debug( '>>>>>>>>>> doSomething, context: %I' , context ) ;
 		
-		if ( ! incomingDocument ) {
+		if ( ! context.input.document ) {
 			context.output.data = { done: "nothing" , cause: "this is a GET request" } ;
 		}
 		else {
-			context.output.data = { done: "something" , to: incomingDocument.to } ;
+			context.output.data = { done: "something" , to: context.input.document.to } ;
 		}
 		
 		return Promise.resolved ;

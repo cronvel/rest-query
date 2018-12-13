@@ -7,6 +7,7 @@ Uncertain features:
 .	restrictedAccess (on collection's schema) is deactivated, should it be removed or refactored?
 .	filter/skip/limit/filter check, security and so on
 .	API Key user are not working anymore
+.	filter and sort in query use the collection schema, not the altered one
 
 
 

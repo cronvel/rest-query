@@ -9,15 +9,15 @@ var Promise = require( 'seventh' ) ;
 
 module.exports = {
 	
-	changeFirstName: async function( pathParts , incomingDocument , attachmentStreams , context ) {
+	changeFirstName: async function( context ) {
 		
 		//log.fatal( '>>>>>>>>>> changeFirstName, context: %I \n\nTHIS:\n%I\n' , arguments , this ) ;
 		
-		if ( ! incomingDocument ) {
+		if ( ! context.input.document ) {
 			context.output.data = { done: "nothing" , cause: "this is a GET request" } ;
 		}
-		else if ( incomingDocument.firstName ) {
-			await this.object.patch( { firstName: incomingDocument.firstName } ) ;
+		else if ( context.input.document.firstName ) {
+			await this.object.patch( { firstName: context.input.document.firstName } ) ;
 			await this.object.commit() ;
 			context.output.data = { done: "something" , to: this.object } ;
 			
