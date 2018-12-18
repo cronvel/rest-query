@@ -20,6 +20,7 @@ Usual properties are:
 	or to a hook, etc), where:
 	
 	* data `object` or `Stream` the data that is the response of the request
+	* extraData `object` (optional) extra data result of *before*-type of hook that further processing may include in the final data object (only few rare methods care)
 	* httpStatus (optional) `number` a particular HTTP status that may overide the default one
 	* meta `Object` (optional) meta-data of the document, common meta data:
 		
