@@ -23,6 +23,6 @@ Refacto:
 
 Misc:
 
-.	change all [array].concat(element) to ES6 [ ... array , element ]
-.	remove ownKeys handler in RootsDB
+OK	change all [array].concat(element) to ES6 [ ... array , element ]
+OK	remove ownKeys handler in RootsDB
 
