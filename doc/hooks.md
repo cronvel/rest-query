@@ -8,10 +8,8 @@ There are few differences between a classical event (i.e.: the observer pattern)
 
 * only one hook can be registered by event (by collection for hooks on collection).
 * a hook can modify or even interupt the main flow (the hook caller).
-* all restQuery hook are async.
+* all restQuery hook are async
 * the main flow is suspended, waiting for the hook completion.
-
-
 
 Whatever the hook, they are always functions of the form: `function( hookContext )` returning a `Promise` that resolve once completed.
 
@@ -147,6 +145,21 @@ The `context.deletedDocument` contains the removed document.
 
 The `context.objectNode` contains the removed *objectNode*, it can be useful to retrieve some data, but it should not be used
 to modify or traverse it (e.g. access its children).
+
+
+
+#### *searchToFilter*
+
+When:
+
+* a GET request with a 'search' parameter in query string
+* executed after checking the 'filter' parameter of the query string
+* executed before checking for text index, the hook may rewrite the 'filter' or 'search' parameters
+
+The `context.input.query.search` contains the text search.
+If `context.input.query.search` is removed, the default search behavior is prevented.
+
+The `context.input.query.filter` contains the already checked and fixed filters.
 
 
 

@@ -3777,6 +3777,11 @@ describe( "Hooks" , () => {
 	it( "Test afterModify hooks" ) ;
 	it( "Test beforeDelete hooks" ) ;
 	it( "Test afterDelete hooks" ) ;
+
+	it( "Test search hooks" ) ;
+
+	it( "Test beforeCreateToken hooks" ) ;
+	it( "Test afterCreateToken hooks" ) ;
 } ) ;
 
 
