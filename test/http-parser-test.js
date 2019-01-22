@@ -88,10 +88,11 @@ function fakeHttpRequest( r , body ) {
 
 
 describe( "Parse HTTP request" , () => {
-
+	
 	it( "should parse a fake GET on /" , async () => {
 		var req = fakeHttpRequest() ;
-		var message = await restQuery.httpModule.parseRequest( req ) ;
+		var httpModule = new restQuery.HttpModule() ;
+		var message = await httpModule.parseRequest( req ) ;
 		
 		expect( message ).to.equal( {
 			//path: '/' ,
@@ -107,7 +108,8 @@ describe( "Parse HTTP request" , () => {
 
 	it( "should parse a fake GET with path and query string" , async () => {
 		var req = fakeHttpRequest( { url: "/path/to/json?populate=group&.prop.$lt=20&.prop.$gt=10&.prop2=bob&search=toto" } ) ;
-		var message = await restQuery.httpModule.parseRequest( req ) ;
+		var httpModule = new restQuery.HttpModule() ;
+		var message = await httpModule.parseRequest( req ) ;
 		
 		expect( message ).to.equal( {
 			//path: '/path/to/json' ,
@@ -151,7 +153,8 @@ describe( "Parse HTTP request" , () => {
 
 	it( "should parse a fake POST with a body" , async () => {
 		var req = fakeHttpRequest( { method: 'POST' } , '{"a":"simple","json":"file"}' ) ;
-		var message = await restQuery.httpModule.parseRequest( req ) ;
+		var httpModule = new restQuery.HttpModule() ;
+		var message = await httpModule.parseRequest( req ) ;
 		
 		expect( message ).to.equal( {
 			//path: '/' ,
