@@ -29,7 +29,8 @@
     "seventh": "^0.7.18",
     "string-kit": "^0.9.0",
     "token-kit": "^0.2.1",
-    "tree-kit": "^0.6.0"
+    "tree-kit": "^0.6.0",
+    "utterminal": "^0.5.25"
   },
   "devDependencies": {
     "mongodb": "3.1.10"
