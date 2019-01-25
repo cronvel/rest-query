@@ -10,7 +10,7 @@
     "test": "test"
   },
   "bin": {
-    "restquery": "./bin/restquery"
+    "rest-query": "./bin/rest-query"
   },
   "dependencies": {
     "async-kit": "^2.2.4",
