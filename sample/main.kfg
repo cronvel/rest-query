@@ -40,6 +40,7 @@ log:
 			role: mon
 			port: 4321
 
+scripts: @@scripts.js
 hooks: @@app.hooks.js
 workers: @@workers.js
 

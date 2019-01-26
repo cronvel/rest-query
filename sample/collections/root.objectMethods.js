@@ -1,5 +1,5 @@
 
-
+"use strict" ;
 
 var restQuery = require( '../../lib/restQuery.js' ) ;
 var log = restQuery.log.global.use( 'root-methods' ) ;

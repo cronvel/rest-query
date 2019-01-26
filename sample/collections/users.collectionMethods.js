@@ -1,7 +1,8 @@
 
+"use strict" ;
 
 var restQuery = require( '../../lib/restQuery.js' ) ;
-var log = require( 'logfella' ).global.use( 'users-methods' ) ;
+var log = restQuery.log.global.use( 'users-methods' ) ;
 
 var Promise = require( 'seventh' ) ;
 

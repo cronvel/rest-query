@@ -1,5 +1,5 @@
 
-
+"use strict" ;
 
 var restQuery = require( '..' ) ;
 var Promise = require( 'seventh' ) ;
