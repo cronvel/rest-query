@@ -102,7 +102,7 @@ async function clearCollection( collectionName ) {
 	var collection = db.collection( collectionName ) ;
 	await collection.remove() ;
 	
-	// ??? this is a mongo collection node a restquery collection
+	// ??? this is a mongo collection node not a restquery collection
 	//if ( collection.attachmentUrl ) { fsKit.deltree( collection.attachmentUrl , callback ) ; } 
 }
 
@@ -117,8 +117,9 @@ function connect() {
 
 
 function runApp() {
-	appProcess = childProcess.spawn( __dirname + '/../bin/restquery' , [
-		__dirname + '/../sample/main.kfg' ,
+	appProcess = childProcess.spawn( __dirname + '/../bin/rest-query' , [
+		'server' ,
+		'--config' , __dirname + '/../sample/main.kfg' ,
 		'--port' , appPort ,
 		'--buildIndexes'
 	] ) ;

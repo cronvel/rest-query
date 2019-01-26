@@ -38,7 +38,7 @@ log:
 			color: true
 		-	type: netServer
 			role: mon
-			listen: 4321
+			port: 4321
 
 hooks: @@app.hooks.js
 workers: @@workers.js
