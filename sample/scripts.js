@@ -8,8 +8,13 @@ var log = restQuery.log.global.use( 'scripts' ) ;
 
 
 module.exports = {
-	test: async function( app , ... args ) {
+	test: async function( app , args ) {
 		log.info( "This is a test script, arguments: %I" , args ) ;
+	} ,
+	nested: {
+		test: async function( app , args ) {
+			log.info( "This is a NESTED test script, arguments: %I" , args ) ;
+		}
 	}
 } ;
 
