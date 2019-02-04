@@ -430,7 +430,7 @@ describe( "Basics tests" , () => {
 		expect( response.status ).to.be( 201 ) ;
 		
 		response = await requester( patchQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
+		expect( response.status ).to.be( 204 ) ;
 		
 		response = await requester( getQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
@@ -513,7 +513,7 @@ describe( "Basics tests" , () => {
 		//console.log( "Response:" , response ) ;
 
 		response = await requester( deleteQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
+		expect( response.status ).to.be( 204 ) ;
 		//console.log( "Response:" , response ) ;
 
 		response = await requester( getQuery ) ;
@@ -769,7 +769,7 @@ describe( "Basics tests on users" , () => {
 		//console.log( "Response:" , response ) ;
 
 		response = await requester( deleteQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
+		expect( response.status ).to.be( 204 ) ;
 		//console.log( "Response:" , response ) ;
 	} ) ;
 } ) ;
