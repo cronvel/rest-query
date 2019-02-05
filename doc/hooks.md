@@ -176,7 +176,7 @@ For documents of collection: Users
 When:
 
 * the createToken method is invoked on a user
-* executed before the token is created, if it rejects the token creation is aborted
+* executed before the token creation, if it rejects the token creation is aborted
 
 The `context.incomingDocument` contains the connection document: it can be altered by the hook.
 
@@ -194,6 +194,35 @@ When:
 * executed after the token creation
 
 The `context.document` contains the user for which the token is created.
+The `context.token` contains the token.
+
+**BETA**, not well specified yet.
+
+
+
+#### *beforeRegenerateToken*
+
+For documents of collection: Users
+
+When:
+
+* the regenerateToken method is invoked on a user
+* executed before the new token creation, if it rejects the new token creation is aborted
+
+**BETA**, not well specified yet.
+
+
+
+#### *afterRegenerateToken*
+
+For documents of collection: Users
+
+When:
+
+* the regenerateToken method is invoked on a user
+* executed after the token creation
+
+The `context.document` contains the user for which a new token is created.
 The `context.token` contains the token.
 
 **BETA**, not well specified yet.
