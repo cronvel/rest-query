@@ -36,6 +36,12 @@ are finished and just before restQuery starts accepting request.
 
 
 
+#### *shutdown*
+
+This hook is executed once, when restQuery is shutting down, before the HTTP module shutdown.
+
+
+
 ### Document hooks
 
 Document hooks are executed when a user issue a request on a document.
