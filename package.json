@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.45.3",
+  "version": "0.45.4",
   "engines": {
     "node": ">=4.5.0"
   },
@@ -19,7 +19,7 @@
     "hash-kit": "^0.3.2",
     "json-kit": "^0.6.2",
     "kung-fig": "^0.51.0",
-    "logfella": "^1.1.6",
+    "logfella": "^1.1.7",
     "logfella-client": "^1.2.0",
     "qs-kit": "^0.6.4",
     "rest-query-shared": "^0.33.6",
