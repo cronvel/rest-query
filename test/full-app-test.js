@@ -100,7 +100,7 @@ function clearDB() {
 
 async function clearCollection( collectionName ) {
 	var collection = db.collection( collectionName ) ;
-	await collection.remove() ;
+	await collection.deleteMany() ;
 	
 	// ??? this is a mongo collection node not a restquery collection
 	//if ( collection.attachmentUrl ) { fsKit.deltree( collection.attachmentUrl , callback ) ; } 

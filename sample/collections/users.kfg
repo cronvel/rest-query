@@ -25,3 +25,8 @@ properties:
 collectionMethods: @@users.collectionMethods.js
 objectMethods: @@users.objectMethods.js
 hooks: @@users.hooks.js
+
+indexes:
+	-	properties:
+			godfather: 1
+

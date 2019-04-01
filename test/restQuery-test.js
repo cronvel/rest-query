@@ -1346,6 +1346,49 @@ describe( "Links" , () => {
 		} ) ;
 	} ) ;
 
+	it( "GET documents filtered on a link property" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , godfatherId , userId ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all" ,
+				godfather: godfatherId
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		response = await app.get( '/Users/' , { performer: performer , input: { query: { filter: { godfather: godfatherId } } } } ) ;
+		expect( response.output.data ).to.partially.equal( [ {
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			slugId: 'joe-doe' ,
+			email: 'joe.doe@gmail.com' ,
+			parent: { id: '/' , collection: 'root' } ,
+			godfather: { _id: godfatherId }
+		} ] ) ;
+	} ) ;
+	
 	it( "GET through a link" ) ;
 
 	it( "PUT (create) on a link" , async () => {
@@ -1815,6 +1858,82 @@ describe( "Multi-links" , () => {
 
 		await expect( () => app.get( '/Groups/' + groupId + '/~~users/' + userId4 , { performer: performer } ) )
 			.to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
+	} ) ;
+
+	it( "GET documents filtered on a multi-link property" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId1 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId2 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fischer" ,
+				email: "bobby.fischer@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId3 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Not In" ,
+				lastName: "Dagroup" ,
+				email: "notindagroup@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId4 = response.output.data.id ;
+
+		response = await app.post( '/Groups' ,
+			{
+				name: "The Group" ,
+				users: [ userId1 , userId2 , userId3 ] ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		groupId = response.output.data.id ;
+
+		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $in: userId1 } } } } } ) ;
+		expect( response.output.data ).to.partially.equal( [ {
+			name: "The Group" ,
+			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]
+		} ] ) ;
 	} ) ;
 
 	it( "POST on a multi-link should create a new resource and add it to the current link's array" , async () => {
