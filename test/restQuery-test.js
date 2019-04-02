@@ -1929,7 +1929,25 @@ describe( "Multi-links" , () => {
 
 		groupId = response.output.data.id ;
 
+		// Without operator behavior
+		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: userId1 } } } } ) ;
+		expect( response.output.data ).to.partially.equal( [ {
+			name: "The Group" ,
+			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]
+		} ] ) ;
+
+		// With the element-compatible operator $in
 		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $in: userId1 } } } } } ) ;
+		expect( response.output.data ).to.partially.equal( [ {
+			name: "The Group" ,
+			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]
+		} ] ) ;
+
+		// With element-compatible operator $nin
+		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $nin: userId1 } } } } } ) ;
+		expect( response.output.data ).to.partially.equal( [] ) ;
+		
+		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $nin: userId4 } } } } } ) ;
 		expect( response.output.data ).to.partially.equal( [ {
 			name: "The Group" ,
 			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]
