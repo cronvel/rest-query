@@ -1,0 +1,5 @@
+beautify: yes
+trailingslash: no
+autoclear:
+	body: no
+module: @@module.js

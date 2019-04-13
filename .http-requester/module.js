@@ -1,7 +1,7 @@
 /*
 	The Cedric's Swiss Knife (CSK) - CSK HTTP Requester
 
-	Copyright (c) 2015 - 2016 Cédric Ronvel
+	Copyright (c) 2015 - 2019 Cédric Ronvel
 
 	The MIT License (MIT)
 
@@ -32,40 +32,37 @@ var api ;
 
 exports.name = 'Rest-Query' ;
 
-exports.init = function init( api_ ) { api = api_ ; } ;
+exports.init = function( api_ ) { api = api_ ; } ;
 
 var commands = exports.commands = {} ;
 
 
 
 // login <login> <password>
-commands.login = function( args , query , callback ) {
-	api.emulate( [
+commands.login = async function( args ) {
+	var token ;
+
+	await api.emulate( [
 		'Content-Type: application/json' ,
 		'body ' + JSON.stringify( { login: args[ 0 ] , password: args[ 1 ] , type: 'header' } ) ,
 		'post /Users/CREATE-TOKEN'
-	] ,
-	() => {
-		var token ;
-
-		try {
-			token = JSON.parse( api.lastResponse().body ).token ;
-		}
-		catch ( error ) {
-			api.term( "%E\n" ) ;
-			callback() ;
-			return ;
-		}
-
-		api.emulate( 'X-Token: ' + token , callback ) ;
+	] ) ;
+	
+	try {
+		token = JSON.parse( api.lastResponse().body ).token ;
 	}
-	) ;
+	catch ( error ) {
+		api.term( "%E\n" ) ;
+		return ;
+	}
+
+	await api.emulate( 'X-Token: ' + token ) ;
 } ;
 
 
 
 // createUser <login> <password> <email> <firstName> <lastName>
-commands.createUser = function( args , query , callback ) {
+commands.createUser = async function( args ) {
 	var data = {
 		login: args[ 0 ] ,
 		password: args[ 1 ] ,
@@ -74,12 +71,10 @@ commands.createUser = function( args , query , callback ) {
 		lastName: args[ 4 ]
 	} ;
 
-	api.emulate( [
+	await api.emulate( [
 		'Content-Type: application/json' ,
 		'body ' + JSON.stringify( data ) ,
 		'post /Users'
-	] ,
-	callback
-	) ;
+	] ) ;
 } ;
 
