@@ -4215,6 +4215,13 @@ describe( "Client error management" , () => {
 
 
 
+describe( "API KEY" , () => {
+
+	it( "Test SYSTEM API KEY" ) ;
+} ) ;
+
+
+
 describe( "Misc" , () => {
 
 	it( "Test of the test: test helper commonApp() should clean previously created items" , async () => {
