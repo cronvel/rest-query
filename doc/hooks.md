@@ -233,3 +233,34 @@ The `context.token` contains the token.
 
 **BETA**, not well specified yet.
 
+
+
+#### *beforeCreateApiKey*
+
+For documents of collection: Users
+
+When:
+
+* the createApiKey method is invoked on a user
+* executed before the API key creation, if it rejects the token creation is aborted
+
+The `context.incomingDocument` contains the incoming document: it can be altered by the hook.
+
+**BETA**, not well specified yet.
+
+
+
+#### *afterCreateApiKey*
+
+For documents of collection: Users
+
+When:
+
+* the createApiKey method is invoked on a user
+* executed after the API key creation
+
+The `context.document` contains the user for which the API key is created.
+The `context.apiKey` contains the API key.
+
+**BETA**, not well specified yet.
+
