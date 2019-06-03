@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.46.11",
+  "version": "0.46.12",
   "engines": {
     "node": ">=4.5.0"
   },
@@ -23,7 +23,7 @@
     "logfella-client": "^1.2.2",
     "qs-kit": "^0.6.4",
     "rest-query-shared": "^0.33.7",
-    "roots-db": "^0.20.7",
+    "roots-db": "^0.20.8",
     "server-kit": "^0.9.14",
     "seventh": "^0.7.23",
     "string-kit": "^0.9.5",
