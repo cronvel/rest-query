@@ -1294,7 +1294,7 @@ describe( "Queries of nested object" , () => {
 
 describe( "Links" , () => {
 
-	it( "zzz GET on a link" , async () => {
+	it( "GET on a link" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , godfatherId , userId ;
