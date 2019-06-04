@@ -698,12 +698,6 @@ describe( "Basics tests on users" , () => {
 		expect( response.status ).to.be( 200 ) ;
 		expect( response.body ).to.be.ok() ;
 		data = JSON.parse( response.body ) ;
-		expect( data.password ).to.be.an( 'object' ) ;
-		expect( data.password.algo ).to.be.a( 'string' ) ;
-		expect( data.password.salt ).to.be.a( 'string' ) ;
-		expect( data.password.hash ).to.be.a( 'string' ) ;
-		//console.log( data.password ) ;
-		delete data.password ;
 		
 		expect( data ).to.equal( {
 			_id: "543bb877bd15489d0d7b0130" ,
@@ -712,8 +706,6 @@ describe( "Basics tests on users" , () => {
 			email: "joe.doe2@gmail.com" ,
 			login: "joe.doe2@gmail.com" ,
 			groups: {} ,
-			token: {} ,
-			apiKeys: [] ,
 			slugId: data.slugId ,	// Cannot be predicted
 			userAccess: {} ,
 			groupAccess: {} ,
@@ -918,13 +910,6 @@ describe( "Links population" , () => {
 		expect( response.status ).to.be( 200 ) ;
 		expect( response.body ).to.be.ok() ;
 		data = JSON.parse( response.body ) ;
-		expect( data.password ).to.be.an( 'object' ) ;
-		expect( data.password.algo ).to.be.a( 'string' ) ;
-		expect( data.password.salt ).to.be.a( 'string' ) ;
-		expect( data.password.hash ).to.be.a( 'string' ) ;
-		delete data.password ;
-		delete data.father.password ;
-		delete data.godfather.password ;
 		expect( data ).to.equal( {
 			_id: data._id ,
 			firstName: "Joe" ,
@@ -937,8 +922,6 @@ describe( "Links population" , () => {
 				collection: 'root' ,
 				id: '/'
 			} ,
-			token: {} ,
-			apiKeys: [] ,
 			publicAccess: {
 				create: true ,
 				read: true ,
@@ -954,8 +937,6 @@ describe( "Links population" , () => {
 				login: "big.joe.doe@gmail.com" ,
 				slugId: data.father.slugId ,
 				groups: {} ,
-				token: {} ,
-				apiKeys: [] ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: { traverse: true , read: true , create: true } ,
@@ -972,8 +953,6 @@ describe( "Links population" , () => {
 				login: "godfather@gmail.com" ,
 				slugId: data.godfather.slugId ,
 				groups: {} ,
-				token: {} ,
-				apiKeys: [] ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: { traverse: true , read: true , create: true } ,
@@ -996,13 +975,6 @@ describe( "Links population" , () => {
 		expect( response.status ).to.be( 200 ) ;
 		expect( response.body ).to.be.ok() ;
 		data = JSON.parse( response.body ) ;
-		expect( data.password ).to.be.an( 'object' ) ;
-		expect( data.password.algo ).to.be.a( 'string' ) ;
-		expect( data.password.salt ).to.be.a( 'string' ) ;
-		expect( data.password.hash ).to.be.a( 'string' ) ;
-		delete data.password ;
-		delete data.father.password ;
-		delete data.godfather.password ;
 		expect( data ).to.equal( {
 			_id: data._id ,
 			firstName: "Joe" ,
@@ -1015,8 +987,6 @@ describe( "Links population" , () => {
 				collection: 'root' ,
 				id: '/'
 			} ,
-			token: {} ,
-			apiKeys: [] ,
 			publicAccess: {
 				create: true ,
 				read: true ,
@@ -1155,8 +1125,6 @@ describe( "Links population" , () => {
 				slugId: data[ 0 ].slugId ,
 				groups: {} ,
 				//father: null, godfather: null,
-				token: {} ,
-				apiKeys: [] ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: { traverse: true , read: true , create: true } ,
@@ -1173,8 +1141,6 @@ describe( "Links population" , () => {
 				login: "joe.doe@gmail.com" ,
 				slugId: data[ 1 ].slugId ,	// Cannot be predicted
 				groups: {} ,
-				token: {} ,
-				apiKeys: [] ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: { traverse: true , read: true , create: true } ,
@@ -1190,8 +1156,6 @@ describe( "Links population" , () => {
 					login: "big.joe.doe@gmail.com" ,
 					slugId: data[ 0 ].slugId ,
 					groups: {} ,
-					token: {} ,
-					apiKeys: [] ,
 					userAccess: {} ,
 					groupAccess: {} ,
 					publicAccess: { traverse: true , read: true , create: true } ,
@@ -1208,8 +1172,6 @@ describe( "Links population" , () => {
 					login: "godfather@gmail.com" ,
 					slugId: data[ 2 ].slugId ,
 					groups: {} ,
-					token: {} ,
-					apiKeys: [] ,
 					userAccess: {} ,
 					groupAccess: {} ,
 					publicAccess: { traverse: true , read: true , create: true } ,
@@ -1228,8 +1190,6 @@ describe( "Links population" , () => {
 				slugId: data[ 2 ].slugId ,
 				groups: {} ,
 				//father: null, godfather: null,
-				token: {} ,
-				apiKeys: [] ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: { traverse: true , read: true , create: true } ,
@@ -1266,8 +1226,6 @@ describe( "Links population" , () => {
 				slugId: data[ 0 ].slugId ,
 				groups: {} ,
 				//father: null, godfather: null,
-				token: {} ,
-				apiKeys: [] ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: { traverse: true , read: true , create: true } ,
@@ -1284,8 +1242,6 @@ describe( "Links population" , () => {
 				login: "joe.doe@gmail.com" ,
 				slugId: data[ 1 ].slugId ,	// Cannot be predicted
 				groups: {} ,
-				token: {} ,
-				apiKeys: [] ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: { traverse: true , read: true , create: true } ,
@@ -1321,8 +1277,6 @@ describe( "Links population" , () => {
 				slugId: data[ 2 ].slugId ,
 				groups: {} ,
 				//father: null, godfather: null,
-				token: {} ,
-				apiKeys: [] ,
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: { traverse: true , read: true , create: true } ,

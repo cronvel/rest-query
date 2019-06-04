@@ -6,7 +6,6 @@ Uncertain features:
 .	populate security model
 .	restrictedAccess (on collection's schema) is deactivated, should it be removed or refactored?
 .	'skip' denial of service possibilities
-.	API Key user are not working anymore
 .	'filter' and 'sort' in query use the collection schema, not the altered one
 
 
