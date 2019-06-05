@@ -9,7 +9,17 @@ properties:
 		type: date
 		sanitize: toDate
 		optional: true
+	likes:
+		type: integer
+		sanitize: toInteger
+		optional: true
+	emotes:
+		type: array
+		of:
+			type: string
+		optional: true
 slugGenerationProperty: title
+unindexedQueries: true
 indexes:
 	-	properties:
 			content: text

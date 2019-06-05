@@ -507,6 +507,11 @@ describe( "Basic queries of top-level collections" , () => {
 			}
 		] ) ;
 	} ) ;
+} ) ;
+
+
+
+describe( "Query: skip, limit, sort" , () => {
 
 	it( "GET on a collection with items, with special query: skip, limit and sort" , async () => {
 		var { app , performer } = await commonApp() ;
@@ -681,11 +686,17 @@ describe( "Basic queries of top-level collections" , () => {
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'descendant' } } } } ) ;
 		expect( response.output.data ).to.equal( expected ) ;
 	} ) ;
+} ) ;
 
-	it( "GET on a collection with items, with special query: filter and (text) search" , async () => {
-		var { app , performer } = await commonApp() ;
 
-		var blog = app.root.children.blogs.collection.createDocument( {
+
+describe( "zzz Query: filters and text search" , () => {
+	var app , performer , blog , post1 , post2 , post3 , expectedPost1 , expectedPost2 , expectedPost3 ;
+
+	beforeEach( async () => {
+		( { app , performer } = await commonApp() ) ;
+
+		blog = app.root.children.blogs.collection.createDocument( {
 			title: 'My wonderful life' ,
 			description: 'This is a supa blog!' ,
 			publicAccess: 'all'
@@ -693,196 +704,215 @@ describe( "Basic queries of top-level collections" , () => {
 
 		await blog.save() ;
 
-		var post1 = await app.root.children.blogs.children.posts.collection.createDocument( {
+		post1 = await app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'First post' ,
 			content: 'First post content.' ,
 			date: new Date( '2018-12-12' ) ,
+			likes: 19 ,
+			emotes: ['happy','thumb-up'] ,
 			parent: { collection: 'blogs' , id: blog.getId() } ,
 			publicAccess: 'all'
 		} ) ;
 
 		await post1.save() ;
 
-		var post2 = await app.root.children.blogs.children.posts.collection.createDocument( {
+		post2 = await app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'Second post' ,
 			content: 'Second post content.' ,
 			date: new Date( '2018-12-14' ) ,
+			likes: 28 ,
+			emotes: ['sad'] ,
 			parent: { collection: 'blogs' , id: blog.getId() } ,
 			publicAccess: 'all'
 		} ) ;
 
 		await post2.save() ;
 
-		var post3 = await app.root.children.blogs.children.posts.collection.createDocument( {
+		post3 = await app.root.children.blogs.children.posts.collection.createDocument( {
 			title: 'Third post' ,
 			content: 'Third post content.' ,
 			date: new Date( '2018-12-16' ) ,
+			likes: 7 ,
 			parent: { collection: 'blogs' , id: blog.getId() } ,
 			publicAccess: 'all'
 		} ) ;
 
 		await post3.save() ;
+		
+		expectedPost1 = {
+			_id: post1.getId() ,
+			slugId: post1.slugId ,
+			title: 'First post' ,
+			content: 'First post content.' ,
+			date: post1.date ,
+			likes: 19 ,
+			emotes: ['happy','thumb-up'] ,
+			parent: { id: blog.getId() , collection: 'blogs' } ,
+			userAccess: {} ,
+			groupAccess: {} ,
+			publicAccess: {
+				traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+			}
+		} ;
+		
+		expectedPost2 = {
+			_id: post2.getId() ,
+			slugId: post2.slugId ,
+			title: 'Second post' ,
+			content: 'Second post content.' ,
+			date: post2.date ,
+			likes: 28 ,
+			emotes: ['sad'] ,
+			parent: { id: blog.getId() , collection: 'blogs' } ,
+			userAccess: {} ,
+			groupAccess: {} ,
+			publicAccess: {
+				traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+			}
+		} ;
+		
+		expectedPost3 = {
+			_id: post3.getId() ,
+			slugId: post3.slugId ,
+			title: 'Third post' ,
+			content: 'Third post content.' ,
+			date: post3.date ,
+			likes: 7 ,
+			parent: { id: blog.getId() , collection: 'blogs' } ,
+			userAccess: {} ,
+			groupAccess: {} ,
+			publicAccess: {
+				traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+			} 
+		} ;
+	} ) ;
 
-		// Perfect match
+	it( "GET on a collection with a filter using standard match on scalar fields" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { title: 'Third post' } } } } ) ;
-		expect( response.output.data ).to.equal( [
-			{
-				title: 'Third post' ,
-				content: 'Third post content.' ,
-				date: post3.date ,
-				_id: post3.getId() ,
-				//embedded: undefined,
-				parent: { id: blog.getId() , collection: 'blogs' } ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
-				} ,
-				slugId: post3.slugId
-			}
-		] ) ;
+		expect( response.output.data ).to.equal( [ expectedPost3 ] ) ;
 
-		// Date matching without needs for sanitizing
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: 19 } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $eq perfect match" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $eq: 19 } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using standard match on array fields should match when the array has that argument as element" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: 'happy' } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $eq perfect match on array fields should throw if the argument is not an array" , async () => {
+		await expect( () => app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: 'happy' } } } } } ) )
+			.to.reject.with( doormen.ValidatorError ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $eq perfect match on array fields should match when the argument is the full array" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: ['happy','thumb-up'] } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: ['happy'] } } } } } ) ;
+		expect( response.output.data ).to.equal( [] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $ne match" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $ne: 19 } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost2 , expectedPost3 ] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $gt match" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $gt: 19 } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost2 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $gt: 40 } } } } } ) ;
+		expect( response.output.data ).to.equal( [] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $gte match" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $gte: 19 } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost2 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $gte: 40 } } } } } ) ;
+		expect( response.output.data ).to.equal( [] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $lt match" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $lt: 19 } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost3 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $lt: 4 } } } } } ) ;
+		expect( response.output.data ).to.equal( [] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $lte match" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $lte: 19 } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost3 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $lte: 4 } } } } } ) ;
+		expect( response.output.data ).to.equal( [] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $in match on scalar fields should match when the value is one of the element of the array argument" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $in: [10,11,12,19,20] } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $in: [10,11,12,20] } } } } } ) ;
+		expect( response.output.data ).to.equal( [] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $in match on array fields should match when the array has one of the element of the array argument" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $in: ['bob','thumb-up'] } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $in: ['bob','thumb-down'] } } } } } ) ;
+		expect( response.output.data ).to.equal( [] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $nin match on scalar fields should NOT match when the value is one of the element of the array argument" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $nin: [10,11,12,19,20] } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost2 , expectedPost3 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $nin: [10,11,12,20] } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost2 , expectedPost3 ] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using $nin match on array fields should NOT match when the array has one of the element of the array argument" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $nin: ['bob','thumb-up'] } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost2 , expectedPost3 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $nin: ['bob','thumb-down'] } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost2 , expectedPost3 ] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using standard match with a Date object" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { date: post3.date } } } } ) ;
-		expect( response.output.data ).to.equal( [
-			{
-				title: 'Third post' ,
-				content: 'Third post content.' ,
-				date: post3.date ,
-				_id: post3.getId() ,
-				//embedded: undefined,
-				parent: { id: blog.getId() , collection: 'blogs' } ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
-				} ,
-				slugId: post3.slugId
-			}
-		] ) ;
-
-		// Date matching with sanitizing needed
+		expect( response.output.data ).to.equal( [ expectedPost3 ] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using standard match with a date string, the string should be sanitized to a Date instance" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { date: '2018-12-16' } } } } ) ;
-		expect( response.output.data ).to.equal( [
-			{
-				title: 'Third post' ,
-				content: 'Third post content.' ,
-				date: post3.date ,
-				_id: post3.getId() ,
-				//embedded: undefined,
-				parent: { id: blog.getId() , collection: 'blogs' } ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
-				} ,
-				slugId: post3.slugId
-			}
-		] ) ;
-
-		// $gte and Date
+		expect( response.output.data ).to.equal( [ expectedPost3 ] ) ;
+	} ) ;
+	
+	it( "GET on a collection with a filter using 'greater than or equal' to a Date object" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { date: { $gte: post2.date } } } } } ) ;
-		expect( response.output.data ).to.equal( [
-			{
-				title: 'Second post' ,
-				content: 'Second post content.' ,
-				date: post2.date ,
-				_id: post2.getId() ,
-				//embedded: undefined,
-				parent: { id: blog.getId() , collection: 'blogs' } ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
-				} ,
-				slugId: post2.slugId
-			} ,
-			{
-				title: 'Third post' ,
-				content: 'Third post content.' ,
-				date: post3.date ,
-				_id: post3.getId() ,
-				//embedded: undefined,
-				parent: { id: blog.getId() , collection: 'blogs' } ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
-				} ,
-				slugId: post3.slugId
-			}
-		] ) ;
-
-		// search
+		expect( response.output.data ).to.equal( [ expectedPost2 , expectedPost3 ] ) ;
+	} ) ;
+	
+	it( "GET on a collection filtering on a text search" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { search: 'second' } } } ) ;
-		expect( response.output.data ).to.equal( [
-			{
-				title: 'Second post' ,
-				content: 'Second post content.' ,
-				date: post2.date ,
-				_id: post2.getId() ,
-				//embedded: undefined,
-				parent: { id: blog.getId() , collection: 'blogs' } ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
-				} ,
-				slugId: post2.slugId
-			}
-		] ) ;
+		expect( response.output.data ).to.equal( [ expectedPost2 ] ) ;
 
 		// search
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { search: 'content' } } } ) ;
-		expect( response.output.data ).to.equal( [
-			{
-				title: 'Third post' ,
-				content: 'Third post content.' ,
-				date: post3.date ,
-				_id: post3.getId() ,
-				//embedded: undefined,
-				parent: { id: blog.getId() , collection: 'blogs' } ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
-				} ,
-				slugId: post3.slugId
-			} ,
-			{
-				title: 'Second post' ,
-				content: 'Second post content.' ,
-				date: post2.date ,
-				_id: post2.getId() ,
-				//embedded: undefined,
-				parent: { id: blog.getId() , collection: 'blogs' } ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
-				} ,
-				slugId: post2.slugId
-			} ,
-			{
-				title: 'First post' ,
-				content: 'First post content.' ,
-				date: post1.date ,
-				_id: post1.getId() ,
-				//embedded: undefined,
-				parent: { id: blog.getId() , collection: 'blogs' } ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
-				} ,
-				slugId: post1.slugId
-			}
-		] ) ;
+		expect( response.output.data ).to.equal( [ expectedPost3 , expectedPost2 , expectedPost1 ] ) ;
 	} ) ;
-
-	it( "Extensive filter testing" ) ;
+	
+	it( "indexed and unindexed queries with the 'unindexedQueries' collection option" ) ;
 } ) ;
-
 
 
 describe( "Built-in collection method: SCHEMA" , () => {

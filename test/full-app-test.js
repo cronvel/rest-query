@@ -117,29 +117,43 @@ function connect() {
 
 
 function runApp() {
-	appProcess = childProcess.spawn( __dirname + '/../bin/rest-query' , [
-		'server' ,
-		'--config' , __dirname + '/../sample/main.kfg' ,
-		'--port' , appPort ,
-		'--buildIndexes'
-	] ) ;
+	var promise = new Promise() ;
+	
+	appProcess = childProcess.fork( __dirname + '/../bin/rest-query' ,
+		[
+			'server' ,
+			'--config' , __dirname + '/../sample/main.kfg' ,
+			'--port' , appPort ,
+			'--buildIndexes'
+		] ,
+		{ stdio: 'pipe' }
+	) ;
 
-	appProcess.stdout.on( 'data' , ( data ) => {
+	// Exists with .spawn() but not with .fork() unless stdio: 'pipe' is used
+	appProcess.stdout.on( 'data' , data => {
 		//console.log( "[appProcess STDOUT] " , data.toString() ) ;
 	} ) ;
 
-	appProcess.stderr.on( 'data' , ( data ) => {
+	appProcess.stderr.on( 'data' , data => {
 		//console.log( "[appProcess STDERR] " , data.toString() ) ;
+	} ) ;
+
+	// We wait for the child to send a ready event, indicating that the child is ready to receive HTTP requests
+	appProcess.on( 'message' , data => {
+		console.log( "[child message received] " , data ) ;
+		if ( data.event === 'ready' ) { promise.resolve() ; }
+	} ) ;
+
+	appProcess.on( 'error' , error => {
+		console.error( "[child error] " , error ) ;
+		promise.reject( error ) ;
 	} ) ;
 
 	appProcess.on( 'exit' , ( code ) => {
 		console.log( '[appProcess exit] ' + code ) ;
 	} ) ;
-
-	// Okay, we have no way to know if the app is ready, except to send it command,
-	// it's way out of the scope of this test suite, so we just hope it is ready after few ms
-	//setTimeout( maybeCallback , 1000 ) ;
-	return Promise.resolveTimeout( 1000 ) ;
+	
+	return promise ;
 }
 
 
