@@ -690,7 +690,7 @@ describe( "Query: skip, limit, sort" , () => {
 
 
 
-describe( "zzz Query: filters and text search" , () => {
+describe( "Query: filters and text search" , () => {
 	var app , performer , blog , post1 , post2 , post3 , expectedPost1 , expectedPost2 , expectedPost3 ;
 
 	beforeEach( async () => {
@@ -807,7 +807,7 @@ describe( "zzz Query: filters and text search" , () => {
 	
 	it( "GET on a collection with a filter using $eq perfect match on array fields should throw if the argument is not an array" , async () => {
 		await expect( () => app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: 'happy' } } } } } ) )
-			.to.reject.with( doormen.ValidatorError ) ;
+			.to.reject.with( ErrorStatus , { type: 'badRequest' } ) ;
 	} ) ;
 	
 	it( "GET on a collection with a filter using $eq perfect match on array fields should match when the argument is the full array" , async () => {
