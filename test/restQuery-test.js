@@ -915,6 +915,74 @@ describe( "Query: filters and text search" , () => {
 } ) ;
 
 
+
+describe( "Advanced PATCH commands" , () => {
+
+	it( "PATCH and $delete/$unset command" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				embedded: { a: 'a' , b: 'b' , array: [1,2,3] } ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				"embedded.a": { $unset: 'A' } ,
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!!' ,
+			description: 'This is a supa blog!' ,
+			embedded: { b: 'b' , array: [1,2,3] } ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+	} ) ;
+
+	it( "PATCH and $push command" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				embedded: { a: 'a' , b: 'b' , array: [1,2,3] } ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				"embedded.array": { $push: 18 } ,
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!!' ,
+			description: 'This is a supa blog!' ,
+			embedded: { a: 'a' , b: 'b' , array: [1,2,3,18] } ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "Built-in collection method: SCHEMA" , () => {
 
 	it( "should get the schema of the collection" , async () => {
