@@ -982,7 +982,7 @@ describe( "Advanced PATCH commands" , () => {
 		} ) ;
 	} ) ;
 
-	it( "PATCH and $push command to multi-link: checking uniqness behavior" , async () => {
+	it( "PATCH and uniqness behavior of multi-link with regular patches and $push patches" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
@@ -1064,6 +1064,11 @@ describe( "Advanced PATCH commands" , () => {
 		response = await app.patch( '/Groups/' + groupId , { users: { $push: userId4 } } , null , { performer: performer } ) ;
 		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
 		expect( response.output.data.users ).to.equal( [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } , { _id: userId4 } ] ) ;
+
+		// Create a patch replace the whole multi-link array
+		response = await app.patch( '/Groups/' + groupId , { users: [ userId1 , userId1 , userId4 , userId1 , userId4 ] } , null , { performer: performer } ) ;
+		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
+		expect( response.output.data.users ).to.equal( [ { _id: userId1 } , { _id: userId4 } ] ) ;
 	} ) ;
 } ) ;
 
