@@ -918,6 +918,8 @@ describe( "Query: filters and text search" , () => {
 
 describe( "Advanced PATCH commands" , () => {
 
+	// Patches are using doormen.applyPatch() behind the scene
+	
 	it( "PATCH and $delete/$unset command" , async () => {
 		var { app , performer } = await commonApp() ;
 
@@ -978,6 +980,90 @@ describe( "Advanced PATCH commands" , () => {
 			embedded: { a: 'a' , b: 'b' , array: [1,2,3,18] } ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
+	} ) ;
+
+	it( "PATCH and $push command to multi-link: checking uniqness behavior" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId1 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId2 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fischer" ,
+				email: "bobby.fischer@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId3 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Not In" ,
+				lastName: "Dagroup" ,
+				email: "notindagroup@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId4 = response.output.data.id ;
+
+		response = await app.post( '/Groups' ,
+			{
+				name: "The Group" ,
+				// Check uniqness when posting
+				users: [ userId1 , userId2 , userId1 , userId3 ] ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		groupId = response.output.data.id ;
+		
+		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
+		expect( response.output.data.users ).to.equal( [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ] ) ;
+
+		// Create a patch that would push a duplicated link, and verify it does nothing
+		response = await app.patch( '/Groups/' + groupId , { users: { $push: userId1 } } , null , { performer: performer } ) ;
+		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
+		expect( response.output.data.users ).to.equal( [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ] ) ;
+
+		// Create a patch that push a new link
+		response = await app.patch( '/Groups/' + groupId , { users: { $push: userId4 } } , null , { performer: performer } ) ;
+		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
+		expect( response.output.data.users ).to.equal( [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } , { _id: userId4 } ] ) ;
 	} ) ;
 } ) ;
 
@@ -1911,9 +1997,11 @@ describe( "Multi-links" , () => {
 		userId4 = response.output.data.id ;
 
 		response = await app.post( '/Groups' ,
-			{			name: "The Group" ,
+			{
+				name: "The Group" ,
 				users: [ userId1 , userId2 , userId3 ] ,
-				publicAccess: "all" } ,
+				publicAccess: "all"
+			} ,
 			null ,
 			{ performer: performer }
 		) ;
