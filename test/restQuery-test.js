@@ -1069,6 +1069,11 @@ describe( "Advanced PATCH commands" , () => {
 		response = await app.patch( '/Groups/' + groupId , { users: [ userId1 , userId1 , userId4 , userId1 , userId4 ] } , null , { performer: performer } ) ;
 		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
 		expect( response.output.data.users ).to.equal( [ { _id: userId1 } , { _id: userId4 } ] ) ;
+
+		// Create a patch replace the whole multi-link array by an empty one
+		response = await app.patch( '/Groups/' + groupId , { users: [] } , null , { performer: performer } ) ;
+		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
+		expect( response.output.data.users ).to.equal( [] ) ;
 	} ) ;
 } ) ;
 
