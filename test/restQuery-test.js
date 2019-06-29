@@ -2594,7 +2594,7 @@ describe( "Slug usages" , () => {
 		) ).to.reject( ErrorStatus , { type: 'conflict' , code: 'duplicateKey' , httpStatus: 409 } ) ;
 	} ) ;
 
-	it( "when a document would generate the same slugId but the slugGeneration.retry option is set in the schema, it should retry by prepending the ID to the slug" , async () => {
+	it( "when a document would generate the same slugId but the slugGeneration.retry option is set in the schema, it should retry by appending parts of the ID to the slug" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
@@ -2632,7 +2632,8 @@ describe( "Slug usages" , () => {
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910ec9a5ae' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My post!!!' ,
-			slugId: '5437f846c41d0e910ec9a5ae-2019-08-07-my-post'
+			//slugId: '5437f846c41d0e910ec9a5ae-2019-08-07-my-post'
+			slugId: '2019-08-07-my-post--5437f846c9a5ae'
 		} ) ;
 	} ) ;
 
