@@ -18,7 +18,11 @@ properties:
 		of:
 			type: string
 		optional: true
-slugGenerationProperty: title
+slugGeneration:
+	properties:
+		- date
+		- title
+	retry: true
 unindexedQueries: true
 indexes:
 	-	properties:

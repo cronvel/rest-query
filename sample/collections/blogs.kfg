@@ -13,7 +13,9 @@ properties:
 		type: strictObject
 alterSchemaProperty: customSchema
 hooks: @@blogs.hooks.js 
-slugGenerationProperty: title 
+slugGeneration:
+	properties:
+		- title
 autoCollection: posts
 
 # allow filter and sort on unindexed properties

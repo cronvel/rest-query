@@ -2499,13 +2499,16 @@ describe( "Groups" , () => {
 
 describe( "Slug usages" , () => {
 
-	it( "when 'slugGenerationProperty' is set on the schema (to an existing property), it should generate a slug from that property's value" , async () => {
+	it( "when 'slugGeneration' is used on the schema, it should generate a slug from its properties array values" , async () => {
 		var { app , performer } = await commonApp() ;
 
+		// Single value
 		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
-			{			title: 'My wonderful life!!!' ,
+			{
+				title: 'My wonderful life!!!' ,
 				description: 'This is a supa blog!' ,
-				publicAccess: 'all' } ,
+				publicAccess: 'all'
+			} ,
 			null ,
 			{ performer: performer }
 		) ;
@@ -2516,35 +2519,101 @@ describe( "Slug usages" , () => {
 			slugId: 'my-wonderful-life' ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
+
+		// From two values
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910ec9a5df' ,
+			{
+				title: 'My post!!!' ,
+				date: new Date( '2019-08-07' ) ,
+				content: 'my content' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910ec9a5df' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My post!!!' ,
+			slugId: '2019-08-07-my-post'
+		} ) ;
 	} ) ;
 
-	it( "when a document will generate the same slugId, it should fail with a 409 - Conflict" , async () => {
+	it( "when a document would generate the same slugId, it should fail with a 409 - Conflict" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response = await app.post( '/Blogs' ,
-			{			title: 'My wonderful life!!!' ,
+			{
+				title: 'My wonderful life!!!' ,
 				description: 'This is a supa blog!' ,
-				publicAccess: 'all' } ,
+				publicAccess: 'all'
+			} ,
 			null ,
 			{ performer: performer }
 		) ;
 
 		await expect( () => app.post( '/Blogs' ,
-			{			title: 'My wonderful life!!!' ,
+			{
+				title: 'My wonderful life!!!' ,
 				description: 'This is another supa blog!' ,
-				publicAccess: 'all' } ,
+				publicAccess: 'all'
+			} ,
 			null ,
 			{ performer: performer }
 		) ).to.reject( ErrorStatus , { type: 'conflict' , code: 'duplicateKey' , httpStatus: 409 } ) ;
+	} ) ;
+
+	it( "when a document would generate the same slugId but the slugGeneration.retry option is set in the schema, it should retry by prepending the ID to the slug" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910ec9a5df' ,
+			{
+				title: 'My post!!!' ,
+				date: new Date( '2019-08-07' ) ,
+				content: 'my content' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910ec9a5ae' ,
+			{
+				title: 'My post!!!' ,
+				date: new Date( '2019-08-07' ) ,
+				content: 'my content' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910ec9a5ae' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My post!!!' ,
+			slugId: '5437f846c41d0e910ec9a5ae-2019-08-07-my-post'
+		} ) ;
 	} ) ;
 
 	it( "the request URL should support slugId instead of ID (GET, PUT, PATCH, DELETE)" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response = await app.post( '/Blogs' ,
-			{			title: 'My wonderful life!!!' ,
+			{
+				title: 'My wonderful life!!!' ,
 				description: 'This is a supa blog!' ,
-				publicAccess: 'all' } ,
+				publicAccess: 'all'
+			} ,
 			null ,
 			{ performer: performer }
 		) ;
@@ -2561,9 +2630,11 @@ describe( "Slug usages" , () => {
 
 		// Replace it
 		response = await app.put( '/Blogs/my-wonderful-life' ,
-			{			title: 'New title!' ,
+			{
+				title: 'New title!' ,
 				description: 'New description!' ,
-				publicAccess: 'all' } ,
+				publicAccess: 'all'
+			} ,
 			null ,
 			{ performer: performer }
 		) ;
@@ -2618,7 +2689,6 @@ describe( "Slug usages" , () => {
 		await expect( () => app.get( '/Blogs/' + blogId , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 		await expect( () => app.get( '/Blogs/my-wonderful-life' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
-
 } ) ;
 
 
