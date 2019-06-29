@@ -2539,6 +2539,37 @@ describe( "Slug usages" , () => {
 		} ) ;
 	} ) ;
 
+	it( "when 'slugGeneration' is used, sanitizers should be called on slug's properties before generation" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910ec9a5df' ,
+			{
+				title: 'My post!!!' ,
+				date: '2019-08-07T08:32:26.439Z' ,
+				content: 'my content' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910ec9a5df' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My post!!!' ,
+			slugId: '2019-08-07-my-post'
+		} ) ;
+	} ) ;
+
 	it( "when a document would generate the same slugId, it should fail with a 409 - Conflict" , async () => {
 		var { app , performer } = await commonApp() ;
 
