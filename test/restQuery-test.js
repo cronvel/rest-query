@@ -1943,6 +1943,110 @@ describe( "Links" , () => {
 		} ) ;
 	} ) ;
 
+	it( "GET + populate broken/dead links should patch the link" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , fatherId , userId , godfatherId ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		response = await app.put( '/Users/' + userId + '/~father' ,
+			{
+				firstName: "Big Joe" ,
+				lastName: "Doe" ,
+				email: "big-joe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		fatherId = response.output.data.id ;
+
+		response = await app.put( '/Users/' + userId + '/~godfather' ,
+			{
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
+
+		response = await app.get( '/Users/' + userId , { performer: performer , query: { populate: [ 'father' , 'godfather' ] } } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			parent: { id: '/' , collection: 'root' } ,
+			father: {
+				_id: fatherId ,
+				firstName: "Big Joe" ,
+				lastName: "Doe" ,
+				email: "big-joe@gmail.com"
+			} ,
+			godfather: {
+				_id: godfatherId ,
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com"
+			}
+		} ) ;
+
+		// Remove one link
+		response = await app.delete( '/Users/' + fatherId , { performer: performer } ) ;
+		response = await app.get( '/Users/' + userId , { performer: performer , query: { populate: [ 'father' , 'godfather' ] } } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			parent: { id: '/' , collection: 'root' } ,
+			father: null ,
+			godfather: {
+				_id: godfatherId ,
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com"
+			}
+		} ) ;
+		
+		// Remove another link
+		response = await app.delete( '/Users/' + godfatherId , { performer: performer } ) ;
+		response = await app.get( '/Users/' + userId , { performer: performer , query: { populate: [ 'father' , 'godfather' ] } } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			parent: { id: '/' , collection: 'root' } ,
+			father: null ,
+			godfather: null
+		} ) ;
+
+		// Test without 'populate' that they are removed
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			parent: { id: '/' , collection: 'root' } ,
+			father: null ,
+			godfather: null
+		} ) ;
+	} ) ;
 } ) ;
 
 
@@ -2362,6 +2466,184 @@ describe( "Multi-links" , () => {
 			firstName: 'Jack' ,
 			lastName: 'Wallace'
 		} ] ) ;
+	} ) ;
+
+	it( "GET + populate on a multi-link" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId1 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId2 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fischer" ,
+				email: "bobby.fischer@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId3 = response.output.data.id ;
+
+		response = await app.post( '/Groups' ,
+			{
+				name: "The Group" ,
+				users: [ userId1 , userId2 , userId3 ] ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		groupId = response.output.data.id ;
+
+		response = await app.get( '/Groups/' + groupId , { performer: performer , query: { populate: [ 'users' ] } } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			name: "The Group" ,
+			users: [
+				{
+					firstName: "Joe" ,
+					lastName: "Doe" ,
+					email: "joe.doe@gmail.com"
+				} ,
+				{
+					firstName: "Jack" ,
+					lastName: "Wallace" ,
+					email: "jack.wallace@gmail.com"
+				} ,
+				{
+					firstName: "Bobby" ,
+					lastName: "Fischer" ,
+					email: "bobby.fischer@gmail.com"
+				}
+			]
+		} ) ;
+	} ) ;
+
+	it( "GET + populate broken/dead links inside of multi-links should patch the link" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId1 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId2 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fischer" ,
+				email: "bobby.fischer@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId3 = response.output.data.id ;
+
+		response = await app.post( '/Groups' ,
+			{
+				name: "The Group" ,
+				users: [ userId1 , userId2 , userId3 ] ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		groupId = response.output.data.id ;
+
+		response = await app.get( '/Groups/' + groupId , { performer: performer , query: { populate: [ 'users' ] } } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			name: "The Group" ,
+			users: [
+				{
+					firstName: "Joe" ,
+					lastName: "Doe" ,
+					email: "joe.doe@gmail.com"
+				} ,
+				{
+					firstName: "Jack" ,
+					lastName: "Wallace" ,
+					email: "jack.wallace@gmail.com"
+				} ,
+				{
+					firstName: "Bobby" ,
+					lastName: "Fischer" ,
+					email: "bobby.fischer@gmail.com"
+				}
+			]
+		} ) ;
+		
+		response = await app.delete( '/Users/' + userId1 , { performer: performer } ) ;
+
+		response = await app.get( '/Groups/' + groupId , { performer: performer , query: { populate: [ 'users' ] } } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			name: "The Group" ,
+			users: [
+				{
+					firstName: "Jack" ,
+					lastName: "Wallace" ,
+					email: "jack.wallace@gmail.com"
+				} ,
+				{
+					firstName: "Bobby" ,
+					lastName: "Fischer" ,
+					email: "bobby.fischer@gmail.com"
+				}
+			]
+		} ) ;
+		
 	} ) ;
 } ) ;
 
@@ -4558,7 +4840,7 @@ describe( "Misc" , () => {
 	} ) ;
 
 	it( "Test CORS" ) ;
-
+	
 	it( "Test --buildIndexes" ) ;
 	it( "Test --initDb <filepath>" ) ;
 } ) ;
