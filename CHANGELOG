@@ -1,4 +1,10 @@
 
+v0.50.0
+-------
+
+BREAKING: now it is allowed to create user without password and even without login, but it is not possible to login using token creation if a user miss any of those : it is meant to create users that can only authenticate with API keys
+
+
 v0.49.5
 -------
 

@@ -3123,9 +3123,9 @@ describe( "Auto collection" , () => {
 
 
 
-describe( "Token creation" , () => {
+describe( "Tokens" , () => {
 
-	it( "login, a.k.a. token creation using POST /Users/CREATE-TOKEN" , async () => {
+	it( "login, a.k.a. token creation using POST /Users/CREATE-TOKEN and test it with the WHO-AM-I method" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response = await app.post( '/Users' ,
@@ -3181,6 +3181,24 @@ describe( "Token creation" , () => {
 		// Should found the token in the user document
 		response = await app.get( '/Users/' + id , { performer: performer } ) ;
 		expect( response.output.data.token[ token ] ).to.be.ok() ;
+
+		var tokenPerformer = app.createPerformer( {
+			type: "header" ,
+			token: token ,
+			agentId: "0123456789"
+		} ) ;
+
+		// Test the API key with the WHO-AM-I method
+		response = await app.get( '/Users/WHO-AM-I' , { performer: tokenPerformer } ) ;
+		expect( response.output.data ).to.equal( {
+			authBy: 'token' ,
+			performer: {
+				_id: id ,
+				groups: {} ,
+				login: "bobby.fisher@gmail.com" ,
+				slugId: "bobby-fisher"
+			}
+		} ) ;
 	} ) ;
 
 	it( "token creation using a bad login should fail" , async () => {
@@ -3713,6 +3731,230 @@ describe( "Token creation" , () => {
 	} ) ;
 
 	it( "'Too many tokens'" ) ;
+} ) ;
+
+
+
+describe( "API keys" , () => {
+
+	it( "Creating an API key with the CREATE-API-KEY method and test it with the WHO-AM-I method" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var userId = response.output.data.id ;
+
+		response = await app.post( '/Users/' + userId + '/CREATE-API-KEY' ,
+			{
+				type: "header" ,
+				agentId: "0123456789012345678901234567890123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		expect( response.output.data ).to.equal( {
+			userId: userId ,
+			type: "header" ,
+			agentId: "0123456789012345678901234567890123456789" ,
+			apiKey: response.output.data.apiKey		// unpredictable
+		} ) ;
+		expect( response.output.data.apiKey.length ).to.be( 107 ) ;
+		var apiKey = response.output.data.apiKey ;
+		var apiKeyData = app.collectionNodes.users.extractFromApiKey( apiKey ) ;
+
+		expect( apiKeyData ).to.equal( {
+			type: "header" ,
+			userId: userId.toString() ,
+			agentId: "0123456789012345678901234567890123456789" ,
+			securityCode: apiKeyData.securityCode	// unpredictable
+		} ) ;
+
+		// Should found the apiKey in the user document
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data.apiKeys ).to.equal( [ {
+			algo: "sha512" ,
+			hash: response.output.data.apiKeys[ 0 ].hash ,	// unpredictable
+			salt: response.output.data.apiKeys[ 0 ].salt ,	// unpredictable
+			start: apiKey.slice( 0 , 6 )
+		} ] ) ;
+
+		var apiKeyPerformer = app.createPerformer( {
+			type: "header" ,
+			apiKey: apiKey ,
+			agentId: "0123456789012345678901234567890123456789"
+		} ) ;
+
+		// Test the API key with the WHO-AM-I method
+		response = await app.get( '/Users/WHO-AM-I' , { performer: apiKeyPerformer } ) ;
+		expect( response.output.data ).to.equal( {
+			authBy: 'apiKey' ,
+			performer: {
+				_id: userId ,
+				groups: {} ,
+				login: "bobby.fisher@gmail.com" ,
+				slugId: "bobby-fisher"
+			}
+		} ) ;
+	} ) ;
+	
+	it( "POST to the REVOKE-API-KEY method should remove a specific API key from the user document" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var userId = response.output.data.id ;
+
+		response = await app.post( '/Users/' + userId + '/CREATE-API-KEY' ,
+			{
+				type: "header" ,
+				agentId: "0123456789012345678901234567890123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var apiKey1 = response.output.data.apiKey ;
+
+		response = await app.post( '/Users/' + userId + '/CREATE-API-KEY' ,
+			{
+				type: "header" ,
+				agentId: "0123456789012345678901234567890123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var apiKey2 = response.output.data.apiKey ;
+
+		// Should found the apiKey in the user document
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data.apiKeys ).to.equal( [
+			{
+				algo: "sha512" ,
+				hash: response.output.data.apiKeys[ 0 ].hash ,	// unpredictable
+				salt: response.output.data.apiKeys[ 0 ].salt ,	// unpredictable
+				start: apiKey1.slice( 0 , 6 )
+			} ,
+			{
+				algo: "sha512" ,
+				hash: response.output.data.apiKeys[ 1 ].hash ,	// unpredictable
+				salt: response.output.data.apiKeys[ 1 ].salt ,	// unpredictable
+				start: apiKey2.slice( 0 , 6 )
+			}
+		] ) ;
+		
+		// Revoke the API key now
+		response = await app.post( '/Users/' + userId + '/REVOKE-API-KEY' , { apiKey: apiKey1 } , null , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { removed: 1 } ) ;
+
+		// Should not found the first apiKey anymore
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data.apiKeys ).to.equal( [
+			{
+				algo: "sha512" ,
+				hash: response.output.data.apiKeys[ 0 ].hash ,	// unpredictable
+				salt: response.output.data.apiKeys[ 0 ].salt ,	// unpredictable
+				start: apiKey2.slice( 0 , 6 )
+			}
+		] ) ;
+
+		// Revoke the API key now
+		response = await app.post( '/Users/' + userId + '/REVOKE-API-KEY' , { apiKey: apiKey2 } , null , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { removed: 1 } ) ;
+
+		// Should not found any apiKey anymore
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data.apiKeys ).to.equal( [] ) ;
+	} ) ;
+	
+	it( "POST to the REVOKE-ALL-API-KEYS method should remove all API key from the user document" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var userId = response.output.data.id ;
+
+		response = await app.post( '/Users/' + userId + '/CREATE-API-KEY' ,
+			{
+				type: "header" ,
+				agentId: "0123456789012345678901234567890123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var apiKey1 = response.output.data.apiKey ;
+
+		response = await app.post( '/Users/' + userId + '/CREATE-API-KEY' ,
+			{
+				type: "header" ,
+				agentId: "0123456789012345678901234567890123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var apiKey2 = response.output.data.apiKey ;
+
+		// Should found the apiKey in the user document
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data.apiKeys ).to.equal( [
+			{
+				algo: "sha512" ,
+				hash: response.output.data.apiKeys[ 0 ].hash ,	// unpredictable
+				salt: response.output.data.apiKeys[ 0 ].salt ,	// unpredictable
+				start: apiKey1.slice( 0 , 6 )
+			} ,
+			{
+				algo: "sha512" ,
+				hash: response.output.data.apiKeys[ 1 ].hash ,	// unpredictable
+				salt: response.output.data.apiKeys[ 1 ].salt ,	// unpredictable
+				start: apiKey2.slice( 0 , 6 )
+			}
+		] ) ;
+		
+		// Revoke ALL API key now
+		response = await app.post( '/Users/' + userId + '/REVOKE-ALL-API-KEYS' , {} , null , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { removed: 2 } ) ;
+
+		// Should not found the apiKey anymore
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data.apiKeys ).to.equal( [] ) ;
+	} ) ;
+
+	it( "'Too many API keys'" ) ;
+	it( "Test SYSTEM API KEY" ) ;
 } ) ;
 
 
@@ -4795,13 +5037,6 @@ describe( "Client error management" , () => {
 
 
 
-describe( "API KEY" , () => {
-
-	it( "Test SYSTEM API KEY" ) ;
-} ) ;
-
-
-
 describe( "Misc" , () => {
 
 	it( "Test of the test: test helper commonApp() should clean previously created items" , async () => {
@@ -4840,6 +5075,7 @@ describe( "Misc" , () => {
 	} ) ;
 
 	it( "Test CORS" ) ;
+	it( "Test agentId (token, API key)" ) ;
 	
 	it( "Test --buildIndexes" ) ;
 	it( "Test --initDb <filepath>" ) ;
