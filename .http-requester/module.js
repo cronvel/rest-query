@@ -32,7 +32,14 @@ var api ;
 
 exports.name = 'Rest-Query' ;
 
-exports.init = function( api_ ) { api = api_ ; } ;
+exports.init = async function( api_ ) {
+	api = api_ ;
+
+	// Set application/json by default
+	await api.emulate( [
+		'Content-Type: application/json'
+	] ) ;
+} ;
 
 var commands = exports.commands = {} ;
 
@@ -48,11 +55,18 @@ commands.login = async function( args ) {
 		'post /Users/CREATE-TOKEN'
 	] ) ;
 	
+	var body = api.lastResponse().body ;
+	
+	if ( ! body ) {
+		api.term.red( "No response body\n" ) ;
+		return ;
+	}
+	
 	try {
-		token = JSON.parse( api.lastResponse().body ).token ;
+		token = JSON.parse( body ).token ;
 	}
 	catch ( error ) {
-		api.term( "%E\n" ) ;
+		api.term( "API %E\n" , error ) ;
 		return ;
 	}
 
