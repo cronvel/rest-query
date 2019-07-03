@@ -1,4 +1,10 @@
 
+v0.49.5
+-------
+
+Bugfix: UserCollectionNode now calls the CollectionNode's initDocument() and initPatch() like it should
+
+
 v0.49.4
 -------
 
