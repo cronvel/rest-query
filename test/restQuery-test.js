@@ -855,6 +855,16 @@ describe( "Query: filters and text search" , () => {
 		expect( response.output.data ).to.equal( [] ) ;
 	} ) ;
 	
+	it( "GET on a collection with a filter using $in match on _id" , async () => {
+		// Without sanitizing
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { _id: { $in: [ post1.getId() , post3.getId() ] } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost3 ] ) ;
+
+		// With sanitizing needed
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { _id: { $in: [ post1.getKey() , post3.getKey() ] } } } } } ) ;
+		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost3 ] ) ;
+	} ) ;
+	
 	it( "GET on a collection with a filter using $in match on scalar fields should match when the value is one of the element of the array argument" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $in: [10,11,12,19,20] } } } } } ) ;
 		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
@@ -5079,5 +5089,10 @@ describe( "Misc" , () => {
 	
 	it( "Test --buildIndexes" ) ;
 	it( "Test --initDb <filepath>" ) ;
+} ) ;
+
+
+
+describe( "Historical bugs" , () => {
 } ) ;
 
