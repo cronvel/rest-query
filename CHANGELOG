@@ -1,4 +1,10 @@
 
+v0.50.3
+-------
+
+Fixing escaping for header X-Error-Message
+
+
 v0.50.2
 -------
 
