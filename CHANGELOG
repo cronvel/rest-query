@@ -1,4 +1,10 @@
 
+v0.50.6
+-------
+
+Doormen dependency (enabling 'nullIsValue' and 'nullIsUndefined' flags)
+
+
 v0.50.5
 -------
 
