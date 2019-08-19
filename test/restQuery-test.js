@@ -100,10 +100,10 @@ function clearCollection( collection ) {
 
 var currentApp ;
 
-async function commonApp() {
+async function commonApp( override = null ) {
 	if ( currentApp ) { currentApp.shutdown() ; }
 
-	var app = new restQuery.App( __dirname + '/../sample/main.kfg' , cliOptions ) ;
+	var app = new restQuery.App( __dirname + '/../sample/main.kfg' , override || cliOptions ) ;
 
 	// Create a system performer
 	var performer = app.createPerformer( null , true ) ;
@@ -5082,6 +5082,24 @@ describe( "Misc" , () => {
 			.to.equal( { traverse: true , read: ['id','content'] , create: true } ) ;
 		expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
 			.to.equal( { read: ['id','content'] } ) ;
+	} ) ;
+
+	it.opt( "Collection with a user/password in URL" , async () => {
+		/*
+			First, create a user in the mongo-shell with the command:
+			db.createUser( { user: 'rqtestuser' , pwd: 'rqtestpw' , roles: [ { role: "readWrite", db: "restQuery" } ] } )
+		*/
+		var { app , performer } = await commonApp( { defaultDomain: 'mongodb://rqtestuser:rqtestpw@localhost:27017/restQuery' } ) ;
+
+		var response = await app.get( '/' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			name: '/' ,
+			title: 'Root' ,
+			description: 'Root object' ,
+			userAccess: {} ,
+			groupAccess: {} ,
+			publicAccess: { traverse: true , read: ['id','content'] , create: true }
+		} ) ;
 	} ) ;
 
 	it( "Test CORS" ) ;
