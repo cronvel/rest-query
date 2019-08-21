@@ -5102,6 +5102,10 @@ describe( "Misc" , () => {
 		} ) ;
 	} ) ;
 
+	it.opt( "Collection with a bad user/password in URL" , async () => {
+		await expect( () => commonApp( { defaultDomain: 'mongodb://rqtestuser:badpw@localhost:27017/restQuery' } ) ).to.reject() ;
+	} ) ;
+
 	it( "Test CORS" ) ;
 	it( "Test agentId (token, API key)" ) ;
 	
