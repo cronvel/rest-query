@@ -2,6 +2,7 @@
 v0.52.0
 -------
 
+BREAKING: 'restQueryType' becomes 'role' in collection's config, and plural form removed for the role-name
 New: versioning
 
 
