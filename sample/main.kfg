@@ -5,6 +5,7 @@ collections:
 	scheduledTasks: @@collections/scheduledTasks.kfg
 	blogs: @@collections/blogs.kfg
 	posts: @@collections/posts.kfg
+	versionedPosts: @@collections/versionedPosts.kfg
 	comments: @@collections/comments.kfg
 
 tree:
@@ -14,6 +15,8 @@ tree:
 	blogs:
 		users: null
 		posts:
+			comments: null
+		versionedPosts:
 			comments: null
 
 defaultDomain: mongodb://localhost:27017/restQuery

@@ -116,7 +116,9 @@ async function commonApp( override = null ) {
 		clearCollection( app.collectionNodes.groups.collection ) ,
 		clearCollection( app.collectionNodes.blogs.collection ) ,
 		clearCollection( app.collectionNodes.posts.collection ) ,
-		clearCollection( app.collectionNodes.comments.collection )
+		clearCollection( app.collectionNodes.comments.collection ) ,
+		
+		clearCollection( app.versionsCollection )
 	] ) ;
 
 	// Sometime .buildIndexes() is really slow (more than 2 seconds) on new mongoDB
@@ -2785,6 +2787,151 @@ describe( "Groups" , () => {
 	it( "DELETE on an unexisting user" ) ;
 
 	it( "PUT, then DELETE, then GET" ) ;
+} ) ;
+
+
+
+describe( "Versioned collections" , () => {
+	
+	it( "POST, then PUT (overwrite), then GET" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog.save() ;
+
+		var response = await app.post( '/Blogs/' + blog.getId() + '/VersionedPosts' ,
+			{
+				title: 'My first post!!!' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var postId = response.output.data.id ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_version: 1 ,
+			title: 'My first post!!!' ,
+			content: 'Blah blah blah...' ,
+		} ) ;
+		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
+
+		// PUT (overwrite)
+		response = await app.put( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId  ,
+			{
+				title: 'My first post!!!' ,
+				content: 'Edit: Blah blah blah...' ,
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_version: 2 ,
+			title: 'My first post!!!' ,
+			content: 'Edit: Blah blah blah...' ,
+		} ) ;
+		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
+
+		// PATCH
+		response = await app.patch( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId  ,
+			{
+				title: 'My 1st post!!!'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			_version: 3 ,
+			title: 'My 1st post!!!' ,
+			content: 'Edit: Blah blah blah...' ,
+		} ) ;
+		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
+		
+		
+		// Now check that everything was correctly versioned as it should
+		
+		var batch = await app.versionsCollection.find( { '_activeVersion._id': postId , '_activeVersion._collection': 'versionedPosts' } ) ;
+		expect( batch ).to.be.partially.like( [
+			{
+				_id: batch[ 0 ]._id ,   // unpredictable
+				_version: 1 ,
+				_lastModified: batch[ 0 ]._lastModified ,   // unpredictable
+				_activeVersion: {
+					_id: postId ,
+					_collection: 'versionedPosts'
+				} ,
+				title: 'My first post!!!' ,
+				content: 'Blah blah blah...'
+            } ,
+			{
+				_id: batch[ 1 ]._id ,   // unpredictable
+				_version: 2 ,
+				_lastModified: batch[ 1 ]._lastModified ,   // unpredictable
+				_activeVersion: {
+					_id: postId ,
+					_collection: 'versionedPosts'
+				} ,
+				title: 'My first post!!!' ,
+				content: 'Edit: Blah blah blah...'
+            } 
+        ] ) ;
+
+		// DELETE
+		response = await app.delete( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId  , { performer: performer } ) ;
+		await expect( () => app.get( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
+		
+		
+		// Now check that all versions are still there
+		
+		var batch = await app.versionsCollection.find( { '_activeVersion._id': postId , '_activeVersion._collection': 'versionedPosts' } ) ;
+		expect( batch ).to.be.partially.like( [
+			{
+				_id: batch[ 0 ]._id ,   // unpredictable
+				_version: 1 ,
+				_lastModified: batch[ 0 ]._lastModified ,   // unpredictable
+				_activeVersion: {
+					_id: postId ,
+					_collection: 'versionedPosts'
+				} ,
+				title: 'My first post!!!' ,
+				content: 'Blah blah blah...'
+            } ,
+			{
+				_id: batch[ 1 ]._id ,   // unpredictable
+				_version: 2 ,
+				_lastModified: batch[ 1 ]._lastModified ,   // unpredictable
+				_activeVersion: {
+					_id: postId ,
+					_collection: 'versionedPosts'
+				} ,
+				title: 'My first post!!!' ,
+				content: 'Edit: Blah blah blah...'
+            } ,
+			{
+				_id: batch[ 2 ]._id ,   // unpredictable
+				_version: 3 ,
+				_lastModified: batch[ 2 ]._lastModified ,   // unpredictable
+				_activeVersion: {
+					_id: postId ,
+					_collection: 'versionedPosts'
+				} ,
+				title: 'My 1st post!!!' ,
+				content: 'Edit: Blah blah blah...'
+            } 
+        ] ) ;
+	} ) ;
 } ) ;
 
 

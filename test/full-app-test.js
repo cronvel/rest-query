@@ -109,7 +109,7 @@ async function clearCollection( collectionName ) {
 
 
 function connect() {
-	return mongodb.MongoClient.connect( dbUrl , { useNewUrlParser: true } ).then( client => {
+	return mongodb.MongoClient.connect( dbUrl , { useNewUrlParser: true , useUnifiedTopology: true } ).then( client => {
 		db = client.db() ;
 	} ) ;
 }
