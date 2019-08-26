@@ -1,4 +1,4 @@
-restQueryType: users
+role: user
 path: /users
 attachmentPath: /users
 properties:

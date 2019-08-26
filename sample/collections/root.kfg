@@ -1,4 +1,4 @@
-restQueryType: root
+role: root
 path: /root
 extraProperties: true
 properties:

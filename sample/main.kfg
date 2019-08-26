@@ -25,6 +25,10 @@ passwords:
 # Warning! it is in plain text! Most of time you should set it to null to disable it!
 systemApiKey: "4r3-u-u51n6-7h4t-471-k3y-4-2341"
 
+versioning:
+	active: true
+	path: /versions
+
 scheduler:
 	active: true
 	period: 1000
