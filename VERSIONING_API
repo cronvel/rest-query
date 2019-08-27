@@ -1,0 +1,12 @@
+
+
+Access the version 51 of an item:
+GET /Items/<ID>/@51
+
+Restore a version:
+GET /Items/<ID>/@51/RESTORE
+
+List versions:
+maybe: GET /Items/<ID>/VERSIONS
+... or maybe: GET /Items/<ID>/@/
+

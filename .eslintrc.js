@@ -151,6 +151,7 @@ module.exports = {
 		'comma-dangle': [ 'error' , 'never' ] ,
 		'quotes': 'off' ,
 		'camelcase': 'warn' ,
+		'require-atomic-updates': 'off' ,
 		
 		
 		
