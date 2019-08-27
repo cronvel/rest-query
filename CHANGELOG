@@ -1,4 +1,10 @@
 
+v0.52.4
+-------
+
+Fix minor Node#patch() bug when used directly from userland
+
+
 v0.52.3
 -------
 
