@@ -1,4 +1,10 @@
 
+v0.52.5
+-------
+
+Expose the password-object creation method to userland
+
+
 v0.52.4
 -------
 

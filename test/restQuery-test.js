@@ -2691,13 +2691,6 @@ describe( "Users" , () => {
 			email: 'joe.doe@gmail.com' ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
-
-		expect( response.output.data.password ).to.be.an( 'object' ) ;
-		expect( response.output.data.password.algo ).to.be( 'sha512' ) ;
-		expect( response.output.data.password.salt ).to.be.a( 'string' ) ;
-		expect( response.output.data.password.hash ).to.be.a( 'string' ) ;
-		// check the password
-		expect( hash.password( "pw" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
 	} ) ;
 
 	it( "PUT, then PUT (overwrite), then GET" ) ;
@@ -2764,6 +2757,31 @@ describe( "Users" , () => {
 	it( "DELETE on an unexisting user" ) ;
 
 	it( "PUT, then DELETE, then GET" ) ;
+
+	it( "users's password should be stored as a password hash object" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Users/5437f846e41d0e910ec9a5d8' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "a-secret-password"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } ) ;
+
+		expect( response.output.data.password ).to.be.an( 'object' ) ;
+		expect( response.output.data.password.algo ).to.be( 'sha512' ) ;
+		expect( response.output.data.password.salt ).to.be.a( 'string' ) ;
+		expect( response.output.data.password.hash ).to.be.a( 'string' ) ;
+		
+		// check back the password
+		expect( hash.password( "a-secret-password" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
+	} ) ;
 } ) ;
 
 
