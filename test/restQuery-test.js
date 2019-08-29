@@ -3432,7 +3432,8 @@ describe( "Tokens" , () => {
 		var { app , performer } = await commonApp() ;
 
 		var response = await app.post( '/Blogs' ,
-			{			title: 'My wonderful life' ,
+			{
+				title: 'My wonderful life' ,
 				description: 'This is a supa blog!' ,
 				publicAccess: 'all' } ,
 			null ,
@@ -4770,6 +4771,89 @@ describe( "Access" , () => {
 	} ) ;
 
 	it( "PATCH of nested resource with inheritance" , async () => {
+		var response , userAccess , groupAccess ;
+		
+		userAccess = {} ;
+		
+		userAccess[ authorizedId ] = {
+			read: true ,
+			write: true ,
+			create: true ,
+			inheritance: {
+				read: true ,
+				write: true
+			}
+		} ;
+
+		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass the check
+
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'passThrough'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{
+				title: 'A boring title' ,
+				content: 'Blah blah blah...'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// Authorized user
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I've changed my mind!" } , null , { performer: authorizedPerformer } ) ;
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.partially.equal( { title: "I've changed my mind!" } ) ;
+
+		// Non-connected user
+		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public patch forbidden.' } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
+		
+		
+		// Now give public access
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				publicAccess: {
+					traverse: true ,
+					inheritance: {
+						read: true ,
+						write: true
+					}
+				}
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+
+		// Non-connected user, it can edit it!
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{ title: "I can do that!" } ,
+			null ,
+			{ performer: notConnectedPerformer }
+		) ;
+		
+		// User not listed in specific rights
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) ;
+		expect( response.output.data ).to.partially.equal( { title: "I can do that!" } ) ;
+	} ) ;
+
+	it.opt( "zzz method execution" , async () => {
+		throw new Error( 'Not coded' ) ;
 		var response , userAccess , groupAccess ;
 		
 		userAccess = {} ;
