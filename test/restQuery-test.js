@@ -4965,6 +4965,92 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.equal( { result: 6 } ) ;
 	} ) ;
 
+
+	it( "method access inheritance" , async () => {
+		var response , userAccess , groupAccess ;
+		
+		userAccess = {} ;
+		
+		userAccess[ authorizedId ] = {
+			traverse: true ,
+			read: true ,
+			write: true ,
+			create: true ,
+			//exec: [ 'method.double' ] ,
+			inheritance: { read: true , write: true , exec: [ 'method.double' ] }
+		} ;
+
+		// Maximal right that does not pass the check
+		userAccess[ notEnoughAuthorizedId ] = {
+			traverse: true ,
+			read: true ,
+			write: true ,
+			create: true ,
+			inheritance: { read: true , write: true , exec: [ 'random-tag' ] }
+		} ;
+
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'passThrough'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{
+				title: 'A boring title' ,
+				content: 'Blah blah blah...'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// Authorized user
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 6 } ) ;
+
+		// Non-connected user
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+		
+		// Now give public access
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				publicAccess: {
+					traverse: true ,
+					//exec: [ 'method.double' ]
+					inheritance: { read: true , write: true , exec: [ 'method.double' ] }
+				}
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+
+		// Non-connected user
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 6 } ) ;
+
+		// User not listed in specific rights
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 6 } ) ;
+
+		// User listed, but with too low rights
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 6 } ) ;
+	} ) ;
+
 	it.skip( "PATCH of nested resource with per-collection inheritance" , async () => {
 		throw new Error( 'Not coded' ) ;
 		var response , userAccess , groupAccess ;
@@ -5048,6 +5134,7 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.partially.equal( { title: "I can do that!" } ) ;
 	} ) ;
 
+	it( "inheritance depth tests needed" ) ;
 	it( "more inheritance tests needed" ) ;
 	it( "fine-grained access" ) ;
 
@@ -5122,11 +5209,11 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 	it( "Custom root object method" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var response = await app.post( '/SUPA-METHOD' , { to: 'toto' } , null , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( { done: "something" , to: "toto" } ) ;
+		var response = await app.post( '/DOUBLE' , { value: 4 } , null , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { result: 8 } ) ;
 
-		response = await app.get( '/SUPA-METHOD' , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
+		response = await app.get( '/DOUBLE' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( null ) ;
 	} ) ;
 
 	it( "Custom collection method" , async () => {

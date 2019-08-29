@@ -24,6 +24,7 @@ slugGeneration:
 		- title
 	retry: true
 unindexedQueries: true
+objectMethods: @@posts.objectMethods.js
 indexes:
 	-	properties:
 			content: text
