@@ -4853,22 +4853,28 @@ describe( "Access" , () => {
 	} ) ;
 
 	it.opt( "zzz method execution" , async () => {
-		throw new Error( 'Not coded' ) ;
 		var response , userAccess , groupAccess ;
 		
 		userAccess = {} ;
 		
 		userAccess[ authorizedId ] = {
+			traverse: true ,
 			read: true ,
 			write: true ,
 			create: true ,
-			inheritance: {
-				read: true ,
-				write: true
-			}
+			exec: [ 'c' ] ,
+			//inheritance: { read: true , write: true }
 		} ;
 
-		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass the check
+		// Maximal right that does not pass the check
+		userAccess[ notEnoughAuthorizedId ] = {
+			traverse: true ,
+			read: true ,
+			write: true ,
+			create: true ,
+			exec: [ 'random-tag' ] ,
+			//inheritance: { read: true , write: true }
+		} ;
 
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -4881,32 +4887,23 @@ describe( "Access" , () => {
 			{ performer: authorizedPerformer }
 		) ;
 		
-		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
-			{
-				title: 'A boring title' ,
-				content: 'Blah blah blah...'
-			} ,
-			null ,
-			{ performer: authorizedPerformer }
-		) ;
-		
 		// Authorized user
-		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I've changed my mind!" } , null , { performer: authorizedPerformer } ) ;
-		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) ;
-		expect( response.output.data ).to.partially.equal( { title: "I've changed my mind!" } ) ;
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/DOUBLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 6 } ) ;
 
 		// Non-connected user
-		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notConnectedPerformer } ) )
-			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public patch forbidden.' } ) ;
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/DOUBLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
 
 		// User not listed in specific rights
-		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: unauthorizedPerformer } ) )
-			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/DOUBLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
 
 		// User listed, but with too low rights
-		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notEnoughAuthorizedPerformer } ) )
-			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/DOUBLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
 		
+		return ;
 		
 		// Now give public access
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,

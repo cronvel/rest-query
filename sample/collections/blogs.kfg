@@ -20,3 +20,5 @@ autoCollection: posts
 
 # allow filter and sort on unindexed properties
 unindexedQueries: true
+
+objectMethods: @@root.objectMethods.js

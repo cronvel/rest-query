@@ -23,28 +23,30 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 */
+
 "use strict" ;
 
-var restQuery = require( '../../lib/restQuery.js' ) ;
-var log = restQuery.log.global.use( 'root-methods' ) ;
-
-var Promise = require( 'seventh' ) ;
 
 
+const restQuery = require( '../../lib/restQuery.js' ) ;
+const log = restQuery.log.global.use( 'root-methods' ) ;
 
-module.exports = {
-	
-	supaMethod: context => {
-		log.debug( '>>>>>>>>>> supaMethod, context: %I' , context ) ;
-		
-		if ( ! context.input.document ) {
-			context.output.data = { done: "nothing" , cause: "this is a GET request" } ;
-		}
-		else {
-			context.output.data = { done: "something" , to: context.input.document.to } ;
-		}
-		
-		return Promise.resolved ;
+const Promise = require( 'seventh' ) ;
+
+
+
+exports.double = context => {
+	if ( ! context.input.document ) {
+		context.output.data = null ;
 	}
+	else {
+		context.output.data = {
+			result: ( + context.input.document.value || 0 ) * 2
+		} ;
+	}
+	
+	return Promise.resolved ;
 } ;
-                                            
+
+exports.double.tags = [ 'content' ] ;
+

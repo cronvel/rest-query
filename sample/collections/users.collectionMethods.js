@@ -23,27 +23,28 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 */
+
 "use strict" ;
 
-var restQuery = require( '../../lib/restQuery.js' ) ;
-var log = restQuery.log.global.use( 'users-methods' ) ;
-
-var Promise = require( 'seventh' ) ;
 
 
+const restQuery = require( '../../lib/restQuery.js' ) ;
+const log = restQuery.log.global.use( 'users-methods' ) ;
 
-module.exports = {
+const Promise = require( 'seventh' ) ;
+
+
+
+exports.doSomething = context => {
+	log.debug( '>>>>>>>>>> doSomething, context: %I' , context ) ;
 	
-	doSomething: context => {
-		log.debug( '>>>>>>>>>> doSomething, context: %I' , context ) ;
-		
-		if ( ! context.input.document ) {
-			context.output.data = { done: "nothing" , cause: "this is a GET request" } ;
-		}
-		else {
-			context.output.data = { done: "something" , to: context.input.document.to } ;
-		}
-		
-		return Promise.resolved ;
+	if ( ! context.input.document ) {
+		context.output.data = { done: "nothing" , cause: "this is a GET request" } ;
 	}
+	else {
+		context.output.data = { done: "something" , to: context.input.document.to } ;
+	}
+	
+	return Promise.resolved ;
 } ;
+
