@@ -38,6 +38,7 @@ var Logfella = require( 'logfella' ) ;
 
 if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
 if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
+//if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 1 } ; }
 var log = Logfella.global.use( 'unit-test' ) ;
 
 var Promise = require( 'seventh' ) ;
@@ -158,7 +159,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: ['id','content'] , create: true }
+			publicAccess: { traverse: true , read: ['id','content'] , query: true , create: true }
 		} ) ;
 	} ) ;
 
@@ -253,7 +254,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		expect( response.output.data ).to.be( 'My wonderful life' ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/.userAccess.' + randomId , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( { traverse: true , read: ['id','content'] } ) ;
+		expect( response.output.data ).to.equal( { traverse: true , read: ['id','content'] , exec: ['id','content'] , query: true } ) ;
 	} ) ;
 
 	it( "POST then GET" , async () => {
@@ -490,7 +491,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
@@ -503,7 +504,7 @@ describe( "Basic queries of top-level collections" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
@@ -553,7 +554,7 @@ describe( "Query: skip, limit, sort" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
@@ -566,7 +567,7 @@ describe( "Query: skip, limit, sort" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
@@ -583,7 +584,7 @@ describe( "Query: skip, limit, sort" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: response.output.data[ 0 ].slugId		// cannot be predicted
 			} ,
@@ -596,7 +597,7 @@ describe( "Query: skip, limit, sort" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: response.output.data[ 1 ].slugId		// cannot be predicted
 			}
@@ -614,7 +615,7 @@ describe( "Query: skip, limit, sort" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: blog1.slugId
 			} ,
@@ -627,7 +628,7 @@ describe( "Query: skip, limit, sort" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: blog3.slugId
 			}
@@ -657,7 +658,7 @@ describe( "Query: skip, limit, sort" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: blog2.slugId
 			} ,
@@ -670,7 +671,7 @@ describe( "Query: skip, limit, sort" , () => {
 				userAccess: {} ,
 				groupAccess: {} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+					traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 				} ,
 				slugId: blog3.slugId
 			}
@@ -753,7 +754,7 @@ describe( "Query: filters and text search" , () => {
 			userAccess: {} ,
 			groupAccess: {} ,
 			publicAccess: {
-				traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 			}
 		} ;
 		
@@ -769,7 +770,7 @@ describe( "Query: filters and text search" , () => {
 			userAccess: {} ,
 			groupAccess: {} ,
 			publicAccess: {
-				traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 			}
 		} ;
 		
@@ -784,7 +785,7 @@ describe( "Query: filters and text search" , () => {
 			userAccess: {} ,
 			groupAccess: {} ,
 			publicAccess: {
-				traverse: true , read: true , write: true , delete: true , overwrite: true , create: true
+				traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 			} 
 		} ;
 	} ) ;
@@ -5528,7 +5529,7 @@ describe( "Misc" , () => {
 	it( "Shema's 'defaultPublicAccess'" , async () => {
 		var { app , performer } = await commonApp() ;
 		expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
-			.to.equal( { traverse: true , read: ['id','content'] , create: true } ) ;
+			.to.equal( { traverse: true , read: ['id','content'] , exec: ['id','content'] , query: true , create: true } ) ;
 		expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
 			.to.equal( { read: ['id','content'] } ) ;
 	} ) ;

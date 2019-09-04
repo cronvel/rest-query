@@ -48,7 +48,7 @@ exports.double = context => {
 	return Promise.resolved ;
 } ;
 
-exports.double.tags = [ 'content' , 'method.double' ] ;
+exports.double.tags = [ 'misc' , 'method.double' ] ;
 
 
 
