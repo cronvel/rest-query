@@ -37,8 +37,8 @@ var restQuery = require( '..' ) ;
 var Logfella = require( 'logfella' ) ;
 
 if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
-if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
-//if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 1 } ; }
+//if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
+if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 1 } ; }
 var log = Logfella.global.use( 'unit-test' ) ;
 
 var Promise = require( 'seventh' ) ;
@@ -5052,8 +5052,7 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.equal( { result: 6 } ) ;
 	} ) ;
 
-	it.skip( "PATCH of nested resource with per-collection inheritance" , async () => {
-		throw new Error( 'Not coded' ) ;
+	it( "zzz PATCH of nested resource with per-collection inheritance" , async () => {
 		var response , userAccess , groupAccess ;
 		
 		userAccess = {} ;
@@ -5061,10 +5060,15 @@ describe( "Access" , () => {
 		userAccess[ authorizedId ] = {
 			read: true ,
 			write: true ,
-			create: true ,
-			inheritance: {
-				read: true ,
-				write: true
+			collections: {
+				posts: {
+					create: true ,
+					query: true ,
+					inheritance: {
+						read: true ,
+						write: true
+					}
+				}
 			}
 		} ;
 
@@ -5113,9 +5117,13 @@ describe( "Access" , () => {
 			{
 				publicAccess: {
 					traverse: true ,
-					inheritance: {
-						read: true ,
-						write: true
+					collections: {
+						posts: {
+							inheritance: {
+								read: true ,
+								write: true
+							}
+						}
 					}
 				}
 			} ,
@@ -5133,6 +5141,124 @@ describe( "Access" , () => {
 		// User not listed in specific rights
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) ;
 		expect( response.output.data ).to.partially.equal( { title: "I can do that!" } ) ;
+	} ) ;
+
+	it( "zzz collection-specific access shadowing object access" , async () => {
+		var response , userAccess , groupAccess ;
+		
+		userAccess = {} ;
+		
+		userAccess[ authorizedId ] = {
+			read: true ,
+			write: true ,
+			create: true ,
+			collections: {
+				posts: {
+					create: false
+				}
+			}
+		} ;
+
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'passThrough'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{
+				title: 'A boring title' ,
+				content: 'Blah blah blah...'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+	} ) ;
+
+	it( "zzz DELETE of nested resource with per-collection inheritance" , async () => {
+		var response , userAccess , groupAccess ;
+		
+		userAccess = {} ;
+		
+		userAccess[ authorizedId ] = {
+			read: true ,
+			write: true ,
+			collections: {
+				posts: {
+					create: true ,
+					query: true ,
+					inheritance: {
+						read: true ,
+						write: true ,
+						//delete: true
+					}
+				}
+			}
+		} ;
+
+		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass the check
+
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				userAccess: userAccess ,
+				publicAccess: 'passThrough'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{
+				title: 'A boring title' ,
+				content: 'Blah blah blah...'
+			} ,
+			null ,
+			{ performer: authorizedPerformer }
+		) ;
+		
+		// Non-connected user
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		// Not yet authorized user
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+		// Now give delete access
+		userAccess[ authorizedId ].collections.posts.inheritance.delete = true ;
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } , null , { performer: authorizedPerformer } ) ;
+
+		// Non-connected user
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
+		// Authorized user
+		response = await app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) ;
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'notFound' , httpStatus: 404 , message: 'Document not found' } ) ;
 	} ) ;
 
 	it( "inheritance depth tests needed" ) ;
