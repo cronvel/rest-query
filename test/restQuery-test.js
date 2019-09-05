@@ -37,8 +37,8 @@ var restQuery = require( '..' ) ;
 var Logfella = require( 'logfella' ) ;
 
 if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
-if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
-//if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 1 } ; }
+//if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
+if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 1 } ; }
 var log = Logfella.global.use( 'unit-test' ) ;
 
 var Promise = require( 'seventh' ) ;
@@ -5052,7 +5052,7 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.equal( { result: 6 } ) ;
 	} ) ;
 
-	it( "xxx yyy tag-less collection-method execution should be public" , async () => {
+	it( "xxx tag-less collection-method execution should be public" , async () => {
 		var response , userAccess , groupAccess ;
 		
 		userAccess = {} ;
@@ -5083,7 +5083,7 @@ describe( "Access" , () => {
 	} ) ;
 
 	it( "xxx tagged collection-method execution should rely on the 'exec' access" , async () => {
-		var response , userAccess , groupAccess ;
+		var response , publicAccess , userAccess , groupAccess ;
 		
 		userAccess = {} ;
 		
@@ -5092,8 +5092,7 @@ describe( "Access" , () => {
 			read: true ,
 			write: true ,
 			create: true ,
-			exec: [ 'method.double' ] ,
-			//inheritance: { read: true , write: true }
+			exec: [ 'method.triple' ] ,
 		} ;
 
 		// Maximal right that does not pass the check
@@ -5103,7 +5102,6 @@ describe( "Access" , () => {
 			write: true ,
 			create: true ,
 			exec: [ 'random-tag' ] ,
-			//inheritance: { read: true , write: true }
 		} ;
 
 		response = await app.patch( '/' , {
@@ -5114,7 +5112,7 @@ describe( "Access" , () => {
 		// Authorized user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
-
+		
 		// Non-connected user
 		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
@@ -5128,14 +5126,13 @@ describe( "Access" , () => {
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
 		
 		// Now give public access
-		response = await app.patch( '/' , {
-			publicAccess: {
-				traverse: true ,
-				exec: [ 'method.double' ]
-				//inheritance: { read: true , write: true }
-			}
-		} ) ;
+		publicAccess = { traverse: true , exec: [ 'method.triple' ] } ;
+		response = await app.patch( '/' , { publicAccess } ) ;
 
+		// Authorized user
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+		
 		// Non-connected user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
@@ -5148,13 +5145,73 @@ describe( "Access" , () => {
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
 		
-		throw new Error( "shadowing!" ) ;
+		// Now shadow everything with a 'collections' access
+		publicAccess.collections = {} ;
+		userAccess[ authorizedId ].collections = {} ;
+		userAccess[ notEnoughAuthorizedId ].collections = {} ;
+		response = await app.patch( '/' , { publicAccess , userAccess } ) ;
+
+		// Authorized user
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+		
+		// Non-connected user
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+		
+		// Now shadow add correct 'collections' access for authorizedPerformer on 'blogs'
+		publicAccess.collections.blogs = { exec: [ 'random-tag' ] } ;
+		userAccess[ authorizedId ].collections.blogs = { exec: [ 'method.triple' ] } ;
+		userAccess[ notEnoughAuthorizedId ].collections.blogs = { exec: [ 'random-tag' ] } ;
+		response = await app.patch( '/' , { publicAccess , userAccess } ) ;
+
+		// Authorized user
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+		
+		// Non-connected user
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+		// Now shadow add correct 'collections' public access on 'blogs'
+		publicAccess.collections.blogs = { exec: [ 'method.triple' ] } ;
+		response = await app.patch( '/' , { publicAccess , userAccess } ) ;
+
+		// Authorized user
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+		
+		// Non-connected user
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+
+		// User not listed in specific rights
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+
+		// User listed, but with too low rights
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
 	} ) ;
 
-
-	it( "xxx collection-method access inheritance" , async () => {
-		throw new Error( "write it!" ) ;
-		var response , userAccess , groupAccess ;
+	it( "xxx yyy collection-method access inheritance from the root-object" , async () => {
+		var response , publicAccess , userAccess , groupAccess ;
 		
 		userAccess = {} ;
 		
@@ -5163,8 +5220,71 @@ describe( "Access" , () => {
 			read: true ,
 			write: true ,
 			create: true ,
-			//exec: [ 'method.double' ] ,
-			inheritance: { read: true , write: true , exec: [ 'method.double' ] }
+			inheritance: { read: true , write: true , exec: [ 'method.triple' ] }
+		} ;
+
+		// Maximal right that does not pass the check
+		userAccess[ notEnoughAuthorizedId ] = {
+			traverse: true ,
+			read: true ,
+			write: true ,
+			create: true ,
+			inheritance: { read: true , write: true , exec: [ 'random-tag' ] }
+		} ;
+
+		publicAccess = { traverse: true } ;
+		response = await app.patch( '/' , { publicAccess , userAccess } ) ;
+		
+		// Authorized user
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+		
+		// Non-connected user
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+		
+		
+		// Now add inheritance to public access
+		publicAccess.inheritance = { read: true , write: true , exec: [ 'method.triple' ] } ;
+		response = await app.patch( '/' , { publicAccess } ) ;
+		
+		// Authorized user
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+		
+		// Non-connected user
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+
+		// User not listed in specific rights
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+
+		// User listed, but with too low rights
+		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+	} ) ;
+
+	it( "xxx yyy collection-method access inheritance" , async () => {
+		var response , publicAccess , userAccess , groupAccess ;
+		
+		userAccess = {} ;
+		
+		userAccess[ authorizedId ] = {
+			traverse: true ,
+			read: true ,
+			write: true ,
+			create: true ,
+			//exec: [ 'method.triple' ] ,
+			inheritance: { read: true , write: true , exec: [ 'method.triple' ] }
 		} ;
 
 		// Maximal right that does not pass the check
@@ -5197,45 +5317,110 @@ describe( "Access" , () => {
 		) ;
 		
 		// Authorized user
-		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
-		expect( response.output.data ).to.equal( { result: 6 } ) ;
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
 
 		// Non-connected user
-		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
 
 		// User not listed in specific rights
-		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) )
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
 
 		// User listed, but with too low rights
-		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
 		
+
 		// Now give public access
-		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
-			{
-				publicAccess: {
-					traverse: true ,
-					//exec: [ 'method.double' ]
-					inheritance: { read: true , write: true , exec: [ 'method.double' ] }
-				}
-			} ,
-			null ,
-			{ performer: authorizedPerformer }
-		) ;
+		publicAccess = {
+			traverse: true ,
+			inheritance: { read: true , write: true , exec: [ 'method.triple' ] }
+		} ;
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { publicAccess } ) ;
+
+		// Authorized user
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
 
 		// Non-connected user
-		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
-		expect( response.output.data ).to.equal( { result: 6 } ) ;
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
 
 		// User not listed in specific rights
-		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) ;
-		expect( response.output.data ).to.equal( { result: 6 } ) ;
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
 
 		// User listed, but with too low rights
-		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) ;
-		expect( response.output.data ).to.equal( { result: 6 } ) ;
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+		
+		
+		// Now removes all inheritance
+		publicAccess.inheritance = null ;
+		userAccess[ authorizedId ].inheritance = null ;
+		userAccess[ notEnoughAuthorizedId ].inheritance = null ;
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { publicAccess , userAccess } ) ;
+
+		// Authorized user
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+		// Non-connected user
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+		
+
+		// Now add an inheritance on the blog collection for a user
+		userAccess[ authorizedId ].inheritance = { exec: [ 'method.triple' ] } ;
+		userAccess[ notEnoughAuthorizedId ].inheritance = { exec: [ 'random-tag' ] } ;
+		response = await app.patch( '/' , { userAccess } ) ;
+
+		// Authorized user
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+
+		// Non-connected user
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+		// User listed, but with too low rights
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+
+		// Now add an inheritance on the blog collection for public
+		publicAccess.inheritance = { exec: [ 'method.triple' ] } ;
+		response = await app.patch( '/' , { publicAccess } ) ;
+
+		// Authorized user
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+
+		// Non-connected user
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+
+		// User not listed in specific rights
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: unauthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
+
+		// User listed, but with too low rights
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) ;
+		expect( response.output.data ).to.equal( { result: 9 } ) ;
 	} ) ;
 
 	it( "zzz PATCH of nested resource with per-collection inheritance" , async () => {

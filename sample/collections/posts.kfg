@@ -25,6 +25,7 @@ slugGeneration:
 	retry: true
 unindexedQueries: true
 objectMethods: @@posts.objectMethods.js
+collectionMethods: @@posts.collectionMethods.js
 indexes:
 	-	properties:
 			content: text
