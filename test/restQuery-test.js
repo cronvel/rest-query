@@ -32,28 +32,28 @@
 
 var cliOptions = getCliOptions() ;
 
-var restQuery = require( '..' ) ;
+const restQuery = require( '..' ) ;
 
-var Logfella = require( 'logfella' ) ;
+const Logfella = require( 'logfella' ) ;
 
 if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
-//if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
-if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 1 } ; }
-var log = Logfella.global.use( 'unit-test' ) ;
+if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
+//if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 1 } ; }
+const log = Logfella.global.use( 'unit-test' ) ;
 
-var Promise = require( 'seventh' ) ;
+const Promise = require( 'seventh' ) ;
 
-var tree = require( 'tree-kit' ) ;
-var string = require( 'string-kit' ) ;
-var ErrorStatus = require( 'error-status' ) ;
-var rootsDb = require( 'roots-db' ) ;
+const tree = require( 'tree-kit' ) ;
+const string = require( 'string-kit' ) ;
+const ErrorStatus = require( 'error-status' ) ;
+const rootsDb = require( 'roots-db' ) ;
 
-var mongodb = require( 'mongodb' ) ;
+const mongodb = require( 'mongodb' ) ;
 
-var doormen = require( 'doormen' ) ;
+const doormen = require( 'doormen' ) ;
 
-var fsKit = require( 'fs-kit' ) ;
-var hash = require( 'hash-kit' ) ;
+const fsKit = require( 'fs-kit' ) ;
+const hash = require( 'hash-kit' ) ;
 
 
 
@@ -4723,11 +4723,7 @@ describe( "Access" , () => {
 	} ) ;
 
 	it( "Access by groups" , async () => {
-		var response , userAccess , groupAccess ;
-		
-		userAccess = {} ;
-		userAccess[ authorizedId ] = 'read' ;
-		//userAccess[ authorizedByGroupId ] = 'passThrough' ;
+		var response , groupAccess ;
 		
 		groupAccess = {} ;
 		groupAccess[ authorizedGroupId ] = 'read' ;
@@ -4736,7 +4732,6 @@ describe( "Access" , () => {
 			{
 				title: 'My wonderful life 2!!!' ,
 				description: 'This is a supa blog! (x2)' ,
-				userAccess: userAccess ,
 				groupAccess: groupAccess ,
 				publicAccess: 'none'
 			} ,
@@ -4744,13 +4739,6 @@ describe( "Access" , () => {
 			{ performer: authorizedPerformer }
 		) ;
 		
-		// By the authorized user
-		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
-		expect( response.output.data ).to.partially.equal( {
-			title: 'My wonderful life 2!!!' ,
-			description: 'This is a supa blog! (x2)'
-		} ) ;
-
 		// User authorized by its group
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedByGroupPerformer } ) ;
 		expect( response.output.data ).to.partially.equal( {
@@ -4765,10 +4753,116 @@ describe( "Access" , () => {
 		// User not listed in specific rights
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+	} ) ;
+
+	it( "Access by groups with inheritance" , async () => {
+		var response , groupAccess ;
 		
-		// User listed, but with too low rights
-		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } ) )
+		groupAccess = {} ;
+		groupAccess[ authorizedGroupId ] = {} ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life 2!!!' ,
+				description: 'This is a supa blog! (x2)' ,
+				groupAccess: groupAccess ,
+				publicAccess: { traverse: true }
+			}
+		) ;
+		
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{
+				title: 'A boring title' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: { traverse: true }
+			}
+		) ;
+		
+		// User not yet authorized by its group
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+		// Non-connected user
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+
+		// Give inherited access
+
+		groupAccess[ authorizedGroupId ] = {
+			inheritance: {
+				read: true ,
+				delete: true
+			}
+		} ;
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { groupAccess: groupAccess } ) ;
+		
+		// User authorized by its group
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			title: 'A boring title' ,
+			content: 'Blah blah blah...'
+		} ) ;
+
+		// Non-connected user
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+		// User authorized by its group to delete, it should not throw
+		await app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) ;
+
+
+		// Give collection-based inherited access
+
+		groupAccess[ authorizedGroupId ] = {
+			inheritance: null ,
+			collections: {
+				posts: {
+					inheritance: {
+						read: true ,
+						delete: true
+					}
+				}
+			}
+		} ;
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { groupAccess: groupAccess } ) ;
+		
+		// it was deleted
+		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{
+				title: 'A boring title' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: { traverse: true }
+			}
+		) ;
+		
+		// User authorized by its group
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			title: 'A boring title' ,
+			content: 'Blah blah blah...'
+		} ) ;
+
+		// Non-connected user
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+		// User authorized by its group to delete, it should not throw
+		await app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) ;
 	} ) ;
 
 	it( "PATCH of nested resource with inheritance" , async () => {
@@ -5052,7 +5146,7 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.equal( { result: 6 } ) ;
 	} ) ;
 
-	it( "xxx tag-less collection-method execution should be public" , async () => {
+	it( "tag-less collection-method execution should be public" , async () => {
 		var response , userAccess , groupAccess ;
 		
 		userAccess = {} ;
@@ -5082,7 +5176,7 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
 	} ) ;
 
-	it( "xxx tagged collection-method execution should rely on the 'exec' access" , async () => {
+	it( "tagged collection-method execution should rely on the 'exec' access" , async () => {
 		var response , publicAccess , userAccess , groupAccess ;
 		
 		userAccess = {} ;
@@ -5210,7 +5304,7 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
 	} ) ;
 
-	it( "xxx yyy collection-method access inheritance from the root-object" , async () => {
+	it( "collection-method access inheritance from the root-object" , async () => {
 		var response , publicAccess , userAccess , groupAccess ;
 		
 		userAccess = {} ;
@@ -5273,7 +5367,7 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
 	} ) ;
 
-	it( "xxx yyy collection-method access inheritance" , async () => {
+	it( "collection-method access inheritance" , async () => {
 		var response , publicAccess , userAccess , groupAccess ;
 		
 		userAccess = {} ;
@@ -5423,7 +5517,7 @@ describe( "Access" , () => {
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
 	} ) ;
 
-	it( "zzz PATCH of nested resource with per-collection inheritance" , async () => {
+	it( "PATCH of nested resource with per-collection inheritance" , async () => {
 		var response , userAccess , groupAccess ;
 		
 		userAccess = {} ;
@@ -5473,6 +5567,8 @@ describe( "Access" , () => {
 		// Non-connected user
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public patch forbidden.' } ) ;
+		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
 
 		// User not listed in specific rights
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: unauthorizedPerformer } ) )
@@ -5492,7 +5588,8 @@ describe( "Access" , () => {
 						posts: {
 							inheritance: {
 								read: true ,
-								write: true
+								write: true ,
+								delete: true
 							}
 						}
 					}
@@ -5512,9 +5609,12 @@ describe( "Access" , () => {
 		// User not listed in specific rights
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) ;
 		expect( response.output.data ).to.partially.equal( { title: "I can do that!" } ) ;
+
+		// Non-connected user, it can delete it!
+		response = await app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notConnectedPerformer } ) ;
 	} ) ;
 
-	it( "zzz per-collection-access shadowing object access for collection once defined (whether specific or not)" , async () => {
+	it( "per-collection-access shadowing object access for collection once defined (whether specific or not)" , async () => {
 		var response , userAccess , groupAccess ;
 		
 		userAccess = {} ;
@@ -5580,7 +5680,7 @@ describe( "Access" , () => {
 		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
 
-	it( "zzz DELETE of nested resource with per-collection inheritance" , async () => {
+	it( "DELETE of nested resource with per-collection inheritance" , async () => {
 		var response , userAccess , groupAccess ;
 		
 		userAccess = {} ;

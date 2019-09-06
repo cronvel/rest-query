@@ -1,4 +1,10 @@
 
+v0.53.0
+-------
+
+BREAKING: new Access/rights management mechanisms: per-collection, per-collection inheritance, object/collection method execution
+
+
 v0.52.6
 -------
 
