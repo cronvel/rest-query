@@ -5851,13 +5851,13 @@ describe( "Access" , () => {
 		}
 		
 		
-		it( "GET resource tag-masking based on access tags" , async () => {
+		it( "GET resource tag-masking based on access tags (tag-list and special value)" , async () => {
 			var response , userAccess ;
 
 			// Start with just the 'id' tag read access
 			
 			userAccess = {} ;
-			userAccess[ authorizedId ] = { read: [ 'id' ] } ;
+			userAccess[ authorizedId ] = { read: false } ;
 			
 			response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 				{
@@ -5868,6 +5868,24 @@ describe( "Access" , () => {
 					publicAccess: 'none'
 				} ,
 			) ;
+
+			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Read forbidden.' } ) ;
+			
+			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			
+
+			// Add more access
+			
+			userAccess[ authorizedId ] = { read: [ 'id' ] } ;
+			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
 
 			// By default, access is [id,content], so it fails here
 			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) )
@@ -5893,6 +5911,9 @@ describe( "Access" , () => {
 				slugId: "my-wonderful-life-2"
 			} ) ;
 
+			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			
 			
 			// Add more access
 			
@@ -5933,6 +5954,9 @@ describe( "Access" , () => {
 				description: "This is a supa blog! (x2)"
 			} ) ;
 
+			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			
 			
 			// Add more access
 			
@@ -5973,6 +5997,54 @@ describe( "Access" , () => {
 				description: "This is a supa blog! (x2)" ,
 				secret: "a secret"
 			} ) ;
+
+			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			
+			
+			// Add more access
+			
+			userAccess[ authorizedId ] = { read: true } ;
+			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
+
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2" ,
+				title: "My wonderful life 2!!!" ,
+				description: "This is a supa blog! (x2)"
+			} ) ;
+			
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2"
+			} ) ;
+			
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2" ,
+				title: "My wonderful life 2!!!" ,
+				description: "This is a supa blog! (x2)" ,
+				secret: "a secret"
+			} ) ;
+			return
+
+			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 		} ) ;
 	} ) ;
 } ) ;
