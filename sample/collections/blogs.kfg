@@ -5,6 +5,11 @@ properties:
 		type: string
 	description:
 		type: string
+	secret:
+		optional: true
+		type: string
+		tags:
+			- secret
 	embedded:
 		optional: true
 		type: strictObject

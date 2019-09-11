@@ -4755,7 +4755,7 @@ describe( "Access" , () => {
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
 
-	it( "zzz Access by groups with inheritance" , async () => {
+	it( "Access by groups with inheritance" , async () => {
 		var response , groupAccess ;
 		
 		groupAccess = {} ;
@@ -5841,6 +5841,140 @@ describe( "Access" , () => {
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
+
+	describe( "Access tag-masking" , () => {
+		
+		// /!\ Not perfect... should use something more clean... 
+		// /!\ Perhaps a new roots-db method...
+		function getFiltered( response ) {
+			return JSON.parse( restQuery.misc.serializeContextData( response ) ) ;
+		}
+		
+		
+		it( "GET resource tag-masking based on access tags" , async () => {
+			var response , userAccess ;
+
+			// Start with just the 'id' tag read access
+			
+			userAccess = {} ;
+			userAccess[ authorizedId ] = { read: [ 'id' ] } ;
+			
+			response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+				{
+					title: 'My wonderful life 2!!!' ,
+					description: 'This is a supa blog! (x2)' ,
+					secret: 'a secret' ,
+					userAccess: userAccess ,
+					publicAccess: 'none'
+				} ,
+			) ;
+
+			// By default, access is [id,content], so it fails here
+			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2"
+			} ) ;
+			
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2"
+			} ) ;
+
+			
+			// Add more access
+			
+			userAccess[ authorizedId ] = { read: [ 'id' , 'content' ] } ;
+			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
+
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2" ,
+				title: "My wonderful life 2!!!" ,
+				description: "This is a supa blog! (x2)"
+			} ) ;
+			
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2"
+			} ) ;
+			
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2" ,
+				title: "My wonderful life 2!!!" ,
+				description: "This is a supa blog! (x2)"
+			} ) ;
+
+			
+			// Add more access
+			
+			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'secret' ] } ;
+			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
+
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2" ,
+				title: "My wonderful life 2!!!" ,
+				description: "This is a supa blog! (x2)"
+			} ) ;
+			
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2"
+			} ) ;
+			
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2" ,
+				title: "My wonderful life 2!!!" ,
+				description: "This is a supa blog! (x2)" ,
+				secret: "a secret"
+			} ) ;
+		} ) ;
+	} ) ;
 } ) ;
 
 
@@ -6137,13 +6271,6 @@ describe( "Alter Schema" , () => {
 describe( "Populate" , () => {
 
 	it( "Test populate" ) ;
-} ) ;
-
-
-
-describe( "Tier level" , () => {
-
-	it( "Test tier level" ) ;
 } ) ;
 
 
