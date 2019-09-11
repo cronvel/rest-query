@@ -4755,11 +4755,18 @@ describe( "Access" , () => {
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 	} ) ;
 
-	it( "Access by groups with inheritance" , async () => {
+	it( "zzz Access by groups with inheritance" , async () => {
 		var response , groupAccess ;
 		
 		groupAccess = {} ;
-		groupAccess[ authorizedGroupId ] = {} ;
+		groupAccess[ authorizedGroupId ] = {
+			collections: {
+				posts: {
+					traverse: true ,
+					create: true
+				}
+			}
+		} ;
 		
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -4770,12 +4777,24 @@ describe( "Access" , () => {
 			}
 		) ;
 		
+		// Test per-collection create 
+		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
+			{
+				title: 'A boring title' ,
+				content: 'Blah blah blah...' ,
+			} ,
+			null ,
+			{ performer: unauthorizedPerformer }
+		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+		
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
 				title: 'A boring title' ,
 				content: 'Blah blah blah...' ,
 				publicAccess: { traverse: true }
-			}
+			} ,
+			null ,
+			{ performer: authorizedByGroupPerformer }
 		) ;
 		
 		// User not yet authorized by its group
@@ -4798,10 +4817,30 @@ describe( "Access" , () => {
 		groupAccess[ authorizedGroupId ] = {
 			inheritance: {
 				read: true ,
+				query: true ,
 				delete: true
 			}
 		} ;
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { groupAccess: groupAccess } ) ;
+		
+		// First try the read/query inheritance on the collection
+		
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , { performer: authorizedByGroupPerformer } ) ;
+		expect( response.output.data ).to.be.partially.like( [ {
+			title: 'A boring title' ,
+			content: 'Blah blah blah...'
+		} ] ) ;
+
+		// Non-connected user
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , { performer: notConnectedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+
+		// User not listed in specific rights
+		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , { performer: unauthorizedPerformer } ) )
+			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+
+		// Then try on the nested object
 		
 		// User authorized by its group
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) ;
