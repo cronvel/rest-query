@@ -6039,12 +6039,211 @@ describe( "Access" , () => {
 				slugId: "my-wonderful-life-2" ,
 				title: "My wonderful life 2!!!" ,
 				description: "This is a supa blog! (x2)" ,
-				secret: "a secret"
+				secret: "a secret" ,
+				publicAccess: {} ,
+				userAccess: userAccess ,
+				groupAccess: {}
+			} ) ;
+			
+			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0e910ec9a5d8" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				slugId: "my-wonderful-life-2" ,
+				title: "My wonderful life 2!!!" ,
+				description: "This is a supa blog! (x2)" ,
+				secret: "a secret" ,
+				publicAccess: {} ,
+				userAccess: userAccess ,
+				groupAccess: {}
+			} ) ;
+		} ) ;
+
+		it( "zzz tag-masking on the 'users' collection and the always excluded 'security' tag" , async () => {
+			var response , data , userAccess ;
+
+			// Start with just the 'id' tag read access
+			
+			userAccess = {} ;
+			userAccess[ authorizedId ] = { read: false } ;
+			
+			response = await app.put( '/Users/5437f846c41d0ef10ec9a5ff' ,
+				{
+					firstName: 'anon' ,
+					lastName: 'anon' ,
+					email: 'anon@yopmail.com' ,
+					password: 'az78s' ,
+					userAccess: userAccess ,
+					publicAccess: 'none'
+				}
+			) ;
+
+			await expect( () => app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+			await expect( () => app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'id' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+
+			await expect( () => app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all-granted' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Read forbidden.' } ) ;
+			
+			await expect( () => app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			
+
+			// Add more access
+			
+			userAccess[ authorizedId ] = { read: [ 'id' , 'content' ] } ;
+			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { userAccess: userAccess } ) ;
+
+			// Only system can read 'security' tags
+			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { access: true } ) ;
+			expect( ( data = getFiltered( response ) ) ).to.equal( {
+				_id: "5437f846c41d0ef10ec9a5ff" ,
+				email: "anon@yopmail.com" ,
+				firstName: "anon" ,
+				lastName: "anon" ,
+				login: "anon@yopmail.com" ,
+				slugId: "anon-anon" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				
+				groups: {} ,
+				
+				publicAccess: {} ,
+				userAccess: userAccess ,
+				groupAccess: {} ,
+				
+				// Security
+				password: {
+					algo: "sha512" ,
+					hash: data.password.hash ,
+					salt: data.password.salt
+				} ,
+				apiKeys: [] ,
+				token: {}
+
+			} ) ;
+
+			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0ef10ec9a5ff" ,
+				email: "anon@yopmail.com" ,
+				firstName: "anon" ,
+				lastName: "anon" ,
+				login: "anon@yopmail.com" ,
+				slugId: "anon-anon" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				}
+			} ) ;
+
+			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'id' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0ef10ec9a5ff" ,
+				login: "anon@yopmail.com" ,
+				slugId: "anon-anon" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				}
+			} ) ;
+
+			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0ef10ec9a5ff" ,
+				email: "anon@yopmail.com" ,
+				firstName: "anon" ,
+				lastName: "anon" ,
+				login: "anon@yopmail.com" ,
+				slugId: "anon-anon" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				}
+			} ) ;
+
+			await expect( () => app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all' } ) )
+				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			
+			
+			// Add more access
+			
+			userAccess[ authorizedId ] = { read: true } ;
+			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { userAccess: userAccess } ) ;
+
+			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0ef10ec9a5ff" ,
+				email: "anon@yopmail.com" ,
+				firstName: "anon" ,
+				lastName: "anon" ,
+				login: "anon@yopmail.com" ,
+				slugId: "anon-anon" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				}
+			} ) ;
+
+			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'id' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0ef10ec9a5ff" ,
+				login: "anon@yopmail.com" ,
+				slugId: "anon-anon" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				}
+			} ) ;
+			
+			console.error( "######################" ) ;
+			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0ef10ec9a5ff" ,
+				email: "anon@yopmail.com" ,
+				firstName: "anon" ,
+				lastName: "anon" ,
+				login: "anon@yopmail.com" ,
+				slugId: "anon-anon" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				
+				groups: {} ,
+				
+				publicAccess: {} ,
+				userAccess: userAccess ,
+				groupAccess: {} ,
 			} ) ;
 			return
 
-			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
-				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
+			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all' } ) ;
+			expect( getFiltered( response ) ).to.equal( {
+				_id: "5437f846c41d0ef10ec9a5ff" ,
+				email: "anon@yopmail.com" ,
+				firstName: "anon" ,
+				lastName: "anon" ,
+				login: "anon@yopmail.com" ,
+				slugId: "anon-anon" ,
+				parent: {
+					collection: "root" ,
+					id: "/"
+				} ,
+				
+				groups: {} ,
+				
+				publicAccess: {} ,
+				userAccess: userAccess ,
+				groupAccess: {} ,
+			} ) ;
 		} ) ;
 	} ) ;
 } ) ;
