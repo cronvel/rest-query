@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.54.2",
+  "version": "0.54.3",
   "engines": {
     "node": ">=4.5.0"
   },
@@ -29,7 +29,7 @@
     "string-kit": "^0.9.12",
     "token-kit": "^0.2.1",
     "tree-kit": "^0.6.1",
-    "utterminal": "^0.5.35"
+    "utterminal": "^0.5.39"
   },
   "devDependencies": {
     "minimist": "^1.2.0",
