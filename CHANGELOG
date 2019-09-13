@@ -1,4 +1,10 @@
 
+v0.54.2
+-------
+
+Fixed .slugify()'s hyphen bug at the begining or the end when an invalid char is removed
+
+
 v0.54.1
 -------
 
