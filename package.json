@@ -1,8 +1,8 @@
 {
   "name": "rest-query",
-  "version": "0.54.3",
+  "version": "0.54.4",
   "engines": {
-    "node": ">=4.5.0"
+    "node": ">=10.0.0"
   },
   "description": "The Awesome REST Framework!",
   "main": "lib/restQuery.js",
@@ -13,7 +13,7 @@
     "rest-query": "./bin/rest-query"
   },
   "dependencies": {
-    "doormen": "^0.10.11",
+    "doormen": "^0.10.12",
     "error-status": "^1.10.0",
     "fs-kit": "^0.3.2",
     "hash-kit": "^0.3.2",
@@ -23,7 +23,7 @@
     "logfella-client": "^1.2.2",
     "qs-kit": "^0.6.4",
     "rest-query-shared": "^0.33.9",
-    "roots-db": "^0.23.7",
+    "roots-db": "^0.23.8",
     "server-kit": "^0.9.16",
     "seventh": "^0.7.28",
     "string-kit": "^0.9.12",
