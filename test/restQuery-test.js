@@ -6723,6 +6723,11 @@ describe( "Misc" , () => {
 			.to.equal( { read: ['id','content'] } ) ;
 	} ) ;
 
+	it( "App exec tags" , async () => {
+		var { app , performer } = await commonApp() ;
+		expect( [ ... app.allCollectionExecTags ] ).to.equal( [] ) ;
+	} ) ;
+
 	it.opt( "Collection with a user/password in URL" , async () => {
 		/*
 			First, create a user in the mongo-shell with the command:
