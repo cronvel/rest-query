@@ -6723,9 +6723,9 @@ describe( "Misc" , () => {
 			.to.equal( { read: ['id','content'] } ) ;
 	} ) ;
 
-	it( "App exec tags" , async () => {
+	it( "App's all collection exec tags" , async () => {
 		var { app , performer } = await commonApp() ;
-		expect( [ ... app.allCollectionExecTags ] ).to.equal( [] ) ;
+		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
 	} ) ;
 
 	it.opt( "Collection with a user/password in URL" , async () => {
