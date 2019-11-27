@@ -1,4 +1,10 @@
 
+v0.54.10
+--------
+
+Fix internal error when sending request to / without a JSON object
+
+
 v0.54.9
 -------
 
