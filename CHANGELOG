@@ -1,4 +1,12 @@
 
+v0.55.0
+-------
+
+Breaking: default queryLimit is back to 100
+HTTP module: support for strange Content-Disposition filename*=UTF-8'' syntax
+support for 'exists' filters in query string
+
+
 v0.54.13
 --------
 
