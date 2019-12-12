@@ -2379,7 +2379,8 @@ describe( "Multi-links" , () => {
 		userId2 = response.output.data.id ;
 
 		response = await app.post( '/Groups' ,
-			{			name: "The Group" ,
+			{
+				name: "The Group" ,
 				users: [ userId1 , userId2 ] ,
 				publicAccess: "all" } ,
 			null ,
@@ -2388,7 +2389,8 @@ describe( "Multi-links" , () => {
 		groupId = response.output.data.id ;
 
 		response = await app.patch( '/Groups/' + groupId + '/~~users/' + userId1 ,
-			{			firstName: "Joey" ,
+			{
+				firstName: "Joey" ,
 				email: "joey.doe@gmail.com" } ,
 			null ,
 			{ performer: performer }
@@ -6760,5 +6762,141 @@ describe( "Misc" , () => {
 
 
 describe( "Historical bugs" , () => {
+
+	it( "xxx PATCH on a link" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , userId , godfatherId ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		response = await app.post( '/Users/' ,
+			{
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
+
+		response = await app.patch( '/Users/' + userId , { godfather: { _id: ''+ godfatherId , firstName: "Joe" , lastName: "Doe" } } , null , { performer: performer } ) ;
+
+		// Check that the godfather has been modified
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectID ) ;
+		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
+	} ) ;
+	
+	it( "yyy PATCH on a link" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , userId , godfatherId ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		response = await app.post( '/Users/' ,
+			{
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
+
+		response = await app.patch( '/Users/' + userId , { "godfather._id": ''+ godfatherId } , null , { performer: performer } ) ;
+
+		// Check that the godfather has been modified
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectID ) ;
+		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
+
+		response = await app.patch( '/Users/' + userId , { "godfather._id": ''+ godfatherId } , null , { performer: performer } ) ;
+
+		// Check that the godfather has been modified
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectID ) ;
+		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
+	} ) ;
+	
+	it( "zzz PATCH through a multi-link" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId1 = response.output.data.id ;
+
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId2 = response.output.data.id ;
+
+		response = await app.post( '/Groups' ,
+			{
+				name: "The Group" ,
+				//users: [ userId1 , userId2 ] ,
+				publicAccess: "all" } ,
+			null ,
+			{ performer: performer }
+		) ;
+		groupId = response.output.data.id ;
+
+		response = await app.patch( '/Groups/' + groupId , { users: [ { _id: '' + userId1 , firstName: "Jack" , lastName: "O' Lantern" } , { _id: '' + userId2 } ] } , null , { performer: performer } ) ;
+
+		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			name: "The Group" ,
+			users: [ userId1 , userId2 ] ,
+		} ) ;
+	} ) ;
 } ) ;
 
