@@ -13,27 +13,27 @@
     "rest-query": "./bin/rest-query"
   },
   "dependencies": {
-    "doormen": "^0.10.12",
+    "doormen": "^0.10.14",
     "error-status": "^1.10.0",
     "fs-kit": "^0.3.2",
     "hash-kit": "^0.3.2",
     "json-kit": "^0.6.3",
     "kung-fig": "^0.52.8",
-    "logfella": "^1.3.1",
+    "logfella": "^1.3.3",
     "logfella-client": "^1.2.3",
     "qs-kit": "^0.6.4",
     "rest-query-shared": "^0.33.9",
     "roots-db": "^0.23.14",
     "server-kit": "^0.9.18",
     "seventh": "^0.7.30",
-    "string-kit": "^0.10.3",
+    "string-kit": "^0.11.1",
     "token-kit": "^0.2.1",
     "tree-kit": "^0.6.2",
-    "utterminal": "^0.5.39"
+    "utterminal": "^0.5.40"
   },
   "devDependencies": {
     "minimist": "^1.2.0",
-    "mongodb": "3.3.5"
+    "mongodb": "3.4.0"
   },
   "scripts": {
     "test": "tea-time -R dot"
