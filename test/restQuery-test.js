@@ -159,7 +159,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: ['id','content'] , query: true , create: true }
+			publicAccess: { traverse: true , read: ['id','content','system-content'] , query: true , create: true }
 		} ) ;
 	} ) ;
 
@@ -205,7 +205,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'A wonderful website' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: ['id','content'] , create: true }
+			publicAccess: { traverse: true , read: ['id','content','system-content'] , create: true }
 		} ) ;
 	} ) ;
 
@@ -254,7 +254,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		expect( response.output.data ).to.be( 'My wonderful life' ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/.userAccess.' + randomId , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( { traverse: true , read: ['id','content'] , exec: ['id','content'] , query: true } ) ;
+		expect( response.output.data ).to.equal( { traverse: true , read: ['id','content','system-content'] , exec: ['id','content'] , query: true } ) ;
 	} ) ;
 
 	it( "POST then GET" , async () => {
@@ -6720,7 +6720,7 @@ describe( "Misc" , () => {
 	it( "Shema's 'defaultPublicAccess'" , async () => {
 		var { app , performer } = await commonApp() ;
 		expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
-			.to.equal( { traverse: true , read: ['id','content'] , exec: ['id','content'] , query: true , create: true } ) ;
+			.to.equal( { traverse: true , read: ['id','content','system-content'] , exec: ['id','content'] , query: true , create: true } ) ;
 		expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
 			.to.equal( { read: ['id','content'] } ) ;
 	} ) ;
@@ -6763,7 +6763,7 @@ describe( "Misc" , () => {
 
 describe( "Historical bugs" , () => {
 
-	it( "xxx PATCH on a link" , async () => {
+	it.opt( "xxx PATCH on a link" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , userId , godfatherId ;
@@ -6802,7 +6802,7 @@ describe( "Historical bugs" , () => {
 		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
 	} ) ;
 	
-	it( "yyy PATCH on a link" , async () => {
+	it.opt( "yyy PATCH on a link" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , userId , godfatherId ;
@@ -6848,7 +6848,7 @@ describe( "Historical bugs" , () => {
 		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
 	} ) ;
 	
-	it( "zzz PATCH through a multi-link" , async () => {
+	it.opt( "zzz PATCH through a multi-link" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;

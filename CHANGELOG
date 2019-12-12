@@ -1,4 +1,10 @@
 
+v0.56.0
+-------
+
+Breaking -- schema can define opaque objects: object that cannot be patched inside, new builtin tag 'system-content'
+
+
 v0.55.0
 -------
 
