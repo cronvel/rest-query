@@ -1,4 +1,10 @@
 
+v0.56.1
+-------
+
+Fix .getAllAccessTag() bug when not all accessType are defined
+
+
 v0.56.0
 -------
 
