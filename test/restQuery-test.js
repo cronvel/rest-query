@@ -6763,7 +6763,7 @@ describe( "Misc" , () => {
 
 describe( "Historical bugs" , () => {
 
-	it.opt( "xxx PATCH on a link" , async () => {
+	it( "PATCH on/through a link" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , userId , godfatherId ;
@@ -6794,61 +6794,17 @@ describe( "Historical bugs" , () => {
 		) ;
 		godfatherId = response.output.data.id ;
 
-		response = await app.patch( '/Users/' + userId , { godfather: { _id: ''+ godfatherId , firstName: "Joe" , lastName: "Doe" } } , null , { performer: performer } ) ;
+		// It must reject! path leading inside an opaque object!
+		await expect( app.patch( '/Users/' + userId , { "godfather._id": ''+ godfatherId } , null , { performer: performer } ) ).to.reject( doormen.ValidatorError ) ;
 
-		// Check that the godfather has been modified
+		// Regular patch, check that the godfather has been modified, but don't contain extra data
+		response = await app.patch( '/Users/' + userId , { godfather: { _id: godfatherId , firstName: "should be removed" , lastName: "should be removed" } } , null , { performer: performer } ) ;
 		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
 		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectID ) ;
 		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
 	} ) ;
 	
-	it.opt( "yyy PATCH on a link" , async () => {
-		var { app , performer } = await commonApp() ;
-
-		var response , userId , godfatherId ;
-
-		response = await app.post( '/Users' ,
-			{
-				firstName: "Joe" ,
-				lastName: "Doe" ,
-				email: "joe.doe@gmail.com" ,
-				password: "pw" ,
-				publicAccess: "all"
-			} ,
-			null ,
-			{ performer: performer }
-		) ;
-		userId = response.output.data.id ;
-
-		response = await app.post( '/Users/' ,
-			{
-				firstName: "THE" ,
-				lastName: "GODFATHER" ,
-				email: "godfather@gmail.com" ,
-				password: "pw" ,
-				publicAccess: "all"
-			} ,
-			null ,
-			{ performer: performer }
-		) ;
-		godfatherId = response.output.data.id ;
-
-		response = await app.patch( '/Users/' + userId , { "godfather._id": ''+ godfatherId } , null , { performer: performer } ) ;
-
-		// Check that the godfather has been modified
-		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
-		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectID ) ;
-		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
-
-		response = await app.patch( '/Users/' + userId , { "godfather._id": ''+ godfatherId } , null , { performer: performer } ) ;
-
-		// Check that the godfather has been modified
-		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
-		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectID ) ;
-		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
-	} ) ;
-	
-	it.opt( "zzz PATCH through a multi-link" , async () => {
+	it( "PATCH on/through a multi-link" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , groupId , userId1 , userId2 , userId3 , userId4 , batch ;
@@ -6890,13 +6846,15 @@ describe( "Historical bugs" , () => {
 		) ;
 		groupId = response.output.data.id ;
 
-		response = await app.patch( '/Groups/' + groupId , { users: [ { _id: '' + userId1 , firstName: "Jack" , lastName: "O' Lantern" } , { _id: '' + userId2 } ] } , null , { performer: performer } ) ;
+		// It must reject! path leading inside an opaque object!
+		await expect( app.patch( '/Groups/' + groupId , { "users.0._id": ''+ userId1 } , null , { performer: performer } ) ).to.reject( doormen.ValidatorError ) ;
 
+		// Regular patch, check that the group has been modified, but don't contain extra data
+		response = await app.patch( '/Groups/' + groupId , { users: [ { _id: '' + userId1 , firstName: "Jack" , lastName: "O' Lantern" } , { _id: '' + userId2 } ] } , null , { performer: performer } ) ;
 		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
-		expect( response.output.data ).to.partially.equal( {
-			name: "The Group" ,
-			users: [ userId1 , userId2 ] ,
-		} ) ;
+		expect( response.output.data.users ).to.equal( [ { _id: userId1 } , { _id: userId2 } ] ) ;
+		expect( response.output.data.users[0] ).to.only.have.own.key( '_id' ) ;
+		expect( response.output.data.users[1] ).to.only.have.own.key( '_id' ) ;
 	} ) ;
 } ) ;
 
