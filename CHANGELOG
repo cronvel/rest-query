@@ -1,4 +1,10 @@
 
+v0.57.0
+-------
+
+Link validation fixed (but it's flagged BREAKING because it touches very sensitive parts of the code)
+
+
 v0.56.1
 -------
 
