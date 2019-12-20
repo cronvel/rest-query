@@ -45,7 +45,6 @@ const Promise = require( 'seventh' ) ;
 
 const tree = require( 'tree-kit' ) ;
 const string = require( 'string-kit' ) ;
-const ErrorStatus = require( 'error-status' ) ;
 const rootsDb = require( 'roots-db' ) ;
 
 const mongodb = require( 'mongodb' ) ;
@@ -54,6 +53,12 @@ const doormen = require( 'doormen' ) ;
 
 const fsKit = require( 'fs-kit' ) ;
 const hash = require( 'hash-kit' ) ;
+
+
+
+const ErrorStatus = require( 'error-status' ) ;
+// For capture inside unit test, for easiest debugging...
+ErrorStatus.alwaysCapture = true ;
 
 
 
@@ -159,7 +164,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: ['id','content','system-content'] , query: true , create: true }
+			publicAccess: { traverse: true , read: [ 'id' , 'content' , 'system-content' ] , query: true , create: true }
 		} ) ;
 	} ) ;
 
@@ -205,7 +210,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'A wonderful website' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: ['id','content','system-content'] , create: true }
+			publicAccess: { traverse: true , read: [ 'id' , 'content' , 'system-content' ] , create: true }
 		} ) ;
 	} ) ;
 
@@ -5810,7 +5815,7 @@ describe( "Access" , () => {
 		var response , userAccess ;
 
 		userAccess = {} ;
-		userAccess[ authorizedId ] = { read: ['content'] } ;	// Minimal right that pass the check
+		userAccess[ authorizedId ] = { read: [ 'content' , 'system-content' ] } ;	// Minimal right that pass the check
 		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass the check
 		
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
@@ -5920,7 +5925,7 @@ describe( "Access" , () => {
 			
 			// Add more access
 			
-			userAccess[ authorizedId ] = { read: [ 'id' , 'content' ] } ;
+			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'system-content' ] } ;
 			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
 
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
@@ -5963,7 +5968,7 @@ describe( "Access" , () => {
 			
 			// Add more access
 			
-			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'secret' ] } ;
+			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'system-content' , 'secret' ] } ;
 			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
 
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
@@ -6105,7 +6110,7 @@ describe( "Access" , () => {
 
 			// Add more access
 			
-			userAccess[ authorizedId ] = { read: [ 'id' , 'content' ] } ;
+			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'system-content' ] } ;
 			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { userAccess: userAccess } ) ;
 
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer } ) ;
@@ -6257,7 +6262,7 @@ describe( "Access" , () => {
 			// Now test groups
 			// Add more access to group
 			
-			groupAccess[ authorizedGroupId ] = { read: [ 'id' , 'content' ] } ;
+			groupAccess[ authorizedGroupId ] = { read: [ 'id' , 'content' , 'system-content' ] } ;
 			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { groupAccess: groupAccess } ) ;
 
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer } ) ;
@@ -6744,7 +6749,7 @@ describe( "Misc" , () => {
 			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: ['id','content'] , create: true }
+			publicAccess: { traverse: true , read: ['id','content','system-content'] , create: true }
 		} ) ;
 	} ) ;
 
