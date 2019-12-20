@@ -29,6 +29,8 @@ Inside a hook, the `this` context is always the current `restQuery.App` instance
 
 
 
+
+
 ### App hooks
 
 App hooks are executed when the restQuery app is at different stage of execution.
@@ -51,6 +53,8 @@ are finished and just before restQuery starts accepting request.
 #### *shutdown*
 
 This hook is executed once, when restQuery is shutting down, before the HTTP module shutdown.
+
+
 
 
 
@@ -166,22 +170,25 @@ to modify or traverse it (e.g. access its children).
 
 
 
-#### *searchToFilter*
+#### *search*
 
 When:
 
-* a GET request with a 'search' parameter in query string
+* a GET request on a Collection with a 'search' parameter in query string
 * executed after checking the 'filter' parameter of the query string
 * executed before checking for text index, the hook may rewrite the 'filter' or 'search' parameters
 
 The `context.input.query.search` contains the text search.
-If `context.input.query.search` is removed, the default search behavior is prevented.
-
 The `context.input.query.filter` contains the already checked and fixed filters.
 
+If `context.input.query.search` is removed, the default search behavior is prevented, so it is possible to replace that
+by custom **CORRECT** query filter (those new filters will not be checked/fixed by Rest Query).
 
 
-### Specific Document hooks
+
+
+
+### Document hooks for specific Collections
 
 Specific hooks are for special collections like `Users`.
 
@@ -189,7 +196,7 @@ Specific hooks are for special collections like `Users`.
 
 #### *beforeCreateToken*
 
-For documents of collection: Users
+For documents of collection: Users.
 
 When:
 
@@ -204,7 +211,7 @@ The `context.incomingDocument` contains the connection document: it can be alter
 
 #### *afterCreateToken*
 
-For documents of collection: Users
+For documents of collection: Users.
 
 When:
 
@@ -220,7 +227,7 @@ The `context.token` contains the token.
 
 #### *beforeRegenerateToken*
 
-For documents of collection: Users
+For documents of collection: Users.
 
 When:
 
@@ -233,7 +240,7 @@ When:
 
 #### *afterRegenerateToken*
 
-For documents of collection: Users
+For documents of collection: Users.
 
 When:
 
@@ -249,7 +256,7 @@ The `context.token` contains the token.
 
 #### *beforeCreateApiKey*
 
-For documents of collection: Users
+For documents of collection: Users.
 
 When:
 
@@ -264,7 +271,7 @@ The `context.incomingDocument` contains the incoming document: it can be altered
 
 #### *afterCreateApiKey*
 
-For documents of collection: Users
+For documents of collection: Users.
 
 When:
 
