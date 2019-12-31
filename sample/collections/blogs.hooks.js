@@ -51,7 +51,7 @@ module.exports = {
 	} ,
 	
 	beforeDelete: function( context ) {
-		log.debug( '>>>>>>>>>> beforeDelete, context: %I' , context ) ;
+		log.debug( '>>>>>>>>>> beforeDelete, context: %[l50000]Y' , context ) ;
 		
 		return context.input.performer.getUser().then( user => {
 			log.debug( '>>>>>>>>>> beforeDelete, user: %I' , user ) ;
