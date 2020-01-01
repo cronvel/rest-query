@@ -43,7 +43,7 @@ module.exports = {
 			context.incomingDocument.slugId = restQuery.slugify( context.incomingDocument.firstName + '-' + context.incomingDocument.lastName ) ;
 		}
 		
-		return context.input.performer.getUser().then( user => {
+		return context.performer.getUser().then( user => {
 			log.debug( '>>>>>>>>>> beforeCreate, user: %I' , user ) ;
 		} ) ;
 	} ,

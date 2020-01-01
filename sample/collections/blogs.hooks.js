@@ -37,7 +37,7 @@ module.exports = {
 	beforeCreate: function( context ) {
 		log.debug( '>>>>>>>>>> beforeCreate, context: %I' , context ) ;
 		
-		return context.input.performer.getUser().then( user => {
+		return context.performer.getUser().then( user => {
 			log.debug( '>>>>>>>>>> beforeCreate, user: %I' , user ) ;
 		} ) ;
 	} ,
@@ -45,7 +45,7 @@ module.exports = {
 	beforeModify: function( context ) {
 		log.debug( '>>>>>>>>>> beforeModify, context: %I' , context ) ;
 		
-		return context.input.performer.getUser().then( user => {
+		return context.performer.getUser().then( user => {
 			log.debug( '>>>>>>>>>> beforeModify, user: %I' , user ) ;
 		} ) ;
 	} ,
@@ -53,7 +53,7 @@ module.exports = {
 	beforeDelete: function( context ) {
 		log.debug( '>>>>>>>>>> beforeDelete, context: %[l50000]Y' , context ) ;
 		
-		return context.input.performer.getUser().then( user => {
+		return context.performer.getUser().then( user => {
 			log.debug( '>>>>>>>>>> beforeDelete, user: %I' , user ) ;
 		} ) ;
 	}
