@@ -6407,7 +6407,8 @@ describe( "Hooks" , () => {
 	it( "Test 'beforeCreateToken' (user) hooks" ) ;
 	it( "Test 'afterCreateToken' (user) hooks" ) ;
 
-	it( "Test Context#preventDefault() in hook" ) ;
+	it( "Test array of hooks" ) ;
+	it( "Test Context#done() in hook" ) ;
 } ) ;
 
 
