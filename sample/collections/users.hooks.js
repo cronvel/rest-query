@@ -37,10 +37,10 @@ module.exports = {
 	beforeCreate: function( context ) {
 		log.debug( '>>>>>>>>>> beforeCreate, context: %I' , context ) ;
 		
-		if ( ! context.incomingDocument.login ) { context.incomingDocument.login = context.incomingDocument.email ; }
+		if ( ! context.hook.incomingDocument.login ) { context.hook.incomingDocument.login = context.hook.incomingDocument.email ; }
 		
-		if ( ! context.incomingDocument.slugId ) {
-			context.incomingDocument.slugId = restQuery.slugify( context.incomingDocument.firstName + '-' + context.incomingDocument.lastName ) ;
+		if ( ! context.hook.incomingDocument.slugId ) {
+			context.hook.incomingDocument.slugId = restQuery.slugify( context.hook.incomingDocument.firstName + '-' + context.hook.incomingDocument.lastName ) ;
 		}
 		
 		return context.performer.getUser().then( user => {
@@ -53,3 +53,4 @@ module.exports = {
 		return Promise.resolved ;
 	}
 } ;
+

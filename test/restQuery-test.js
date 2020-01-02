@@ -6392,18 +6392,22 @@ describe( "Indexes" , () => {
 
 describe( "Hooks" , () => {
 
-	it( "Test init (app) hooks" ) ;
-	it( "Test beforeCreate hooks" ) ;
-	it( "Test afterCreate hooks" ) ;
-	it( "Test beforeModify hooks" ) ;
-	it( "Test afterModify hooks" ) ;
-	it( "Test beforeDelete hooks" ) ;
-	it( "Test afterDelete hooks" ) ;
+	it( "Test 'init' (app) hook" ) ;
+	it( "Test 'shutdown' (app) hook" ) ;
 
-	it( "Test search hooks" ) ;
+	it( "Test 'beforeCreate' hook" ) ;
+	it( "Test 'afterCreate' hook" ) ;
+	it( "Test 'beforeModify' hook" ) ;
+	it( "Test 'afterModify' hook" ) ;
+	it( "Test 'beforeDelete' hook" ) ;
+	it( "Test 'afterDelete' hook" ) ;
 
-	it( "Test beforeCreateToken hooks" ) ;
-	it( "Test afterCreateToken hooks" ) ;
+	it( "Test 'search' hooks" ) ;
+
+	it( "Test 'beforeCreateToken' (user) hooks" ) ;
+	it( "Test 'afterCreateToken' (user) hooks" ) ;
+
+	it( "Test Context#preventDefault() in hook" ) ;
 } ) ;
 
 

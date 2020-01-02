@@ -42,13 +42,13 @@ exports.changeFirstName = async function( context ) {
 		context.output.data = { done: "nothing" , cause: "this is a GET request" } ;
 	}
 	else if ( context.input.document.firstName ) {
-		await this.object.patch( { firstName: context.input.document.firstName } ) ;
-		await this.object.commit() ;
-		context.output.data = { done: "something" , to: this.object } ;
+		await context.document.patch( { firstName: context.input.document.firstName } ) ;
+		await context.document.commit() ;
+		context.output.data = { done: "something" , to: context.document } ;
 		
 	}
 	else {
-		context.output.data = { done: "nothing" , to: this.object } ;
+		context.output.data = { done: "nothing" , to: context.document } ;
 	}
 } ;
 
