@@ -13,7 +13,7 @@
     "rest-query": "./bin/rest-query"
   },
   "dependencies": {
-    "doormen": "^0.10.15",
+    "doormen": "^0.10.18",
     "error-status": "^1.10.0",
     "fs-kit": "^0.3.2",
     "hash-kit": "^0.3.2",
@@ -23,8 +23,8 @@
     "logfella-client": "^1.2.3",
     "qs-kit": "^0.6.4",
     "rest-query-shared": "^0.33.9",
-    "roots-db": "^0.25.3",
-    "server-kit": "^0.9.20",
+    "roots-db": "^0.25.4",
+    "server-kit": "^0.9.21",
     "seventh": "^0.7.30",
     "string-kit": "^0.11.6",
     "token-kit": "^0.2.1",

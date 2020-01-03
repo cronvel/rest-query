@@ -17,8 +17,7 @@ This is the data structure of a context:
 	* query `Object` particular query (filters, populate, etc...) to apply on the resource
 	* document `Object` (optional) the given document, if any (e.g. the body of a HTTP PUT request)
 	* attachmentStreams `Object` (optional) the given binary stream, if any (e.g. a part of a multipart body of a HTTP PUT request)
-* output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client
-  or to a hook, etc), where:
+* output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client or to a hook, etc), where:
 	* data `object` or `Stream` the data that is the response of the request
 	* extraData `object` (optional) extra data result of *before*-type of hook that further processing may include in the final data object (only few rare methods care)
 	* httpStatus (optional) `number` a particular HTTP status that may overide the default one
@@ -48,4 +47,10 @@ This is the data structure of a context:
 	* incomingPatch `Object` (optional) a patch to apply on a existing document.
 	* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
 	* deletedDocument `Object` (optional) if set, it is a document that have been deleted or replaced.
+
+
+
+Furthermore, the context object has this public methods:
+
+* done(): mark the current request as done/finished, preventing any Rest Query's default behavior
 

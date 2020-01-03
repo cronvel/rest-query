@@ -16,16 +16,14 @@ Work in progress, early alpha.
 
 A hook is a registered function that is triggered when some event occurs.
 
-There are few differences between a classical event (i.e.: the observer pattern) and a restQuery hook:
+There are few differences between a classical event (i.e.: the observer pattern) and a Rest Query hook:
 
 * only one hook can be registered by event (by collection for hooks on collection).
 * a hook can modify or even interupt the main flow (the hook caller).
-* all restQuery hook are async
+* all Rest Query hook are async
 * the main flow is suspended, waiting for the hook completion.
 
 Whatever the hook, they are always functions of the form: `function( hookContext )` returning a `Promise` that resolve once completed.
-
-Inside a hook, the `this` context is always the current `restQuery.App` instance.
 
 
 
@@ -33,26 +31,23 @@ Inside a hook, the `this` context is always the current `restQuery.App` instance
 
 ### App hooks
 
-App hooks are executed when the restQuery app is at different stage of execution.
+App hooks are executed when the Rest Query app is at different stage of execution.
 
-The hook is a function of the form: `function( hookContext )`, where:
-
-* hookContext `Object` this object is currently empty
-
-The current restQuery stage will wait for the `Promise`'s hook to resolve to continue, if it rejects the restQuery app will be aborted.
+The hook is a function of the form: `function()`.
+The current Rest Query stage will wait for the `Promise`'s hook to resolve to continue, if it rejects the Rest Query app will be aborted.
 
 
 
 #### *init*
 
-This hook is executed once, when restQuery is starting up, after the config is fully loaded, after any built-in initialization
-are finished and just before restQuery starts accepting request.
+This hook is executed once, when Rest Query is starting up, after the config is fully loaded, after any built-in initialization
+are finished and just before Rest Query starts accepting request.
 
 
 
 #### *shutdown*
 
-This hook is executed once, when restQuery is shutting down, before the HTTP module shutdown.
+This hook is executed once, when Rest Query is shutting down, before the HTTP module shutdown.
 
 
 
@@ -62,12 +57,18 @@ This hook is executed once, when restQuery is shutting down, before the HTTP mod
 
 Document hooks are executed when a user issue a request on a document.
 
-The hook is a function of the form: `function( hookContext )`, where:
+**NEW:** It is now possible to specify an array of hook in the schema, they will be called one after the other (in a serial fashion).
+If one hook call `context.done()`, it will prevent default behavior as well has subsequent hooks.
 
-* hookContext `Object` an object containing various information on the current request to be processed,
-	see [*Common context*](#ref.common-context)
+There are two type of hooks, *normal* or *before* hooks and *after* hooks.
+When a *normal* hook throw or reject, all the request is aborted, *after* hooks are run after the default behavior, and thus do not change the final
+outcome of the request, if it throws or rejects, it does not change the HTTP status, but subsequent *after* hook will not run.
 
-The request processing will wait for the `Promise`'s hook to resolve to continue, if it rejects the request will be aborted.
+The hook is a function of the form: `function( context )`, where:
+
+* context `Context` an object containing various information on the current request to be processed, see [*Context*](#ref.context)
+
+The request processing will wait for the `Promise`'s hook to resolve to continue.
 
 
 
@@ -79,7 +80,7 @@ When:
 * a PUT request creating a new document or overwriting a whole document
 * executed before the document is inserted, if it rejects the document creation is aborted
 
-The `context.incomingDocument` contains the document about to be created: it can be altered by the hook.
+The `context.hook.incomingDocument` contains the document about to be created: it can be altered by the hook.
 
 If `context.parentObjectNode` is set, then the resource about to be created is a child of that *objectNode*
 (e.g. PUT, POST on a collection).
@@ -89,7 +90,7 @@ If `context.linkerObjectNode` is set, then the resource about to be created is l
 
 If `context.objectNode` is set at this stage, then this is an *objectNode* about to be overwritten.
 
-The same apply to `context.existingDocument` (the document about to be replaced).
+The same apply to `context.hook.existingDocument` (the document about to be replaced).
 
 
 
@@ -105,8 +106,8 @@ The `context.document` contains the freshly created document.
 
 The `context.objectNode` contains the freshly created *objectNode*.
 
-If `context.deletedDocument` is set, this is the document that have been deleted (this is the same document
-as `context.existingDocument` in the *beforeCreate* hook).
+If `context.hook.deletedDocument` is set, this is the document that have been deleted (this is the same document
+as `context.hook.existingDocument` in the *beforeCreate* hook).
 
 If `context.linkerObjectNode` is set, then the freshly created resource is linked by that *objectNode*
 (e.g. PUT on a link).
@@ -121,9 +122,9 @@ When:
 * a PUT request on a subpart of a document (it's internally transformed into a PATCH request)
 * executed before the document is modified, if it rejects the modification is aborted
 
-The `context.incomingPatch` contains the patch about to be issued: it can be altered by the hook.
+The `context.hook.incomingPatch` contains the patch about to be issued: it can be altered by the hook.
 
-The `context.existingDocument` is always set, and contains the document that will be patched (before the patch).
+The `context.hook.existingDocument` is always set, and contains the document that will be patched (before the patch).
 
 The `context.objectNode` contains the *objectNode* about to be patched.
 
@@ -150,7 +151,7 @@ When:
 * a DELETE request deleting a document
 * executed before the document is modified, if it rejects the document will not be deleted
 
-The `context.existingDocument` is always set, and contains the document about to be deleted.
+The `context.hook.existingDocument` is always set, and contains the document about to be deleted.
 
 The `context.objectNode` contains the *objectNode* about to be deleted.
 
@@ -163,7 +164,7 @@ When:
 * a DELETE request deleting a document
 * executed after the document is deleted
 
-The `context.deletedDocument` contains the removed document.
+The `context.hook.deletedDocument` contains the removed document.
 
 The `context.objectNode` contains the removed *objectNode*, it can be useful to retrieve some data, but it should not be used
 to modify or traverse it (e.g. access its children).
@@ -203,7 +204,7 @@ When:
 * the createToken method is invoked on a user
 * executed before the token creation, if it rejects the token creation is aborted
 
-The `context.incomingDocument` contains the connection document: it can be altered by the hook.
+The `context.hook.incomingDocument` contains the connection document: it can be altered by the hook.
 
 **BETA**, not well specified yet.
 
@@ -219,7 +220,7 @@ When:
 * executed after the token creation
 
 The `context.document` contains the user for which the token is created.
-The `context.token` contains the token.
+The `context.hook.token` contains the token.
 
 **BETA**, not well specified yet.
 
@@ -248,7 +249,7 @@ When:
 * executed after the token creation
 
 The `context.document` contains the user for which a new token is created.
-The `context.token` contains the token.
+The `context.hook.token` contains the token.
 
 **BETA**, not well specified yet.
 
@@ -263,7 +264,7 @@ When:
 * the createApiKey method is invoked on a user
 * executed before the API key creation, if it rejects the token creation is aborted
 
-The `context.incomingDocument` contains the incoming document: it can be altered by the hook.
+The `context.hook.incomingDocument` contains the incoming document: it can be altered by the hook.
 
 **BETA**, not well specified yet.
 
@@ -279,53 +280,9 @@ When:
 * executed after the API key creation
 
 The `context.document` contains the user for which the API key is created.
-The `context.apiKey` contains the API key.
+The `context.hook.apiKey` contains the API key.
 
 **BETA**, not well specified yet.
-
-
-
-
-<a name="ref.common-context"></a>
-## Common context
-
-This is the common object format passed to hook, custom method and as the third argument of the request callback.
-Usual properties are:
-                                                    
-* input `Object` contains data that have been passed as input (e.g. by a HTTP client), where:
-	
-	* method `string` the original method used (i.e. the lower-cased HTTP method)
-	* pathParts `Array` the fully parsed path to the resource
-	* query `Object` particular query (filters, populate, etc...) to apply on the resource
-	* performer `Object` an instance of `restQuery.Performer`, it represents the user or the entity performing the action
-	* document `Object` (optional) the given document, if any (e.g. the body of a HTTP PUT request)
-	* attachmentStreams `Object` (optional) the given binary stream, if any (e.g. a part of a multipart body of a HTTP PUT request)
-
-* output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client
-	or to a hook, etc), where:
-	
-	* data `object` or `Stream` the data that is the response of the request
-	* extraData `object` (optional) extra data result of *before*-type of hook that further processing may include in the final data object (only few rare methods care)
-	* httpStatus (optional) `number` a particular HTTP status that may overide the default one
-	* meta `Object` (optional) meta-data of the document, common meta data:
-		
-		* contentType (optional) `string` the type of the content, default to `application/json`
-		* filename (optional) `string` if binary data is about to be sent, this is the name of the file
-	
-	* serializer `Function` (optional) the serializer to use, default to JSON.stringify()
-	* serializerArg (optional) an extra argument to pass to the serializer
-
-* document `Object` (optional) the targeted/created document in its final state.
-* incomingDocument `Object` (optional) a whole document to create or that will overwrite another.
-* incomingPatch `Object` (optional) a patch to apply on a existing document.
-* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
-* deletedDocument `Object` (optional) if set, it is a document that have been deleted or replaced.
-* collectionNode `Object` instance of `restQuery.collectionNode` of the context of this hook
-* objectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook
-* parentObjectNode `Object` (optional) instance of `restQuery.objectNode` of the context of this hook, is set when
-	the `objectNode` property does not make sense (e.g. POST on a collection)
-* linkerObjectNode `Object` (optional) the objectNode that linked the document
-
 
 
 
