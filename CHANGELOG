@@ -1,4 +1,12 @@
 
+v0.58.0
+-------
+
+BREAKING: Hook context changed (now instance of Context) and no more 'this' binding
+hooks can be array of hooks in the schema
+Big refacto
+
+
 v0.57.4
 -------
 
