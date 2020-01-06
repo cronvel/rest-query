@@ -23,7 +23,7 @@ There are few differences between a classical event (i.e.: the observer pattern)
 * all Rest Query hook are async
 * the main flow is suspended, waiting for the hook completion.
 
-Whatever the hook, they are always functions of the form: `function( hookContext )` returning a `Promise` that resolve once completed.
+Whatever the hook, they are always functions of the form: `function( context )` returning a `Promise` that resolve once completed.
 
 
 
@@ -33,7 +33,11 @@ Whatever the hook, they are always functions of the form: `function( hookContext
 
 App hooks are executed when the Rest Query app is at different stage of execution.
 
-The hook is a function of the form: `function()`.
+The hook is a function of the form: `function( appContext )`, `appContext` being an object, where:
+* app `App` the running App instance
+
+Note that `appContext` here **IS NOT** a [*Context*](#ref.context) instance, because there are for request to the service.
+
 The current Rest Query stage will wait for the `Promise`'s hook to resolve to continue, if it rejects the Rest Query app will be aborted.
 
 
