@@ -38,7 +38,7 @@ This is the data structure of a context:
 * batchOf `Array` (optional) *internal usage only*
 * linkerObjectNode `ObjectNode` (optional) the *objectNode* that is linking to the current node
 * linkerPath (optional) *internal usage only*
-* document `Document` (optional) the targeted/created document in its final state.
+* document `Document` (optional) the targeted/created/related document in its final state, for object methods it is the same as `.objectNode.object`
 * patch `Object` (optional) a patch to apply to a *document*
 * isDone `boolean` true if there is nothing more to do for this request (however, no hook or methods will be called with `isDone: true`)
 * hook `Object` hook-specific data, may change from one hook to another, so see the hook documentation for details.

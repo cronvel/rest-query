@@ -26,6 +26,8 @@
 
 "use strict" ;
 
+
+
 const restQuery = require( '../lib/restQuery.js' ) ;
 const log = restQuery.log.global.use( 'init' ) ;
 
@@ -38,4 +40,5 @@ module.exports = {
 		//console.log( context ) ;
 	}
 } ;
+
                                             

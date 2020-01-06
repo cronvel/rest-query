@@ -6483,6 +6483,99 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 			lastName: 'Doe'
 		} ) ;
 	} ) ;
+
+	it( "Root object method context" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/DOUBLE' , { value: 4 } , null , { performer: performer } ) ;
+		expect( response ).to.be.a( restQuery.Context ) ;
+		expect( response.performer ).to.be.a( restQuery.Performer ) ;
+		expect( response.performer ).to.be( performer ) ;
+		expect( response.collectionNode ).to.be.a( restQuery.RootCollectionNode ) ;
+		expect( response.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+		expect( response.document._ ).to.be.a( rootsDb.Document ) ;
+		expect( response.objectNode.object ).to.be( response.document ) ;
+		expect( response.document._.raw ).to.partially.equal( {
+			title: "Root" ,
+			name: "/" ,
+			description: "Root object" ,
+			parent: {
+				collection: "root" ,
+				id: "/"
+			}
+		} ) ;
+	} ) ;
+
+	it( "Collection method context" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users/DO-SOMETHING' , { to: 'toto' } , null , { performer: performer } ) ;
+		expect( response ).to.be.a( restQuery.Context ) ;
+		expect( response.performer ).to.be.a( restQuery.Performer ) ;
+		expect( response.performer ).to.be( performer ) ;
+		expect( response.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+		expect( response.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+		expect( response.document._ ).to.be.a( rootsDb.Document ) ;
+		expect( response.objectNode.object ).to.be( response.document ) ;
+		
+		// It should still be the Root Object
+		expect( response.document._.raw ).to.partially.equal( {
+			title: "Root" ,
+			name: "/" ,
+			description: "Root object" ,
+			parent: {
+				collection: "root" ,
+				id: "/"
+			}
+		} ) ;
+	} ) ;
+
+	it( "Object method context" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		var userId = response.output.data.id ;
+		
+		response = await app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' ,
+			{ firstName: 'Toto' } ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		expect( response ).to.be.a( restQuery.Context ) ;
+		expect( response.performer ).to.be.a( restQuery.Performer ) ;
+		expect( response.performer ).to.be( performer ) ;
+		expect( response.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+		expect( response.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+		expect( response.document._ ).to.be.a( rootsDb.Document ) ;
+		expect( response.objectNode.object ).to.be( response.document ) ;
+		expect( response.document._.raw ).to.partially.equal( {
+			firstName: "Toto" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com"
+		} ) ;
+		
+		// Parent Object Node is the Root Object
+		expect( response.parentObjectNode.object._.raw ).to.partially.equal( {
+			title: "Root" ,
+			name: "/" ,
+			description: "Root object" ,
+			parent: {
+				collection: "root" ,
+				id: "/"
+			}
+		} ) ;
+	} ) ;
 } ) ;
 
 
