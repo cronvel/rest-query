@@ -47,6 +47,7 @@ This is the data structure of a context:
 	* incomingPatch `Object` (optional) a patch to apply on a existing document.
 	* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
 	* deletedDocument `Object` (optional) if set, it is a document that have been deleted or replaced.
+* usr `Object` userland-specific data, can be used to communicate informations from upstream hooks to downstream hooks
 
 
 

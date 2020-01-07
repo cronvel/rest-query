@@ -23,30 +23,42 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 */
+
 "use strict" ;
 
-var restQuery = require( '../../lib/restQuery.js' ) ;
-var log = restQuery.log.global.use( 'blogs-hooks' ) ;
 
-var Promise = require( 'seventh' ) ;
+
+const restQuery = require( '../../lib/restQuery.js' ) ;
+const log = restQuery.log.global.use( 'blogs-hooks' ) ;
+
+const Promise = require( 'seventh' ) ;
 
 
 
 module.exports = {
 	
-	beforeCreate: function( context ) {
-		log.debug( '>>>>>>>>>> beforeCreate, context: %I' , context ) ;
-		
-		return context.performer.getUser().then( user => {
-			log.debug( '>>>>>>>>>> beforeCreate, user: %I' , user ) ;
-		} ) ;
+	beforeCreate: async function( context ) {
+		if ( context.input.query.activateBeforeCreate ) {
+			context.hook.incomingDocument.secret = context.input.query.activateBeforeCreate ;
+			context.usr.beforeCreateContext = Object.assign( {} , context ) ;
+			// Because it is cleared to avoid creating tons of objects
+			context.usr.beforeCreateContext.hook = Object.assign( {} , context.hook ) ;
+		}
+	} ,
+	
+	afterCreate: async function( context ) {
+		if ( context.input.query.activateAfterCreate ) {
+			context.usr.afterCreateContext = Object.assign( {} , context ) ;
+			// Because it is cleared to avoid creating tons of objects
+			context.usr.afterCreateContext.hook = Object.assign( {} , context.hook ) ;
+		}
 	} ,
 	
 	beforeModify: function( context ) {
-		log.debug( '>>>>>>>>>> beforeModify, context: %I' , context ) ;
+		log.debug( '>>>>>>>>>> beforeModify, context: %Y' , context ) ;
 		
 		return context.performer.getUser().then( user => {
-			log.debug( '>>>>>>>>>> beforeModify, user: %I' , user ) ;
+			log.debug( '>>>>>>>>>> beforeModify, user: %Y' , user ) ;
 		} ) ;
 	} ,
 	
@@ -54,7 +66,8 @@ module.exports = {
 		log.debug( '>>>>>>>>>> beforeDelete, context: %[l50000]Y' , context ) ;
 		
 		return context.performer.getUser().then( user => {
-			log.debug( '>>>>>>>>>> beforeDelete, user: %I' , user ) ;
+			log.debug( '>>>>>>>>>> beforeDelete, user: %Y' , user ) ;
 		} ) ;
 	}
 } ;
+
