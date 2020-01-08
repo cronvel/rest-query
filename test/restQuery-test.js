@@ -6430,22 +6430,12 @@ describe( "Hooks" , () => {
 				id: "/"
 			}
 		} ) ;
-		
+		expect( context.parentObjectNode.object ).to.be( context.document ) ;
+
 		expect( context.hook ).to.equal( {
 			incomingDocument: response.document._.raw
 		} ) ;
 		
-		// Parent Object Node is the Root Object
-		expect( context.parentObjectNode.object._.raw ).to.partially.equal( {
-			title: "Root" ,
-			name: "/" ,
-			description: "Root object" ,
-			parent: {
-				collection: "root" ,
-				id: "/"
-			}
-		} ) ;
-
 		var id = response.output.data.id.toString() ;
 		expect( id ).to.be.a( 'string' ) ;
 		expect( id ).to.have.length.of( 24 ) ;
@@ -6458,15 +6448,6 @@ describe( "Hooks" , () => {
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
-
-
-
-
-
-// ----------------------- USE context, not response !!! ---------------------------------------------------------------------------
-
-
-
 
 	it( "'beforeCreate' hook effects and context for a PUT request (new document)" , async () => {
 		var { app , performer } = await commonApp() ;
@@ -6485,24 +6466,16 @@ describe( "Hooks" , () => {
 		var context = response.usr.beforeCreateContext ;
 		
 		expect( response ).to.be.a( restQuery.Context ) ;
-		expect( response.app ).to.be.a( restQuery.App ) ;
-		expect( response.app ).to.be( app ) ;
-		expect( response.performer ).to.be.a( restQuery.Performer ) ;
-		expect( response.performer ).to.be( performer ) ;
-		expect( response.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
-		expect( response.collectionNode.name ).to.be( 'blogs' ) ;
-		expect( response.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( response.document._ ).to.be.a( rootsDb.Document ) ;
-		expect( response.objectNode.object ).to.be( response.document ) ;
-		expect( response.document._.raw ).to.partially.equal( {
-			title: 'My wonderful life!!!' ,
-			description: 'This is a supa blog!' ,
-			secret: 'some string'
-		} ) ;
-		
-		// Test objectNode at the hook time
+		expect( context.app ).to.be.a( restQuery.App ) ;
+		expect( context.app ).to.be( app ) ;
+		expect( context.performer ).to.be.a( restQuery.Performer ) ;
+		expect( context.performer ).to.be( performer ) ;
+		expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+		expect( context.collectionNode.name ).to.be( 'blogs' ) ;
 		expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( context.objectNode.object._.raw ).to.partially.equal( {
+		expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+		expect( context.objectNode.object ).to.be( context.document ) ;
+		expect( context.document._.raw ).to.partially.equal( {
 			title: "Root" ,
 			name: "/" ,
 			description: "Root object" ,
@@ -6511,20 +6484,10 @@ describe( "Hooks" , () => {
 				id: "/"
 			}
 		} ) ;
-		
+		expect( context.parentObjectNode.object ).to.be( context.document ) ;
+
 		expect( context.hook ).to.equal( {
 			incomingDocument: response.document._.raw
-		} ) ;
-
-		// Parent Object Node is the Root Object
-		expect( response.parentObjectNode.object._.raw ).to.partially.equal( {
-			title: "Root" ,
-			name: "/" ,
-			description: "Root object" ,
-			parent: {
-				collection: "root" ,
-				id: "/"
-			}
 		} ) ;
 
 		var id = response.output.data.id.toString() ;
@@ -6569,35 +6532,22 @@ describe( "Hooks" , () => {
 		var context = response.usr.beforeCreateContext ;
 
 		expect( response ).to.be.a( restQuery.Context ) ;
-		expect( response.app ).to.be.a( restQuery.App ) ;
-		expect( response.app ).to.be( app ) ;
-		expect( response.performer ).to.be.a( restQuery.Performer ) ;
-		expect( response.performer ).to.be( performer ) ;
-		expect( response.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
-		expect( response.collectionNode.name ).to.be( 'blogs' ) ;
-		expect( response.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( response.document._ ).to.be.a( rootsDb.Document ) ;
-		expect( response.objectNode.object ).to.be( response.document ) ;
-		expect( response.document._.raw ).to.partially.equal( {
-			title: 'My wonderful life!!! (overwrite)' ,
-			description: 'This is a supa blog!' ,
-			secret: 'some string'
-		} ) ;
-
-		// Test objectNode at the hook time
+		expect( context.app ).to.be.a( restQuery.App ) ;
+		expect( context.app ).to.be( app ) ;
+		expect( context.performer ).to.be.a( restQuery.Performer ) ;
+		expect( context.performer ).to.be( performer ) ;
+		expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+		expect( context.collectionNode.name ).to.be( 'blogs' ) ;
 		expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( context.objectNode.object._.raw ).to.partially.equal( {
+		expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+		expect( context.objectNode.object ).to.be( context.document ) ;
+		expect( context.document._.raw ).to.partially.equal( {
 			title: 'My wonderful life!!! (initial)' ,
 			description: 'This is a supa blog!'
 		} ) ;
-		
-		expect( context.hook ).to.equal( {
-			incomingDocument: response.document._.raw ,
-			existingDocument: context.objectNode.object._.raw
-		} ) ;
 
 		// Parent Object Node is the Root Object
-		expect( response.parentObjectNode.object._.raw ).to.partially.equal( {
+		expect( context.parentObjectNode.object._.raw ).to.partially.equal( {
 			title: "Root" ,
 			name: "/" ,
 			description: "Root object" ,
@@ -6605,6 +6555,11 @@ describe( "Hooks" , () => {
 				collection: "root" ,
 				id: "/"
 			}
+		} ) ;
+
+		expect( context.hook ).to.equal( {
+			incomingDocument: response.document._.raw ,
+			existingDocument: context.document
 		} ) ;
 
 		var id = response.output.data.id.toString() ;
@@ -6635,26 +6590,23 @@ describe( "Hooks" , () => {
 		) ;
 		
 		var context = response.usr.afterCreateContext ;
-
+		
 		expect( response ).to.be.a( restQuery.Context ) ;
-		expect( response.app ).to.be.a( restQuery.App ) ;
-		expect( response.app ).to.be( app ) ;
-		expect( response.performer ).to.be.a( restQuery.Performer ) ;
-		expect( response.performer ).to.be( performer ) ;
-		expect( response.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
-		expect( response.collectionNode.name ).to.be( 'blogs' ) ;
-		expect( response.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( response.document._ ).to.be.a( rootsDb.Document ) ;
-		expect( response.objectNode.object ).to.be( response.document ) ;
-		expect( response.document._.raw ).to.partially.equal( {
+		expect( context.app ).to.be.a( restQuery.App ) ;
+		expect( context.app ).to.be( app ) ;
+		expect( context.performer ).to.be.a( restQuery.Performer ) ;
+		expect( context.performer ).to.be( performer ) ;
+		expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+		expect( context.collectionNode.name ).to.be( 'blogs' ) ;
+		expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+		expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+		expect( context.objectNode.object ).to.be( context.document ) ;
+		expect( context.document._.raw ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			description: 'This is a supa blog!' ,
-			secret: 'some string'
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
-		
-		// Test objectNode at the hook time
-		expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( context.objectNode.object._.raw ).to.partially.equal( {
+		expect( context.parentObjectNode.object._.raw ).to.partially.equal( {
 			title: "Root" ,
 			name: "/" ,
 			description: "Root object" ,
@@ -6664,21 +6616,10 @@ describe( "Hooks" , () => {
 			}
 		} ) ;
 
-		expect( context.hook ).to.equal( {
-			incomingDocument: response.document._.raw
-		} ) ;
+		expect( response.usr.activatedAfterCreate ).to.be( 'some string' ) ;
 		
-		// Parent Object Node is the Root Object
-		expect( response.parentObjectNode.object._.raw ).to.partially.equal( {
-			title: "Root" ,
-			name: "/" ,
-			description: "Root object" ,
-			parent: {
-				collection: "root" ,
-				id: "/"
-			}
-		} ) ;
-
+		expect( context.hook ).to.equal( {} ) ;
+		
 		var id = response.output.data.id.toString() ;
 		expect( id ).to.be.a( 'string' ) ;
 		expect( id ).to.have.length.of( 24 ) ;
@@ -6687,7 +6628,6 @@ describe( "Hooks" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			description: 'This is a supa blog!' ,
-			secret: 'some string' ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
@@ -6707,41 +6647,23 @@ describe( "Hooks" , () => {
 		) ;
 		
 		var context = response.usr.afterCreateContext ;
-
+		
 		expect( response ).to.be.a( restQuery.Context ) ;
-		expect( response.app ).to.be.a( restQuery.App ) ;
-		expect( response.app ).to.be( app ) ;
-		expect( response.performer ).to.be.a( restQuery.Performer ) ;
-		expect( response.performer ).to.be( performer ) ;
-		expect( response.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
-		expect( response.collectionNode.name ).to.be( 'blogs' ) ;
-		expect( response.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( response.document._ ).to.be.a( rootsDb.Document ) ;
-		expect( response.objectNode.object ).to.be( response.document ) ;
-		expect( response.document._.raw ).to.partially.equal( {
+		expect( context.app ).to.be.a( restQuery.App ) ;
+		expect( context.app ).to.be( app ) ;
+		expect( context.performer ).to.be.a( restQuery.Performer ) ;
+		expect( context.performer ).to.be( performer ) ;
+		expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+		expect( context.collectionNode.name ).to.be( 'blogs' ) ;
+		expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+		expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+		expect( context.objectNode.object ).to.be( context.document ) ;
+		expect( context.document._.raw ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			description: 'This is a supa blog!' ,
-			secret: 'some string'
+			parent: { id: '/' , collection: 'root' }
 		} ) ;
-		
-		// Test objectNode at the hook time
-		expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( context.objectNode.object._.raw ).to.partially.equal( {
-			title: "Root" ,
-			name: "/" ,
-			description: "Root object" ,
-			parent: {
-				collection: "root" ,
-				id: "/"
-			}
-		} ) ;
-		
-		expect( context.hook ).to.equal( {
-			incomingDocument: response.document._.raw
-		} ) ;
-
-		// Parent Object Node is the Root Object
-		expect( response.parentObjectNode.object._.raw ).to.partially.equal( {
+		expect( context.parentObjectNode.object._.raw ).to.partially.equal( {
 			title: "Root" ,
 			name: "/" ,
 			description: "Root object" ,
@@ -6751,6 +6673,10 @@ describe( "Hooks" , () => {
 			}
 		} ) ;
 
+		expect( response.usr.activatedAfterCreate ).to.be( 'some string' ) ;
+		
+		expect( context.hook ).to.equal( {} ) ;
+		
 		var id = response.output.data.id.toString() ;
 		expect( id ).to.be.a( 'string' ) ;
 		expect( id ).to.have.length.of( 24 ) ;
@@ -6759,7 +6685,6 @@ describe( "Hooks" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			description: 'This is a supa blog!' ,
-			secret: 'some string' ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
@@ -6793,35 +6718,22 @@ describe( "Hooks" , () => {
 		var context = response.usr.afterCreateContext ;
 
 		expect( response ).to.be.a( restQuery.Context ) ;
-		expect( response.app ).to.be.a( restQuery.App ) ;
-		expect( response.app ).to.be( app ) ;
-		expect( response.performer ).to.be.a( restQuery.Performer ) ;
-		expect( response.performer ).to.be( performer ) ;
-		expect( response.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
-		expect( response.collectionNode.name ).to.be( 'blogs' ) ;
-		expect( response.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( response.document._ ).to.be.a( rootsDb.Document ) ;
-		expect( response.objectNode.object ).to.be( response.document ) ;
-		expect( response.document._.raw ).to.partially.equal( {
-			title: 'My wonderful life!!! (overwrite)' ,
-			description: 'This is a supa blog!' ,
-			secret: 'some string'
-		} ) ;
-
-		// Test objectNode at the hook time
+		expect( context.app ).to.be.a( restQuery.App ) ;
+		expect( context.app ).to.be( app ) ;
+		expect( context.performer ).to.be.a( restQuery.Performer ) ;
+		expect( context.performer ).to.be( performer ) ;
+		expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+		expect( context.collectionNode.name ).to.be( 'blogs' ) ;
 		expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
-		expect( context.objectNode.object._.raw ).to.partially.equal( {
-			title: 'My wonderful life!!! (initial)' ,
+		expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+		expect( context.objectNode.object ).to.be( context.document ) ;
+		expect( context.document._.raw ).to.partially.equal( {
+			title: 'My wonderful life!!! (overwrite)' ,
 			description: 'This is a supa blog!'
-		} ) ;
-		
-		expect( context.hook ).to.equal( {
-			incomingDocument: response.document._.raw ,
-			existingDocument: context.objectNode.object._.raw
 		} ) ;
 
 		// Parent Object Node is the Root Object
-		expect( response.parentObjectNode.object._.raw ).to.partially.equal( {
+		expect( context.parentObjectNode.object._.raw ).to.partially.equal( {
 			title: "Root" ,
 			name: "/" ,
 			description: "Root object" ,
@@ -6829,6 +6741,14 @@ describe( "Hooks" , () => {
 				collection: "root" ,
 				id: "/"
 			}
+		} ) ;
+
+		expect( response.usr.activatedAfterCreate ).to.be( 'some string' ) ;
+		
+		expect( context.hook ).to.have.only.own.keys( 'deletedDocument' ) ;
+		expect( context.hook.deletedDocument ).to.partially.equal( {
+			title: 'My wonderful life!!! (initial)' ,
+			description: 'This is a supa blog!'
 		} ) ;
 
 		var id = response.output.data.id.toString() ;
@@ -6839,7 +6759,6 @@ describe( "Hooks" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!! (overwrite)' ,
 			description: 'This is a supa blog!' ,
-			secret: 'some string' ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;

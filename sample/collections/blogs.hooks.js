@@ -48,6 +48,7 @@ module.exports = {
 	
 	afterCreate: async function( context ) {
 		if ( context.input.query.activateAfterCreate ) {
+			context.usr.activatedAfterCreate = context.input.query.activateAfterCreate ;
 			context.usr.afterCreateContext = Object.assign( {} , context ) ;
 			// Because it is cleared to avoid creating tons of objects
 			context.usr.afterCreateContext.hook = Object.assign( {} , context.hook ) ;
