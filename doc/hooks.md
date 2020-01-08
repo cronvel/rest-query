@@ -99,11 +99,10 @@ The `context.document` contains the freshly created document.
 
 The `context.objectNode` contains the freshly created *objectNode*.
 
-If `context.hook.deletedDocument` is set, this is the document that have been deleted (this is the same document
-as `context.hook.existingDocument` in the *beforeCreate* hook).
+If `context.hook.deletedDocument` is set, this is the document that have been deleted (this is the same document as `context.hook.existingDocument`
+in the *beforeCreate* hook).
 
-If `context.linkerObjectNode` is set, then the freshly created resource is linked by that *objectNode*
-(e.g. PUT on a link).
+If `context.linkerObjectNode` is set, then the freshly created resource is linked by that *objectNode* (e.g. PUT on a link).
 
 
 

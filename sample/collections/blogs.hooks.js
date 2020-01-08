@@ -38,37 +38,27 @@ const Promise = require( 'seventh' ) ;
 module.exports = {
 	
 	beforeCreate: async function( context ) {
-		if ( context.input.query.activateBeforeCreate ) {
-			context.hook.incomingDocument.secret = context.input.query.activateBeforeCreate ;
-			context.usr.beforeCreateContext = Object.assign( {} , context ) ;
-			// Because it is cleared to avoid creating tons of objects
-			context.usr.beforeCreateContext.hook = Object.assign( {} , context.hook ) ;
-		}
+		if ( context.usr.beforeCreateTest ) { context.usr.beforeCreateTest( context ) ; }
 	} ,
 	
 	afterCreate: async function( context ) {
-		if ( context.input.query.activateAfterCreate ) {
-			context.usr.activatedAfterCreate = context.input.query.activateAfterCreate ;
-			context.usr.afterCreateContext = Object.assign( {} , context ) ;
-			// Because it is cleared to avoid creating tons of objects
-			context.usr.afterCreateContext.hook = Object.assign( {} , context.hook ) ;
-		}
+		if ( context.usr.afterCreateTest ) { context.usr.afterCreateTest( context ) ; }
 	} ,
 	
 	beforeModify: function( context ) {
-		log.debug( '>>>>>>>>>> beforeModify, context: %Y' , context ) ;
-		
-		return context.performer.getUser().then( user => {
-			log.debug( '>>>>>>>>>> beforeModify, user: %Y' , user ) ;
-		} ) ;
+		if ( context.usr.beforeModifyTest ) { context.usr.beforeModifyTest( context ) ; }
 	} ,
 	
+	afterModify: function( context ) {
+		if ( context.usr.afterModifyTest ) { context.usr.afterModifyTest( context ) ; }
+	} ,
+
 	beforeDelete: function( context ) {
-		log.debug( '>>>>>>>>>> beforeDelete, context: %[l50000]Y' , context ) ;
-		
-		return context.performer.getUser().then( user => {
-			log.debug( '>>>>>>>>>> beforeDelete, user: %Y' , user ) ;
-		} ) ;
-	}
+		if ( context.usr.beforeDeleteTest ) { context.usr.beforeDeleteTest( context ) ; }
+	} ,
+	
+	afterDelete: function( context ) {
+		if ( context.usr.afterDeleteTest ) { context.usr.afterDeleteTest( context ) ; }
+	} ,
 } ;
 
