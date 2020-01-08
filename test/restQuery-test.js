@@ -7127,14 +7127,466 @@ describe( "Hooks" , () => {
 		await expect( app.get( '/Blogs/5437f846c41d0e910ec9e000' , { performer: performer } ) ).to.reject.with.an( ErrorStatus , { type: 'notFound' } ) ;
 	} ) ;
 
-	it( "Test 'search' hooks" ) ;
+	it( "'search' hook effects and context for a GET request on a collection" , async () => {
+		var { app , performer } = await commonApp() ;
 
-	it( "Test 'beforeCreateToken' (user) hooks" ) ;
-	it( "Test 'afterCreateToken' (user) hooks" ) ;
+		var response = await app.put(
+			'/Blogs/5437f846c41d0e910ec9e222' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		var hookRan = false ;
+		response = await app.get(
+			'/Blogs' ,
+			{
+				performer: performer ,
+				// Search something that don't exist
+				query: { search: "gasp" } ,
+				usr: {
+					searchTest: context => {
+						expect( hookRan ).to.be.false() ;
 
-	it( "Test array of hooks" ) ;
-	it( "Test Context#done() in hook" ) ;
-	it( "Test hook throwing error, that should abort the request" ) ;
+						expect( context ).to.be.a( restQuery.Context ) ;
+						expect( context.app ).to.be.a( restQuery.App ) ;
+						expect( context.app ).to.be( app ) ;
+						expect( context.performer ).to.be.a( restQuery.Performer ) ;
+						expect( context.performer ).to.be( performer ) ;
+						expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+						expect( context.collectionNode.name ).to.be( 'blogs' ) ;
+						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+						expect( context.objectNode.object ).to.be( context.document ) ;
+						expect( context.document._.raw ).to.partially.equal( {
+							title: "Root" ,
+							name: "/" ,
+							description: "Root object" ,
+							parent: {
+								collection: "root" ,
+								id: "/"
+							}
+						} ) ;
+						expect( context.parentObjectNode.object ).to.be( context.document ) ;
+
+						expect( context.hook ).to.equal( {} ) ;
+
+						// Change the query to something that actually exist
+						context.input.query.search = 'wonderful' ;
+						
+						// Must be at the end
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+		
+		expect( hookRan ).to.be.true() ;
+
+		expect( response.output.data ).to.partially.equal( [ {
+			title: 'My wonderful life!!!' ,
+			description: 'This is a supa blog!'
+		} ] ) ;
+
+		// Just ensure that without changing the search value, it would fail
+		hookRan = false ;
+		response = await app.get(
+			'/Blogs' ,
+			{
+				performer: performer ,
+				// Search something that don't exist
+				query: { search: "gasp" } ,
+				usr: {
+					searchTest: context => {
+						expect( hookRan ).to.be.false() ;
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+		
+		expect( hookRan ).to.be.true() ;
+		expect( response.output.data ).to.equal( [] ) ;
+	} ) ;
+
+	it( "The 'beforeCreateToken' hook should be triggered on POST on /Users/CREATE-TOKEN" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var id = response.output.data.id ;
+		
+		var hookRan = false ;
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "badpw" ,
+				agentId: "0123456789"
+			} ,
+			null ,
+			{
+				performer: performer ,
+				usr: {
+					beforeCreateTokenTest: context => {
+						expect( hookRan ).to.be.false() ;
+
+						expect( context ).to.be.a( restQuery.Context ) ;
+						expect( context.app ).to.be.a( restQuery.App ) ;
+						expect( context.app ).to.be( app ) ;
+						expect( context.performer ).to.be.a( restQuery.Performer ) ;
+						expect( context.performer ).to.be( performer ) ;
+						expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+						expect( context.collectionNode.name ).to.be( 'users' ) ;
+						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+						expect( context.objectNode.object ).to.be( context.document ) ;
+						expect( context.document._.raw ).to.partially.equal( {
+							title: "Root" ,
+							name: "/" ,
+							description: "Root object" ,
+							parent: {
+								collection: "root" ,
+								id: "/"
+							}
+						} ) ;
+						expect( context.parentObjectNode.object ).to.be( context.document ) ;
+
+						expect( context.hook ).to.only.have.own.key( 'incomingDocument' ) ;
+						expect( context.hook.incomingDocument ).to.equal( {
+							type: "header" ,
+							login: "bobby.fisher@gmail.com" ,
+							password: "badpw" ,
+							agentId: "0123456789"
+						} ) ;
+
+						// Fix the bad password
+						context.hook.incomingDocument.password = 'pw' ;
+						
+						// Must be at the end
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+
+		expect( hookRan ).to.be.true() ;
+
+		expect( response.output.data ).to.partially.equal( { userId: id } ) ;
+	} ) ;
+	
+	it( "The 'afterCreateToken' hook should be triggered on POST on /Users/CREATE-TOKEN, after token creation" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var id = response.output.data.id ;
+
+		var hookRan = false ;
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
+			} ,
+			null ,
+			{
+				performer: performer ,
+				usr: {
+					afterCreateTokenTest: context => {
+						expect( hookRan ).to.be.false() ;
+
+						expect( context ).to.be.a( restQuery.Context ) ;
+						expect( context.app ).to.be.a( restQuery.App ) ;
+						expect( context.app ).to.be( app ) ;
+						expect( context.performer ).to.be.a( restQuery.Performer ) ;
+						expect( context.performer ).to.be( performer ) ;
+						expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+						expect( context.collectionNode.name ).to.be( 'users' ) ;
+						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+						//expect( context.objectNode.object ).to.be( context.document ) ;
+						expect( context.document._.raw ).to.partially.equal( {
+							firstName: "Bobby" ,
+							lastName: "Fisher" ,
+						} ) ;
+						expect( context.parentObjectNode.object ).to.partially.equal( {
+							title: "Root" ,
+							name: "/" ,
+							description: "Root object" ,
+							parent: {
+								collection: "root" ,
+								id: "/"
+							}
+						} ) ;
+
+						expect( context.hook ).to.only.have.own.key( 'token' ) ;
+						expect( context.hook.token ).to.partially.equal( {
+							userId: id ,
+							token: response.output.data.token ,	// unpredictable
+							type: "header" ,
+							agentId: "0123456789" ,
+							creationTime: response.output.data.creationTime ,	// not predictable at all
+							expirationTime: response.output.data.expirationTime ,	// not predictable at all
+							duration: 900000
+						} ) ;
+
+						// Must be at the end
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+
+		expect( hookRan ).to.be.true() ;
+
+		expect( response.output.data ).to.partially.equal( { userId: id } ) ;
+	} ) ;
+
+	it( "'beforeRegenerateToken' (user) hooks" ) ;
+	it( "'afterRegenerateToken' (user) hooks" ) ;
+	it( "'beforeCreateApiKey' (user) hooks" ) ;
+	it( "'afterCreateApiKey' (user) hooks" ) ;
+	
+	it( "All hook throwing/rejecting, except 'after*' hooks, must abort the request as well as remaining hooks with an error" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var preHookRan = false ,
+			hookRan = false ;
+
+		await expect( () => app.put(
+			'/Blogs/5437f846c41d0e910ec9e111' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{
+				performer: performer ,
+				usr: {
+					beforeCreatePreHookTest: context => {
+						expect( preHookRan ).to.be.false() ;
+						preHookRan = true ;
+						throw new Error( "Dang!" ) ;
+					} ,
+					beforeCreateTest: context => {
+						expect( hookRan ).to.be.false() ;
+						hookRan = true ;
+					}
+				}
+			}
+		) ).to.eventually.throw() ;
+		
+		expect( preHookRan ).to.be.true() ;
+		expect( hookRan ).to.be.false() ;
+
+		await expect( app.get( '/Blogs/5437f846c41d0e910ec9e111' , { performer: performer } ) ).to.reject.with.an( ErrorStatus , { type: 'notFound' } ) ;
+
+		
+		// Async
+		preHookRan = hookRan = false ;
+
+		await expect( app.put(
+			'/Blogs/5437f846c41d0e910ec9e111' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{
+				performer: performer ,
+				usr: {
+					beforeCreatePreHookTest: async ( context ) => {
+						expect( preHookRan ).to.be.false() ;
+						preHookRan = true ;
+						return Promise.rejectTimeout( 100 , new Error( "Dang!" ) ) ;
+					} ,
+					beforeCreateTest: context => {
+						expect( hookRan ).to.be.false() ;
+						hookRan = true ;
+					}
+				}
+			}
+		) ).to.reject() ;
+		
+		expect( preHookRan ).to.be.true() ;
+		expect( hookRan ).to.be.false() ;
+
+		await expect( app.get( '/Blogs/5437f846c41d0e910ec9e111' , { performer: performer } ) ).to.reject.with.an( ErrorStatus , { type: 'notFound' } ) ;
+	} ) ;
+
+	it( "When a hook call context.done() should abort the request as well as remaining hooks, but should not throw/reject" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var preHookRan = false ,
+			hookRan = false ;
+
+		await app.put(
+			'/Blogs/5437f846c41d0e910ec9e111' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{
+				performer: performer ,
+				usr: {
+					beforeCreatePreHookTest: context => {
+						expect( preHookRan ).to.be.false() ;
+						preHookRan = true ;
+						context.done() ;
+					} ,
+					beforeCreateTest: context => {
+						expect( hookRan ).to.be.false() ;
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+		
+		expect( preHookRan ).to.be.true() ;
+		expect( hookRan ).to.be.false() ;
+
+		await expect( app.get( '/Blogs/5437f846c41d0e910ec9e111' , { performer: performer } ) ).to.reject.with.an( ErrorStatus , { type: 'notFound' } ) ;
+	} ) ;
+
+	it( "Array of hooks" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var hookRan = false ,
+			preHookRan = false ;
+		
+		var response = await app.post(
+			'/Blogs' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{
+				performer: performer ,
+				usr: {
+					beforeCreatePreHookTest: context => {
+						expect( preHookRan ).to.be.false() ;
+
+						expect( context ).to.be.a( restQuery.Context ) ;
+						expect( context.app ).to.be.a( restQuery.App ) ;
+						expect( context.app ).to.be( app ) ;
+						expect( context.performer ).to.be.a( restQuery.Performer ) ;
+						expect( context.performer ).to.be( performer ) ;
+						expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+						expect( context.collectionNode.name ).to.be( 'blogs' ) ;
+						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+						expect( context.objectNode.object ).to.be( context.document ) ;
+						expect( context.document._.raw ).to.partially.equal( {
+							title: "Root" ,
+							name: "/" ,
+							description: "Root object" ,
+							parent: {
+								collection: "root" ,
+								id: "/"
+							}
+						} ) ;
+						expect( context.parentObjectNode.object ).to.be( context.document ) ;
+
+						expect( context.hook ).to.only.have.own.keys( 'incomingDocument' ) ;
+						expect( context.hook.incomingDocument ).to.partially.equal( {
+							title: 'My wonderful life!!!' ,
+							description: 'This is a supa blog!'
+						} ) ;
+
+						// Make the hook alter the incoming document
+						context.hook.incomingDocument.secret = 'some string' ;
+
+						// Must be at the end
+						preHookRan = true ;
+					} ,
+
+					beforeCreateTest: context => {
+						expect( hookRan ).to.be.false() ;
+
+						expect( context ).to.be.a( restQuery.Context ) ;
+						expect( context.app ).to.be.a( restQuery.App ) ;
+						expect( context.app ).to.be( app ) ;
+						expect( context.performer ).to.be.a( restQuery.Performer ) ;
+						expect( context.performer ).to.be( performer ) ;
+						expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+						expect( context.collectionNode.name ).to.be( 'blogs' ) ;
+						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+						expect( context.objectNode.object ).to.be( context.document ) ;
+						expect( context.document._.raw ).to.partially.equal( {
+							title: "Root" ,
+							name: "/" ,
+							description: "Root object" ,
+							parent: {
+								collection: "root" ,
+								id: "/"
+							}
+						} ) ;
+						expect( context.parentObjectNode.object ).to.be( context.document ) ;
+
+						expect( context.hook ).to.only.have.own.keys( 'incomingDocument' ) ;
+						expect( context.hook.incomingDocument ).to.partially.equal( {
+							title: 'My wonderful life!!!' ,
+							description: 'This is a supa blog!'
+						} ) ;
+
+						// Make the hook alter the incoming document
+						context.hook.incomingDocument.secret = 'some string' ;
+
+						// Must be at the end
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+		
+		expect( preHookRan ).to.be.true() ;
+		expect( hookRan ).to.be.true() ;
+
+		var id = response.output.data.id.toString() ;
+		expect( id ).to.be.a( 'string' ) ;
+		expect( id ).to.have.length.of( 24 ) ;
+
+		response = await app.get( '/Blogs/' + id , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!!' ,
+			description: 'This is a supa blog!' ,
+			secret: 'some string' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+	} ) ;
 } ) ;
 
 

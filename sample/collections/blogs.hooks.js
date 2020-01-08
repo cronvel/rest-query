@@ -37,28 +37,38 @@ const Promise = require( 'seventh' ) ;
 
 module.exports = {
 	
-	beforeCreate: async ( context ) => {
-		if ( context.usr.beforeCreateTest ) { context.usr.beforeCreateTest( context ) ; }
-	} ,
+	beforeCreate: [
+		async ( context ) => {
+			if ( context.usr.beforeCreatePreHookTest ) { await context.usr.beforeCreatePreHookTest( context ) ; }
+			if ( context.usr.beforeCreatePreHookDone ) { context.done() ; }
+		} ,
+		async ( context ) => {
+			if ( context.usr.beforeCreateTest ) { await context.usr.beforeCreateTest( context ) ; }
+		}
+	] ,
 	
 	afterCreate: async ( context ) => {
-		if ( context.usr.afterCreateTest ) { context.usr.afterCreateTest( context ) ; }
+		if ( context.usr.afterCreateTest ) { await context.usr.afterCreateTest( context ) ; }
 	} ,
 	
 	beforeModify: async ( context ) => {
-		if ( context.usr.beforeModifyTest ) { context.usr.beforeModifyTest( context ) ; }
+		if ( context.usr.beforeModifyTest ) { await context.usr.beforeModifyTest( context ) ; }
 	} ,
 	
 	afterModify: async ( context ) => {
-		if ( context.usr.afterModifyTest ) { context.usr.afterModifyTest( context ) ; }
+		if ( context.usr.afterModifyTest ) { await context.usr.afterModifyTest( context ) ; }
 	} ,
 
 	beforeDelete: async ( context ) => {
-		if ( context.usr.beforeDeleteTest ) { context.usr.beforeDeleteTest( context ) ; }
+		if ( context.usr.beforeDeleteTest ) { await context.usr.beforeDeleteTest( context ) ; }
 	} ,
 	
 	afterDelete: async ( context ) => {
-		if ( context.usr.afterDeleteTest ) { context.usr.afterDeleteTest( context ) ; }
+		if ( context.usr.afterDeleteTest ) { await context.usr.afterDeleteTest( context ) ; }
+	} ,
+
+	search: async ( context ) => {
+		if ( context.usr.searchTest ) { await context.usr.searchTest( context ) ; }
 	}
 } ;
 

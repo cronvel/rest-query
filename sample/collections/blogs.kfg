@@ -28,3 +28,7 @@ unindexedQueries: true
 
 collectionMethods: @@blogs.collectionMethods.js
 objectMethods: @@blogs.objectMethods.js
+
+indexes:
+	-	properties:
+			title: text

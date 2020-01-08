@@ -48,9 +48,12 @@ module.exports = {
 		} ) ;
 	} ,
 
-	afterCreateToken: function( context ) {
-		log.debug( '>>>>>>>>>> afterCreateToken, context: %I' , context ) ;
-		return Promise.resolved ;
+	beforeCreateToken: async ( context ) => {
+		if ( context.usr.beforeCreateTokenTest ) { await context.usr.beforeCreateTokenTest( context ) ; }
+	} ,
+	
+	afterCreateToken: async ( context ) => {
+		if ( context.usr.afterCreateTokenTest ) { await context.usr.afterCreateTokenTest( context ) ; }
 	}
 } ;
 

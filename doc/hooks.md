@@ -212,7 +212,7 @@ When:
 * executed after the token creation
 
 The `context.document` contains the user for which the token is created.
-The `context.hook.token` contains the token.
+The `context.hook.token` contains the token data.
 
 **BETA**, not well specified yet.
 
