@@ -37,28 +37,28 @@ const Promise = require( 'seventh' ) ;
 
 module.exports = {
 	
-	beforeCreate: async function( context ) {
+	beforeCreate: async ( context ) => {
 		if ( context.usr.beforeCreateTest ) { context.usr.beforeCreateTest( context ) ; }
 	} ,
 	
-	afterCreate: async function( context ) {
+	afterCreate: async ( context ) => {
 		if ( context.usr.afterCreateTest ) { context.usr.afterCreateTest( context ) ; }
 	} ,
 	
-	beforeModify: function( context ) {
+	beforeModify: async ( context ) => {
 		if ( context.usr.beforeModifyTest ) { context.usr.beforeModifyTest( context ) ; }
 	} ,
 	
-	afterModify: function( context ) {
+	afterModify: async ( context ) => {
 		if ( context.usr.afterModifyTest ) { context.usr.afterModifyTest( context ) ; }
 	} ,
 
-	beforeDelete: function( context ) {
+	beforeDelete: async ( context ) => {
 		if ( context.usr.beforeDeleteTest ) { context.usr.beforeDeleteTest( context ) ; }
 	} ,
 	
-	afterDelete: function( context ) {
+	afterDelete: async ( context ) => {
 		if ( context.usr.afterDeleteTest ) { context.usr.afterDeleteTest( context ) ; }
-	} ,
+	}
 } ;
 

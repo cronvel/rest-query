@@ -86,15 +86,16 @@ When:
 
 The `context.hook.incomingDocument` contains the document about to be created: it can be altered by the hook.
 
-If `context.parentObjectNode` is set, then the resource about to be created is a child of that *objectNode*
-(e.g. PUT, POST on a collection).
+The `context.hook.existingDocument` contains the document about to be replaced, it is only set for PUT request overwriting an existing document.
 
-If `context.linkerObjectNode` is set, then the resource about to be created is linked by that *objectNode*
-(e.g. PUT on a link).
+The `context.parentObjectNode` is the parent *objectNode* of the resource about to be created (e.g. PUT, POST on a collection).
 
-If `context.objectNode` is set at this stage, then this is an *objectNode* about to be overwritten.
+The `context.objectNode` is more contextual, for PUT overwriting a document, it is the existing *objectNode* about to be overwritten,
+for POST or PUT creating a new document, this is the same than `context.parentObjectNode`.
+In fact `context.objectNode` is always the last existing *objectNode* during the URL traversal.
+It is often recommended not to use `context.objectNode` which is more for Rest Query internal stuff.
 
-The same apply to `context.hook.existingDocument` (the document about to be replaced).
+If `context.linkerObjectNode` is set, then the resource about to be created is linked by that *objectNode* (e.g. PUT on a link).
 
 
 
@@ -110,11 +111,10 @@ The `context.document` contains the freshly created document.
 
 The `context.objectNode` contains the freshly created *objectNode*.
 
-If `context.hook.deletedDocument` is set, this is the document that have been deleted (this is the same document
-as `context.hook.existingDocument` in the *beforeCreate* hook).
+If `context.hook.deletedDocument` is set, this is the document that have been deleted (this is the same document as `context.hook.existingDocument`
+in the *beforeCreate* hook).
 
-If `context.linkerObjectNode` is set, then the freshly created resource is linked by that *objectNode*
-(e.g. PUT on a link).
+If `context.linkerObjectNode` is set, then the freshly created resource is linked by that *objectNode* (e.g. PUT on a link).
 
 
 
@@ -328,7 +328,7 @@ This is the data structure of a context:
 * batchOf `Array` (optional) *internal usage only*
 * linkerObjectNode `ObjectNode` (optional) the *objectNode* that is linking to the current node
 * linkerPath (optional) *internal usage only*
-* document `Document` (optional) the targeted/created document in its final state.
+* document `Document` (optional) the targeted/created/related document in its final state, for object methods it is the same as `.objectNode.object`
 * patch `Object` (optional) a patch to apply to a *document*
 * isDone `boolean` true if there is nothing more to do for this request (however, no hook or methods will be called with `isDone: true`)
 * hook `Object` hook-specific data, may change from one hook to another, so see the hook documentation for details.
@@ -337,6 +337,7 @@ This is the data structure of a context:
 	* incomingPatch `Object` (optional) a patch to apply on a existing document.
 	* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
 	* deletedDocument `Object` (optional) if set, it is a document that have been deleted or replaced.
+* usr `Object` userland-specific data, can be used to communicate informations from upstream hooks to downstream hooks
 
 
 

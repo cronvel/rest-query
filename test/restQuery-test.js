@@ -6412,7 +6412,7 @@ describe( "Hooks" , () => {
 				usr: {
 					beforeCreateTest: context => {
 						expect( hookRan ).to.be.false() ;
-						hookRan = true ;
+
 						expect( context ).to.be.a( restQuery.Context ) ;
 						expect( context.app ).to.be.a( restQuery.App ) ;
 						expect( context.app ).to.be( app ) ;
@@ -6442,6 +6442,9 @@ describe( "Hooks" , () => {
 
 						// Make the hook alter the incoming document
 						context.hook.incomingDocument.secret = 'some string' ;
+
+						// Must be at the end
+						hookRan = true ;
 					}
 				}
 			}
@@ -6479,7 +6482,7 @@ describe( "Hooks" , () => {
 				usr: {
 					beforeCreateTest: context => {
 						expect( hookRan ).to.be.false() ;
-						hookRan = true ;
+
 						expect( context ).to.be.a( restQuery.Context ) ;
 						expect( context.app ).to.be.a( restQuery.App ) ;
 						expect( context.app ).to.be( app ) ;
@@ -6509,6 +6512,9 @@ describe( "Hooks" , () => {
 
 						// Make the hook alter the incoming document
 						context.hook.incomingDocument.secret = 'some string' ;
+
+						// Must be at the end
+						hookRan = true ;
 					}
 				}
 			}
@@ -6558,7 +6564,7 @@ describe( "Hooks" , () => {
 				usr: {
 					beforeCreateTest: context => {
 						expect( hookRan ).to.be.false() ;
-						hookRan = true ;
+
 						expect( context ).to.be.a( restQuery.Context ) ;
 						expect( context.app ).to.be.a( restQuery.App ) ;
 						expect( context.app ).to.be( app ) ;
@@ -6594,6 +6600,9 @@ describe( "Hooks" , () => {
 
 						// Make the hook alter the incoming document
 						context.hook.incomingDocument.secret = 'some string' ;
+
+						// Must be at the end
+						hookRan = true ;
 					}
 				}
 			}
@@ -6631,7 +6640,7 @@ describe( "Hooks" , () => {
 				usr: {
 					afterCreateTest: context => {
 						expect( hookRan ).to.be.false() ;
-						hookRan = true ;
+
 						expect( context ).to.be.a( restQuery.Context ) ;
 						expect( context.app ).to.be.a( restQuery.App ) ;
 						expect( context.app ).to.be( app ) ;
@@ -6658,6 +6667,9 @@ describe( "Hooks" , () => {
 						} ) ;
 
 						expect( context.hook ).to.equal( {} ) ;
+
+						// Must be at the end
+						hookRan = true ;
 					}
 				}
 			}
@@ -6694,7 +6706,7 @@ describe( "Hooks" , () => {
 				usr: {
 					afterCreateTest: context => {
 						expect( hookRan ).to.be.false() ;
-						hookRan = true ;
+
 						expect( context ).to.be.a( restQuery.Context ) ;
 						expect( context.app ).to.be.a( restQuery.App ) ;
 						expect( context.app ).to.be( app ) ;
@@ -6721,6 +6733,9 @@ describe( "Hooks" , () => {
 						} ) ;
 
 						expect( context.hook ).to.equal( {} ) ;
+
+						// Must be at the end
+						hookRan = true ;
 					}
 				}
 			}
@@ -6769,7 +6784,7 @@ describe( "Hooks" , () => {
 				usr: {
 					afterCreateTest: context => {
 						expect( hookRan ).to.be.false() ;
-						hookRan = true ;
+
 						expect( response ).to.be.a( restQuery.Context ) ;
 						expect( context.app ).to.be.a( restQuery.App ) ;
 						expect( context.app ).to.be( app ) ;
@@ -6801,6 +6816,9 @@ describe( "Hooks" , () => {
 							title: 'My wonderful life!!! (initial)' ,
 							description: 'This is a supa blog!'
 						} ) ;
+
+						// Must be at the end
+						hookRan = true ;
 					}
 				}
 			}
@@ -6845,7 +6863,7 @@ describe( "Hooks" , () => {
 				usr: {
 					beforeModifyTest: context => {
 						expect( hookRan ).to.be.false() ;
-						hookRan = true ;
+
 						expect( response ).to.be.a( restQuery.Context ) ;
 						expect( context.app ).to.be.a( restQuery.App ) ;
 						expect( context.app ).to.be( app ) ;
@@ -6883,6 +6901,9 @@ describe( "Hooks" , () => {
 
 						// Make the hook alter the incoming patch
 						context.hook.incomingPatch.secret = 'some string' ;
+
+						// Must be at the end
+						hookRan = true ;
 					}
 				}
 			}
@@ -6900,10 +6921,211 @@ describe( "Hooks" , () => {
 	} ) ;
 
 	it( "'afterModify' hook effects and context for a PATCH request" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put(
+			'/Blogs/5437f846c41d0e910ec9e5f0' ,
+			{
+				title: 'My wonderful life!!! (initial)' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		// Patch
+		var hookRan = false ;
+		response = await app.patch(
+			'/Blogs/5437f846c41d0e910ec9e5f0' ,
+			{ title: 'My wonderful life!!! (patch)' } ,
+			null ,
+			{
+				performer: performer ,
+				usr: {
+					afterModifyTest: context => {
+						expect( hookRan ).to.be.false() ;
+
+						expect( response ).to.be.a( restQuery.Context ) ;
+						expect( context.app ).to.be.a( restQuery.App ) ;
+						expect( context.app ).to.be( app ) ;
+						expect( context.performer ).to.be.a( restQuery.Performer ) ;
+						expect( context.performer ).to.be( performer ) ;
+						expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+						expect( context.collectionNode.name ).to.be( 'blogs' ) ;
+						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+						expect( context.objectNode.object ).to.be( context.document ) ;
+						expect( context.document._.raw ).to.partially.equal( {
+							title: 'My wonderful life!!! (patch)' ,
+							description: 'This is a supa blog!'
+						} ) ;
+
+						// Parent Object Node is the Root Object
+						expect( context.parentObjectNode.object._.raw ).to.partially.equal( {
+							title: "Root" ,
+							name: "/" ,
+							description: "Root object" ,
+							parent: {
+								collection: "root" ,
+								id: "/"
+							}
+						} ) ;
+
+						expect( context.hook ).to.equal( {} ) ;
+
+						// Must be at the end
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+
+		expect( hookRan ).to.be.true() ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9e5f0' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!! (patch)' ,
+			description: 'This is a supa blog!' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
 	} ) ;
 
-	it( "Test 'beforeDelete' hook" ) ;
-	it( "Test 'afterDelete' hook" ) ;
+	it( "'beforeDelete' hook effects and context for a DELETE request" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put(
+			'/Blogs/5437f846c41d0e910ec9e000' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		// Delete
+		var hookRan = false ;
+		response = await app.delete(
+			'/Blogs/5437f846c41d0e910ec9e000' ,
+			{
+				performer: performer ,
+				usr: {
+					beforeDeleteTest: context => {
+						expect( hookRan ).to.be.false() ;
+
+						expect( response ).to.be.a( restQuery.Context ) ;
+						expect( context.app ).to.be.a( restQuery.App ) ;
+						expect( context.app ).to.be( app ) ;
+						expect( context.performer ).to.be.a( restQuery.Performer ) ;
+						expect( context.performer ).to.be( performer ) ;
+						expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+						expect( context.collectionNode.name ).to.be( 'blogs' ) ;
+						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+						expect( context.objectNode.object ).to.be( context.document ) ;
+						expect( context.document._.raw ).to.partially.equal( {
+							title: 'My wonderful life!!!' ,
+							description: 'This is a supa blog!'
+						} ) ;
+
+						// Parent Object Node is the Root Object
+						expect( context.parentObjectNode.object._.raw ).to.partially.equal( {
+							title: "Root" ,
+							name: "/" ,
+							description: "Root object" ,
+							parent: {
+								collection: "root" ,
+								id: "/"
+							}
+						} ) ;
+
+						expect( context.hook ).to.have.only.own.keys( 'existingDocument' ) ;
+						expect( context.hook.existingDocument ).to.partially.equal( {
+							title: 'My wonderful life!!!' ,
+							description: 'This is a supa blog!'
+						} ) ;
+
+						// Must be at the end
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+
+		expect( hookRan ).to.be.true() ;
+
+		await expect( app.get( '/Blogs/5437f846c41d0e910ec9e000' , { performer: performer } ) ).to.reject.with.an( ErrorStatus , { type: 'notFound' } ) ;
+	} ) ;
+
+	it( "'afterDelete' hook effects and context for a DELETE request" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put(
+			'/Blogs/5437f846c41d0e910ec9e000' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		// Delete
+		var hookRan = false ;
+		response = await app.delete(
+			'/Blogs/5437f846c41d0e910ec9e000' ,
+			{
+				performer: performer ,
+				usr: {
+					afterDeleteTest: context => {
+						expect( hookRan ).to.be.false() ;
+
+						expect( response ).to.be.a( restQuery.Context ) ;
+						expect( context.app ).to.be.a( restQuery.App ) ;
+						expect( context.app ).to.be( app ) ;
+						expect( context.performer ).to.be.a( restQuery.Performer ) ;
+						expect( context.performer ).to.be( performer ) ;
+						expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+						expect( context.collectionNode.name ).to.be( 'blogs' ) ;
+						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+						expect( context.objectNode.object ).to.be( context.document ) ;
+						expect( context.document._.raw ).to.partially.equal( {
+							title: 'My wonderful life!!!' ,
+							description: 'This is a supa blog!'
+						} ) ;
+
+						// Parent Object Node is the Root Object
+						expect( context.parentObjectNode.object._.raw ).to.partially.equal( {
+							title: "Root" ,
+							name: "/" ,
+							description: "Root object" ,
+							parent: {
+								collection: "root" ,
+								id: "/"
+							}
+						} ) ;
+
+						expect( context.hook ).to.have.only.own.keys( 'deletedDocument' ) ;
+						expect( context.hook.deletedDocument ).to.partially.equal( {
+							title: 'My wonderful life!!!' ,
+							description: 'This is a supa blog!'
+						} ) ;
+
+						// Must be at the end
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+
+		expect( hookRan ).to.be.true() ;
+
+		await expect( app.get( '/Blogs/5437f846c41d0e910ec9e000' , { performer: performer } ) ).to.reject.with.an( ErrorStatus , { type: 'notFound' } ) ;
+	} ) ;
 
 	it( "Test 'search' hooks" ) ;
 

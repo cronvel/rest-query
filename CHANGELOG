@@ -1,4 +1,11 @@
 
+v0.58.3
+-------
+
+More hook unit tests
+Context.usr initial value can be set at request time (params.usr)
+
+
 v0.58.2
 -------
 
