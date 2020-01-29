@@ -12,4 +12,5 @@ properties:
 		optional: true
 		type: strictObject
 autoCollection: blogs
+refreshTimeout: 1000
 objectMethods: @@root.objectMethods.js

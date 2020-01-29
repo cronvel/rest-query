@@ -1,4 +1,10 @@
 
+v0.59.0
+-------
+
+Root object has a timeout now, it is reloaded from DB from time to time, so it makes RestQuery work with multiple instances again (default: every one minute, since standard usage should not modify the root)
+
+
 v0.58.4
 -------
 

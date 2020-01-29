@@ -8049,6 +8049,8 @@ describe( "Misc" , () => {
 
 	it( "Test CORS" ) ;
 	it( "Test agentId (token, API key)" ) ;
+
+	it( "Test root's refreshTimeout" ) ;
 	
 	it( "Test --buildIndexes" ) ;
 	it( "Test --initDb <filepath>" ) ;
