@@ -1,4 +1,10 @@
 
+v0.59.1
+-------
+
+ctx.objectNode.object -> ctx.document
+
+
 v0.59.0
 -------
 
