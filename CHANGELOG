@@ -1,4 +1,10 @@
 
+v0.60.1
+-------
+
+Prepend [hook] in the error.message when it appends in one, help debugging userland from RestQuery issues
+
+
 v0.60.0
 -------
 
