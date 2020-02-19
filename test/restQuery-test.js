@@ -98,7 +98,7 @@ function clearCollection( collection ) {
 		.then( () => collection.driver.raw.deleteMany( {} ) )
 		.then( () => {
 			if ( ! collection.attachmentUrl ) { return ; }
-			return Promise.promisify( fsKit.deltree , fsKit )( collection.attachmentUrl ) ;
+			return fsKit.deltree( collection.attachmentUrl ) ;
 		} ) ;
 }
 

@@ -1,4 +1,10 @@
 
+v0.60.0
+-------
+
+Maybe breaking: using roots-db new breaking version, where collection needs to be init apart from the constructor (because init is now async)
+
+
 v0.59.1
 -------
 

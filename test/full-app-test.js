@@ -41,7 +41,7 @@ var mongodb = require( 'mongodb' ) ;
 
 var Promise = require( 'seventh' ) ;
 var tree = require( 'tree-kit' ) ;
-var fsKit = require( 'fs-kit' ) ;
+//var fsKit = require( 'fs-kit' ) ;
 
 var appProto = 'http' ;
 var appPort = 1234 ;
@@ -103,7 +103,7 @@ async function clearCollection( collectionName ) {
 	await collection.deleteMany() ;
 	
 	// ??? this is a mongo collection node not a restquery collection
-	//if ( collection.attachmentUrl ) { fsKit.deltree( collection.attachmentUrl , callback ) ; } 
+	//if ( collection.attachmentUrl ) { await fsKit.deltree( collection.attachmentUrl ) ; } 
 }
 
 
