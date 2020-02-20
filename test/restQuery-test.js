@@ -98,7 +98,7 @@ function clearCollection( collection ) {
 		.then( () => collection.driver.raw.deleteMany( {} ) )
 		.then( () => {
 			if ( ! collection.attachmentUrl ) { return ; }
-			return Promise.promisify( fsKit.deltree , fsKit )( collection.attachmentUrl ) ;
+			return fsKit.deltree( collection.attachmentUrl ) ;
 		} ) ;
 }
 
@@ -8049,6 +8049,8 @@ describe( "Misc" , () => {
 
 	it( "Test CORS" ) ;
 	it( "Test agentId (token, API key)" ) ;
+
+	it( "Test root's refreshTimeout" ) ;
 	
 	it( "Test --buildIndexes" ) ;
 	it( "Test --initDb <filepath>" ) ;
