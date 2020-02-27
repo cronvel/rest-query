@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.60.1",
+  "version": "0.60.2",
   "engines": {
     "node": ">=10.0.0"
   },
@@ -22,7 +22,7 @@
     "logfella-client": "^1.2.3",
     "qs-kit": "^0.6.4",
     "rest-query-shared": "^0.33.9",
-    "roots-db": "^0.26.0",
+    "roots-db": "^0.26.1",
     "server-kit": "^0.9.21",
     "seventh": "^0.7.34",
     "string-kit": "^0.11.6",
@@ -33,7 +33,7 @@
   "devDependencies": {
     "fs-kit": "^0.5.1",
     "minimist": "^1.2.0",
-    "mongodb": "3.5.3"
+    "mongodb": "3.5.4"
   },
   "scripts": {
     "test": "tea-time -R dot"

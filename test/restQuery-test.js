@@ -2065,6 +2065,95 @@ describe( "Links" , () => {
 			godfather: null
 		} ) ;
 	} ) ;
+
+	it( "GET + deep-populate links" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , fatherId , userId , godfatherId , fatherGodfatherId ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		response = await app.put( '/Users/' + userId + '/~father' ,
+			{
+				firstName: "Big Joe" ,
+				lastName: "Doe" ,
+				email: "big-joe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		fatherId = response.output.data.id ;
+
+		response = await app.put( '/Users/' + userId + '/~godfather' ,
+			{
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
+
+		response = await app.put( '/Users/' + userId + '/~father/~godfather' ,
+			{
+				firstName: "ULTIMATE" ,
+				lastName: "GODFATHER" ,
+				email: "ultimate-godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		fatherGodfatherId = response.output.data.id ;
+
+		//response = await app.get( '/Users/' + userId , { performer: performer , query: { populate: [ 'father' , 'godfather' ] } } ) ;
+		//response = await app.get( '/Users/' + userId , { performer: performer , query: { depth: 1 , deepPopulate: { users: [ 'father' , 'godfather' ] } } } ) ;
+		response = await app.get( '/Users/' + userId , { performer: performer , query: { deepPopulate: { users: [ 'father' , 'godfather' ] } } } ) ;
+		//log.hdebug( "Data: %[l50000]Y" , response.output.data ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			parent: { id: '/' , collection: 'root' } ,
+			father: {
+				_id: fatherId ,
+				firstName: "Big Joe" ,
+				lastName: "Doe" ,
+				email: "big-joe@gmail.com" ,
+				godfather: {
+					_id: fatherGodfatherId ,
+					firstName: "ULTIMATE" ,
+					lastName: "GODFATHER" ,
+					email: "ultimate-godfather@gmail.com"
+				}
+			} ,
+			godfather: {
+				_id: godfatherId ,
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com"
+			}
+		} ) ;
+	} ) ;
+
+	it( "Test populate and deep-populate links for batch/collection" ) ;
 } ) ;
 
 
@@ -7958,13 +8047,6 @@ describe( "Alter Schema" , () => {
 			custom: 'value2'
 		} ) ;
 	} ) ;
-} ) ;
-
-
-
-describe( "Populate" , () => {
-
-	it( "Test populate" ) ;
 } ) ;
 
 

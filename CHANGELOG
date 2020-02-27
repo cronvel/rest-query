@@ -1,4 +1,10 @@
 
+v0.60.2
+-------
+
+New: deep-populate -- query string syntax: deepPopulate.<collection>=[<path1>,<path2>] also depth=<depthLimit>
+
+
 v0.60.1
 -------
 
