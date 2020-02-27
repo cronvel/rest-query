@@ -1,4 +1,10 @@
 
+v0.60.3
+-------
+
+New: deep-populate -- query string syntax: deepPopulate.<collection>=[<path1>,<path2>] also depth=<depthLimit> (fix previous publish merge error)
+
+
 v0.60.2
 -------
 
