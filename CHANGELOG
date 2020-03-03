@@ -1,4 +1,10 @@
 
+v0.60.4
+-------
+
+Add ctx.hook.appliedPatch in the afterModify hook context
+
+
 v0.60.3
 -------
 

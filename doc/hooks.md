@@ -130,6 +130,9 @@ When:
 * a PUT request on a subpart of a document (it's internally transformed into a PATCH request)
 * executed after the document is patched
 
+The `context.hook.appliedPatch` contains the patch that have been applied, it could be different from `context.hook.incomingPatch`
+of the *beforeModify* hook because it was sanitized before being applied.
+
 The `context.document` contains the document in its final state (after the patch is applied).
 
 The `context.objectNode` contains the patched *objectNode*.

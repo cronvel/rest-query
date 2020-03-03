@@ -142,6 +142,9 @@ When:
 * a PUT request on a subpart of a document (it's internally transformed into a PATCH request)
 * executed after the document is patched
 
+The `context.hook.appliedPatch` contains the patch that have been applied, it could be different from `context.hook.incomingPatch`
+of the *beforeModify* hook because it was sanitized before being applied.
+
 The `context.document` contains the document in its final state (after the patch is applied).
 
 The `context.objectNode` contains the patched *objectNode*.
@@ -335,6 +338,7 @@ This is the data structure of a context:
   Some non-exhaustive common properties:
 	* incomingDocument `Object` (optional) a whole document to create or that will overwrite another.
 	* incomingPatch `Object` (optional) a patch to apply on a existing document.
+	* appliedPatch `Object` (optional) a patch that have been applied on a existing document (afterModify)
 	* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
 	* deletedDocument `Object` (optional) if set, it is a document that have been deleted or replaced.
 * usr `Object` userland-specific data, can be used to communicate informations from upstream hooks to downstream hooks

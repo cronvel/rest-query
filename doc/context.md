@@ -45,6 +45,7 @@ This is the data structure of a context:
   Some non-exhaustive common properties:
 	* incomingDocument `Object` (optional) a whole document to create or that will overwrite another.
 	* incomingPatch `Object` (optional) a patch to apply on a existing document.
+	* appliedPatch `Object` (optional) a patch that have been applied on a existing document (afterModify)
 	* existingDocument `Object` (optional) if set, it is an existing document about to be patched or overwritten.
 	* deletedDocument `Object` (optional) if set, it is a document that have been deleted or replaced.
 * usr `Object` userland-specific data, can be used to communicate informations from upstream hooks to downstream hooks

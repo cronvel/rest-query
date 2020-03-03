@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.60.3",
+  "version": "0.60.4",
   "engines": {
     "node": ">=10.0.0"
   },
@@ -13,7 +13,7 @@
     "rest-query": "./bin/rest-query"
   },
   "dependencies": {
-    "doormen": "^0.10.19",
+    "doormen": "^0.10.21",
     "error-status": "^1.10.0",
     "hash-kit": "^0.3.2",
     "json-kit": "^0.6.3",
@@ -22,8 +22,8 @@
     "logfella-client": "^1.2.3",
     "qs-kit": "^0.6.4",
     "rest-query-shared": "^0.33.9",
-    "roots-db": "^0.26.1",
-    "server-kit": "^0.9.21",
+    "roots-db": "^0.26.2",
+    "server-kit": "^0.9.22",
     "seventh": "^0.7.34",
     "string-kit": "^0.11.6",
     "token-kit": "^0.2.1",

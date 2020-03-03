@@ -7061,7 +7061,9 @@ describe( "Hooks" , () => {
 							}
 						} ) ;
 
-						expect( context.hook ).to.equal( {} ) ;
+						expect( context.hook ).to.equal( {
+							appliedPatch: { title: "My wonderful life!!! (patch)" }
+						} ) ;
 
 						// Must be at the end
 						hookRan = true ;
