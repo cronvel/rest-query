@@ -1,4 +1,10 @@
 
+v0.60.6
+-------
+
+[roots-db] Fix a bug in anyCollection link: now Document instance are supported as link and will be sanitized correctly
+
+
 v0.60.5
 -------
 
