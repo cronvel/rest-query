@@ -1097,7 +1097,7 @@ describe( "Advanced PATCH commands" , () => {
 
 
 
-describe( "Built-in collection method: SCHEMA" , () => {
+describe( "Built-in object and collection method: SCHEMA" , () => {
 
 	it( "should get the schema of the collection" , async () => {
 		var { app , performer } = await commonApp() ;
@@ -1118,6 +1118,57 @@ describe( "Built-in collection method: SCHEMA" , () => {
 
 		var response = await app.get( '/Blogs/' + blog.getId() + '/SCHEMA' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( app.collectionNodes.blogs.schema ) ;
+	} ) ;
+} ) ;
+
+
+
+describe( "Built-in object method: REGENERATE-SLUG" , () => {
+
+	it( "should get the schema of the object" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!!' ,
+			description: 'This is a supa blog!' ,
+			slugId: 'my-wonderful-life'
+		} ) ;
+
+		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
+			{ title: 'Some random title...' } ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'Some random title...' ,
+			description: 'This is a supa blog!' ,
+			slugId: 'my-wonderful-life'
+		} ) ;
+
+		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/REGENERATE-SLUG' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			slugId: 'some-random-title'
+		} ) ;
+
+		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'Some random title...' ,
+			description: 'This is a supa blog!' ,
+			slugId: 'some-random-title'
+		} ) ;
 	} ) ;
 } ) ;
 
@@ -8106,7 +8157,7 @@ describe( "Misc" , () => {
 
 	it( "App's all collection exec tags" , async () => {
 		var { app , performer } = await commonApp() ;
-		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
+		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "regenerateSlug" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
 	} ) ;
 
 	it.opt( "Collection with a user/password in URL" , async () => {
