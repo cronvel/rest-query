@@ -1,4 +1,10 @@
 
+v0.61.2
+-------
+
+Fix bad type-checker for slugs, now updated to support new unicode slugs
+
+
 v0.61.1
 -------
 
