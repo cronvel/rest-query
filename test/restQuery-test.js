@@ -954,7 +954,7 @@ describe( "Advanced PATCH commands" , () => {
 
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
-				"embedded.a": { $unset: 'A' } ,
+				"embedded.a": { $unset: true } ,
 			} ,
 			null ,
 			{ performer: performer }
@@ -8176,7 +8176,7 @@ describe( "Historical bugs" , () => {
 		godfatherId = response.output.data.id ;
 
 		// It must reject! path leading inside an opaque object!
-		await expect( app.patch( '/Users/' + userId , { "godfather._id": ''+ godfatherId } , null , { performer: performer } ) ).to.reject( doormen.ValidatorError ) ;
+		await expect( app.patch( '/Users/' + userId , { "godfather._id": ''+ godfatherId } , null , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'badRequest' } ) ;
 
 		// Regular patch, check that the godfather has been modified, but don't contain extra data
 		response = await app.patch( '/Users/' + userId , { godfather: { _id: godfatherId , firstName: "should be removed" , lastName: "should be removed" } } , null , { performer: performer } ) ;
@@ -8228,7 +8228,7 @@ describe( "Historical bugs" , () => {
 		groupId = response.output.data.id ;
 
 		// It must reject! path leading inside an opaque object!
-		await expect( app.patch( '/Groups/' + groupId , { "users.0._id": ''+ userId1 } , null , { performer: performer } ) ).to.reject( doormen.ValidatorError ) ;
+		await expect( app.patch( '/Groups/' + groupId , { "users.0._id": ''+ userId1 } , null , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'badRequest' } ) ;
 
 		// Regular patch, check that the group has been modified, but don't contain extra data
 		response = await app.patch( '/Groups/' + groupId , { users: [ { _id: '' + userId1 , firstName: "Jack" , lastName: "O' Lantern" } , { _id: '' + userId2 } ] } , null , { performer: performer } ) ;
