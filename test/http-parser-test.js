@@ -119,6 +119,7 @@ describe( "Parse HTTP request" , () => {
 					isCollection: false ,
 					isDocument: true ,
 					value: "path" ,
+					unicode: false ,
 					type: "slugId"
 				} ,
 				{
@@ -126,6 +127,7 @@ describe( "Parse HTTP request" , () => {
 					isCollection: false ,
 					isDocument: true ,
 					value: "to" ,
+					unicode: false ,
 					type: "slugId"
 				} ,
 				{
@@ -133,6 +135,7 @@ describe( "Parse HTTP request" , () => {
 					isCollection: false ,
 					isDocument: true ,
 					value: "json" ,
+					unicode: false ,
 					type: "slugId"
 				}
 			] ,
