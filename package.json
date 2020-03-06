@@ -23,7 +23,7 @@
     "qs-kit": "^0.6.4",
     "rest-query-shared": "^0.34.0",
     "roots-db": "^0.26.4",
-    "server-kit": "^0.9.22",
+    "server-kit": "^0.9.25",
     "seventh": "^0.7.34",
     "string-kit": "^0.11.6",
     "token-kit": "^0.2.1",
