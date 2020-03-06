@@ -30,27 +30,21 @@
 
 
 
-var restQuery = require( '..' ) ;
+const restQuery = require( '..' ) ;
 
-var tree = require( 'tree-kit' ) ;
-var stream = require( 'stream' ) ;
-
-
-
+const tree = require( 'tree-kit' ) ;
+const stream = require( 'stream' ) ;
+const server = require( 'server-kit' ) ;
 
 
-/* Utils */
 
-
+// Utils
 
 // r: httpRequest part that overwrite defaults
 // body: the faked body
-function fakeHttpRequest( r , body ) {
+function fakeHttpClient( r = {} , body = '' ) {
 	//var req = stream.Duplex() ;
 	var req = stream.PassThrough() ;
-
-	if ( ! r || typeof r !== 'object' ) { r = {} ; }
-	if ( ! body || typeof body !== 'string' ) { body = '' ; }
 
 	tree.extend( { deep: true } , req , {
 		method: "GET" ,
@@ -75,22 +69,18 @@ function fakeHttpRequest( r , body ) {
 
 	req.end() ;
 
-	return req ;
+	return new server.Client( null , {
+		request: req ,
+		queryParserOptions: restQuery.HttpModule.queryParserOptions
+	} ) ;
 }
-
-
-
-
-
-/* Tests */
-
 
 
 
 describe( "Parse HTTP request" , () => {
 	
 	it( "should parse a fake GET on /" , async () => {
-		var req = fakeHttpRequest() ;
+		var req = fakeHttpClient() ;
 		var httpModule = new restQuery.HttpModule() ;
 		var message = await httpModule.parseRequest( req ) ;
 		
@@ -107,7 +97,7 @@ describe( "Parse HTTP request" , () => {
 	} ) ;
 
 	it( "should parse a fake GET with path and query string" , async () => {
-		var req = fakeHttpRequest( { url: "/path/to/json?populate=group&.prop.$lt=20&.prop.$gt=10&.prop2=bob&search=toto" } ) ;
+		var req = fakeHttpClient( { url: "/path/to/json?populate=group&.prop.$lt=20&.prop.$gt=10&.prop2=bob&search=toto" } ) ;
 		var httpModule = new restQuery.HttpModule() ;
 		var message = await httpModule.parseRequest( req ) ;
 		
@@ -155,7 +145,7 @@ describe( "Parse HTTP request" , () => {
 	} ) ;
 
 	it( "should parse a fake POST with a body" , async () => {
-		var req = fakeHttpRequest( { method: 'POST' } , '{"a":"simple","json":"file"}' ) ;
+		var req = fakeHttpClient( { method: 'POST' } , '{"a":"simple","json":"file"}' ) ;
 		var httpModule = new restQuery.HttpModule() ;
 		var message = await httpModule.parseRequest( req ) ;
 		

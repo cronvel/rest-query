@@ -21,6 +21,7 @@ hooks: @@blogs.hooks.js
 slugGeneration:
 	properties:
 		- title
+	unicode: true
 autoCollection: posts
 
 # allow filter and sort on unindexed properties

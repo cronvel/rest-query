@@ -30,27 +30,32 @@
 
 
 
-var cli = getCliOptions() ;
+var cliOptions = getCliOptions() ;
 
-var restQuery = require( '..' ) ;
+const restQuery = require( '..' ) ;
 
-var http = require( 'http' ) ;
-var childProcess = require( 'child_process' ) ;
-var mongodb = require( 'mongodb' ) ;
+const Logfella = require( 'logfella' ) ;
+
+if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
+if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
+//if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 1 } ; }
+const log = Logfella.global.use( 'unit-test' ) ;
+
+const http = require( 'http' ) ;
+const url = require( 'url' ) ;
+const childProcess = require( 'child_process' ) ;
+const mongodb = require( 'mongodb' ) ;
 
 
-var Promise = require( 'seventh' ) ;
-var tree = require( 'tree-kit' ) ;
-//var fsKit = require( 'fs-kit' ) ;
+const Promise = require( 'seventh' ) ;
+const tree = require( 'tree-kit' ) ;
+//const fsKit = require( 'fs-kit' ) ;
 
 var appProto = 'http' ;
 var appPort = 1234 ;
 var appProcess ;
 var dbUrl = 'mongodb://localhost:27017/restQuery' ;
 var db ;
-
-var Logfella = require( 'logfella' ) ;
-var log = Logfella.global.use( 'unit-test' ) ;
 
 
 
@@ -60,7 +65,7 @@ var log = Logfella.global.use( 'unit-test' ) ;
 
 
 // it flatten prototype chain, so a single object owns every property of its parents
-var protoflatten = tree.extend.bind( undefined , { deep: true , immutables: [ mongodb.ObjectID.prototype ] } , null ) ;
+const protoflatten = tree.extend.bind( undefined , { deep: true , immutables: [ mongodb.ObjectID.prototype ] } , null ) ;
 
 
 
@@ -80,7 +85,7 @@ function getCliOptions() {
 
 
 function debug() {
-	if ( cli.log ) { console.log( ... arguments ) ; }
+	if ( cliOptions.log ) { console.log( ... arguments ) ; }
 }
 
 
@@ -124,6 +129,7 @@ function runApp() {
 			'server' ,
 			'--config' , __dirname + '/../sample/main.kfg' ,
 			'--port' , appPort ,
+			//'--log.minLevel' , 'debug' ,
 			'--buildIndexes'
 		] ,
 		{ stdio: 'pipe' }
@@ -131,11 +137,11 @@ function runApp() {
 
 	// Exists with .spawn() but not with .fork() unless stdio: 'pipe' is used
 	appProcess.stdout.on( 'data' , data => {
-		//console.log( "[appProcess STDOUT] " , data.toString() ) ;
+		//log.debug( "[appProcess STDOUT] %s" , data.toString() ) ;
 	} ) ;
 
 	appProcess.stderr.on( 'data' , data => {
-		//console.log( "[appProcess STDERR] " , data.toString() ) ;
+		//log.error( "[appProcess STDERR] %s" , data.toString() ) ;
 	} ) ;
 
 	// We wait for the child to send a ready event, indicating that the child is ready to receive HTTP requests
@@ -168,12 +174,24 @@ function killApp() {
 
 
 
-function requester( query ) {
+function requester( query_ ) {
 	var promise = new Promise() ;
 	
-	query = tree.extend( null , { hostname: 'localhost' , port: appPort } , query ) ;
+	var query = tree.extend( null , { hostname: 'localhost' , port: appPort } , query_ ) ;
+	
+	var parsed = url.parse( query.path ) ;
+	//log.hdebug( "parsed: %J" , parsed ) ;
+	// Search string is more complicated to escape...
+	query.path =
+		encodeURI( parsed.pathname )
+		+ ( parsed.search ?
+			'?' + parsed.search.slice( 1 ).replace( /[^&=,[\]+]+/g , match => encodeURIComponent( match ) ) :
+			''
+		) ;
+	
+	//log.hdebug( "path before: %s -- after: %s" , query_.path , query.path ) ;
 
-	if ( query.body ) { query.headers['Content-Length'] = query.body.length ; }
+	if ( query.body ) { query.headers['Content-Length'] = Buffer.byteLength( query.body ) ; }
 
 	var request = http.request( query , ( response ) => {
 		var body = '' ;
@@ -635,6 +653,103 @@ describe( "Basics tests" , () => {
 			}
 		] ) ;
 		//console.log( "Response:" , response ) ;
+	} ) ;
+} ) ;
+
+
+
+describe( "Test slugs" , () => {
+
+	it( "GET on a blog using the slug" , async () => {
+		var response , data ;
+		
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Blogs/543bb877bd15489d0d7b0aaa' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: "My wonderful website!" ,
+				description: "... about my wonderful life" ,
+				publicAccess: { traverse: true , read: true , create: true }
+			} )
+		} ;
+
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Blogs/my-wonderful-website' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		response = await requester( putQuery ) ;
+		expect( response.status ).to.be( 201 ) ;
+		
+		response = await requester( getQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be.ok() ;
+		
+		data = JSON.parse( response.body ) ;
+		
+		expect( data ).to.equal( {
+			_id: "543bb877bd15489d0d7b0aaa" ,
+			title: "My wonderful website!" ,
+			description: "... about my wonderful life" ,
+			slugId: 'my-wonderful-website' ,
+			parent: {
+				collection: 'root' ,
+				id: '/'
+			}
+		} ) ;
+	} ) ;
+
+	it( "GET on a blog using an unicode slug" , async () => {
+		var response , data ;
+		
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Blogs/543bb877bd15489d0d7b0bbb' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: JSON.stringify( {
+				title: 'عِنْدَمَا ذَهَبْتُ إِلَى ٱلْمَكْتَبَةِ' ,
+				description: 'كنت أريد أن أقرأ كتابا عن تاريخ المرأة في فرنسا' ,
+				publicAccess: { traverse: true , read: true , create: true }
+			} )
+		} ;
+
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Blogs/عِنْدَمَا-ذَهَبْتُ-إِلَى-ٱلْمَكْتَبَةِ' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		response = await requester( putQuery ) ;
+		expect( response.status ).to.be( 201 ) ;
+		
+		response = await requester( getQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be.ok() ;
+		
+		data = JSON.parse( response.body ) ;
+		
+		expect( data ).to.equal( {
+			_id: "543bb877bd15489d0d7b0bbb" ,
+			title: 'عِنْدَمَا ذَهَبْتُ إِلَى ٱلْمَكْتَبَةِ' ,
+			description: 'كنت أريد أن أقرأ كتابا عن تاريخ المرأة في فرنسا' ,
+			slugId: 'عِنْدَمَا-ذَهَبْتُ-إِلَى-ٱلْمَكْتَبَةِ' ,
+			parent: {
+				collection: 'root' ,
+				id: '/'
+			}
+		} ) ;
 	} ) ;
 } ) ;
 
