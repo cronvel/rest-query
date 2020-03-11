@@ -1,4 +1,10 @@
 
+v0.61.4
+-------
+
+Dependencies upgraded (fix a potentially critical issue in roots-db/nested-proxies, anything like Array#splice() that need to construct an object from within the proxy trap would crash)
+
+
 v0.61.3
 -------
 
