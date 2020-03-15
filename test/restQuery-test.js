@@ -3235,11 +3235,7 @@ describe( "Slug usages" , () => {
 		) ;
 
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910ec9a5ae' , { performer: performer } ) ;
-		expect( response.output.data ).to.partially.equal( {
-			title: 'My post!!!' ,
-			//slugId: '5437f846c41d0e910ec9a5ae-2019-08-07-my-post'
-			slugId: '2019-08-07-my-post--5437f846c9a5ae'
-		} ) ;
+		expect( response.output.data.slugId.match( /^2019-08-07-my-post--[0-9]{3}$/ ) ).to.be.ok() ;
 	} ) ;
 
 	it( "the request URL should support slugId instead of ID (GET, PUT, PATCH, DELETE)" , async () => {
