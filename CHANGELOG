@@ -1,4 +1,16 @@
 
+v0.61.8
+-------
+
+Fix slug regeneration algo
+
+
+v0.61.7
+-------
+
+'exec' command now install exit handlers like it should
+
+
 v0.61.6
 -------
 
