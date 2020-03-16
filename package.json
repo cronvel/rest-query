@@ -22,7 +22,7 @@
     "logfella-client": "^1.2.3",
     "qs-kit": "^0.6.5",
     "rest-query-shared": "^0.34.0",
-    "roots-db": "^0.26.7",
+    "roots-db": "^0.27.0",
     "server-kit": "^0.9.27",
     "seventh": "^0.7.35",
     "string-kit": "^0.11.6",
