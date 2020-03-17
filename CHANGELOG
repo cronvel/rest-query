@@ -2,7 +2,7 @@
 v0.62.0
 -------
 
-BREAKING: index order has changed in the new roots DB (now they are sorted), the duplicate key for slugs with regen is incompatible with older indexestt ! (indexes need to be built again)
+BREAKING: index order has changed in the new roots DB (now they are sorted), the duplicate key for slugs with regen is incompatible with older indexes! (indexes need to be built again)
 
 
 v0.61.8
