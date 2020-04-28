@@ -1,4 +1,10 @@
 
+v0.62.6
+-------
+
+New: allow PATCH to return content
+
+
 v0.62.5
 -------
 
