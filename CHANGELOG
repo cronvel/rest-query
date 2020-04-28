@@ -1,4 +1,10 @@
 
+v0.62.5
+-------
+
+Fix a nasty link validation bug, when we directly pass a Document instance
+
+
 v0.62.4
 -------
 
