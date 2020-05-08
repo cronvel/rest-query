@@ -1,4 +1,11 @@
 
+v0.62.7
+-------
+
+Fix two potential bug: 'pAccess' never share a Set instance with 'access' anymore
+collection's own 'defaultPublicAccess' has precedence over App's one (it seems silly that it was not the case)
+
+
 v0.62.6
 -------
 

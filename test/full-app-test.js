@@ -1143,6 +1143,72 @@ describe( "Links population" , () => {
 			}
 		} ) ;
 
+		// Check different access
+		getQuery = {
+			method: 'GET' ,
+			path: '/Users/' + u3 + '?populate=[father,godfather]&access=content&pAccess=id' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		response = await requester( getQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be.ok() ;
+		data = JSON.parse( response.body ) ;
+		expect( data ).to.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			father: {
+				_id: data.father._id ,
+				slugId: "big-joe-doe" ,
+				login: "big.joe.doe@gmail.com" ,
+				parent: {
+					collection: 'root' ,
+					id: "/"
+				}
+			} ,
+			godfather: {
+				_id: data.godfather._id ,
+				slugId: "the-godfather" ,
+				login: "godfather@gmail.com" ,
+				parent: {
+					collection: 'root' ,
+					id: "/"
+				}
+			}
+		} ) ;
+
+		// Check if pAccess uses access tags if not defined
+		getQuery = {
+			method: 'GET' ,
+			path: '/Users/' + u3 + '?populate=[father,godfather]&access=content' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+		
+		response = await requester( getQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be.ok() ;
+		data = JSON.parse( response.body ) ;
+		expect( data ).to.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			email: "joe.doe@gmail.com" ,
+			father: {
+				email: "big.joe.doe@gmail.com" ,
+				firstName: "Big Joe" ,
+				lastName: "Doe"
+			} ,
+			godfather: {
+				email: "godfather@gmail.com" ,
+				firstName: "THE" ,
+				lastName: "GODFATHER"
+			}
+		} ) ;
+
 		getQuery = {
 			method: 'GET' ,
 			path: '/Users?populate=[father,godfather]' ,
