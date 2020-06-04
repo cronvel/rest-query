@@ -1,4 +1,35 @@
 
+v0.62.7
+-------
+
+Fix two potential bug: 'pAccess' never share a Set instance with 'access' anymore
+collection's own 'defaultPublicAccess' has precedence over App's one (it seems silly that it was not the case)
+
+
+v0.62.6
+-------
+
+New: allow PATCH to return content
+
+
+v0.62.5
+-------
+
+Fix a nasty link validation bug, when we directly pass a Document instance
+
+
+v0.62.4
+-------
+
+non-blocking index building mode
+
+
+v0.62.3
+-------
+
+Dependencies
+
+
 v0.62.2
 -------
 
