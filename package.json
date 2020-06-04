@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.62.7",
+  "version": "0.62.8",
   "engines": {
     "node": ">=10.0.0"
   },
@@ -43,8 +43,14 @@
     "url": "https://github.com/cronvel/rest-query.git"
   },
   "keywords": [
-    "REST",
-    "query"
+    "rest",
+    "query",
+    "restful",
+    "api",
+    "app",
+    "router",
+    "web",
+    "framework"
   ],
   "author": "Cédric Ronvel",
   "license": "MIT",
