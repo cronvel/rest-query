@@ -2868,6 +2868,9 @@ describe( "Attachment links" , () => {
 
 		response = await app.get( '/Users/' + userId + '/~avatar' , { performer: performer } ) ;
 		expect( response.output.data ).to.be.a( stream.Readable ) ;
+
+		var content = await streamKit.getFullString( response.output.data ) ;
+		expect( content ).to.be( 'a'.repeat( 40 ) ) ;
 	} ) ;
 } ) ;
 
