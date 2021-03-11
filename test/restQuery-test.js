@@ -2814,7 +2814,7 @@ describe( "Multi-links" , () => {
 
 describe( "Attachment links" , () => {
 
-	it( "zzz POST a document with attachmentStreams and GET it" , async () => {
+	it( "POST a document with attachmentStreams and GET it" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , userId ;
@@ -2871,6 +2871,58 @@ describe( "Attachment links" , () => {
 
 		var content = await streamKit.getFullString( response.output.data ) ;
 		expect( content ).to.be( 'a'.repeat( 40 ) ) ;
+	} ) ;
+
+	it( "PUT an attachment on an existing document" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , userId ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		// We need to create an AttachmentStreams manually
+		var attachmentStreams = new rootsDb.AttachmentStreams() ;
+
+		attachmentStreams.addStream(
+			new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 )
+			} ) ,
+			//'avatar' ,	// the documentPath is optional because we put on the attachment link
+			null ,
+			{ filename: 'random.bin' , contentType: 'bin/random' }
+		) ;
+
+		attachmentStreams.end() ;
+
+		response = await app.put( '/Users/' + userId + '/~avatar' ,
+			null ,
+			attachmentStreams ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( {
+			contentType: "bin/random" ,
+			filename: "random.bin" ,
+			id: response.output.data.id	// unpredictable
+		} ) ;
+
+		response = await app.get( '/Users/' + userId + '/~avatar' , { performer: performer } ) ;
+		expect( response.output.data ).to.be.a( stream.Readable ) ;
+
+		var content = await streamKit.getFullString( response.output.data ) ;
+		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
 } ) ;
 
