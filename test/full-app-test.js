@@ -897,13 +897,6 @@ describe( "Basics tests on users" , () => {
 
 
 
-describe( "Attachment" , () => {
-
-	it( "Attachment tests..." ) ;
-} ) ;
-
-
-
 describe( "Links population" , () => {
 
 	it( "GET on document and collection + populate links" , async () => {

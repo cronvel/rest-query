@@ -54,6 +54,9 @@ const doormen = require( 'doormen' ) ;
 const fsKit = require( 'fs-kit' ) ;
 const hash = require( 'hash-kit' ) ;
 
+const stream = require( 'stream' ) ;
+const streamKit = require( 'stream-kit' ) ;
+
 
 
 const ErrorStatus = require( 'error-status' ) ;
@@ -2804,6 +2807,67 @@ describe( "Multi-links" , () => {
 			]
 		} ) ;
 		
+	} ) ;
+} ) ;
+
+
+
+describe( "Attachment links" , () => {
+
+	it( "zzz POST a document with attachmentStreams and GET it" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , userId ;
+
+		// We need to create an AttachmentStreams manually
+		var attachmentStreams = new rootsDb.AttachmentStreams() ;
+
+		attachmentStreams.addStream(
+			new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 )
+			} ) ,
+			'avatar' ,
+			{ filename: 'random.bin' , contentType: 'bin/random' }
+		) ;
+
+		attachmentStreams.end() ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			attachmentStreams ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			slugId: 'joe-doe' ,
+			email: 'joe.doe@gmail.com' ,
+			parent: { id: '/' , collection: 'root' } ,
+			avatar: {
+				contentType: "bin/random" ,
+				filename: "random.bin" ,
+				id: response.output.data.avatar.id	// unpredictable
+			}
+		} ) ;
+
+		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( {
+			contentType: "bin/random" ,
+			filename: "random.bin" ,
+			id: response.output.data.id	// unpredictable
+		} ) ;
+
+		response = await app.get( '/Users/' + userId + '/~avatar' , { performer: performer } ) ;
+		expect( response.output.data ).to.be.a( stream.Readable ) ;
 	} ) ;
 } ) ;
 
