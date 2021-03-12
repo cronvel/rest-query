@@ -45,7 +45,8 @@ log:
 	transports:
 		-	type: console
 			timeFormatter: time
-			color: true
+			#color: true
+			color: false
 		-	type: netServer
 			role: mon
 			port: 4321

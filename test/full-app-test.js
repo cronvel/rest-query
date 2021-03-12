@@ -48,6 +48,7 @@ const childProcess = require( 'child_process' ) ;
 const mongodb = require( 'mongodb' ) ;
 
 const stream = require( 'stream' ) ;
+const streamKit = require( 'stream-kit' ) ;
 const FormData = require( 'form-data' ) ;
 
 const Promise = require( 'seventh' ) ;
@@ -132,7 +133,7 @@ function runApp() {
 			'server' ,
 			'--config' , __dirname + '/../sample/main.kfg' ,
 			'--port' , appPort ,
-			//'--log.minLevel' , 'debug' ,
+			'--log.minLevel' , 'debug' ,
 			'--buildIndexes'
 		] ,
 		{ stdio: 'pipe' }
@@ -140,11 +141,11 @@ function runApp() {
 
 	// Exists with .spawn() but not with .fork() unless stdio: 'pipe' is used
 	appProcess.stdout.on( 'data' , data => {
-		//log.debug( "[appProcess STDOUT] %s" , data.toString() ) ;
+		log.debug( "[appProcess STDOUT] %s" , data.toString() ) ;
 	} ) ;
 
 	appProcess.stderr.on( 'data' , data => {
-		//log.error( "[appProcess STDERR] %s" , data.toString() ) ;
+		log.error( "[appProcess STDERR] %s" , data.toString() ) ;
 	} ) ;
 
 	// We wait for the child to send a ready event, indicating that the child is ready to receive HTTP requests
@@ -195,7 +196,7 @@ function requester( query_ ) {
 
 	//log.hdebug( "path before: %s -- after: %s" , query_.path , query.path ) ;
 
-	var request = Array.isArray( query.body ) ?
+	var request = query.multipartFormData ?
 		multipartRequest( query ) :
 		normalRequest( query ) ;
 
@@ -227,8 +228,6 @@ function requester( query_ ) {
 		promise.reject( error ) ;
 	} ) ;
 
-	request.end() ;
-
 	return promise ;
 }
 
@@ -252,6 +251,8 @@ function normalRequest( query ) {
 		}
 	}
 
+	request.end() ;
+
 	return request ;
 }
 
@@ -260,15 +261,37 @@ function normalRequest( query ) {
 function multipartRequest( query ) {
 	var form = new FormData() ;
 
-	var request = http.request( query ) ;
+	for ( let fieldName in query.multipartFormData ) {
+		let value = query.multipartFormData[ fieldName ] ,
+			header = {} ,
+			filename ;
 
-	query.body.forEach( part => {
-		if ( part.body && typeof part.body === 'object' && ! Array.isArray( part.body ) ) { part.body = JSON.stringify( part.body ) ; }
-		form.append( part.name , part.body ) ;
-	} ) ;
+		if ( value instanceof stream.Readable ) {
+			// /!\ CHANGE THAT WITH THE CORRECT FILENAME!!! /!\
+			filename = 'bob' ;
+		}
+		else if ( typeof value !== 'string' ) {
+			value = JSON.stringify( value ) ;
+			header['content-type'] = 'application/json' ;
+		}
+
+		form.append( fieldName , value , { header , filename } ) ;
+	}
+
+	if ( query.headers ) {
+		Object.assign( query.headers , form.getHeaders() ) ;
+	}
+	else {
+		query.headers = form.getHeaders() ;
+	}
+
+	var request = http.request( query ) ;
 
 	form.pipe( request ) ;
 	
+	//request.end() ;
+	//form.on( 'finish' , () => request.end() ) ;
+
 	return request ;
 }
 
@@ -939,7 +962,7 @@ describe( "Basics tests on users" , () => {
 
 describe( "Attachment" , () => {
 
-	it( "PUT a user with an attachment then GET it" , async () => {
+	it( "zzz PUT a user with an attachment then GET it" , async () => {
 		var response , data ;
 		
 		var putQuery = {
@@ -949,12 +972,17 @@ describe( "Attachment" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: {
+			multipartFormData: {
 				firstName: "Joe" ,
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
 				password: "pw" ,
-				publicAccess: { traverse: true , read: true , create: true }
+				publicAccess: { traverse: true , read: true , create: true } ,
+				//*
+				avatar: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 )
+				} )
+				//*/
 			}
 		} ;
 
@@ -982,36 +1010,29 @@ describe( "Attachment" , () => {
 			login: "joe.doe2@gmail.com" ,
 			//groups: {} ,
 			slugId: data.slugId ,	// Cannot be predicted
+			avatar: {
+				contentType: 'application/octet-stream' ,
+				filename: 'bob' ,
+				id: data.avatar.id
+			} ,
 			parent: {
 				collection: 'root' ,
 				id: '/'
 			}
 		} ) ;
-		
-		getQuery.path += "?access=all" ;
-		
+
+
+		getQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb877bd15c89dad7b0130/~avatar' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+
 		response = await requester( getQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		
-		expect( data ).to.equal( {
-			_id: "543bb877bd15c89dad7b0130" ,
-			firstName: "Joe" ,
-			lastName: "Doe2" ,
-			email: "joe.doe2@gmail.com" ,
-			login: "joe.doe2@gmail.com" ,
-			groups: {} ,
-			slugId: data.slugId ,	// Cannot be predicted
-			userAccess: {} ,
-			groupAccess: {} ,
-			publicAccess: { traverse: true , read: true , create: true } ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
-		} ) ;
-		//console.log( "Response:" , response ) ;
+		expect( response.body ).to.be( 'a'.repeat( 40 ) ) ;
 	} ) ;
 } ) ;
 
