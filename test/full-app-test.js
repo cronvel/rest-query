@@ -44,8 +44,11 @@ const log = Logfella.global.use( 'unit-test' ) ;
 const http = require( 'http' ) ;
 const url = require( 'url' ) ;
 const childProcess = require( 'child_process' ) ;
+
 const mongodb = require( 'mongodb' ) ;
 
+const stream = require( 'stream' ) ;
+const FormData = require( 'form-data' ) ;
 
 const Promise = require( 'seventh' ) ;
 const tree = require( 'tree-kit' ) ;
@@ -176,24 +179,27 @@ function killApp() {
 
 function requester( query_ ) {
 	var promise = new Promise() ;
-	
+
 	var query = tree.extend( null , { hostname: 'localhost' , port: appPort } , query_ ) ;
-	
+
 	var parsed = url.parse( query.path ) ;
 	//log.hdebug( "parsed: %J" , parsed ) ;
 	// Search string is more complicated to escape...
+
 	query.path =
 		encodeURI( parsed.pathname )
 		+ ( parsed.search ?
 			'?' + parsed.search.slice( 1 ).replace( /[^&=,[\]+]+/g , match => encodeURIComponent( match ) ) :
 			''
 		) ;
-	
+
 	//log.hdebug( "path before: %s -- after: %s" , query_.path , query.path ) ;
 
-	if ( query.body ) { query.headers['Content-Length'] = Buffer.byteLength( query.body ) ; }
+	var request = Array.isArray( query.body ) ?
+		multipartRequest( query ) :
+		normalRequest( query ) ;
 
-	var request = http.request( query , ( response ) => {
+	request.on( 'response' , response => {
 		var body = '' ;
 
 		//console.log( '[requester] STATUS: ' + response.statusCode ) ;
@@ -221,15 +227,49 @@ function requester( query_ ) {
 		promise.reject( error ) ;
 	} ) ;
 
-	// Write .body... erf... to request body
-	if ( query.body ) {
-		//console.log( "BODY to send:" , query.body ) ;
-		request.write( query.body ) ;
-	}
-	
 	request.end() ;
-	
+
 	return promise ;
+}
+
+
+
+function normalRequest( query ) {
+	if ( query.body ) {
+		if ( typeof query.body === 'object' ) { query.body = JSON.stringify( query.body ) ; }
+		query.headers['Content-Length'] = Buffer.byteLength( query.body ) ;
+	}
+
+	var request = http.request( query ) ;
+
+	// Write the request's body
+	if ( query.body ) {
+		if ( typeof query.body === 'string' ) {
+			request.write( query.body ) ;
+		}
+		else if ( query.body instanceof stream.Readable ) {
+			query.body.pipe( request ) ;
+		}
+	}
+
+	return request ;
+}
+
+
+
+function multipartRequest( query ) {
+	var form = new FormData() ;
+
+	var request = http.request( query ) ;
+
+	query.body.forEach( part => {
+		if ( part.body && typeof part.body === 'object' && ! Array.isArray( part.body ) ) { part.body = JSON.stringify( part.body ) ; }
+		form.append( part.name , part.body ) ;
+	} ) ;
+
+	form.pipe( request ) ;
+	
+	return request ;
 }
 
 
@@ -288,11 +328,11 @@ describe( "Basics tests" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
 				publicAccess: { traverse: true , read: true , create: true }
-			} )
+			}
 		} ;
 
 		var getQuery = {
@@ -355,11 +395,11 @@ describe( "Basics tests" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
 				publicAccess: { traverse: true , read: true , create: true }
-			} )
+			}
 		} ;
 
 		var getQuery = {
@@ -428,13 +468,13 @@ describe( "Basics tests" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
 					publicAccess: {
 					traverse: true , read: true , write: true , delete: true , create: true
 				}
-			} )
+			}
 		} ;
 
 		var patchQuery = {
@@ -444,10 +484,10 @@ describe( "Basics tests" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: "My *NEW* website!" ,
 				description: "... about my wonderful life"
-			} )
+			}
 		} ;
 
 		var getQuery = {
@@ -514,13 +554,13 @@ describe( "Basics tests" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
 				publicAccess: {
 					traverse: true , read: true , write: true , delete: true , create: true
 				}
-			} )
+			}
 		} ;
 
 		var deleteQuery = {
@@ -564,10 +604,10 @@ describe( "Basics tests" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: "First post!" ,
 				description: "Everything started with that."
-			} )
+			}
 		} ;
 
 		var putQuery2 = {
@@ -577,10 +617,10 @@ describe( "Basics tests" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: "About" ,
 				description: "About this blog."
-			} )
+			}
 		} ;
 
 		var putQuery3 = {
@@ -590,10 +630,10 @@ describe( "Basics tests" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: "10 things about nothing" ,
 				description: "10 things you should know... or not..."
-			} )
+			}
 		} ;
 
 		var getQuery = {
@@ -670,11 +710,11 @@ describe( "Test slugs" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: "My wonderful website!" ,
 				description: "... about my wonderful life" ,
 				publicAccess: { traverse: true , read: true , create: true }
-			} )
+			}
 		} ;
 
 		var getQuery = {
@@ -716,11 +756,11 @@ describe( "Test slugs" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				title: 'عِنْدَمَا ذَهَبْتُ إِلَى ٱلْمَكْتَبَةِ' ,
 				description: 'كنت أريد أن أقرأ كتابا عن تاريخ المرأة في فرنسا' ,
 				publicAccess: { traverse: true , read: true , create: true }
-			} )
+			}
 		} ;
 
 		var getQuery = {
@@ -782,13 +822,13 @@ describe( "Basics tests on users" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				firstName: "Joe" ,
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
 				password: "pw" ,
 				publicAccess: { traverse: true , read: true , create: true }
-			} )
+			}
 		} ;
 
 		var getQuery = {
@@ -857,7 +897,7 @@ describe( "Basics tests on users" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				firstName: "John" ,
 				lastName: "Doe" ,
 				email: "john.doe@gmail.com" ,
@@ -865,7 +905,7 @@ describe( "Basics tests on users" , () => {
 				publicAccess: {
 					traverse: true , read: true , write: true , delete: true , create: true
 				}
-			} )
+			}
 		} ;
 
 		var deleteQuery = {
@@ -897,6 +937,86 @@ describe( "Basics tests on users" , () => {
 
 
 
+describe( "Attachment" , () => {
+
+	it( "PUT a user with an attachment then GET it" , async () => {
+		var response , data ;
+		
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb877bd15c89dad7b0130' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: {
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				password: "pw" ,
+				publicAccess: { traverse: true , read: true , create: true }
+			}
+		} ;
+
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb877bd15c89dad7b0130' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+
+		response = await requester( putQuery ) ;
+		expect( response.status ).to.be( 201 ) ;
+		//console.log( "Response:" , response ) ;
+
+		response = await requester( getQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be.ok() ;
+		data = JSON.parse( response.body ) ;
+		expect( data ).to.equal( {
+			_id: "543bb877bd15c89dad7b0130" ,
+			firstName: "Joe" ,
+			lastName: "Doe2" ,
+			email: "joe.doe2@gmail.com" ,
+			login: "joe.doe2@gmail.com" ,
+			//groups: {} ,
+			slugId: data.slugId ,	// Cannot be predicted
+			parent: {
+				collection: 'root' ,
+				id: '/'
+			}
+		} ) ;
+		
+		getQuery.path += "?access=all" ;
+		
+		response = await requester( getQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be.ok() ;
+		data = JSON.parse( response.body ) ;
+		
+		expect( data ).to.equal( {
+			_id: "543bb877bd15c89dad7b0130" ,
+			firstName: "Joe" ,
+			lastName: "Doe2" ,
+			email: "joe.doe2@gmail.com" ,
+			login: "joe.doe2@gmail.com" ,
+			groups: {} ,
+			slugId: data.slugId ,	// Cannot be predicted
+			userAccess: {} ,
+			groupAccess: {} ,
+			publicAccess: { traverse: true , read: true , create: true } ,
+			parent: {
+				collection: 'root' ,
+				id: '/'
+			}
+		} ) ;
+		//console.log( "Response:" , response ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "Links population" , () => {
 
 	it( "GET on document and collection + populate links" , async () => {
@@ -909,13 +1029,13 @@ describe( "Links population" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				firstName: "Big Joe" ,
 				lastName: "Doe" ,
 				email: "big.joe.doe@gmail.com" ,
 				password: "pw" ,
 				publicAccess: { traverse: true , read: true , create: true }
-			} )
+			}
 		} ;
 
 		var postQuery2 = {
@@ -925,13 +1045,13 @@ describe( "Links population" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				firstName: "THE" ,
 				lastName: "GODFATHER" ,
 				email: "godfather@gmail.com" ,
 				password: "pw" ,
 				publicAccess: { traverse: true , read: true , create: true }
-			} )
+			}
 		} ;
 
 		var postQuery3 , getQuery ;
@@ -951,7 +1071,7 @@ describe( "Links population" , () => {
 				Host: 'localhost' ,
 				"Content-Type": 'application/json'
 			} ,
-			body: JSON.stringify( {
+			body: {
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -959,7 +1079,7 @@ describe( "Links population" , () => {
 				father: u1 ,
 				godfather: u2 ,
 				publicAccess: { traverse: true , read: true , create: true }
-			} )
+			}
 		} ;
 
 		response = await requester( postQuery3 ) ;
