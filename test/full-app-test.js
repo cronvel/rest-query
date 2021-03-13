@@ -133,7 +133,7 @@ function runApp() {
 			'server' ,
 			'--config' , __dirname + '/../sample/main.kfg' ,
 			'--port' , appPort ,
-			'--log.minLevel' , 'debug' ,
+			//'--log.minLevel' , 'debug' ,
 			'--buildIndexes'
 		] ,
 		{ stdio: 'pipe' }
@@ -141,11 +141,11 @@ function runApp() {
 
 	// Exists with .spawn() but not with .fork() unless stdio: 'pipe' is used
 	appProcess.stdout.on( 'data' , data => {
-		log.debug( "[appProcess STDOUT] %s" , data.toString() ) ;
+		//log.debug( "[appProcess STDOUT] %s" , data.toString() ) ;
 	} ) ;
 
 	appProcess.stderr.on( 'data' , data => {
-		log.error( "[appProcess STDERR] %s" , data.toString() ) ;
+		//log.error( "[appProcess STDERR] %s" , data.toString() ) ;
 	} ) ;
 
 	// We wait for the child to send a ready event, indicating that the child is ready to receive HTTP requests
@@ -196,8 +196,9 @@ function requester( query_ ) {
 
 	//log.hdebug( "path before: %s -- after: %s" , query_.path , query.path ) ;
 
-	var request = query.multipartFormData ?
-		multipartRequest( query ) :
+	var request =
+		query.multipartFormData ? multipartRequest( query ) :
+		query.body instanceof stream.Readable ? streamRequest( query ) :
 		normalRequest( query ) ;
 
 	request.on( 'response' , response => {
@@ -235,23 +236,30 @@ function requester( query_ ) {
 
 function normalRequest( query ) {
 	if ( query.body ) {
-		if ( typeof query.body === 'object' ) { query.body = JSON.stringify( query.body ) ; }
-		query.headers['Content-Length'] = Buffer.byteLength( query.body ) ;
+		if ( typeof query.body !== 'string' ) { query.body = JSON.stringify( query.body ) ; }
+		query.headers['content-length'] = Buffer.byteLength( query.body ) ;
 	}
 
 	var request = http.request( query ) ;
 
 	// Write the request's body
-	if ( query.body ) {
-		if ( typeof query.body === 'string' ) {
-			request.write( query.body ) ;
-		}
-		else if ( query.body instanceof stream.Readable ) {
-			query.body.pipe( request ) ;
-		}
-	}
+	if ( query.body ) { request.write( query.body ) ; }
 
 	request.end() ;
+
+	return request ;
+}
+
+
+
+function streamRequest( query ) {
+	query.headers['content-type'] = query.body?.meta?.contentType ?? 'application/octet-stream' ;
+	query.headers['content-disposition'] = 'inline; filename="' + query.body?.meta?.filename + '"' ;
+	
+	var request = http.request( query ) ;
+
+	// Write the request's body
+	query.body.pipe( request ) ;
 
 	return request ;
 }
@@ -267,8 +275,8 @@ function multipartRequest( query ) {
 			filename ;
 
 		if ( value instanceof stream.Readable ) {
-			// /!\ CHANGE THAT WITH THE CORRECT FILENAME!!! /!\
-			filename = 'bob' ;
+			filename = value?.meta?.filename ?? 'file' ;
+			if ( value?.meta?.contentType ) { header['content-type'] = value.meta.contentType ; }
 		}
 		else if ( typeof value !== 'string' ) {
 			value = JSON.stringify( value ) ;
@@ -962,7 +970,7 @@ describe( "Basics tests on users" , () => {
 
 describe( "Attachment" , () => {
 
-	it( "zzz PUT a user with an attachment then GET it" , async () => {
+	it( "PUT a document with an attachment (multipart/form-data) then GET it" , async () => {
 		var response , data ;
 		
 		var putQuery = {
@@ -978,13 +986,15 @@ describe( "Attachment" , () => {
 				email: "joe.doe2@gmail.com" ,
 				password: "pw" ,
 				publicAccess: { traverse: true , read: true , create: true } ,
-				//*
 				avatar: new streamKit.FakeReadable( {
-					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 )
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 ) , meta: { filename: 'test.txt' }
 				} )
-				//*/
 			}
 		} ;
+
+		response = await requester( putQuery ) ;
+		expect( response.status ).to.be( 201 ) ;
+		//console.log( "Response:" , response ) ;
 
 		var getQuery = {
 			method: 'GET' ,
@@ -993,10 +1003,6 @@ describe( "Attachment" , () => {
 				Host: 'localhost'
 			}
 		} ;
-
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
 
 		response = await requester( getQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
@@ -1011,9 +1017,9 @@ describe( "Attachment" , () => {
 			//groups: {} ,
 			slugId: data.slugId ,	// Cannot be predicted
 			avatar: {
-				contentType: 'application/octet-stream' ,
-				filename: 'bob' ,
-				id: data.avatar.id
+				contentType: 'text/plain' ,
+				filename: 'test.txt' ,
+				id: data.avatar.id	// Cannot be predicted
 			} ,
 			parent: {
 				collection: 'root' ,
@@ -1021,8 +1027,7 @@ describe( "Attachment" , () => {
 			}
 		} ) ;
 
-
-		getQuery = {
+		var getAttachmentQuery = {
 			method: 'GET' ,
 			path: '/Users/543bb877bd15c89dad7b0130/~avatar' ,
 			headers: {
@@ -1030,9 +1035,92 @@ describe( "Attachment" , () => {
 			}
 		} ;
 
-		response = await requester( getQuery ) ;
+		response = await requester( getAttachmentQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
 		expect( response.body ).to.be( 'a'.repeat( 40 ) ) ;
+	} ) ;
+
+	it( "PUT an attachment on an existing document then GET it" , async () => {
+		var response , data ;
+		
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb8d7bd15a89dad7b0130' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: {
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				password: "pw" ,
+				publicAccess: { traverse: true , read: true , create: true }
+			}
+		} ;
+
+		response = await requester( putQuery ) ;
+		expect( response.status ).to.be( 201 ) ;
+		//console.log( "Response:" , response ) ;
+
+		var putAttachmentQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+			headers: {
+				Host: 'localhost' ,
+				"Content-Type": 'application/json'
+			} ,
+			body: new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
+			} )
+		} ;
+
+		response = await requester( putAttachmentQuery ) ;
+		expect( response.status ).to.be( 204 ) ;
+		//console.log( "Response:" , response ) ;
+
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb8d7bd15a89dad7b0130' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+
+		response = await requester( getQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be.ok() ;
+		data = JSON.parse( response.body ) ;
+		expect( data ).to.equal( {
+			_id: "543bb8d7bd15a89dad7b0130" ,
+			firstName: "Joe" ,
+			lastName: "Doe2" ,
+			email: "joe.doe2@gmail.com" ,
+			login: "joe.doe2@gmail.com" ,
+			//groups: {} ,
+			slugId: data.slugId ,	// Cannot be predicted
+			avatar: {
+				contentType: 'text/plain' ,
+				filename: 'test2.txt' ,
+				id: data.avatar.id	// Cannot be predicted
+			} ,
+			parent: {
+				collection: 'root' ,
+				id: '/'
+			}
+		} ) ;
+
+		var getAttachmentQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+
+		response = await requester( getAttachmentQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
 } ) ;
 

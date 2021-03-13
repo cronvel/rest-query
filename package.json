@@ -2,7 +2,7 @@
   "name": "rest-query",
   "version": "0.62.9",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.15.0"
   },
   "description": "The Awesome REST Framework!",
   "main": "lib/restQuery.js",
@@ -35,7 +35,7 @@
     "fs-kit": "^0.6.1",
     "minimist": "^1.2.5",
     "mongodb": "3.6.4",
-    "stream-kit": "^0.4.5"
+    "stream-kit": "^0.4.6"
   },
   "scripts": {
     "test": "tea-time -R dot"
