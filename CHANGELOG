@@ -1,4 +1,12 @@
 
+v0.63.0
+-------
+
+BREAKING: require Node v14.15 engine
+BREAKING: attachment refacto (rootsDB), now it requires a protocol in the attachment URL (e.g.: file:// or s3://)
+attachment bug fixed and full app unit test
+
+
 v0.62.9
 -------
 
