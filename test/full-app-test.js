@@ -47,6 +47,7 @@ const childProcess = require( 'child_process' ) ;
 
 const mongodb = require( 'mongodb' ) ;
 
+const crypto = require( 'crypto' ) ;
 const stream = require( 'stream' ) ;
 const streamKit = require( 'stream-kit' ) ;
 const FormData = require( 'form-data' ) ;
@@ -971,8 +972,9 @@ describe( "Basics tests on users" , () => {
 describe( "Attachment" , () => {
 
 	it( "PUT a document with an attachment (multipart/form-data) then GET it" , async () => {
-		var response , data ;
-		
+		var response , data ,
+			contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'hex' ) ;
+
 		var putQuery = {
 			method: 'PUT' ,
 			path: '/Users/543bb877bd15c89dad7b0130' ,
@@ -1019,6 +1021,8 @@ describe( "Attachment" , () => {
 			avatar: {
 				contentType: 'text/plain' ,
 				filename: 'test.txt' ,
+				hashType: 'sha256' ,
+				hash: contentHash ,
 				id: data.avatar.id	// Cannot be predicted
 			} ,
 			parent: {
@@ -1041,7 +1045,8 @@ describe( "Attachment" , () => {
 	} ) ;
 
 	it( "PUT an attachment on an existing document then GET it" , async () => {
-		var response , data ;
+		var response , data ,
+			contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'hex' ) ;
 		
 		var putQuery = {
 			method: 'PUT' ,
@@ -1102,6 +1107,8 @@ describe( "Attachment" , () => {
 			avatar: {
 				contentType: 'text/plain' ,
 				filename: 'test2.txt' ,
+				hashType: 'sha256' ,
+				hash: contentHash ,
 				id: data.avatar.id	// Cannot be predicted
 			} ,
 			parent: {
@@ -1122,6 +1129,10 @@ describe( "Attachment" , () => {
 		expect( response.status ).to.be( 200 ) ;
 		expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
+
+	it( "TODO: How to retrieve checksum/hash in a GET attachment query?" ) ;
+	it( "PUT a document with an attachment (multipart/form-data) with checksum/hash part header" ) ;
+	it( "PUT an attachment with checksum/hash header" ) ;
 } ) ;
 
 

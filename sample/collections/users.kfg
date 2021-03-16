@@ -1,6 +1,7 @@
 role: user
 path: /users
 attachmentPath: /users
+attachmentHashType: sha256
 properties:
 	firstName:
 		type: string

@@ -52,7 +52,9 @@ const mongodb = require( 'mongodb' ) ;
 const doormen = require( 'doormen' ) ;
 
 const fsKit = require( 'fs-kit' ) ;
+
 const hash = require( 'hash-kit' ) ;
+const crypto = require( 'crypto' ) ;
 
 const stream = require( 'stream' ) ;
 const streamKit = require( 'stream-kit' ) ;
@@ -2822,6 +2824,8 @@ describe( "Attachment links" , () => {
 		// We need to create an AttachmentStreams manually
 		var attachmentStreams = new rootsDb.AttachmentStreams() ;
 
+		var contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'hex' ) ;
+
 		attachmentStreams.addStream(
 			new streamKit.FakeReadable( {
 				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 )
@@ -2855,6 +2859,8 @@ describe( "Attachment links" , () => {
 			avatar: {
 				contentType: "bin/random" ,
 				filename: "random.bin" ,
+				hashType: 'sha256' ,
+				hash: contentHash ,
 				id: response.output.data.avatar.id	// unpredictable
 			}
 		} ) ;
@@ -2863,6 +2869,8 @@ describe( "Attachment links" , () => {
 		expect( response.output.data ).to.equal( {
 			contentType: "bin/random" ,
 			filename: "random.bin" ,
+			hashType: 'sha256' ,
+			hash: contentHash ,
 			id: response.output.data.id	// unpredictable
 		} ) ;
 
@@ -2894,6 +2902,8 @@ describe( "Attachment links" , () => {
 		// We need to create an AttachmentStreams manually
 		var attachmentStreams = new rootsDb.AttachmentStreams() ;
 
+		var contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'hex' ) ;
+
 		attachmentStreams.addStream(
 			new streamKit.FakeReadable( {
 				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 )
@@ -2915,6 +2925,88 @@ describe( "Attachment links" , () => {
 		expect( response.output.data ).to.equal( {
 			contentType: "bin/random" ,
 			filename: "random.bin" ,
+			hashType: 'sha256' ,
+			hash: contentHash ,
+			id: response.output.data.id	// unpredictable
+		} ) ;
+
+		response = await app.get( '/Users/' + userId + '/~avatar' , { performer: performer } ) ;
+		expect( response.output.data ).to.be.a( stream.Readable ) ;
+
+		var content = await streamKit.getFullString( response.output.data ) ;
+		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
+	} ) ;
+
+	it( "PUT an attachment on an existing document, expecting a given checksum/hash" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , userId ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		var contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'hex' ) ,
+			badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
+
+
+		// First, with a bad checksum
+
+		var badAttachmentStreams = new rootsDb.AttachmentStreams() ;
+
+		badAttachmentStreams.addStream(
+			new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 )
+			} ) ,
+			//'avatar' ,	// the documentPath is optional because we put on the attachment link
+			null ,
+			{ filename: 'random.bin' , contentType: 'bin/random' , hash: badContentHash }
+		) ;
+
+		badAttachmentStreams.end() ;
+
+		await expect( () => app.put( '/Users/' + userId + '/~avatar' , null , badAttachmentStreams , { performer: performer } ) )
+			.to.eventually.throw( Error , { code: 'badHash' } ) ;
+
+		
+		// Start over with the correct checksum
+		
+		var attachmentStreams = new rootsDb.AttachmentStreams() ;
+
+		attachmentStreams.addStream(
+			new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 )
+			} ) ,
+			//'avatar' ,	// the documentPath is optional because we put on the attachment link
+			null ,
+			{ filename: 'random.bin' , contentType: 'bin/random' , hash: contentHash }
+		) ;
+
+		attachmentStreams.end() ;
+
+		response = await app.put( '/Users/' + userId + '/~avatar' ,
+			null ,
+			attachmentStreams ,
+			{ performer: performer }
+		) ;
+
+		
+		
+		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( {
+			contentType: "bin/random" ,
+			filename: "random.bin" ,
+			hashType: 'sha256' ,
+			hash: contentHash ,
 			id: response.output.data.id	// unpredictable
 		} ) ;
 
