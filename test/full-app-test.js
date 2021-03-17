@@ -278,6 +278,7 @@ function multipartRequest( query ) {
 		if ( value instanceof stream.Readable ) {
 			filename = value?.meta?.filename ?? 'file' ;
 			if ( value?.meta?.contentType ) { header['content-type'] = value.meta.contentType ; }
+			if ( value?.meta?.hashType && value?.meta?.hash ) { header['digest'] = restQuery.HttpModule.stringifyDigest( value.meta.hashType , value.meta.hash ) ; }
 		}
 		else if ( typeof value !== 'string' ) {
 			value = JSON.stringify( value ) ;
@@ -358,7 +359,7 @@ describe( "Basics tests" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0120' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: "My website!" ,
@@ -425,7 +426,7 @@ describe( "Basics tests" , () => {
 			path: '/Blogs' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: "My website!" ,
@@ -498,7 +499,7 @@ describe( "Basics tests" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0121' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: "My website!" ,
@@ -514,7 +515,7 @@ describe( "Basics tests" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0121' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: "My *NEW* website!" ,
@@ -584,7 +585,7 @@ describe( "Basics tests" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0122' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: "My website!" ,
@@ -600,7 +601,7 @@ describe( "Basics tests" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0122' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			}
 		} ;
 
@@ -634,7 +635,7 @@ describe( "Basics tests" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0121' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: "First post!" ,
@@ -647,7 +648,7 @@ describe( "Basics tests" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0122' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: "About" ,
@@ -660,7 +661,7 @@ describe( "Basics tests" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0123' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: "10 things about nothing" ,
@@ -740,7 +741,7 @@ describe( "Test slugs" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0aaa' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: "My wonderful website!" ,
@@ -786,7 +787,7 @@ describe( "Test slugs" , () => {
 			path: '/Blogs/543bb877bd15489d0d7b0bbb' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				title: 'عِنْدَمَا ذَهَبْتُ إِلَى ٱلْمَكْتَبَةِ' ,
@@ -852,7 +853,7 @@ describe( "Basics tests on users" , () => {
 			path: '/Users/543bb877bd15489d0d7b0130' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				firstName: "Joe" ,
@@ -927,7 +928,7 @@ describe( "Basics tests on users" , () => {
 			path: '/Users/543bb877bd15489d0d7b0132' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				firstName: "John" ,
@@ -945,7 +946,7 @@ describe( "Basics tests on users" , () => {
 			path: '/Users/543bb877bd15489d0d7b0132' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			}
 		} ;
 
@@ -973,14 +974,14 @@ describe( "Attachment" , () => {
 
 	it( "PUT a document with an attachment (multipart/form-data) then GET it" , async () => {
 		var response , data ,
-			contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'hex' ) ;
+			contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ;
 
 		var putQuery = {
 			method: 'PUT' ,
 			path: '/Users/543bb877bd15c89dad7b0130' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			multipartFormData: {
 				firstName: "Joe" ,
@@ -1042,18 +1043,21 @@ describe( "Attachment" , () => {
 		response = await requester( getAttachmentQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
 		expect( response.body ).to.be( 'a'.repeat( 40 ) ) ;
+
+		// Should retrieve the correct hash
+		expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
 	} ) ;
 
 	it( "PUT an attachment on an existing document then GET it" , async () => {
 		var response , data ,
-			contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'hex' ) ;
+			contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ;
 		
 		var putQuery = {
 			method: 'PUT' ,
 			path: '/Users/543bb8d7bd15a89dad7b0130' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				firstName: "Joe" ,
@@ -1073,7 +1077,7 @@ describe( "Attachment" , () => {
 			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: new streamKit.FakeReadable( {
 				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
@@ -1128,11 +1132,232 @@ describe( "Attachment" , () => {
 		response = await requester( getAttachmentQuery ) ;
 		expect( response.status ).to.be( 200 ) ;
 		expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
+
+		// Should retrieve the correct hash
+		expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
 	} ) ;
 
-	it( "TODO: How to retrieve checksum/hash in a GET attachment query?" ) ;
-	it( "PUT a document with an attachment (multipart/form-data) with checksum/hash part header" ) ;
-	it( "PUT an attachment with checksum/hash header" ) ;
+	it( "PUT a document with an attachment (multipart/form-data) with checksum/hash part header" , async () => {
+		var response , data ,
+			contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ,
+			badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
+
+
+		// First, with a bad hash
+
+		var putBadQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb877bd15c89dad7b0130' ,
+			headers: {
+				Host: 'localhost' ,
+				"content-type": 'application/json'
+			} ,
+			multipartFormData: {
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				password: "pw" ,
+				publicAccess: { traverse: true , read: true , create: true } ,
+				avatar: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 ) , meta: { filename: 'test.txt' , hashType: 'sha256' , hash: badContentHash }
+				} )
+			}
+		} ;
+
+		response = await requester( putBadQuery ) ;
+		expect( response.status ).to.be( 400 ) ;
+
+
+		// Then, with the correct hash
+
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb877bd15c89dad7b0130' ,
+			headers: {
+				Host: 'localhost' ,
+				"content-type": 'application/json'
+			} ,
+			multipartFormData: {
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				password: "pw" ,
+				publicAccess: { traverse: true , read: true , create: true } ,
+				avatar: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 ) , meta: { filename: 'test.txt' , hashType: 'sha256' , hash: contentHash }
+				} )
+			}
+		} ;
+
+		response = await requester( putQuery ) ;
+		expect( response.status ).to.be( 201 ) ;
+		//console.log( "Response:" , response ) ;
+
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb877bd15c89dad7b0130' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+
+		response = await requester( getQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be.ok() ;
+		data = JSON.parse( response.body ) ;
+		expect( data ).to.equal( {
+			_id: "543bb877bd15c89dad7b0130" ,
+			firstName: "Joe" ,
+			lastName: "Doe2" ,
+			email: "joe.doe2@gmail.com" ,
+			login: "joe.doe2@gmail.com" ,
+			//groups: {} ,
+			slugId: data.slugId ,	// Cannot be predicted
+			avatar: {
+				contentType: 'text/plain' ,
+				filename: 'test.txt' ,
+				hashType: 'sha256' ,
+				hash: contentHash ,
+				id: data.avatar.id	// Cannot be predicted
+			} ,
+			parent: {
+				collection: 'root' ,
+				id: '/'
+			}
+		} ) ;
+
+		var getAttachmentQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb877bd15c89dad7b0130/~avatar' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+
+		response = await requester( getAttachmentQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be( 'a'.repeat( 40 ) ) ;
+
+		// Should retrieve the correct hash
+		expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
+	} ) ;
+
+	it( "PUT an attachment with checksum/hash header" , async () => {
+		var response , data ,
+			contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ,
+			badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
+
+		var putQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb8d7bd15a89dad7b0130' ,
+			headers: {
+				Host: "localhost" ,
+				"content-type": "application/json"
+			} ,
+			body: {
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				password: "pw" ,
+				publicAccess: { traverse: true , read: true , create: true }
+			}
+		} ;
+
+		response = await requester( putQuery ) ;
+		expect( response.status ).to.be( 201 ) ;
+		//console.log( "Response:" , response ) ;
+
+
+		// First, with a bad checksum
+
+		var putBadAttachmentQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+			headers: {
+				Host: 'localhost' ,
+				"content-type": 'application/json' ,
+				"digest": "sha-256=" + badContentHash
+			} ,
+			body: new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
+			} )
+		} ;
+
+		response = await requester( putBadAttachmentQuery ) ;
+		//console.error( response ) ;
+		expect( response.status ).to.be( 400 ) ;
+
+
+		// Then, with the correct checksum
+
+		var putAttachmentQuery = {
+			method: 'PUT' ,
+			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+			headers: {
+				Host: 'localhost' ,
+				"content-type": 'application/json' ,
+				"digest": "sha-256=" + contentHash
+			} ,
+			body: new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
+			} )
+		} ;
+
+		response = await requester( putAttachmentQuery ) ;
+		//console.error( response ) ;
+		expect( response.status ).to.be( 204 ) ;
+
+
+
+		//console.log( "Response:" , response ) ;
+
+		var getQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb8d7bd15a89dad7b0130' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+
+		response = await requester( getQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be.ok() ;
+		data = JSON.parse( response.body ) ;
+		expect( data ).to.equal( {
+			_id: "543bb8d7bd15a89dad7b0130" ,
+			firstName: "Joe" ,
+			lastName: "Doe2" ,
+			email: "joe.doe2@gmail.com" ,
+			login: "joe.doe2@gmail.com" ,
+			//groups: {} ,
+			slugId: data.slugId ,	// Cannot be predicted
+			avatar: {
+				contentType: 'text/plain' ,
+				filename: 'test2.txt' ,
+				hashType: 'sha256' ,
+				hash: contentHash ,
+				id: data.avatar.id	// Cannot be predicted
+			} ,
+			parent: {
+				collection: 'root' ,
+				id: '/'
+			}
+		} ) ;
+
+		var getAttachmentQuery = {
+			method: 'GET' ,
+			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+			headers: {
+				Host: 'localhost'
+			}
+		} ;
+
+		response = await requester( getAttachmentQuery ) ;
+		expect( response.status ).to.be( 200 ) ;
+		expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
+	} ) ;
+
+	it( "TODO: attachment with checksum/hash in the TRAILER" ) ;
 } ) ;
 
 
@@ -1147,7 +1372,7 @@ describe( "Links population" , () => {
 			path: '/Users' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				firstName: "Big Joe" ,
@@ -1163,7 +1388,7 @@ describe( "Links population" , () => {
 			path: '/Users' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				firstName: "THE" ,
@@ -1189,7 +1414,7 @@ describe( "Links population" , () => {
 			path: '/Users' ,
 			headers: {
 				Host: 'localhost' ,
-				"Content-Type": 'application/json'
+				"content-type": 'application/json'
 			} ,
 			body: {
 				firstName: "Joe" ,

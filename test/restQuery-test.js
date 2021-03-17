@@ -2824,7 +2824,7 @@ describe( "Attachment links" , () => {
 		// We need to create an AttachmentStreams manually
 		var attachmentStreams = new rootsDb.AttachmentStreams() ;
 
-		var contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'hex' ) ;
+		var contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ;
 
 		attachmentStreams.addStream(
 			new streamKit.FakeReadable( {
@@ -2902,7 +2902,7 @@ describe( "Attachment links" , () => {
 		// We need to create an AttachmentStreams manually
 		var attachmentStreams = new rootsDb.AttachmentStreams() ;
 
-		var contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'hex' ) ;
+		var contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ;
 
 		attachmentStreams.addStream(
 			new streamKit.FakeReadable( {
@@ -2955,7 +2955,7 @@ describe( "Attachment links" , () => {
 		) ;
 		userId = response.output.data.id ;
 
-		var contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'hex' ) ,
+		var contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ,
 			badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
 
 
@@ -2975,7 +2975,7 @@ describe( "Attachment links" , () => {
 		badAttachmentStreams.end() ;
 
 		await expect( () => app.put( '/Users/' + userId + '/~avatar' , null , badAttachmentStreams , { performer: performer } ) )
-			.to.eventually.throw( Error , { code: 'badHash' } ) ;
+			.to.eventually.throw( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
 
 		
 		// Start over with the correct checksum

@@ -1,4 +1,10 @@
 
+v0.63.1
+-------
+
+Attachment now supports checksum/hash, HTTP module can check if the expected checksum is correct, using the standard 'Digest' HTTP header (for both the request and the response)
+
+
 v0.63.0
 -------
 
