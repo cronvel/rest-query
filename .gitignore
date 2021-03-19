@@ -15,6 +15,7 @@ build
 _build
 _templates
 _static
+extensions
 
 
 # gitignore / Node.gitignore #
