@@ -51,6 +51,7 @@ const mongodb = require( 'mongodb' ) ;
 
 const doormen = require( 'doormen' ) ;
 
+const path = require( 'path' ) ;
 const fsKit = require( 'fs-kit' ) ;
 
 const hash = require( 'hash-kit' ) ;
@@ -58,6 +59,11 @@ const crypto = require( 'crypto' ) ;
 
 const stream = require( 'stream' ) ;
 const streamKit = require( 'stream-kit' ) ;
+
+
+
+// Init restQuery extensions
+restQuery.initExtensions( path.join( path.dirname( __dirname ) , 'sample' ) ) ;
 
 
 
