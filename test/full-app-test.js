@@ -98,7 +98,7 @@ function debug() {
 // clear DB: remove every item, so we can safely test
 function clearDB() {
 	return Promise.all( [
-		clearCollection( 'root' ) ,
+		//clearCollection( 'root' ) ,	// Don't clear this collection here, this causes troubles with the cache
 		clearCollection( 'blogs' ) ,
 		clearCollection( 'posts' ) ,
 		clearCollection( 'comments' ) ,
@@ -972,7 +972,9 @@ describe( "Basics tests on users" , () => {
 
 describe( "Attachment" , () => {
 
-	it( "PUT a document with an attachment (multipart/form-data) then GET it" , async () => {
+	it( "PUT a document with an attachment (multipart/form-data) then GET it" , async function() {
+		this.timeout( 4000 ) ;
+
 		var response , data ,
 			contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ;
 
@@ -1048,7 +1050,9 @@ describe( "Attachment" , () => {
 		expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
 	} ) ;
 
-	it( "PUT an attachment on an existing document then GET it" , async () => {
+	it( "PUT an attachment on an existing document then GET it" , async function() {
+		this.timeout( 4000 ) ;
+
 		var response , data ,
 			contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ;
 		
@@ -1137,7 +1141,9 @@ describe( "Attachment" , () => {
 		expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
 	} ) ;
 
-	it( "PUT a document with an attachment (multipart/form-data) with checksum/hash part header" , async () => {
+	it( "PUT a document with an attachment (multipart/form-data) with checksum/hash part header" , async function() {
+		this.timeout( 4000 ) ;
+
 		var response , data ,
 			contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ,
 			badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
@@ -1242,7 +1248,9 @@ describe( "Attachment" , () => {
 		expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
 	} ) ;
 
-	it( "PUT an attachment with checksum/hash header" , async () => {
+	it( "PUT an attachment with checksum/hash header" , async function() {
+		this.timeout( 4000 ) ;
+
 		var response , data ,
 			contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ,
 			badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
@@ -1356,8 +1364,6 @@ describe( "Attachment" , () => {
 		expect( response.status ).to.be( 200 ) ;
 		expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
-
-	it( "TODO: attachment with checksum/hash in the TRAILER" ) ;
 } ) ;
 
 

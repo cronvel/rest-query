@@ -2822,7 +2822,9 @@ describe( "Multi-links" , () => {
 
 describe( "Attachment links" , () => {
 
-	it( "POST a document with attachmentStreams and GET it" , async () => {
+	it( "POST a document with attachmentStreams and GET it" , async function() {
+		this.timeout( 4000 ) ;
+
 		var { app , performer } = await commonApp() ;
 
 		var response , userId ;
@@ -2887,7 +2889,9 @@ describe( "Attachment links" , () => {
 		expect( content ).to.be( 'a'.repeat( 40 ) ) ;
 	} ) ;
 
-	it( "PUT an attachment on an existing document" , async () => {
+	it( "PUT an attachment on an existing document" , async function() {
+		this.timeout( 4000 ) ;
+
 		var { app , performer } = await commonApp() ;
 
 		var response , userId ;
@@ -2943,7 +2947,9 @@ describe( "Attachment links" , () => {
 		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
 
-	it( "PUT an attachment on an existing document, expecting a given checksum/hash" , async () => {
+	it( "PUT an attachment on an existing document, expecting a given checksum/hash" , async function() {
+		this.timeout( 4000 ) ;
+
 		var { app , performer } = await commonApp() ;
 
 		var response , userId ;
