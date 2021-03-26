@@ -21,6 +21,8 @@ tree:
 
 defaultDomain: mongodb://localhost:27017/restQuery
 defaultAttachmentDomain: file:///tmp/restQuery
+defaultAttachmentPublicDomain: cdn.example.com/app
+
 passwords:
 	algo: sha512
 	salt: 3113 n3 v3u+ p45 13 d123

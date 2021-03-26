@@ -1,4 +1,10 @@
 
+v0.63.3
+-------
+
+Roots DB dependency: now Attachment are supporting custom content metadata, fileSize. But publicUrl has some issue and Roots DB should improve that part.
+
+
 v0.63.2
 -------
 

@@ -1026,6 +1026,8 @@ describe( "Attachment" , () => {
 				filename: 'test.txt' ,
 				hashType: 'sha256' ,
 				hash: contentHash ,
+				fileSize: 40 ,
+				metadata: {} ,
 				id: data.avatar.id	// Cannot be predicted
 			} ,
 			parent: {
@@ -1117,6 +1119,8 @@ describe( "Attachment" , () => {
 				filename: 'test2.txt' ,
 				hashType: 'sha256' ,
 				hash: contentHash ,
+				fileSize: 40 ,
+				metadata: {} ,
 				id: data.avatar.id	// Cannot be predicted
 			} ,
 			parent: {
@@ -1224,6 +1228,8 @@ describe( "Attachment" , () => {
 				filename: 'test.txt' ,
 				hashType: 'sha256' ,
 				hash: contentHash ,
+				fileSize: 40 ,
+				metadata: {} ,
 				id: data.avatar.id	// Cannot be predicted
 			} ,
 			parent: {
@@ -1344,6 +1350,8 @@ describe( "Attachment" , () => {
 				filename: 'test2.txt' ,
 				hashType: 'sha256' ,
 				hash: contentHash ,
+				fileSize: 40 ,
+				metadata: {} ,
 				id: data.avatar.id	// Cannot be predicted
 			} ,
 			parent: {

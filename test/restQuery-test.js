@@ -2869,6 +2869,8 @@ describe( "Attachment links" , () => {
 				filename: "random.bin" ,
 				hashType: 'sha256' ,
 				hash: contentHash ,
+				fileSize: 40 ,
+				metadata: {} ,
 				id: response.output.data.avatar.id	// unpredictable
 			}
 		} ) ;
@@ -2879,6 +2881,8 @@ describe( "Attachment links" , () => {
 			filename: "random.bin" ,
 			hashType: 'sha256' ,
 			hash: contentHash ,
+			fileSize: 40 ,
+			metadata: {} ,
 			id: response.output.data.id	// unpredictable
 		} ) ;
 
@@ -2937,6 +2941,8 @@ describe( "Attachment links" , () => {
 			filename: "random.bin" ,
 			hashType: 'sha256' ,
 			hash: contentHash ,
+			fileSize: 40 ,
+			metadata: {} ,
 			id: response.output.data.id	// unpredictable
 		} ) ;
 
@@ -2947,7 +2953,7 @@ describe( "Attachment links" , () => {
 		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
 
-	it( "PUT an attachment on an existing document, expecting a given checksum/hash" , async function() {
+	it( "PUT an attachment on an existing document, expecting a given checksum/hash + fileSize" , async function() {
 		this.timeout( 4000 ) ;
 
 		var { app , performer } = await commonApp() ;
@@ -2981,12 +2987,31 @@ describe( "Attachment links" , () => {
 			} ) ,
 			//'avatar' ,	// the documentPath is optional because we put on the attachment link
 			null ,
-			{ filename: 'random.bin' , contentType: 'bin/random' , hash: badContentHash }
+			{ filename: 'random.bin' , contentType: 'bin/random' , hash: badContentHash , fileSize: 40 }
 		) ;
 
 		badAttachmentStreams.end() ;
 
 		await expect( () => app.put( '/Users/' + userId + '/~avatar' , null , badAttachmentStreams , { performer: performer } ) )
+			.to.eventually.throw( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
+
+		
+		// Then, with a bad file size
+
+		var badAttachmentStreams2 = new rootsDb.AttachmentStreams() ;
+
+		badAttachmentStreams2.addStream(
+			new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 )
+			} ) ,
+			//'avatar' ,	// the documentPath is optional because we put on the attachment link
+			null ,
+			{ filename: 'random.bin' , contentType: 'bin/random' , hash: contentHash , fileSize: 15 }
+		) ;
+
+		badAttachmentStreams2.end() ;
+
+		await expect( () => app.put( '/Users/' + userId + '/~avatar' , null , badAttachmentStreams2 , { performer: performer } ) )
 			.to.eventually.throw( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
 
 		
@@ -3000,7 +3025,7 @@ describe( "Attachment links" , () => {
 			} ) ,
 			//'avatar' ,	// the documentPath is optional because we put on the attachment link
 			null ,
-			{ filename: 'random.bin' , contentType: 'bin/random' , hash: contentHash }
+			{ filename: 'random.bin' , contentType: 'bin/random' , hash: contentHash , fileSize: 40 }
 		) ;
 
 		attachmentStreams.end() ;
@@ -3019,6 +3044,8 @@ describe( "Attachment links" , () => {
 			filename: "random.bin" ,
 			hashType: 'sha256' ,
 			hash: contentHash ,
+			fileSize: 40 ,
+			metadata: {} ,
 			id: response.output.data.id	// unpredictable
 		} ) ;
 
