@@ -60,6 +60,8 @@ const crypto = require( 'crypto' ) ;
 const stream = require( 'stream' ) ;
 const streamKit = require( 'stream-kit' ) ;
 
+var PUBLIC_URL = 'cdn.example.com/app' ;	// From the config sample/main.kfg
+
 
 
 // Init restQuery extensions
@@ -2858,7 +2860,7 @@ describe( "Attachment links" , () => {
 		userId = response.output.data.id ;
 
 		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
-		expect( response.output.data ).to.partially.equal( {
+		expect( response.output.data ).to.be.partially.like( {
 			firstName: 'Joe' ,
 			lastName: 'Doe' ,
 			slugId: 'joe-doe' ,
@@ -2871,18 +2873,20 @@ describe( "Attachment links" , () => {
 				hash: contentHash ,
 				fileSize: 40 ,
 				metadata: {} ,
+				publicUrl: PUBLIC_URL + '/users/' + userId + '/' + response.output.data.avatar.id ,
 				id: response.output.data.avatar.id	// unpredictable
 			}
 		} ) ;
 
 		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( {
+		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
 			filename: "random.bin" ,
 			hashType: 'sha256' ,
 			hash: contentHash ,
 			fileSize: 40 ,
 			metadata: {} ,
+			publicUrl: PUBLIC_URL + '/users/' + userId + '/' + response.output.data.id ,
 			id: response.output.data.id	// unpredictable
 		} ) ;
 
@@ -2936,13 +2940,14 @@ describe( "Attachment links" , () => {
 		) ;
 
 		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( {
+		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
 			filename: "random.bin" ,
 			hashType: 'sha256' ,
 			hash: contentHash ,
 			fileSize: 40 ,
 			metadata: {} ,
+			publicUrl: PUBLIC_URL + '/users/' + userId + '/' + response.output.data.id ,
 			id: response.output.data.id	// unpredictable
 		} ) ;
 
@@ -3039,13 +3044,14 @@ describe( "Attachment links" , () => {
 		
 		
 		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( {
+		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
 			filename: "random.bin" ,
 			hashType: 'sha256' ,
 			hash: contentHash ,
 			fileSize: 40 ,
 			metadata: {} ,
+			publicUrl: PUBLIC_URL + '/users/' + userId + '/' + response.output.data.id ,
 			id: response.output.data.id	// unpredictable
 		} ) ;
 

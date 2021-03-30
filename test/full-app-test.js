@@ -61,6 +61,8 @@ var appPort = 1234 ;
 var appProcess ;
 var dbUrl = 'mongodb://localhost:27017/restQuery' ;
 var db ;
+var PUBLIC_URL = 'cdn.example.com/app' ;	// From the config sample/main.kfg
+
 
 
 
@@ -335,1493 +337,1214 @@ beforeEach( clearDB ) ;
 
 
 
-describe( "Basics tests" , () => {
+describe( "Service" , () => {
 
-	it( "GET on an unexistant blog" , async () => {
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Blogs/111111111111111111111111' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
+	describe( "Basics tests" , () => {
 
-		var response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 404 ) ;
-		expect( response.body ).not.to.be.ok() ;
-	} ) ;
-
-	it( "PUT then GET on a blog" , async () => {
-		var response , data ;
-		
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Blogs/543bb877bd15489d0d7b0120' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				title: "My website!" ,
-				description: "... about my wonderful life" ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Blogs/543bb877bd15489d0d7b0120' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-		
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		
-		data = JSON.parse( response.body ) ;
-		
-		expect( data ).to.equal( {
-			_id: "543bb877bd15489d0d7b0120" ,
-			title: "My website!" ,
-			description: "... about my wonderful life" ,
-			slugId: data.slugId ,	// Cannot be predicted
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
-		} ) ;
-		
-		getQuery.path += "?access=all" ;
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		
-		data = JSON.parse( response.body ) ;
-		
-		expect( data ).to.equal( {
-			_id: "543bb877bd15489d0d7b0120" ,
-			title: "My website!" ,
-			description: "... about my wonderful life" ,
-			slugId: data.slugId ,	// Cannot be predicted
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			} ,
-			userAccess: {} ,
-			groupAccess: {} ,
-			publicAccess: { traverse: true , read: true , create: true }
-		} ) ;
-	} ) ;
-
-	it( "POST then GET on a blog" , async () => {
-		var response , data , postDocument ;
-
-		var postQuery = {
-			method: 'POST' ,
-			path: '/Blogs' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				title: "My website!" ,
-				description: "... about my wonderful life" ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Blogs/' ,	// this should be completed with the ID after the POST
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( postQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
-		postDocument = JSON.parse( response.body ) ;
-		expect( typeof postDocument.id ).to.be( 'string' ) ;
-		expect( postDocument.id.length ).to.be( 24 ) ;
-		//console.log( response.headers.location ) ;
-		expect( response.headers.location ).to.be( appProto + '://localhost:' + appPort + '/Blogs/' + postDocument.id ) ;
-		
-		getQuery.path += postDocument.id ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: postDocument.id ,
-			title: "My website!" ,
-			description: "... about my wonderful life" ,
-			slugId: data.slugId ,	// Cannot be predicted
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
-		} ) ;
-		
-		getQuery.path += "?access=all" ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: postDocument.id ,
-			title: "My website!" ,
-			description: "... about my wonderful life" ,
-			slugId: data.slugId ,	// Cannot be predicted
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			} ,
-			userAccess: {} ,
-			groupAccess: {} ,
-			publicAccess: { traverse: true , read: true , create: true }
-		} ) ;
-		//console.log( "Response:" , response ) ;
-	} ) ;
-
-	it( "PUT, PATCH then GET on a blog" , async () => {
-		var response , data ;
-		
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Blogs/543bb877bd15489d0d7b0121' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				title: "My website!" ,
-				description: "... about my wonderful life" ,
-					publicAccess: {
-					traverse: true , read: true , write: true , delete: true , create: true
+		it( "GET on an unexistant blog" , async () => {
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Blogs/111111111111111111111111' ,
+				headers: {
+					Host: 'localhost'
 				}
-			}
-		} ;
+			} ;
 
-		var patchQuery = {
-			method: 'PATCH' ,
-			path: '/Blogs/543bb877bd15489d0d7b0121' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				title: "My *NEW* website!" ,
-				description: "... about my wonderful life"
-			}
-		} ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Blogs/543bb877bd15489d0d7b0121' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		
-		response = await requester( patchQuery ) ;
-		expect( response.status ).to.be( 204 ) ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: "543bb877bd15489d0d7b0121" ,
-			title: "My *NEW* website!" ,
-			description: "... about my wonderful life" ,
-			slugId: data.slugId ,	// Cannot be predicted
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
+			var response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 404 ) ;
+			expect( response.body ).not.to.be.ok() ;
 		} ) ;
-		//console.log( "Response:" , response ) ;
 
-		getQuery.path += "?access=all" ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: "543bb877bd15489d0d7b0121" ,
-			title: "My *NEW* website!" ,
-			description: "... about my wonderful life" ,
-			slugId: data.slugId ,	// Cannot be predicted
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			} ,
-			userAccess: {} ,
-			groupAccess: {} ,
-			publicAccess: {
-				traverse: true , read: true , write: true , delete: true , create: true
-			}
-		} ) ;
-		//console.log( "Response:" , response ) ;
-	} ) ;
+		it( "PUT then GET on a blog" , async () => {
+			var response , data ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Blogs/543bb877bd15489d0d7b0120' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: "My website!" ,
+					description: "... about my wonderful life" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
 
-	it( "PUT, DELETE then GET on a blog" , async () => {
-		var response , data ;
-
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Blogs/543bb877bd15489d0d7b0122' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Blogs/543bb877bd15489d0d7b0120' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+			
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			
+			data = JSON.parse( response.body ) ;
+			
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0120" ,
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+			
+			getQuery.path += "?access=all" ;
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			
+			data = JSON.parse( response.body ) ;
+			
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0120" ,
+				title: "My website!" ,
+				description: "... about my wonderful life" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				} ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: { traverse: true , read: true , create: true }
+			} ) ;
+		} ) ;
+
+		it( "POST then GET on a blog" , async () => {
+			var response , data , postDocument ;
+
+			var postQuery = {
+				method: 'POST' ,
+				path: '/Blogs' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: "My website!" ,
+					description: "... about my wonderful life" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Blogs/' ,	// this should be completed with the ID after the POST
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( postQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+			postDocument = JSON.parse( response.body ) ;
+			expect( typeof postDocument.id ).to.be( 'string' ) ;
+			expect( postDocument.id.length ).to.be( 24 ) ;
+			//console.log( response.headers.location ) ;
+			expect( response.headers.location ).to.be( appProto + '://localhost:' + appPort + '/Blogs/' + postDocument.id ) ;
+			
+			getQuery.path += postDocument.id ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: postDocument.id ,
+				title: "My website!" ,
+				description: "... about my wonderful life" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+			
+			getQuery.path += "?access=all" ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: postDocument.id ,
+				title: "My website!" ,
+				description: "... about my wonderful life" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				} ,
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: { traverse: true , read: true , create: true }
+			} ) ;
+			//console.log( "Response:" , response ) ;
+		} ) ;
+
+		it( "PUT, PATCH then GET on a blog" , async () => {
+			var response , data ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Blogs/543bb877bd15489d0d7b0121' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: "My website!" ,
+					description: "... about my wonderful life" ,
+						publicAccess: {
+						traverse: true , read: true , write: true , delete: true , create: true
+					}
+				}
+			} ;
+
+			var patchQuery = {
+				method: 'PATCH' ,
+				path: '/Blogs/543bb877bd15489d0d7b0121' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: "My *NEW* website!" ,
+					description: "... about my wonderful life"
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Blogs/543bb877bd15489d0d7b0121' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			
+			response = await requester( patchQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0121" ,
+				title: "My *NEW* website!" ,
+				description: "... about my wonderful life" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+			//console.log( "Response:" , response ) ;
+
+			getQuery.path += "?access=all" ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0121" ,
+				title: "My *NEW* website!" ,
+				description: "... about my wonderful life" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				} ,
+				userAccess: {} ,
+				groupAccess: {} ,
 				publicAccess: {
 					traverse: true , read: true , write: true , delete: true , create: true
 				}
-			}
-		} ;
+			} ) ;
+			//console.log( "Response:" , response ) ;
+		} ) ;
 
-		var deleteQuery = {
-			method: 'DELETE' ,
-			path: '/Blogs/543bb877bd15489d0d7b0122' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			}
-		} ;
+		it( "PUT, DELETE then GET on a blog" , async () => {
+			var response , data ;
 
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Blogs/543bb877bd15489d0d7b0122' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Blogs/543bb877bd15489d0d7b0122' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: "My website!" ,
+					description: "... about my wonderful life" ,
+					publicAccess: {
+						traverse: true , read: true , write: true , delete: true , create: true
+					}
+				}
+			} ;
 
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
+			var deleteQuery = {
+				method: 'DELETE' ,
+				path: '/Blogs/543bb877bd15489d0d7b0122' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				}
+			} ;
 
-		response = await requester( deleteQuery ) ;
-		expect( response.status ).to.be( 204 ) ;
-		//console.log( "Response:" , response ) ;
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Blogs/543bb877bd15489d0d7b0122' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
 
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 404 ) ;
-		expect( response.body ).not.to.be.ok() ;
-		//console.log( "Response:" , response ) ;
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			response = await requester( deleteQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+			//console.log( "Response:" , response ) ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 404 ) ;
+			expect( response.body ).not.to.be.ok() ;
+			//console.log( "Response:" , response ) ;
+		} ) ;
+
+		it( "Multiple PUT then GET on the whole blog collection" , async () => {
+			var response , data ;
+			
+			var putQuery1 = {
+				method: 'PUT' ,
+				path: '/Blogs/543bb877bd15489d0d7b0121' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: "First post!" ,
+					description: "Everything started with that."
+				}
+			} ;
+
+			var putQuery2 = {
+				method: 'PUT' ,
+				path: '/Blogs/543bb877bd15489d0d7b0122' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: "About" ,
+					description: "About this blog."
+				}
+			} ;
+
+			var putQuery3 = {
+				method: 'PUT' ,
+				path: '/Blogs/543bb877bd15489d0d7b0123' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: "10 things about nothing" ,
+					description: "10 things you should know... or not..."
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Blogs/' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( putQuery1 ) ;
+			expect( response.status ).to.be( 201 ) ;
+			
+			response = await requester( putQuery2 ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			response = await requester( putQuery3 ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			data = data.sort( ( a , b ) => a._id < b._id ? -1 : 1 ) ;
+			expect( data ).to.equal( [
+				{
+					_id: "543bb877bd15489d0d7b0121" ,
+					title: "First post!" ,
+					description: "Everything started with that." ,
+					slugId: data[ 0 ].slugId ,	// Cannot be predicted
+					parent: {
+						collection: 'root' ,
+						id: '/'
+					}
+				} ,
+				{
+					_id: "543bb877bd15489d0d7b0122" ,
+					title: "About" ,
+					description: "About this blog." ,
+					slugId: data[ 1 ].slugId ,	// Cannot be predicted
+					parent: {
+						collection: 'root' ,
+						id: '/'
+					}
+				} ,
+				{
+					_id: "543bb877bd15489d0d7b0123" ,
+					title: "10 things about nothing" ,
+					description: "10 things you should know... or not..." ,
+					slugId: data[ 2 ].slugId ,	// Cannot be predicted
+					parent: {
+						collection: 'root' ,
+						id: '/'
+					}
+				}
+			] ) ;
+			//console.log( "Response:" , response ) ;
+		} ) ;
 	} ) ;
 
-	it( "Multiple PUT then GET on the whole blog collection" , async () => {
-		var response , data ;
-		
-		var putQuery1 = {
-			method: 'PUT' ,
-			path: '/Blogs/543bb877bd15489d0d7b0121' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				title: "First post!" ,
-				description: "Everything started with that."
-			}
-		} ;
 
-		var putQuery2 = {
-			method: 'PUT' ,
-			path: '/Blogs/543bb877bd15489d0d7b0122' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				title: "About" ,
-				description: "About this blog."
-			}
-		} ;
 
-		var putQuery3 = {
-			method: 'PUT' ,
-			path: '/Blogs/543bb877bd15489d0d7b0123' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				title: "10 things about nothing" ,
-				description: "10 things you should know... or not..."
-			}
-		} ;
+	describe( "Test slugs" , () => {
 
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Blogs/' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( putQuery1 ) ;
-		expect( response.status ).to.be( 201 ) ;
-		
-		response = await requester( putQuery2 ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
-
-		response = await requester( putQuery3 ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		data = data.sort( ( a , b ) => a._id < b._id ? -1 : 1 ) ;
-		expect( data ).to.equal( [
-			{
-				_id: "543bb877bd15489d0d7b0121" ,
-				title: "First post!" ,
-				description: "Everything started with that." ,
-				slugId: data[ 0 ].slugId ,	// Cannot be predicted
-				parent: {
-					collection: 'root' ,
-					id: '/'
+		it( "GET on a blog using the slug" , async () => {
+			var response , data ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Blogs/543bb877bd15489d0d7b0aaa' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: "My wonderful website!" ,
+					description: "... about my wonderful life" ,
+					publicAccess: { traverse: true , read: true , create: true }
 				}
-			} ,
-			{
-				_id: "543bb877bd15489d0d7b0122" ,
-				title: "About" ,
-				description: "About this blog." ,
-				slugId: data[ 1 ].slugId ,	// Cannot be predicted
-				parent: {
-					collection: 'root' ,
-					id: '/'
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Blogs/my-wonderful-website' ,
+				headers: {
+					Host: 'localhost'
 				}
-			} ,
-			{
-				_id: "543bb877bd15489d0d7b0123" ,
-				title: "10 things about nothing" ,
-				description: "10 things you should know... or not..." ,
-				slugId: data[ 2 ].slugId ,	// Cannot be predicted
-				parent: {
-					collection: 'root' ,
-					id: '/'
-				}
-			}
-		] ) ;
-		//console.log( "Response:" , response ) ;
-	} ) ;
-} ) ;
-
-
-
-describe( "Test slugs" , () => {
-
-	it( "GET on a blog using the slug" , async () => {
-		var response , data ;
-		
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Blogs/543bb877bd15489d0d7b0aaa' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
+			} ;
+			
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			
+			data = JSON.parse( response.body ) ;
+			
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0aaa" ,
 				title: "My wonderful website!" ,
 				description: "... about my wonderful life" ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Blogs/my-wonderful-website' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-		
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		
-		data = JSON.parse( response.body ) ;
-		
-		expect( data ).to.equal( {
-			_id: "543bb877bd15489d0d7b0aaa" ,
-			title: "My wonderful website!" ,
-			description: "... about my wonderful life" ,
-			slugId: 'my-wonderful-website' ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
+				slugId: 'my-wonderful-website' ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
 		} ) ;
-	} ) ;
 
-	it( "GET on a blog using an unicode slug" , async () => {
-		var response , data ;
-		
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Blogs/543bb877bd15489d0d7b0bbb' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
+		it( "GET on a blog using an unicode slug" , async () => {
+			var response , data ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Blogs/543bb877bd15489d0d7b0bbb' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					title: 'عِنْدَمَا ذَهَبْتُ إِلَى ٱلْمَكْتَبَةِ' ,
+					description: 'كنت أريد أن أقرأ كتابا عن تاريخ المرأة في فرنسا' ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Blogs/عِنْدَمَا-ذَهَبْتُ-إِلَى-ٱلْمَكْتَبَةِ' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+			
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			
+			data = JSON.parse( response.body ) ;
+			
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0bbb" ,
 				title: 'عِنْدَمَا ذَهَبْتُ إِلَى ٱلْمَكْتَبَةِ' ,
 				description: 'كنت أريد أن أقرأ كتابا عن تاريخ المرأة في فرنسا' ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Blogs/عِنْدَمَا-ذَهَبْتُ-إِلَى-ٱلْمَكْتَبَةِ' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-		
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		
-		data = JSON.parse( response.body ) ;
-		
-		expect( data ).to.equal( {
-			_id: "543bb877bd15489d0d7b0bbb" ,
-			title: 'عِنْدَمَا ذَهَبْتُ إِلَى ٱلْمَكْتَبَةِ' ,
-			description: 'كنت أريد أن أقرأ كتابا عن تاريخ المرأة في فرنسا' ,
-			slugId: 'عِنْدَمَا-ذَهَبْتُ-إِلَى-ٱلْمَكْتَبَةِ' ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
+				slugId: 'عِنْدَمَا-ذَهَبْتُ-إِلَى-ٱلْمَكْتَبَةِ' ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
 		} ) ;
 	} ) ;
-} ) ;
 
 
 
-describe( "Basics tests on users" , () => {
+	describe( "Basics tests on users" , () => {
 
-	it( "GET on an unexistant user" , async () => {
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Users/111111111111111111111111' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
+		it( "GET on an unexistant user" , async () => {
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Users/111111111111111111111111' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
 
-		var response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 404 ) ;
-		expect( response.body ).not.to.be.ok() ;
-		//console.log( "Response:" , response ) ;
-	} ) ;
+			var response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 404 ) ;
+			expect( response.body ).not.to.be.ok() ;
+			//console.log( "Response:" , response ) ;
+		} ) ;
 
-	it( "PUT then GET on a user" , async () => {
-		var response , data ;
-		
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb877bd15489d0d7b0130' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
+		it( "PUT then GET on a user" , async () => {
+			var response , data ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb877bd15489d0d7b0130' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					firstName: "Joe" ,
+					lastName: "Doe2" ,
+					email: "joe.doe2@gmail.com" ,
+					password: "pw" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb877bd15489d0d7b0130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0130" ,
 				firstName: "Joe" ,
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
-				password: "pw" ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb877bd15489d0d7b0130' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: "543bb877bd15489d0d7b0130" ,
-			firstName: "Joe" ,
-			lastName: "Doe2" ,
-			email: "joe.doe2@gmail.com" ,
-			login: "joe.doe2@gmail.com" ,
-			//groups: {} ,
-			slugId: data.slugId ,	// Cannot be predicted
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
+				login: "joe.doe2@gmail.com" ,
+				//groups: {} ,
+				slugId: data.slugId ,	// Cannot be predicted
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+			
+			getQuery.path += "?access=all" ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0130" ,
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				login: "joe.doe2@gmail.com" ,
+				groups: {} ,
+				slugId: data.slugId ,	// Cannot be predicted
+				userAccess: {} ,
+				groupAccess: {} ,
+				publicAccess: { traverse: true , read: true , create: true } ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+			//console.log( "Response:" , response ) ;
 		} ) ;
-		
-		getQuery.path += "?access=all" ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		
-		expect( data ).to.equal( {
-			_id: "543bb877bd15489d0d7b0130" ,
-			firstName: "Joe" ,
-			lastName: "Doe2" ,
-			email: "joe.doe2@gmail.com" ,
-			login: "joe.doe2@gmail.com" ,
-			groups: {} ,
-			slugId: data.slugId ,	// Cannot be predicted
-			userAccess: {} ,
-			groupAccess: {} ,
-			publicAccess: { traverse: true , read: true , create: true } ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
+
+		it( "PUT, DELETE then GET on a user" , async () => {
+			var response , data ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb877bd15489d0d7b0132' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					firstName: "John" ,
+					lastName: "Doe" ,
+					email: "john.doe@gmail.com" ,
+					password: "pw" ,
+					publicAccess: {
+						traverse: true , read: true , write: true , delete: true , create: true
+					}
+				}
+			} ;
+
+			var deleteQuery = {
+				method: 'DELETE' ,
+				path: '/Users/543bb877bd15489d0d7b0132' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb877bd15489d0d7b0132' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			response = await requester( deleteQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+			//console.log( "Response:" , response ) ;
 		} ) ;
-		//console.log( "Response:" , response ) ;
 	} ) ;
 
-	it( "PUT, DELETE then GET on a user" , async () => {
-		var response , data ;
-		
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb877bd15489d0d7b0132' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				firstName: "John" ,
+
+
+	describe( "Attachment" , () => {
+
+		it( "PUT a document with an attachment (multipart/form-data) then GET it" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ,
+				contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ;
+
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb877bd15c89dad7b0130' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				multipartFormData: {
+					firstName: "Joe" ,
+					lastName: "Doe2" ,
+					email: "joe.doe2@gmail.com" ,
+					password: "pw" ,
+					publicAccess: { traverse: true , read: true , create: true } ,
+					avatar: new streamKit.FakeReadable( {
+						timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 ) , meta: { filename: 'test.txt' }
+					} )
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb877bd15c89dad7b0130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15c89dad7b0130" ,
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				login: "joe.doe2@gmail.com" ,
+				//groups: {} ,
+				slugId: data.slugId ,	// Cannot be predicted
+				avatar: {
+					contentType: 'text/plain' ,
+					filename: 'test.txt' ,
+					hashType: 'sha256' ,
+					hash: contentHash ,
+					fileSize: 40 ,
+					metadata: {} ,
+					publicUrl: PUBLIC_URL + '/users/543bb877bd15c89dad7b0130/' + data.avatar.id ,
+					id: data.avatar.id	// Cannot be predicted
+				} ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			var getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb877bd15c89dad7b0130/~avatar' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'a'.repeat( 40 ) ) ;
+
+			// Should retrieve the correct hash
+			expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
+		} ) ;
+
+		it( "PUT an attachment on an existing document then GET it" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ,
+				contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb8d7bd15a89dad7b0130' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					firstName: "Joe" ,
+					lastName: "Doe2" ,
+					email: "joe.doe2@gmail.com" ,
+					password: "pw" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			var putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+			//console.log( "Response:" , response ) ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb8d7bd15a89dad7b0130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7b0130" ,
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				login: "joe.doe2@gmail.com" ,
+				//groups: {} ,
+				slugId: data.slugId ,	// Cannot be predicted
+				avatar: {
+					contentType: 'text/plain' ,
+					filename: 'test2.txt' ,
+					hashType: 'sha256' ,
+					hash: contentHash ,
+					fileSize: 40 ,
+					metadata: {} ,
+					publicUrl: PUBLIC_URL + '/users/543bb8d7bd15a89dad7b0130/' + data.avatar.id ,
+					id: data.avatar.id	// Cannot be predicted
+				} ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			var getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
+
+			// Should retrieve the correct hash
+			expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
+		} ) ;
+
+		it( "PUT a document with an attachment (multipart/form-data) with checksum/hash part header" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ,
+				contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ,
+				badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
+
+
+			// First, with a bad hash
+
+			var putBadQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb877bd15c89dad7b0130' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				multipartFormData: {
+					firstName: "Joe" ,
+					lastName: "Doe2" ,
+					email: "joe.doe2@gmail.com" ,
+					password: "pw" ,
+					publicAccess: { traverse: true , read: true , create: true } ,
+					avatar: new streamKit.FakeReadable( {
+						timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 ) , meta: { filename: 'test.txt' , hashType: 'sha256' , hash: badContentHash }
+					} )
+				}
+			} ;
+
+			response = await requester( putBadQuery ) ;
+			expect( response.status ).to.be( 400 ) ;
+
+
+			// Then, with the correct hash
+
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb877bd15c89dad7b0130' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				multipartFormData: {
+					firstName: "Joe" ,
+					lastName: "Doe2" ,
+					email: "joe.doe2@gmail.com" ,
+					password: "pw" ,
+					publicAccess: { traverse: true , read: true , create: true } ,
+					avatar: new streamKit.FakeReadable( {
+						timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 ) , meta: { filename: 'test.txt' , hashType: 'sha256' , hash: contentHash }
+					} )
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb877bd15c89dad7b0130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15c89dad7b0130" ,
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				login: "joe.doe2@gmail.com" ,
+				//groups: {} ,
+				slugId: data.slugId ,	// Cannot be predicted
+				avatar: {
+					contentType: 'text/plain' ,
+					filename: 'test.txt' ,
+					hashType: 'sha256' ,
+					hash: contentHash ,
+					fileSize: 40 ,
+					metadata: {} ,
+					publicUrl: PUBLIC_URL + '/users/543bb877bd15c89dad7b0130/' + data.avatar.id ,
+					id: data.avatar.id	// Cannot be predicted
+				} ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			var getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb877bd15c89dad7b0130/~avatar' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'a'.repeat( 40 ) ) ;
+
+			// Should retrieve the correct hash
+			expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
+		} ) ;
+
+		it( "PUT an attachment with checksum/hash header" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ,
+				contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ,
+				badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
+
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb8d7bd15a89dad7b0130' ,
+				headers: {
+					Host: "localhost" ,
+					"content-type": "application/json"
+				} ,
+				body: {
+					firstName: "Joe" ,
+					lastName: "Doe2" ,
+					email: "joe.doe2@gmail.com" ,
+					password: "pw" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+
+			// First, with a bad checksum
+
+			var putBadAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json' ,
+					"digest": "sha-256=" + badContentHash
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putBadAttachmentQuery ) ;
+			//console.error( response ) ;
+			expect( response.status ).to.be( 400 ) ;
+
+
+			// Then, with the correct checksum
+
+			var putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json' ,
+					"digest": "sha-256=" + contentHash
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			//console.error( response ) ;
+			expect( response.status ).to.be( 204 ) ;
+
+
+
+			//console.log( "Response:" , response ) ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb8d7bd15a89dad7b0130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7b0130" ,
+				firstName: "Joe" ,
+				lastName: "Doe2" ,
+				email: "joe.doe2@gmail.com" ,
+				login: "joe.doe2@gmail.com" ,
+				//groups: {} ,
+				slugId: data.slugId ,	// Cannot be predicted
+				avatar: {
+					contentType: 'text/plain' ,
+					filename: 'test2.txt' ,
+					hashType: 'sha256' ,
+					hash: contentHash ,
+					fileSize: 40 ,
+					metadata: {} ,
+					publicUrl: PUBLIC_URL + '/users/543bb8d7bd15a89dad7b0130/' + data.avatar.id ,
+					id: data.avatar.id	// Cannot be predicted
+				} ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			var getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
+		} ) ;
+	} ) ;
+
+
+
+	describe( "Links population" , () => {
+
+		it( "GET on document and collection + populate links" , async () => {
+			var response , data , u1 , u2 , u3 ;
+
+			var postQuery1 = {
+				method: 'POST' ,
+				path: '/Users' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					firstName: "Big Joe" ,
+					lastName: "Doe" ,
+					email: "big.joe.doe@gmail.com" ,
+					password: "pw" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			var postQuery2 = {
+				method: 'POST' ,
+				path: '/Users' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					firstName: "THE" ,
+					lastName: "GODFATHER" ,
+					email: "godfather@gmail.com" ,
+					password: "pw" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			var postQuery3 , getQuery ;
+			
+			response = await requester( postQuery1 ) ;
+			expect( response.status ).to.be( 201 ) ;
+			u1 = JSON.parse( response.body ).id ;
+			
+			response = await requester( postQuery2 ) ;
+			expect( response.status ).to.be( 201 ) ;
+			u2 = JSON.parse( response.body ).id ;
+
+			var postQuery3 = {
+				method: 'POST' ,
+				path: '/Users' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					firstName: "Joe" ,
+					lastName: "Doe" ,
+					email: "joe.doe@gmail.com" ,
+					password: "pw" ,
+					father: u1 ,
+					godfather: u2 ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			response = await requester( postQuery3 ) ;
+			expect( response.status ).to.be( 201 ) ;
+			u3 = JSON.parse( response.body ).id ;
+			
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Users/' + u3 + '?populate=[father,godfather]' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			delete data.father.password ;
+			delete data.godfather.password ;
+			expect( data ).to.equal( {
+				_id: data._id ,
+				firstName: "Joe" ,
 				lastName: "Doe" ,
-				email: "john.doe@gmail.com" ,
-				password: "pw" ,
+				email: "joe.doe@gmail.com" ,
+				login: "joe.doe@gmail.com" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				//groups: {} ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				} ,
+				father: {
+					_id: data.father._id ,
+					firstName: "Big Joe" ,
+					lastName: "Doe" ,
+					email: "big.joe.doe@gmail.com" ,
+					login: "big.joe.doe@gmail.com" ,
+					slugId: data.father.slugId ,
+					//groups: {} ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				} ,
+				godfather: {
+					_id: data.godfather._id ,
+					firstName: "THE" ,
+					lastName: "GODFATHER" ,
+					email: "godfather@gmail.com" ,
+					login: "godfather@gmail.com" ,
+					slugId: data.godfather.slugId ,
+					//groups: {} ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				}
+			} ) ;
+			
+			getQuery = {
+				method: 'GET' ,
+				path: '/Users/' + u3 + '?populate=[father,godfather]&access=all&pAccess=all' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: data._id ,
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				login: "joe.doe@gmail.com" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				groups: {} ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				} ,
 				publicAccess: {
-					traverse: true , read: true , write: true , delete: true , create: true
-				}
-			}
-		} ;
-
-		var deleteQuery = {
-			method: 'DELETE' ,
-			path: '/Users/543bb877bd15489d0d7b0132' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			}
-		} ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb877bd15489d0d7b0132' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
-
-		response = await requester( deleteQuery ) ;
-		expect( response.status ).to.be( 204 ) ;
-		//console.log( "Response:" , response ) ;
-	} ) ;
-} ) ;
-
-
-
-describe( "Attachment" , () => {
-
-	it( "PUT a document with an attachment (multipart/form-data) then GET it" , async function() {
-		this.timeout( 4000 ) ;
-
-		var response , data ,
-			contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ;
-
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb877bd15c89dad7b0130' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			multipartFormData: {
-				firstName: "Joe" ,
-				lastName: "Doe2" ,
-				email: "joe.doe2@gmail.com" ,
-				password: "pw" ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				avatar: new streamKit.FakeReadable( {
-					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 ) , meta: { filename: 'test.txt' }
-				} )
-			}
-		} ;
-
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb877bd15c89dad7b0130' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: "543bb877bd15c89dad7b0130" ,
-			firstName: "Joe" ,
-			lastName: "Doe2" ,
-			email: "joe.doe2@gmail.com" ,
-			login: "joe.doe2@gmail.com" ,
-			//groups: {} ,
-			slugId: data.slugId ,	// Cannot be predicted
-			avatar: {
-				contentType: 'text/plain' ,
-				filename: 'test.txt' ,
-				hashType: 'sha256' ,
-				hash: contentHash ,
-				fileSize: 40 ,
-				metadata: {} ,
-				id: data.avatar.id	// Cannot be predicted
-			} ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
-		} ) ;
-
-		var getAttachmentQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb877bd15c89dad7b0130/~avatar' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getAttachmentQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be( 'a'.repeat( 40 ) ) ;
-
-		// Should retrieve the correct hash
-		expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
-	} ) ;
-
-	it( "PUT an attachment on an existing document then GET it" , async function() {
-		this.timeout( 4000 ) ;
-
-		var response , data ,
-			contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ;
-		
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb8d7bd15a89dad7b0130' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				firstName: "Joe" ,
-				lastName: "Doe2" ,
-				email: "joe.doe2@gmail.com" ,
-				password: "pw" ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
-
-		var putAttachmentQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: new streamKit.FakeReadable( {
-				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
-			} )
-		} ;
-
-		response = await requester( putAttachmentQuery ) ;
-		expect( response.status ).to.be( 204 ) ;
-		//console.log( "Response:" , response ) ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb8d7bd15a89dad7b0130' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: "543bb8d7bd15a89dad7b0130" ,
-			firstName: "Joe" ,
-			lastName: "Doe2" ,
-			email: "joe.doe2@gmail.com" ,
-			login: "joe.doe2@gmail.com" ,
-			//groups: {} ,
-			slugId: data.slugId ,	// Cannot be predicted
-			avatar: {
-				contentType: 'text/plain' ,
-				filename: 'test2.txt' ,
-				hashType: 'sha256' ,
-				hash: contentHash ,
-				fileSize: 40 ,
-				metadata: {} ,
-				id: data.avatar.id	// Cannot be predicted
-			} ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
-		} ) ;
-
-		var getAttachmentQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getAttachmentQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
-
-		// Should retrieve the correct hash
-		expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
-	} ) ;
-
-	it( "PUT a document with an attachment (multipart/form-data) with checksum/hash part header" , async function() {
-		this.timeout( 4000 ) ;
-
-		var response , data ,
-			contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ,
-			badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
-
-
-		// First, with a bad hash
-
-		var putBadQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb877bd15c89dad7b0130' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			multipartFormData: {
-				firstName: "Joe" ,
-				lastName: "Doe2" ,
-				email: "joe.doe2@gmail.com" ,
-				password: "pw" ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				avatar: new streamKit.FakeReadable( {
-					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 ) , meta: { filename: 'test.txt' , hashType: 'sha256' , hash: badContentHash }
-				} )
-			}
-		} ;
-
-		response = await requester( putBadQuery ) ;
-		expect( response.status ).to.be( 400 ) ;
-
-
-		// Then, with the correct hash
-
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb877bd15c89dad7b0130' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			multipartFormData: {
-				firstName: "Joe" ,
-				lastName: "Doe2" ,
-				email: "joe.doe2@gmail.com" ,
-				password: "pw" ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				avatar: new streamKit.FakeReadable( {
-					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 ) , meta: { filename: 'test.txt' , hashType: 'sha256' , hash: contentHash }
-				} )
-			}
-		} ;
-
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb877bd15c89dad7b0130' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: "543bb877bd15c89dad7b0130" ,
-			firstName: "Joe" ,
-			lastName: "Doe2" ,
-			email: "joe.doe2@gmail.com" ,
-			login: "joe.doe2@gmail.com" ,
-			//groups: {} ,
-			slugId: data.slugId ,	// Cannot be predicted
-			avatar: {
-				contentType: 'text/plain' ,
-				filename: 'test.txt' ,
-				hashType: 'sha256' ,
-				hash: contentHash ,
-				fileSize: 40 ,
-				metadata: {} ,
-				id: data.avatar.id	// Cannot be predicted
-			} ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
-		} ) ;
-
-		var getAttachmentQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb877bd15c89dad7b0130/~avatar' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getAttachmentQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be( 'a'.repeat( 40 ) ) ;
-
-		// Should retrieve the correct hash
-		expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
-	} ) ;
-
-	it( "PUT an attachment with checksum/hash header" , async function() {
-		this.timeout( 4000 ) ;
-
-		var response , data ,
-			contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ,
-			badContentHash = contentHash.slice( 0 , -3 ) + 'bad' ;
-
-		var putQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb8d7bd15a89dad7b0130' ,
-			headers: {
-				Host: "localhost" ,
-				"content-type": "application/json"
-			} ,
-			body: {
-				firstName: "Joe" ,
-				lastName: "Doe2" ,
-				email: "joe.doe2@gmail.com" ,
-				password: "pw" ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		response = await requester( putQuery ) ;
-		expect( response.status ).to.be( 201 ) ;
-		//console.log( "Response:" , response ) ;
-
-
-		// First, with a bad checksum
-
-		var putBadAttachmentQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json' ,
-				"digest": "sha-256=" + badContentHash
-			} ,
-			body: new streamKit.FakeReadable( {
-				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
-			} )
-		} ;
-
-		response = await requester( putBadAttachmentQuery ) ;
-		//console.error( response ) ;
-		expect( response.status ).to.be( 400 ) ;
-
-
-		// Then, with the correct checksum
-
-		var putAttachmentQuery = {
-			method: 'PUT' ,
-			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json' ,
-				"digest": "sha-256=" + contentHash
-			} ,
-			body: new streamKit.FakeReadable( {
-				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
-			} )
-		} ;
-
-		response = await requester( putAttachmentQuery ) ;
-		//console.error( response ) ;
-		expect( response.status ).to.be( 204 ) ;
-
-
-
-		//console.log( "Response:" , response ) ;
-
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb8d7bd15a89dad7b0130' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: "543bb8d7bd15a89dad7b0130" ,
-			firstName: "Joe" ,
-			lastName: "Doe2" ,
-			email: "joe.doe2@gmail.com" ,
-			login: "joe.doe2@gmail.com" ,
-			//groups: {} ,
-			slugId: data.slugId ,	// Cannot be predicted
-			avatar: {
-				contentType: 'text/plain' ,
-				filename: 'test2.txt' ,
-				hashType: 'sha256' ,
-				hash: contentHash ,
-				fileSize: 40 ,
-				metadata: {} ,
-				id: data.avatar.id	// Cannot be predicted
-			} ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			}
-		} ) ;
-
-		var getAttachmentQuery = {
-			method: 'GET' ,
-			path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getAttachmentQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
-	} ) ;
-} ) ;
-
-
-
-describe( "Links population" , () => {
-
-	it( "GET on document and collection + populate links" , async () => {
-		var response , data , u1 , u2 , u3 ;
-
-		var postQuery1 = {
-			method: 'POST' ,
-			path: '/Users' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				firstName: "Big Joe" ,
-				lastName: "Doe" ,
-				email: "big.joe.doe@gmail.com" ,
-				password: "pw" ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		var postQuery2 = {
-			method: 'POST' ,
-			path: '/Users' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				firstName: "THE" ,
-				lastName: "GODFATHER" ,
-				email: "godfather@gmail.com" ,
-				password: "pw" ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		var postQuery3 , getQuery ;
-		
-		response = await requester( postQuery1 ) ;
-		expect( response.status ).to.be( 201 ) ;
-		u1 = JSON.parse( response.body ).id ;
-		
-		response = await requester( postQuery2 ) ;
-		expect( response.status ).to.be( 201 ) ;
-		u2 = JSON.parse( response.body ).id ;
-
-		var postQuery3 = {
-			method: 'POST' ,
-			path: '/Users' ,
-			headers: {
-				Host: 'localhost' ,
-				"content-type": 'application/json'
-			} ,
-			body: {
-				firstName: "Joe" ,
-				lastName: "Doe" ,
-				email: "joe.doe@gmail.com" ,
-				password: "pw" ,
-				father: u1 ,
-				godfather: u2 ,
-				publicAccess: { traverse: true , read: true , create: true }
-			}
-		} ;
-
-		response = await requester( postQuery3 ) ;
-		expect( response.status ).to.be( 201 ) ;
-		u3 = JSON.parse( response.body ).id ;
-		
-		var getQuery = {
-			method: 'GET' ,
-			path: '/Users/' + u3 + '?populate=[father,godfather]' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		delete data.father.password ;
-		delete data.godfather.password ;
-		expect( data ).to.equal( {
-			_id: data._id ,
-			firstName: "Joe" ,
-			lastName: "Doe" ,
-			email: "joe.doe@gmail.com" ,
-			login: "joe.doe@gmail.com" ,
-			slugId: data.slugId ,	// Cannot be predicted
-			//groups: {} ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			} ,
-			father: {
-				_id: data.father._id ,
-				firstName: "Big Joe" ,
-				lastName: "Doe" ,
-				email: "big.joe.doe@gmail.com" ,
-				login: "big.joe.doe@gmail.com" ,
-				slugId: data.father.slugId ,
-				//groups: {} ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			} ,
-			godfather: {
-				_id: data.godfather._id ,
-				firstName: "THE" ,
-				lastName: "GODFATHER" ,
-				email: "godfather@gmail.com" ,
-				login: "godfather@gmail.com" ,
-				slugId: data.godfather.slugId ,
-				//groups: {} ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			}
-		} ) ;
-		
-		getQuery = {
-			method: 'GET' ,
-			path: '/Users/' + u3 + '?populate=[father,godfather]&access=all&pAccess=all' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: data._id ,
-			firstName: "Joe" ,
-			lastName: "Doe" ,
-			email: "joe.doe@gmail.com" ,
-			login: "joe.doe@gmail.com" ,
-			slugId: data.slugId ,	// Cannot be predicted
-			groups: {} ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			} ,
-			publicAccess: {
-				create: true ,
-				read: true ,
-				traverse: true
-			} ,
-			userAccess: {} ,
-			groupAccess: {} ,
-			father: {
-				_id: data.father._id ,
-				firstName: "Big Joe" ,
-				lastName: "Doe" ,
-				email: "big.joe.doe@gmail.com" ,
-				login: "big.joe.doe@gmail.com" ,
-				slugId: data.father.slugId ,
-				groups: {} ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			} ,
-			godfather: {
-				_id: data.godfather._id ,
-				firstName: "THE" ,
-				lastName: "GODFATHER" ,
-				email: "godfather@gmail.com" ,
-				login: "godfather@gmail.com" ,
-				slugId: data.godfather.slugId ,
-				groups: {} ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			}
-		} ) ;
-		
-		getQuery = {
-			method: 'GET' ,
-			path: '/Users/' + u3 + '?populate=[father,godfather]&access=all&pAccess=id' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			_id: data._id ,
-			firstName: "Joe" ,
-			lastName: "Doe" ,
-			email: "joe.doe@gmail.com" ,
-			login: "joe.doe@gmail.com" ,
-			slugId: data.slugId ,	// Cannot be predicted
-			groups: {} ,
-			parent: {
-				collection: 'root' ,
-				id: '/'
-			} ,
-			publicAccess: {
-				create: true ,
-				read: true ,
-				traverse: true
-			} ,
-			userAccess: {} ,
-			groupAccess: {} ,
-			father: {
-				_id: data.father._id ,
-				slugId: "big-joe-doe" ,
-				login: "big.joe.doe@gmail.com" ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			} ,
-			godfather: {
-				_id: data.godfather._id ,
-				slugId: "the-godfather" ,
-				login: "godfather@gmail.com" ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			}
-		} ) ;
-
-		// Check different access
-		getQuery = {
-			method: 'GET' ,
-			path: '/Users/' + u3 + '?populate=[father,godfather]&access=content&pAccess=id' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			firstName: "Joe" ,
-			lastName: "Doe" ,
-			email: "joe.doe@gmail.com" ,
-			father: {
-				_id: data.father._id ,
-				slugId: "big-joe-doe" ,
-				login: "big.joe.doe@gmail.com" ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			} ,
-			godfather: {
-				_id: data.godfather._id ,
-				slugId: "the-godfather" ,
-				login: "godfather@gmail.com" ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			}
-		} ) ;
-
-		// Check if pAccess uses access tags if not defined
-		getQuery = {
-			method: 'GET' ,
-			path: '/Users/' + u3 + '?populate=[father,godfather]&access=content' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-		
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		expect( data ).to.equal( {
-			firstName: "Joe" ,
-			lastName: "Doe" ,
-			email: "joe.doe@gmail.com" ,
-			father: {
-				email: "big.joe.doe@gmail.com" ,
-				firstName: "Big Joe" ,
-				lastName: "Doe"
-			} ,
-			godfather: {
-				email: "godfather@gmail.com" ,
-				firstName: "THE" ,
-				lastName: "GODFATHER"
-			}
-		} ) ;
-
-		getQuery = {
-			method: 'GET' ,
-			path: '/Users?populate=[father,godfather]' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		data.sort( ( a , b ) => a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ) ;
-		expect( data ).to.equal( [
-			{
-				_id: data[ 0 ]._id ,
-				firstName: "Big Joe" ,
-				lastName: "Doe" ,
-				email: "big.joe.doe@gmail.com" ,
-				login: "big.joe.doe@gmail.com" ,
-				slugId: data[ 0 ].slugId ,
-				//groups: {} ,
-				//father: null, godfather: null,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			} ,
-			{
-				_id: data[ 1 ]._id ,
-				firstName: "Joe" ,
-				lastName: "Doe" ,
-				email: "joe.doe@gmail.com" ,
-				login: "joe.doe@gmail.com" ,
-				slugId: data[ 1 ].slugId ,	// Cannot be predicted
-				//groups: {} ,
-				parent: {
-					collection: 'root' ,
-					id: '/'
+					create: true ,
+					read: true ,
+					traverse: true
 				} ,
+				userAccess: {} ,
+				groupAccess: {} ,
 				father: {
-					_id: data[ 0 ]._id ,
+					_id: data.father._id ,
 					firstName: "Big Joe" ,
 					lastName: "Doe" ,
 					email: "big.joe.doe@gmail.com" ,
 					login: "big.joe.doe@gmail.com" ,
-					slugId: data[ 0 ].slugId ,
-					//groups: {} ,
-					parent: {
-						collection: 'root' ,
-						id: "/"
-					}
-				} ,
-				godfather: {
-					_id: data[ 2 ]._id ,
-					firstName: "THE" ,
-					lastName: "GODFATHER" ,
-					email: "godfather@gmail.com" ,
-					login: "godfather@gmail.com" ,
-					slugId: data[ 2 ].slugId ,
-					//groups: {} ,
-					parent: {
-						collection: 'root' ,
-						id: "/"
-					}
-				}
-			} ,
-			{
-				_id: data[ 2 ]._id ,
-				firstName: "THE" ,
-				lastName: "GODFATHER" ,
-				email: "godfather@gmail.com" ,
-				login: "godfather@gmail.com" ,
-				slugId: data[ 2 ].slugId ,
-				//groups: {} ,
-				//father: null, godfather: null,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			}
-		] ) ;
-
-		getQuery = {
-			method: 'GET' ,
-			path: '/Users?populate=[father,godfather]&access=all&pAccess=all' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		data.sort( ( a , b ) => a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ) ;
-		delete data[ 0 ].password ;
-		delete data[ 1 ].password ;
-		delete data[ 1 ].father.password ;
-		delete data[ 1 ].godfather.password ;
-		delete data[ 2 ].password ;
-		expect( data ).to.equal( [
-			{
-				_id: data[ 0 ]._id ,
-				firstName: "Big Joe" ,
-				lastName: "Doe" ,
-				email: "big.joe.doe@gmail.com" ,
-				login: "big.joe.doe@gmail.com" ,
-				slugId: data[ 0 ].slugId ,
-				groups: {} ,
-				//father: null, godfather: null,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			} ,
-			{
-				_id: data[ 1 ]._id ,
-				firstName: "Joe" ,
-				lastName: "Doe" ,
-				email: "joe.doe@gmail.com" ,
-				login: "joe.doe@gmail.com" ,
-				slugId: data[ 1 ].slugId ,	// Cannot be predicted
-				groups: {} ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				parent: {
-					collection: 'root' ,
-					id: '/'
-				} ,
-				father: {
-					_id: data[ 0 ]._id ,
-					firstName: "Big Joe" ,
-					lastName: "Doe" ,
-					email: "big.joe.doe@gmail.com" ,
-					login: "big.joe.doe@gmail.com" ,
-					slugId: data[ 0 ].slugId ,
+					slugId: data.father.slugId ,
 					groups: {} ,
 					userAccess: {} ,
 					groupAccess: {} ,
@@ -1832,12 +1555,12 @@ describe( "Links population" , () => {
 					}
 				} ,
 				godfather: {
-					_id: data[ 2 ]._id ,
+					_id: data.godfather._id ,
 					firstName: "THE" ,
 					lastName: "GODFATHER" ,
 					email: "godfather@gmail.com" ,
 					login: "godfather@gmail.com" ,
-					slugId: data[ 2 ].slugId ,
+					slugId: data.godfather.slugId ,
 					groups: {} ,
 					userAccess: {} ,
 					groupAccess: {} ,
@@ -1847,86 +1570,50 @@ describe( "Links population" , () => {
 						id: "/"
 					}
 				}
-			} ,
-			{
-				_id: data[ 2 ]._id ,
-				firstName: "THE" ,
-				lastName: "GODFATHER" ,
-				email: "godfather@gmail.com" ,
-				login: "godfather@gmail.com" ,
-				slugId: data[ 2 ].slugId ,
-				groups: {} ,
-				//father: null, godfather: null,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
+			} ) ;
+			
+			getQuery = {
+				method: 'GET' ,
+				path: '/Users/' + u3 + '?populate=[father,godfather]&access=all&pAccess=id' ,
+				headers: {
+					Host: 'localhost'
 				}
-			}
-		] ) ;
-
-		getQuery = {
-			method: 'GET' ,
-			path: '/Users?populate=[father,godfather]&access=all&pAccess=id' ,
-			headers: {
-				Host: 'localhost'
-			}
-		} ;
-
-		response = await requester( getQuery ) ;
-		expect( response.status ).to.be( 200 ) ;
-		expect( response.body ).to.be.ok() ;
-		data = JSON.parse( response.body ) ;
-		data.sort( ( a , b ) => a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ) ;
-		delete data[ 0 ].password ;
-		delete data[ 1 ].password ;
-		delete data[ 2 ].password ;
-		expect( data ).to.equal( [
-			{
-				_id: data[ 0 ]._id ,
-				firstName: "Big Joe" ,
-				lastName: "Doe" ,
-				email: "big.joe.doe@gmail.com" ,
-				login: "big.joe.doe@gmail.com" ,
-				slugId: data[ 0 ].slugId ,
-				groups: {} ,
-				//father: null, godfather: null,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
-				}
-			} ,
-			{
-				_id: data[ 1 ]._id ,
+			} ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: data._id ,
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
 				login: "joe.doe@gmail.com" ,
-				slugId: data[ 1 ].slugId ,	// Cannot be predicted
+				slugId: data.slugId ,	// Cannot be predicted
 				groups: {} ,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: { traverse: true , read: true , create: true } ,
 				parent: {
 					collection: 'root' ,
 					id: '/'
 				} ,
+				publicAccess: {
+					create: true ,
+					read: true ,
+					traverse: true
+				} ,
+				userAccess: {} ,
+				groupAccess: {} ,
 				father: {
-					_id: data[ 0 ]._id ,
-					login: "big.joe.doe@gmail.com" ,
+					_id: data.father._id ,
 					slugId: "big-joe-doe" ,
+					login: "big.joe.doe@gmail.com" ,
 					parent: {
 						collection: 'root' ,
 						id: "/"
 					}
 				} ,
 				godfather: {
-					_id: data[ 2 ]._id ,
+					_id: data.godfather._id ,
 					slugId: "the-godfather" ,
 					login: "godfather@gmail.com" ,
 					parent: {
@@ -1934,25 +1621,347 @@ describe( "Links population" , () => {
 						id: "/"
 					}
 				}
-			} ,
-			{
-				_id: data[ 2 ]._id ,
-				firstName: "THE" ,
-				lastName: "GODFATHER" ,
-				email: "godfather@gmail.com" ,
-				login: "godfather@gmail.com" ,
-				slugId: data[ 2 ].slugId ,
-				groups: {} ,
-				//father: null, godfather: null,
-				userAccess: {} ,
-				groupAccess: {} ,
-				publicAccess: { traverse: true , read: true , create: true } ,
-				parent: {
-					collection: 'root' ,
-					id: "/"
+			} ) ;
+
+			// Check different access
+			getQuery = {
+				method: 'GET' ,
+				path: '/Users/' + u3 + '?populate=[father,godfather]&access=content&pAccess=id' ,
+				headers: {
+					Host: 'localhost'
 				}
-			}
-		] ) ;
+			} ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				father: {
+					_id: data.father._id ,
+					slugId: "big-joe-doe" ,
+					login: "big.joe.doe@gmail.com" ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				} ,
+				godfather: {
+					_id: data.godfather._id ,
+					slugId: "the-godfather" ,
+					login: "godfather@gmail.com" ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				}
+			} ) ;
+
+			// Check if pAccess uses access tags if not defined
+			getQuery = {
+				method: 'GET' ,
+				path: '/Users/' + u3 + '?populate=[father,godfather]&access=content' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				father: {
+					email: "big.joe.doe@gmail.com" ,
+					firstName: "Big Joe" ,
+					lastName: "Doe"
+				} ,
+				godfather: {
+					email: "godfather@gmail.com" ,
+					firstName: "THE" ,
+					lastName: "GODFATHER"
+				}
+			} ) ;
+
+			getQuery = {
+				method: 'GET' ,
+				path: '/Users?populate=[father,godfather]' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			data.sort( ( a , b ) => a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ) ;
+			expect( data ).to.equal( [
+				{
+					_id: data[ 0 ]._id ,
+					firstName: "Big Joe" ,
+					lastName: "Doe" ,
+					email: "big.joe.doe@gmail.com" ,
+					login: "big.joe.doe@gmail.com" ,
+					slugId: data[ 0 ].slugId ,
+					//groups: {} ,
+					//father: null, godfather: null,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				} ,
+				{
+					_id: data[ 1 ]._id ,
+					firstName: "Joe" ,
+					lastName: "Doe" ,
+					email: "joe.doe@gmail.com" ,
+					login: "joe.doe@gmail.com" ,
+					slugId: data[ 1 ].slugId ,	// Cannot be predicted
+					//groups: {} ,
+					parent: {
+						collection: 'root' ,
+						id: '/'
+					} ,
+					father: {
+						_id: data[ 0 ]._id ,
+						firstName: "Big Joe" ,
+						lastName: "Doe" ,
+						email: "big.joe.doe@gmail.com" ,
+						login: "big.joe.doe@gmail.com" ,
+						slugId: data[ 0 ].slugId ,
+						//groups: {} ,
+						parent: {
+							collection: 'root' ,
+							id: "/"
+						}
+					} ,
+					godfather: {
+						_id: data[ 2 ]._id ,
+						firstName: "THE" ,
+						lastName: "GODFATHER" ,
+						email: "godfather@gmail.com" ,
+						login: "godfather@gmail.com" ,
+						slugId: data[ 2 ].slugId ,
+						//groups: {} ,
+						parent: {
+							collection: 'root' ,
+							id: "/"
+						}
+					}
+				} ,
+				{
+					_id: data[ 2 ]._id ,
+					firstName: "THE" ,
+					lastName: "GODFATHER" ,
+					email: "godfather@gmail.com" ,
+					login: "godfather@gmail.com" ,
+					slugId: data[ 2 ].slugId ,
+					//groups: {} ,
+					//father: null, godfather: null,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				}
+			] ) ;
+
+			getQuery = {
+				method: 'GET' ,
+				path: '/Users?populate=[father,godfather]&access=all&pAccess=all' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			data.sort( ( a , b ) => a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ) ;
+			delete data[ 0 ].password ;
+			delete data[ 1 ].password ;
+			delete data[ 1 ].father.password ;
+			delete data[ 1 ].godfather.password ;
+			delete data[ 2 ].password ;
+			expect( data ).to.equal( [
+				{
+					_id: data[ 0 ]._id ,
+					firstName: "Big Joe" ,
+					lastName: "Doe" ,
+					email: "big.joe.doe@gmail.com" ,
+					login: "big.joe.doe@gmail.com" ,
+					slugId: data[ 0 ].slugId ,
+					groups: {} ,
+					//father: null, godfather: null,
+					userAccess: {} ,
+					groupAccess: {} ,
+					publicAccess: { traverse: true , read: true , create: true } ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				} ,
+				{
+					_id: data[ 1 ]._id ,
+					firstName: "Joe" ,
+					lastName: "Doe" ,
+					email: "joe.doe@gmail.com" ,
+					login: "joe.doe@gmail.com" ,
+					slugId: data[ 1 ].slugId ,	// Cannot be predicted
+					groups: {} ,
+					userAccess: {} ,
+					groupAccess: {} ,
+					publicAccess: { traverse: true , read: true , create: true } ,
+					parent: {
+						collection: 'root' ,
+						id: '/'
+					} ,
+					father: {
+						_id: data[ 0 ]._id ,
+						firstName: "Big Joe" ,
+						lastName: "Doe" ,
+						email: "big.joe.doe@gmail.com" ,
+						login: "big.joe.doe@gmail.com" ,
+						slugId: data[ 0 ].slugId ,
+						groups: {} ,
+						userAccess: {} ,
+						groupAccess: {} ,
+						publicAccess: { traverse: true , read: true , create: true } ,
+						parent: {
+							collection: 'root' ,
+							id: "/"
+						}
+					} ,
+					godfather: {
+						_id: data[ 2 ]._id ,
+						firstName: "THE" ,
+						lastName: "GODFATHER" ,
+						email: "godfather@gmail.com" ,
+						login: "godfather@gmail.com" ,
+						slugId: data[ 2 ].slugId ,
+						groups: {} ,
+						userAccess: {} ,
+						groupAccess: {} ,
+						publicAccess: { traverse: true , read: true , create: true } ,
+						parent: {
+							collection: 'root' ,
+							id: "/"
+						}
+					}
+				} ,
+				{
+					_id: data[ 2 ]._id ,
+					firstName: "THE" ,
+					lastName: "GODFATHER" ,
+					email: "godfather@gmail.com" ,
+					login: "godfather@gmail.com" ,
+					slugId: data[ 2 ].slugId ,
+					groups: {} ,
+					//father: null, godfather: null,
+					userAccess: {} ,
+					groupAccess: {} ,
+					publicAccess: { traverse: true , read: true , create: true } ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				}
+			] ) ;
+
+			getQuery = {
+				method: 'GET' ,
+				path: '/Users?populate=[father,godfather]&access=all&pAccess=id' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			data.sort( ( a , b ) => a.firstName.charCodeAt( 0 ) - b.firstName.charCodeAt( 0 ) ) ;
+			delete data[ 0 ].password ;
+			delete data[ 1 ].password ;
+			delete data[ 2 ].password ;
+			expect( data ).to.equal( [
+				{
+					_id: data[ 0 ]._id ,
+					firstName: "Big Joe" ,
+					lastName: "Doe" ,
+					email: "big.joe.doe@gmail.com" ,
+					login: "big.joe.doe@gmail.com" ,
+					slugId: data[ 0 ].slugId ,
+					groups: {} ,
+					//father: null, godfather: null,
+					userAccess: {} ,
+					groupAccess: {} ,
+					publicAccess: { traverse: true , read: true , create: true } ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				} ,
+				{
+					_id: data[ 1 ]._id ,
+					firstName: "Joe" ,
+					lastName: "Doe" ,
+					email: "joe.doe@gmail.com" ,
+					login: "joe.doe@gmail.com" ,
+					slugId: data[ 1 ].slugId ,	// Cannot be predicted
+					groups: {} ,
+					userAccess: {} ,
+					groupAccess: {} ,
+					publicAccess: { traverse: true , read: true , create: true } ,
+					parent: {
+						collection: 'root' ,
+						id: '/'
+					} ,
+					father: {
+						_id: data[ 0 ]._id ,
+						login: "big.joe.doe@gmail.com" ,
+						slugId: "big-joe-doe" ,
+						parent: {
+							collection: 'root' ,
+							id: "/"
+						}
+					} ,
+					godfather: {
+						_id: data[ 2 ]._id ,
+						slugId: "the-godfather" ,
+						login: "godfather@gmail.com" ,
+						parent: {
+							collection: 'root' ,
+							id: "/"
+						}
+					}
+				} ,
+				{
+					_id: data[ 2 ]._id ,
+					firstName: "THE" ,
+					lastName: "GODFATHER" ,
+					email: "godfather@gmail.com" ,
+					login: "godfather@gmail.com" ,
+					slugId: data[ 2 ].slugId ,
+					groups: {} ,
+					//father: null, godfather: null,
+					userAccess: {} ,
+					groupAccess: {} ,
+					publicAccess: { traverse: true , read: true , create: true } ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				}
+			] ) ;
+		} ) ;
 	} ) ;
 } ) ;
 
