@@ -13,7 +13,7 @@
     "rest-query": "./bin/rest-query"
   },
   "dependencies": {
-    "doormen": "^0.12.3",
+    "doormen": "^0.12.4",
     "error-status": "^1.12.1",
     "exm": "^0.5.6",
     "hash-kit": "^0.3.9",
@@ -23,10 +23,10 @@
     "logfella-client": "^1.2.3",
     "qs-kit": "^0.6.6",
     "rest-query-shared": "^0.34.0",
-    "roots-db": "^0.32.1",
+    "roots-db": "^0.34.2",
     "server-kit": "^0.9.41",
     "seventh": "^0.7.40",
-    "string-kit": "^0.12.1",
+    "string-kit": "^0.12.5",
     "token-kit": "^0.2.1",
     "tree-kit": "^0.7.0",
     "utterminal": "^0.5.51"
@@ -35,7 +35,7 @@
     "form-data": "^4.0.0",
     "fs-kit": "^0.6.1",
     "minimist": "^1.2.5",
-    "mongodb": "^3.6.5",
+    "mongodb": "^3.6.6",
     "stream-kit": "^0.4.13"
   },
   "scripts": {
