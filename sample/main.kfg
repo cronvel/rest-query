@@ -7,6 +7,7 @@ collections:
 	posts: @@collections/posts.kfg
 	versionedPosts: @@collections/versionedPosts.kfg
 	comments: @@collections/comments.kfg
+	images: @@collections/images.kfg
 
 tree:
 	users: null
@@ -18,6 +19,7 @@ tree:
 			comments: null
 		versionedPosts:
 			comments: null
+	images: null
 
 defaultDomain: mongodb://localhost:27017/restQuery
 defaultAttachmentDomain: file:///tmp/restQuery

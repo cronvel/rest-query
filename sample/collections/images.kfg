@@ -1,0 +1,12 @@
+path: /images
+
+attachmentPath: /images
+attachmentPublicBasePath: /images
+attachmentHashType: sha256
+
+properties:
+	name:
+		type: string
+	file:
+		type: attachmentSet
+
