@@ -38,9 +38,14 @@ versioning:
 
 scheduler:
 	active: true
-	period: 1000
-	tasks:
-		- task
+	retrieveDelay: 200
+	retryDelay: 500
+	maxRetry: 2
+	jobs:
+		path: /jobs
+	domains:
+		default:
+			runners: @@jobRunners.js
 
 log:
 	minLevel: 3
@@ -57,6 +62,5 @@ log:
 
 scripts: @@scripts.js
 hooks: @@app.hooks.js
-workers: @@workers.js
 
 (*>) @config.local.kfg

@@ -52,7 +52,7 @@ log/mocha.log: log/npm-dev-install.log lib/*.js test/*.js
 
 # README
 README.md: doc/*.md
-	cat doc/overview.md doc/hooks.md doc/context.md doc/workers.md > README.md
+	cat doc/overview.md doc/hooks.md doc/context.md doc/job-runners.md > README.md
 
 # Mocha Markdown BDD spec
 bdd-spec.md: log/npm-dev-install.log lib/*.js test/*.js

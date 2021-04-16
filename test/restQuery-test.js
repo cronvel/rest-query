@@ -122,7 +122,8 @@ var currentApp ;
 async function commonApp( override = null ) {
 	if ( currentApp ) { currentApp.shutdown() ; }
 
-	var app = new restQuery.App( __dirname + '/../sample/main.kfg' , override || cliOptions ) ;
+	//var app = new restQuery.App( __dirname + '/../sample/main.kfg' , override || cliOptions ) ;
+	var app = new restQuery.App( __dirname + '/../sample/main.kfg' , tree.extend( { deep: true } , {} , override , cliOptions ) ) ;
 
 	// Create a system performer
 	var performer = app.createPerformer( null , true ) ;
@@ -138,13 +139,15 @@ async function commonApp( override = null ) {
 		clearCollection( app.collectionNodes.comments.collection ) ,
 		clearCollection( app.collectionNodes.images.collection ) ,
 		
-		clearCollection( app.versionsCollection )
+		clearCollection( app.versionsCollection ) ,
+		clearCollection( app.jobsCollection )
 	] ) ;
 
 	// Sometime .buildIndexes() is really slow (more than 2 seconds) on new mongoDB
 	await app.buildIndexes() ;
 	
 	await app.loadSystemDocuments() ;
+	await app.init() ;
 
 	return { app , performer } ;
 }
@@ -8483,7 +8486,34 @@ describe( "Alter Schema" , () => {
 
 describe( "Scheduler" , () => {
 
-	it( "Test the scheduler" ) ;
+	it( "Basic test" , async function() {
+		//this.timeout( 5000 ) ;
+		
+		var runnerCalls = [] ;
+		
+		var { app , performer } = await commonApp( {
+			scheduler: {
+				retrieveDelay: 200 ,
+				runners: {
+					unit: async ( data , job , app_ ) => {
+						// Error here will be catched.
+						// So the original error will be lost, but will be detected by runnerCalls' value expectations
+						expect( app_ ).to.be( app ) ;
+						runnerCalls.push( data ) ;
+						await Promise.resolveTimeout( 200 ) ;
+					}
+				}
+			}
+		} ) ;
+		
+		await app.scheduler.start() ;
+		app.scheduler.addJob( { runner: 'unit' , scheduledFor: Date.now() + 500 , data: { key: 'value' } } ) ;
+		await Promise.resolveTimeout( 400 ) ;
+		expect( runnerCalls ).to.equal( [] ) ;
+		// 500ms of schedule + max 200ms of retrieveDelay + 200ms of runner time - 400ms of first timeout
+		await Promise.resolveTimeout( 500 ) ;
+		expect( runnerCalls ).to.equal( [ { key: 'value' } ] ) ;
+	} ) ;
 } ) ;
 
 

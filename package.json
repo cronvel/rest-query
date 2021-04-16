@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.64.0",
+  "version": "0.65.0",
   "engines": {
     "node": ">=14.15.0"
   },
@@ -24,7 +24,7 @@
     "qs-kit": "^0.6.6",
     "rest-query-shared": "^0.34.0",
     "roots-db": "^0.36.4",
-    "roots-scheduler": "^0.1.1",
+    "roots-scheduler": "^0.1.5",
     "server-kit": "^0.9.42",
     "seventh": "^0.7.40",
     "string-kit": "^0.12.5",
