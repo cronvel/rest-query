@@ -104,7 +104,8 @@ function clearDB() {
 		clearCollection( 'blogs' ) ,
 		clearCollection( 'posts' ) ,
 		clearCollection( 'comments' ) ,
-		clearCollection( 'users' )
+		clearCollection( 'users' ) ,
+		clearCollection( 'images' )
 	] ) ;
 }
 
@@ -1088,7 +1089,7 @@ describe( "Service" , () => {
 				path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
 				headers: {
 					Host: 'localhost' ,
-					"content-type": 'application/json'
+					"content-type": 'application/octet-stream'
 				} ,
 				body: new streamKit.FakeReadable( {
 					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 ) , meta: { filename: 'test2.txt' , contentType: 'text/plain' }
@@ -1296,7 +1297,7 @@ describe( "Service" , () => {
 				path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
 				headers: {
 					Host: 'localhost' ,
-					"content-type": 'application/json' ,
+					"content-type": 'application/octet-stream' ,
 					"digest": "sha-256=" + badContentHash
 				} ,
 				body: new streamKit.FakeReadable( {
@@ -1316,7 +1317,7 @@ describe( "Service" , () => {
 				path: '/Users/543bb8d7bd15a89dad7b0130/~avatar' ,
 				headers: {
 					Host: 'localhost' ,
-					"content-type": 'application/json' ,
+					"content-type": 'application/octet-stream' ,
 					"digest": "sha-256=" + contentHash
 				} ,
 				body: new streamKit.FakeReadable( {
@@ -1379,6 +1380,630 @@ describe( "Service" , () => {
 			response = await requester( getAttachmentQuery ) ;
 			expect( response.status ).to.be( 200 ) ;
 			expect( response.body ).to.be( 'b'.repeat( 40 ) ) ;
+		} ) ;
+	} ) ;
+
+
+
+	describe( "AttachmentSet" , () => {
+
+		it( "PUT an attachment on an AttachmentSet of an existing document then GET it" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ,
+				contentHash = crypto.createHash( 'sha256' ).update( 'z'.repeat( 40 ) ).digest( 'base64' ) ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					name: "image" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			var putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~file' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/octet-stream'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'z'.charCodeAt( 0 ) , meta: { filename: 'image.png' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+			//console.log( "Response:" , response ) ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7ba130" ,
+				name: "image" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				file: {
+					attachments: {
+						source: {
+							contentType: "text/plain" ,
+							filename: "image.png" ,
+							hashType: "sha256" ,
+							hash: contentHash ,
+							fileSize: 40 ,
+							metadata: {} ,
+							publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.file.attachments.source.id ,
+							id: data.file.attachments.source.id	// Cannot be predicted
+						}
+					} ,
+					metadata: {}
+				} ,
+				arrayOfAttachments: [] ,
+				arrayOfAttachmentSets: [] ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			var getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~file' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'z'.repeat( 40 ) ) ;
+
+			// Should retrieve the correct hash
+			expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
+
+
+			// GET it using the variant name
+			
+			getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~file/~source' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'z'.repeat( 40 ) ) ;
+
+			// Should retrieve the correct hash
+			expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
+
+
+			// PUT on a variant
+			
+			var contentHashThumbnail = crypto.createHash( 'sha256' ).update( 'x'.repeat( 40 ) ).digest( 'base64' ) ;
+
+			putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~file/~thumbnail' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/octet-stream'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'x'.charCodeAt( 0 ) , meta: { filename: 'thumbnail.png' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+
+
+			getQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7ba130" ,
+				name: "image" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				file: {
+					attachments: {
+						source: {
+							contentType: "text/plain" ,
+							filename: "image.png" ,
+							hashType: "sha256" ,
+							hash: contentHash ,
+							fileSize: 40 ,
+							metadata: {} ,
+							publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.file.attachments.source.id ,
+							id: data.file.attachments.source.id	// Cannot be predicted
+						} ,
+						thumbnail: {
+							contentType: "text/plain" ,
+							filename: "thumbnail.png" ,
+							hashType: "sha256" ,
+							hash: contentHashThumbnail ,
+							fileSize: 40 ,
+							metadata: {} ,
+							publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.file.attachments.thumbnail.id ,
+							id: data.file.attachments.thumbnail.id	// Cannot be predicted
+						}
+					} ,
+					metadata: {}
+				} ,
+				arrayOfAttachments: [] ,
+				arrayOfAttachmentSets: [] ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~file/~thumbnail' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'x'.repeat( 40 ) ) ;
+
+			// Should retrieve the correct hash
+			expect( response.headers.digest ).to.be( 'sha-256=' + contentHashThumbnail ) ;
+		} ) ;
+	} ) ;
+
+
+
+	describe( "Array of Attachment/AttachmentSet" , () => {
+
+		it( "PUT in an array of Attachment of an existing document then GET it" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ,
+				contentHash = crypto.createHash( 'sha256' ).update( 'z'.repeat( 40 ) ).digest( 'base64' ) ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					name: "image" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			var putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachments.0' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/octet-stream'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'z'.charCodeAt( 0 ) , meta: { filename: 'image.png' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+			//console.log( "Response:" , response ) ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7ba130" ,
+				name: "image" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				file: {
+					attachments: {} ,
+					metadata: {}
+				} ,
+				arrayOfAttachments: [
+					{
+						contentType: "text/plain" ,
+						filename: "image.png" ,
+						hashType: "sha256" ,
+						hash: contentHash ,
+						fileSize: 40 ,
+						metadata: {} ,
+						publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachments[ 0 ].id ,
+						id: data.arrayOfAttachments[ 0 ].id		// Cannot be predicted
+					}
+				] ,
+				arrayOfAttachmentSets: [] ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			var getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachments.0' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'z'.repeat( 40 ) ) ;
+
+			// Should retrieve the correct hash
+			expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
+
+			var contentHash2 = crypto.createHash( 'sha256' ).update( 'x'.repeat( 40 ) ).digest( 'base64' ) ;
+
+			putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachments.1' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/octet-stream'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'x'.charCodeAt( 0 ) , meta: { filename: 'image2.png' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+
+
+			getQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7ba130" ,
+				name: "image" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				file: {
+					attachments: {} ,
+					metadata: {}
+				} ,
+				arrayOfAttachments: [
+					{
+						contentType: "text/plain" ,
+						filename: "image.png" ,
+						hashType: "sha256" ,
+						hash: contentHash ,
+						fileSize: 40 ,
+						metadata: {} ,
+						publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachments[ 0 ].id ,
+						id: data.arrayOfAttachments[ 0 ].id		// Cannot be predicted
+					} ,
+					{
+						contentType: "text/plain" ,
+						filename: "image2.png" ,
+						hashType: "sha256" ,
+						hash: contentHash2 ,
+						fileSize: 40 ,
+						metadata: {} ,
+						publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachments[ 1 ].id ,
+						id: data.arrayOfAttachments[ 1 ].id	// Cannot be predicted
+					}
+				] ,
+				arrayOfAttachmentSets: [] ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+		} ) ;
+
+		it( "zzz PUT in an array of AttachmentSet of an existing document then GET it" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ,
+				contentHash = crypto.createHash( 'sha256' ).update( 'z'.repeat( 40 ) ).digest( 'base64' ) ;
+			
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					name: "image" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			response = await requester( putQuery ) ;
+			expect( response.status ).to.be( 201 ) ;
+			//console.log( "Response:" , response ) ;
+
+			var putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.0' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/octet-stream'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'z'.charCodeAt( 0 ) , meta: { filename: 'image.png' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7ba130" ,
+				name: "image" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				file: {
+					attachments: {} ,
+					metadata: {}
+				} ,
+				arrayOfAttachments: [] ,
+				arrayOfAttachmentSets: [
+					{
+						attachments: {
+							source: {
+								contentType: "text/plain" ,
+								filename: "image.png" ,
+								hashType: "sha256" ,
+								hash: contentHash ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 0 ].attachments.source.id ,
+								id: data.arrayOfAttachmentSets[ 0 ].attachments.source.id	// Cannot be predicted
+							}
+						} ,
+						metadata: {}
+					}
+				] ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			var getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.0' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'z'.repeat( 40 ) ) ;
+
+			// Should retrieve the correct hash
+			expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
+
+			var contentHash2 = crypto.createHash( 'sha256' ).update( 'x'.repeat( 40 ) ).digest( 'base64' ) ;
+
+			putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.1' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/octet-stream'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'x'.charCodeAt( 0 ) , meta: { filename: 'image2.png' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+
+
+			getQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7ba130" ,
+				name: "image" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				file: {
+					attachments: {} ,
+					metadata: {}
+				} ,
+				arrayOfAttachments: [] ,
+				arrayOfAttachmentSets: [
+					{
+						attachments: {
+							source: {
+								contentType: "text/plain" ,
+								filename: "image.png" ,
+								hashType: "sha256" ,
+								hash: contentHash ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 0 ].attachments.source.id ,
+								id: data.arrayOfAttachmentSets[ 0 ].attachments.source.id	// Cannot be predicted
+							}
+						} ,
+						metadata: {}
+					} ,
+					{
+						attachments: {
+							source: {
+								contentType: "text/plain" ,
+								filename: "image2.png" ,
+								hashType: "sha256" ,
+								hash: contentHash2 ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 1 ].attachments.source.id ,
+								id: data.arrayOfAttachmentSets[ 1 ].attachments.source.id	// Cannot be predicted
+							}
+						} ,
+						metadata: {}
+					}
+				] ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+			return ;
+
+
+// --------------------------------------------------------------------------------- HERE -----------------------------------------------
+
+			// More attachments inside sets
+
+			putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.1/~' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/octet-stream'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'x'.charCodeAt( 0 ) , meta: { filename: 'image2.png' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+
+
+			getQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7ba130" ,
+				name: "image" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				file: {
+					attachments: {} ,
+					metadata: {}
+				} ,
+				arrayOfAttachments: [] ,
+				arrayOfAttachmentSets: [
+					{
+						attachments: {
+							source: {
+								contentType: "text/plain" ,
+								filename: "image.png" ,
+								hashType: "sha256" ,
+								hash: contentHash ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 0 ].attachments.source.id ,
+								id: data.arrayOfAttachmentSets[ 0 ].attachments.source.id	// Cannot be predicted
+							}
+						} ,
+						metadata: {}
+					} ,
+					{
+						attachments: {
+							source: {
+								contentType: "text/plain" ,
+								filename: "image2.png" ,
+								hashType: "sha256" ,
+								hash: contentHash2 ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 1 ].attachments.source.id ,
+								id: data.arrayOfAttachmentSets[ 1 ].attachments.source.id	// Cannot be predicted
+							}
+						} ,
+						metadata: {}
+					}
+				] ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
 		} ) ;
 	} ) ;
 

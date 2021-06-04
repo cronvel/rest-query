@@ -9,4 +9,15 @@ properties:
 		type: string
 	file:
 		type: attachmentSet
+	
+	arrayOfAttachments:
+		type: array
+		default: <Array>
+		of:
+			type: attachment
 
+	arrayOfAttachmentSets:
+		type: array
+		default: <Array>
+		of:
+			type: attachmentSet
