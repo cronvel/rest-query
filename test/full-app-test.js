@@ -1750,8 +1750,8 @@ describe( "Service" , () => {
 			} ) ;
 		} ) ;
 
-		it( "zzz PUT in an array of AttachmentSet of an existing document then GET it" , async function() {
-			this.timeout( 4000 ) ;
+		it( "PUT in an array of AttachmentSet of an existing document then GET it" , async function() {
+			this.timeout( 6000 ) ;
 
 			var response , data ,
 				contentHash = crypto.createHash( 'sha256' ).update( 'z'.repeat( 40 ) ).digest( 'base64' ) ;
@@ -1923,22 +1923,20 @@ describe( "Service" , () => {
 					id: '/'
 				}
 			} ) ;
-			return ;
 
+			// New attachmentSet + set key
 
-// --------------------------------------------------------------------------------- HERE -----------------------------------------------
-
-			// More attachments inside sets
+			var contentHash3 = crypto.createHash( 'sha256' ).update( 'k'.repeat( 40 ) ).digest( 'base64' ) ;
 
 			putAttachmentQuery = {
 				method: 'PUT' ,
-				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.1/~' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.2/~archive' ,
 				headers: {
 					Host: 'localhost' ,
 					"content-type": 'application/octet-stream'
 				} ,
 				body: new streamKit.FakeReadable( {
-					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'x'.charCodeAt( 0 ) , meta: { filename: 'image2.png' , contentType: 'text/plain' }
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'k'.charCodeAt( 0 ) , meta: { filename: 'image3.png' , contentType: 'text/plain' }
 				} )
 			} ;
 
@@ -1997,6 +1995,21 @@ describe( "Service" , () => {
 							}
 						} ,
 						metadata: {}
+					} ,
+					{
+						attachments: {
+							archive: {
+								contentType: "text/plain" ,
+								filename: "image3.png" ,
+								hashType: "sha256" ,
+								hash: contentHash3 ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 2 ].attachments.archive.id ,
+								id: data.arrayOfAttachmentSets[ 2 ].attachments.archive.id	// Cannot be predicted
+							}
+						} ,
+						metadata: {}
 					}
 				] ,
 				parent: {
@@ -2004,6 +2017,211 @@ describe( "Service" , () => {
 					id: '/'
 				}
 			} ) ;
+
+			// Existing attachmentSet + set key
+
+			var contentHash4 = crypto.createHash( 'sha256' ).update( 'w'.repeat( 40 ) ).digest( 'base64' ) ;
+			var contentHash5 = crypto.createHash( 'sha256' ).update( 'y'.repeat( 40 ) ).digest( 'base64' ) ;
+
+			putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.2/~thumbnail' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/octet-stream'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'w'.charCodeAt( 0 ) , meta: { filename: 'image4.png' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+
+			putAttachmentQuery = {
+				method: 'PUT' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.0/~small' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/octet-stream'
+				} ,
+				body: new streamKit.FakeReadable( {
+					timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'y'.charCodeAt( 0 ) , meta: { filename: 'image5.png' , contentType: 'text/plain' }
+				} )
+			} ;
+
+			response = await requester( putAttachmentQuery ) ;
+			expect( response.status ).to.be( 204 ) ;
+
+
+			getQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb8d7bd15a89dad7ba130" ,
+				name: "image" ,
+				slugId: data.slugId ,	// Cannot be predicted
+				file: {
+					attachments: {} ,
+					metadata: {}
+				} ,
+				arrayOfAttachments: [] ,
+				arrayOfAttachmentSets: [
+					{
+						attachments: {
+							source: {
+								contentType: "text/plain" ,
+								filename: "image.png" ,
+								hashType: "sha256" ,
+								hash: contentHash ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 0 ].attachments.source.id ,
+								id: data.arrayOfAttachmentSets[ 0 ].attachments.source.id	// Cannot be predicted
+							} ,
+							small: {
+								contentType: "text/plain" ,
+								filename: "image5.png" ,
+								hashType: "sha256" ,
+								hash: contentHash5 ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 0 ].attachments.small.id ,
+								id: data.arrayOfAttachmentSets[ 0 ].attachments.small.id	// Cannot be predicted
+							}
+						} ,
+						metadata: {}
+					} ,
+					{
+						attachments: {
+							source: {
+								contentType: "text/plain" ,
+								filename: "image2.png" ,
+								hashType: "sha256" ,
+								hash: contentHash2 ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 1 ].attachments.source.id ,
+								id: data.arrayOfAttachmentSets[ 1 ].attachments.source.id	// Cannot be predicted
+							}
+						} ,
+						metadata: {}
+					} ,
+					{
+						attachments: {
+							archive: {
+								contentType: "text/plain" ,
+								filename: "image3.png" ,
+								hashType: "sha256" ,
+								hash: contentHash3 ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 2 ].attachments.archive.id ,
+								id: data.arrayOfAttachmentSets[ 2 ].attachments.archive.id	// Cannot be predicted
+							} ,
+							thumbnail: {
+								contentType: "text/plain" ,
+								filename: "image4.png" ,
+								hashType: "sha256" ,
+								hash: contentHash4 ,
+								fileSize: 40 ,
+								metadata: {} ,
+								publicUrl: PUBLIC_URL + '/images/543bb8d7bd15a89dad7ba130/' + data.arrayOfAttachmentSets[ 2 ].attachments.thumbnail.id ,
+								id: data.arrayOfAttachmentSets[ 2 ].attachments.thumbnail.id	// Cannot be predicted
+							}
+						} ,
+						metadata: {}
+					}
+				] ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+			
+
+			// Get (check) all files
+
+			getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.0' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'z'.repeat( 40 ) ) ;
+
+			getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.0/~source' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'z'.repeat( 40 ) ) ;
+
+			getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.0/~small' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'y'.repeat( 40 ) ) ;
+
+			getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.1/~source' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'x'.repeat( 40 ) ) ;
+
+			getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.2/~archive' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'k'.repeat( 40 ) ) ;
+
+			getAttachmentQuery = {
+				method: 'GET' ,
+				path: '/Images/543bb8d7bd15a89dad7ba130/~arrayOfAttachmentSets.2/~thumbnail' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			response = await requester( getAttachmentQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be( 'w'.repeat( 40 ) ) ;
 		} ) ;
 	} ) ;
 

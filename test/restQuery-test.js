@@ -3245,6 +3245,62 @@ describe( "AttachmentSet links" , () => {
 		var content = await streamKit.getFullString( response.output.data ) ;
 		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
+
+	it( "PUT an attachment in a an array of set, with defined set key, on an existing document, then GET it" , async function() {
+		this.timeout( 4000 ) ;
+
+		var { app , performer } = await commonApp() ;
+
+		var response , imageId ;
+
+		response = await app.post( '/Images' , { name: "image1" } , null , { performer: performer } ) ;
+		imageId = response.output.data.id ;
+
+		// We need to create an AttachmentStreams manually
+		var attachmentStreams = new rootsDb.AttachmentStreams() ;
+
+		var contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ;
+
+		attachmentStreams.addStream(
+			new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 )
+			} ) ,
+			//'avatar' ,	// the documentPath is optional because we put on the attachment link
+			null ,
+			{ filename: 'avatar.jpg' , contentType: 'image/jpeg' }
+		) ;
+
+		attachmentStreams.end() ;
+
+		response = await app.put( '/Images/' + imageId + '/~arrayOfAttachmentSets.0/~archive' ,
+			null ,
+			attachmentStreams ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Images/' + imageId + '/.arrayOfAttachmentSets.0' , { performer: performer } ) ;
+		expect( response.output.data ).to.be.like( {
+			metadata: {} ,
+			attachments: {
+				archive: {
+					contentType: "image/jpeg" ,
+					filename: "avatar.jpg" ,
+					hashType: 'sha256' ,
+					hash: contentHash ,
+					fileSize: 40 ,
+					metadata: {} ,
+					publicUrl: PUBLIC_URL + '/images/' + imageId + '/' + response.output.data.attachments.archive.id ,
+					id: response.output.data.attachments.archive.id	// unpredictable
+				}
+			}
+		} ) ;
+
+		response = await app.get( '/Images/' + imageId + '/~arrayOfAttachmentSets.0/~archive' , { performer: performer } ) ;
+		expect( response.output.data ).to.be.a( stream.Readable ) ;
+
+		var content = await streamKit.getFullString( response.output.data ) ;
+		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
+	} ) ;
 	
 	it( "More array of attachmentSet to do, also with the set key..." ) ;
 } ) ;
