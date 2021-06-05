@@ -2873,6 +2873,7 @@ describe( "Attachment links" , () => {
 			avatar: {
 				contentType: "bin/random" ,
 				filename: "random.bin" ,
+				extension: "bin" ,
 				hashType: 'sha256' ,
 				hash: contentHash ,
 				fileSize: 40 ,
@@ -2886,6 +2887,7 @@ describe( "Attachment links" , () => {
 		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
 			filename: "random.bin" ,
+			extension: "bin" ,
 			hashType: 'sha256' ,
 			hash: contentHash ,
 			fileSize: 40 ,
@@ -2947,6 +2949,7 @@ describe( "Attachment links" , () => {
 		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
 			filename: "random.bin" ,
+			extension: "bin" ,
 			hashType: 'sha256' ,
 			hash: contentHash ,
 			fileSize: 40 ,
@@ -3051,6 +3054,7 @@ describe( "Attachment links" , () => {
 		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
 			filename: "random.bin" ,
+			extension: "bin" ,
 			hashType: 'sha256' ,
 			hash: contentHash ,
 			fileSize: 40 ,
@@ -3110,6 +3114,7 @@ describe( "AttachmentSet links" , () => {
 				source: {
 					contentType: "image/jpeg" ,
 					filename: "avatar.jpg" ,
+					extension: "jpg" ,
 					hashType: 'sha256' ,
 					hash: contentHash ,
 					fileSize: 40 ,
@@ -3166,6 +3171,7 @@ describe( "AttachmentSet links" , () => {
 				source: {
 					contentType: "image/jpeg" ,
 					filename: "avatar.jpg" ,
+					extension: "jpg" ,
 					hashType: 'sha256' ,
 					hash: contentHash ,
 					fileSize: 40 ,
@@ -3229,6 +3235,7 @@ describe( "AttachmentSet links" , () => {
 				source: {
 					contentType: "image/jpeg" ,
 					filename: "avatar.jpg" ,
+					extension: "jpg" ,
 					hashType: 'sha256' ,
 					hash: contentHash ,
 					fileSize: 40 ,
@@ -3285,6 +3292,7 @@ describe( "AttachmentSet links" , () => {
 				archive: {
 					contentType: "image/jpeg" ,
 					filename: "avatar.jpg" ,
+					extension: "jpg" ,
 					hashType: 'sha256' ,
 					hash: contentHash ,
 					fileSize: 40 ,
@@ -3296,6 +3304,61 @@ describe( "AttachmentSet links" , () => {
 		} ) ;
 
 		response = await app.get( '/Images/' + imageId + '/~arrayOfAttachmentSets.0/~archive' , { performer: performer } ) ;
+		expect( response.output.data ).to.be.a( stream.Readable ) ;
+
+		var content = await streamKit.getFullString( response.output.data ) ;
+		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
+	} ) ;
+	
+	it( "with 'attachmentAppendExtension' option on, the attachment ID and the file storage should have the extension" , async function() {
+		this.timeout( 4000 ) ;
+
+		var { app , performer } = await commonApp() ;
+
+		var response , imageId ;
+
+		response = await app.post( '/Images' , { name: "image1" } , null , { performer: performer } ) ;
+		imageId = response.output.data.id ;
+
+		// We need to create an AttachmentStreams manually
+		var attachmentStreams = new rootsDb.AttachmentStreams() ;
+
+		var contentHash = crypto.createHash( 'sha256' ).update( 'b'.repeat( 40 ) ).digest( 'base64' ) ;
+
+		attachmentStreams.addStream(
+			new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'b'.charCodeAt( 0 )
+			} ) ,
+			//'avatar' ,	// the documentPath is optional because we put on the attachment link
+			null ,
+			{ filename: 'avatar.jpg' , contentType: 'image/jpeg' }
+		) ;
+
+		attachmentStreams.end() ;
+
+		response = await app.put( '/Images/' + imageId + '/~arrayOfAttachments.0' ,
+			null ,
+			attachmentStreams ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Images/' + imageId + '/.arrayOfAttachments.0' , { performer: performer } ) ;
+		expect( response.output.data ).to.be.like( {
+			contentType: "image/jpeg" ,
+			filename: "avatar.jpg" ,
+			extension: "jpg" ,
+			hashType: 'sha256' ,
+			hash: contentHash ,
+			fileSize: 40 ,
+			metadata: {} ,
+			publicUrl: PUBLIC_URL + '/images/' + imageId + '/' + response.output.data.id ,
+			id: response.output.data.id	// unpredictable
+		} ) ;
+		
+		expect( path.extname( response.output.data.id ) ).to.be( '.jpg' ) ;
+		expect( path.extname( response.output.data.publicUrl ) ).to.be( '.jpg' ) ;
+
+		response = await app.get( '/Images/' + imageId + '/~arrayOfAttachments.0' , { performer: performer } ) ;
 		expect( response.output.data ).to.be.a( stream.Readable ) ;
 
 		var content = await streamKit.getFullString( response.output.data ) ;

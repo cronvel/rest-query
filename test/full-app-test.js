@@ -1029,6 +1029,7 @@ describe( "Service" , () => {
 				avatar: {
 					contentType: 'text/plain' ,
 					filename: 'test.txt' ,
+					extension: 'txt' ,
 					hashType: 'sha256' ,
 					hash: contentHash ,
 					fileSize: 40 ,
@@ -1123,6 +1124,7 @@ describe( "Service" , () => {
 				avatar: {
 					contentType: 'text/plain' ,
 					filename: 'test2.txt' ,
+					extension: 'txt' ,
 					hashType: 'sha256' ,
 					hash: contentHash ,
 					fileSize: 40 ,
@@ -1233,6 +1235,7 @@ describe( "Service" , () => {
 				avatar: {
 					contentType: 'text/plain' ,
 					filename: 'test.txt' ,
+					extension: 'txt' ,
 					hashType: 'sha256' ,
 					hash: contentHash ,
 					fileSize: 40 ,
@@ -1356,6 +1359,7 @@ describe( "Service" , () => {
 				avatar: {
 					contentType: 'text/plain' ,
 					filename: 'test2.txt' ,
+					extension: 'txt' ,
 					hashType: 'sha256' ,
 					hash: contentHash ,
 					fileSize: 40 ,
@@ -1447,6 +1451,7 @@ describe( "Service" , () => {
 						source: {
 							contentType: "text/plain" ,
 							filename: "image.png" ,
+							extension: 'png' ,
 							hashType: "sha256" ,
 							hash: contentHash ,
 							fileSize: 40 ,
@@ -1540,6 +1545,7 @@ describe( "Service" , () => {
 						source: {
 							contentType: "text/plain" ,
 							filename: "image.png" ,
+							extension: 'png' ,
 							hashType: "sha256" ,
 							hash: contentHash ,
 							fileSize: 40 ,
@@ -1550,6 +1556,7 @@ describe( "Service" , () => {
 						thumbnail: {
 							contentType: "text/plain" ,
 							filename: "thumbnail.png" ,
+							extension: 'png' ,
 							hashType: "sha256" ,
 							hash: contentHashThumbnail ,
 							fileSize: 40 ,
@@ -1589,7 +1596,7 @@ describe( "Service" , () => {
 
 	describe( "Array of Attachment/AttachmentSet" , () => {
 
-		it( "PUT in an array of Attachment of an existing document then GET it" , async function() {
+		it( "zzz PUT in an array of Attachment of an existing document then GET it" , async function() {
 			this.timeout( 4000 ) ;
 
 			var response , data ,
@@ -1652,6 +1659,7 @@ describe( "Service" , () => {
 					{
 						contentType: "text/plain" ,
 						filename: "image.png" ,
+						extension: 'png' ,
 						hashType: "sha256" ,
 						hash: contentHash ,
 						fileSize: 40 ,
@@ -1678,6 +1686,7 @@ describe( "Service" , () => {
 			response = await requester( getAttachmentQuery ) ;
 			expect( response.status ).to.be( 200 ) ;
 			expect( response.body ).to.be( 'z'.repeat( 40 ) ) ;
+			expect( response.headers['content-disposition'] ).to.be( "inline; filename=\"image.png\"; filename*=UTF-8''image.png" ) ;
 
 			// Should retrieve the correct hash
 			expect( response.headers.digest ).to.be( 'sha-256=' + contentHash ) ;
@@ -1724,6 +1733,7 @@ describe( "Service" , () => {
 					{
 						contentType: "text/plain" ,
 						filename: "image.png" ,
+						extension: 'png' ,
 						hashType: "sha256" ,
 						hash: contentHash ,
 						fileSize: 40 ,
@@ -1734,6 +1744,7 @@ describe( "Service" , () => {
 					{
 						contentType: "text/plain" ,
 						filename: "image2.png" ,
+						extension: 'png' ,
 						hashType: "sha256" ,
 						hash: contentHash2 ,
 						fileSize: 40 ,
@@ -1815,6 +1826,7 @@ describe( "Service" , () => {
 							source: {
 								contentType: "text/plain" ,
 								filename: "image.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash ,
 								fileSize: 40 ,
@@ -1892,6 +1904,7 @@ describe( "Service" , () => {
 							source: {
 								contentType: "text/plain" ,
 								filename: "image.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash ,
 								fileSize: 40 ,
@@ -1907,6 +1920,7 @@ describe( "Service" , () => {
 							source: {
 								contentType: "text/plain" ,
 								filename: "image2.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash2 ,
 								fileSize: 40 ,
@@ -1971,6 +1985,7 @@ describe( "Service" , () => {
 							source: {
 								contentType: "text/plain" ,
 								filename: "image.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash ,
 								fileSize: 40 ,
@@ -1986,6 +2001,7 @@ describe( "Service" , () => {
 							source: {
 								contentType: "text/plain" ,
 								filename: "image2.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash2 ,
 								fileSize: 40 ,
@@ -2001,6 +2017,7 @@ describe( "Service" , () => {
 							archive: {
 								contentType: "text/plain" ,
 								filename: "image3.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash3 ,
 								fileSize: 40 ,
@@ -2081,6 +2098,7 @@ describe( "Service" , () => {
 							source: {
 								contentType: "text/plain" ,
 								filename: "image.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash ,
 								fileSize: 40 ,
@@ -2091,6 +2109,7 @@ describe( "Service" , () => {
 							small: {
 								contentType: "text/plain" ,
 								filename: "image5.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash5 ,
 								fileSize: 40 ,
@@ -2106,6 +2125,7 @@ describe( "Service" , () => {
 							source: {
 								contentType: "text/plain" ,
 								filename: "image2.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash2 ,
 								fileSize: 40 ,
@@ -2121,6 +2141,7 @@ describe( "Service" , () => {
 							archive: {
 								contentType: "text/plain" ,
 								filename: "image3.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash3 ,
 								fileSize: 40 ,
@@ -2131,6 +2152,7 @@ describe( "Service" , () => {
 							thumbnail: {
 								contentType: "text/plain" ,
 								filename: "image4.png" ,
+								extension: 'png' ,
 								hashType: "sha256" ,
 								hash: contentHash4 ,
 								fileSize: 40 ,

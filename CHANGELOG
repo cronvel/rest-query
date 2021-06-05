@@ -1,4 +1,10 @@
 
+v0.65.3
+-------
+
+New collection option: 'attachmentAppendExtension' that append extension to ID and thus to file storage
+
+
 v0.65.2
 -------
 

@@ -3,6 +3,7 @@ path: /images
 attachmentPath: /images
 attachmentPublicBasePath: /images
 attachmentHashType: sha256
+attachmentAppendExtension: yes
 
 properties:
 	name:
