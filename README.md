@@ -62,7 +62,7 @@ This hook is executed once, when Rest Query is shutting down, before the HTTP mo
 Document hooks are executed when a user issue a request on a document.
 
 **NEW:** It is now possible to specify an array of hook in the schema, they will be called one after the other (in a serial fashion).
-If one hook call `context.done()`, it will prevent default behavior as well has subsequent hooks.
+If one hook call `context.done()`, it will prevent default behavior as well as subsequent hooks.
 
 There are two type of hooks, *normal* or *before* hooks and *after* hooks.
 When a *normal* hook throw or reject, all the request is aborted, *after* hooks are run after the default behavior, and thus do not change the final
@@ -348,4 +348,20 @@ This is the data structure of a context:
 Furthermore, the context object has this public methods:
 
 * done(): mark the current request as done/finished, preventing any Rest Query's default behavior
+
+
+
+## Job Runners
+
+A Job Runner is a function of the form: `function( jobData , job , app )`.
+
+* jobData `any` the data to be processed by the job runner, this is pure userland
+* job `Scheduler.Job` it is the Job instance calling this runner, it can be used to call the Job's API
+* app `App` it is App instance running the Scheduler
+
+The Scheduler await for this function, so it MUST be async or return a `Promise`.
+After awaiting, the job is considered done and no more actions should be hanging.
+
+If it throws, the job is considered failed and may be retried later.
+If it is a permanent error, the job runner should throw an Error having a `fatal` property set to true.
 

@@ -63,4 +63,4 @@ log:
 scripts: @@scripts.js
 hooks: @@app.hooks.js
 
-(*>) @config.local.kfg
+@config.local.kfg

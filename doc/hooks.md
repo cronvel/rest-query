@@ -50,7 +50,7 @@ This hook is executed once, when Rest Query is shutting down, before the HTTP mo
 Document hooks are executed when a user issue a request on a document.
 
 **NEW:** It is now possible to specify an array of hook in the schema, they will be called one after the other (in a serial fashion).
-If one hook call `context.done()`, it will prevent default behavior as well has subsequent hooks.
+If one hook call `context.done()`, it will prevent default behavior as well as subsequent hooks.
 
 There are two type of hooks, *normal* or *before* hooks and *after* hooks.
 When a *normal* hook throw or reject, all the request is aborted, *after* hooks are run after the default behavior, and thus do not change the final

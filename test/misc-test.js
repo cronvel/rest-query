@@ -30,12 +30,12 @@
 
 
 
-var doormen = require( 'doormen' ) ;
-var kungFig = require( 'kung-fig' ) ;
-var string = require( 'string-kit' ) ;
+const doormen = require( 'doormen' ) ;
+const kungFig = require( 'kung-fig' ) ;
+const string = require( 'string-kit' ) ;
 
 // restQuery will extend doormen, so it should be loaded
-var restQuery = require( '..' ) ;
+const restQuery = require( '..' ) ;
 
 
 

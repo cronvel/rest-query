@@ -1,4 +1,10 @@
 
+v0.66.0
+-------
+
+MAYBE BREAKING: major dependencies upgrades (new Kung-Fig v0.64 does old tree-ops operators -- was using v0.54 until now)
+
+
 v0.65.3
 -------
 
