@@ -72,7 +72,7 @@ var PUBLIC_URL = 'cdn.example.com/app' ;	// From the config sample/main.kfg
 
 
 // it flatten prototype chain, so a single object owns every property of its parents
-const protoflatten = tree.extend.bind( undefined , { deep: true , immutables: [ mongodb.ObjectID.prototype ] } , null ) ;
+const protoflatten = tree.extend.bind( undefined , { deep: true , immutables: [ mongodb.ObjectId.prototype ] } , null ) ;
 
 
 

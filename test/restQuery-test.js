@@ -87,7 +87,7 @@ var blogs , posts , comments , images ;
 
 
 // it flatten prototype chain, so a single object owns every property of its parents
-var protoflatten = tree.extend.bind( undefined , { deep: true , immutables: [ mongodb.ObjectID.prototype ] } , null ) ;
+var protoflatten = tree.extend.bind( undefined , { deep: true , immutables: [ mongodb.ObjectId.prototype ] } , null ) ;
 
 
 
@@ -258,7 +258,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 	it( "GET on a property of a regular item" , async () => {
 		var { app , performer } = await commonApp() ;
 
-		var randomId = new mongodb.ObjectID() ,
+		var randomId = new mongodb.ObjectId() ,
 			userAccess = {} ;
 
 		userAccess[ randomId ] = 'read' ;	// Random unexistant ID
@@ -8816,7 +8816,7 @@ describe( "Historical bugs" , () => {
 		// Regular patch, check that the godfather has been modified, but don't contain extra data
 		response = await app.patch( '/Users/' + userId , { godfather: { _id: godfatherId , firstName: "should be removed" , lastName: "should be removed" } } , null , { performer: performer } ) ;
 		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
-		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectID ) ;
+		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectId ) ;
 		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
 	} ) ;
 	
