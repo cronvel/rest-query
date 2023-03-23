@@ -8874,3 +8874,30 @@ describe( "Historical bugs" , () => {
 	} ) ;
 } ) ;
 
+
+
+if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
+
+	describe( "fff Fake data generator" , () => {
+
+		it( "POST then GET" , async () => {
+			var { app , performer } = await commonApp() ;
+
+			var response = await app.post( '/Users/GENERATE-FAKE' ,
+				{
+					count: 3
+				} ,
+				null ,
+				{ performer: performer }
+			) ;
+
+			log.hdebug( "response.output.data: %I" , response.output.data ) ;
+
+			response = await app.get( '/Users' , { performer: performer } ) ;
+			expect( response.output.data ).to.partially.equal( {
+				parent: { id: '/' , collection: 'root' }
+			} ) ;
+		} ) ;
+	} ) ;
+}
+
