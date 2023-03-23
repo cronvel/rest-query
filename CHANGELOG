@@ -1,4 +1,10 @@
 
+v0.67.1
+-------
+
+New Collection method: GENERATE-FAKE, generating fake batch of documents
+
+
 v0.67.0
 -------
 

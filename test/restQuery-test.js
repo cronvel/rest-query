@@ -39,7 +39,7 @@ const Logfella = require( 'logfella' ) ;
 if ( cliOptions.overrideConsole === undefined ) { cliOptions.overrideConsole = false ; }
 if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 4 } ; }
 //if ( ! cliOptions.log ) { cliOptions.log = { minLevel: 1 } ; }
-const log = Logfella.global.use( 'unit-test' ) ;
+//const log = Logfella.global.use( 'unit-test' ) ;
 
 const Promise = require( 'seventh' ) ;
 
@@ -8741,7 +8741,7 @@ describe( "Misc" , () => {
 
 	it( "App's all collection exec tags" , async () => {
 		var { app , performer } = await commonApp() ;
-		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "regenerateSlug" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
+		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "regenerateSlug" , "generateFake" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
 	} ) ;
 
 	it.opt( "Collection with a user/password in URL" , async () => {
@@ -8878,9 +8878,9 @@ describe( "Historical bugs" , () => {
 
 if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
 
-	describe( "fff Fake data generator" , () => {
+	describe( "Fake data generator" , () => {
 
-		it( "POST then GET" , async () => {
+		it( "POST to method GENERATE-FAKE then GET" , async () => {
 			var { app , performer } = await commonApp() ;
 
 			var response = await app.post( '/Users/GENERATE-FAKE' ,
@@ -8891,13 +8891,25 @@ if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
 				{ performer: performer }
 			) ;
 
-			log.hdebug( "response.output.data: %I" , response.output.data ) ;
+			//log( "response.output.data: %I" , response.output.data ) ;
 
 			response = await app.get( '/Users' , { performer: performer } ) ;
-			expect( response.output.data ).to.partially.equal( {
-				parent: { id: '/' , collection: 'root' }
-			} ) ;
+			//log( "response.output.data: %[2l100000]I" , response.output.data ) ;
+			expect( response.output.data ).to.partially.equal( [
+				{
+					parent: { id: '/' , collection: 'root' }
+				} ,
+				{
+					parent: { id: '/' , collection: 'root' }
+				} ,
+				{
+					parent: { id: '/' , collection: 'root' }
+				}
+			] ) ;
 		} ) ;
+
+		it( "Better tests" ) ;
+		it( "Test partial errors" ) ;
 	} ) ;
 }
 

@@ -5,13 +5,20 @@ attachmentPath: /users
 attachmentPublicBasePath: /users
 attachmentHashType: sha256
 
+fakeDataGenerator:
+	type: faker
+	locale: fr
+
 properties:
 	firstName:
 		type: string
+		fake: firstName
 	lastName:
 		type: string
+		fake: lastName
 	email: 
 		type: email
+		fake: email
 	avatar:
 		type: attachment
 		optional: true
