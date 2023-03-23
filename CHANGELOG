@@ -1,4 +1,10 @@
 
+v0.67.2
+-------
+
+Fix GENERATE-FAKE so that slugs are correctly generated
+
+
 v0.67.1
 -------
 

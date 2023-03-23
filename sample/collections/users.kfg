@@ -5,10 +5,6 @@ attachmentPath: /users
 attachmentPublicBasePath: /users
 attachmentHashType: sha256
 
-fakeDataGenerator:
-	type: faker
-	locale: fr
-
 properties:
 	firstName:
 		type: string
@@ -41,3 +37,13 @@ indexes:
 	-	properties:
 			godfather: 1
 
+fakeDataGenerator:
+	type: faker
+	locale: fr
+
+slugGeneration:
+	properties:
+		- firstName
+		- lastName
+	unicode: true
+	retry: true

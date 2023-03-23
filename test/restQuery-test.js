@@ -8906,6 +8906,15 @@ if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
 					parent: { id: '/' , collection: 'root' }
 				}
 			] ) ;
+
+			// Check if slugs are generated appropriately
+			for ( let index = 0 ; index < 3 ; index ++ ) {
+				expect( response.output.data[ index ].slugId ).to.be(
+					string.latinize( response.output.data[ index ].firstName ).toLowerCase()
+					+ '-'
+					+ string.latinize( response.output.data[ index ].lastName ).toLowerCase()
+				) ;
+			}
 		} ) ;
 
 		it( "Better tests" ) ;
