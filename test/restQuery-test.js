@@ -3887,6 +3887,12 @@ describe( "Slug usages" , () => {
 
 
 
+describe( "HID (Human ID) usages" , () => {
+	it( "TODO" ) ;
+} ) ;
+
+
+
 describe( "Auto collection" , () => {
 
 	it( "Root auto collection" , async () => {
