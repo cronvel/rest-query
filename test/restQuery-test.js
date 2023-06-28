@@ -3968,6 +3968,47 @@ describe( "HID (Human ID) usages" , () => {
 		response = await app.get( '/Users/5437f846c41d0e910ec9a876' , { performer: performer } ) ;
 		expect( response.output.data.hid.match( /^Joe Doe \([0-9]{3}\)$/ ) ).to.be.ok() ;
 	} ) ;
+
+	it( "the HID MUST BE regenerated each time its generating properties change" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Users/5437f846e41d0e910ec9abcd' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846e41d0e910ec9abcd' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			hid: 'Joe Doe' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+
+		response = await app.patch( '/Users/5437f846e41d0e910ec9abcd' ,
+			{
+				firstName: "Joana" ,
+				lastName: "Smith"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846e41d0e910ec9abcd' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joana" ,
+			lastName: "Smith" ,
+			hid: 'Joana Smith' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+	} ) ;
 } ) ;
 
 
