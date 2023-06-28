@@ -1,6 +1,7 @@
 collections:
 	root: @@collections/root.kfg
 	users: @@collections/users.kfg
+	uniqueUsers: @@collections/uniqueUsers.kfg
 	groups: @@collections/groups.kfg
 	scheduledTasks: @@collections/scheduledTasks.kfg
 	blogs: @@collections/blogs.kfg
@@ -11,6 +12,7 @@ collections:
 
 tree:
 	users: null
+	uniqueUsers: null
 	groups: null
 	scheduledTasks: null
 	blogs:

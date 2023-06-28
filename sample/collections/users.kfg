@@ -47,3 +47,8 @@ slugGeneration:
 		- lastName
 	unicode: true
 	retry: true
+hidGeneration:
+	properties:
+		- firstName
+		- lastName
+	retry: true

@@ -1,0 +1,26 @@
+# For testing HID with no retry
+
+path: /uniqueUsers
+
+properties:
+	firstName:
+		type: string
+		fake: firstName
+	lastName:
+		type: string
+		fake: lastName
+
+fakeDataGenerator:
+	type: faker
+	locale: fr
+
+slugGeneration:
+	properties:
+		- firstName
+		- lastName
+	unicode: true
+	retry: true
+hidGeneration:
+	properties:
+		- firstName
+		- lastName

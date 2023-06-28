@@ -133,6 +133,7 @@ async function commonApp( override = null ) {
 	await Promise.all( [
 		clearCollection( app.collectionNodes.root.collection ) ,
 		clearCollection( app.collectionNodes.users.collection ) ,
+		clearCollection( app.collectionNodes.uniqueUsers.collection ) ,
 		clearCollection( app.collectionNodes.groups.collection ) ,
 		clearCollection( app.collectionNodes.blogs.collection ) ,
 		clearCollection( app.collectionNodes.posts.collection ) ,
@@ -3760,7 +3761,7 @@ describe( "Slug usages" , () => {
 		) ).to.reject( ErrorStatus , { type: 'conflict' , code: 'duplicateKey' , httpStatus: 409 } ) ;
 	} ) ;
 
-	it( "when a document would generate the same slugId but the slugGeneration.retry option is set in the schema, it should retry by appending parts of the ID to the slug" , async () => {
+	it( "when a document would generate the same slugId but the slugGeneration.retry option is set in the schema, it should retry by appending a random number to the slug" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
@@ -3888,7 +3889,85 @@ describe( "Slug usages" , () => {
 
 
 describe( "HID (Human ID) usages" , () => {
-	it( "TODO" ) ;
+
+	it( "when 'hidGeneration' is used on the schema, it should generate a HID (Human ID) from its properties array values" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Users/5437f846e41d0e910ec9abcd' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846e41d0e910ec9abcd' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			hid: 'Joe Doe' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+	} ) ;
+
+	it( "when a document would generate the same HID, it should fail with a 409 - Conflict" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/UniqueUsers' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		await expect( () => app.post( '/UniqueUsers' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'conflict' , code: 'duplicateKey' , httpStatus: 409 } ) ;
+	} ) ;
+
+	it( "when a document would generate the same HID but the hidGeneration.retry option is set in the schema, it should retry by appending a random number to the HID" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Users/5437f846c41d0e910ec9a432' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.put( '/Users/5437f846c41d0e910ec9a876' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "notjoe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846c41d0e910ec9a876' , { performer: performer } ) ;
+		expect( response.output.data.hid.match( /^Joe Doe \([0-9]{3}\)$/ ) ).to.be.ok() ;
+	} ) ;
 } ) ;
 
 
@@ -6785,8 +6864,8 @@ describe( "Access" , () => {
 			
 			response = await app.put( '/Users/5437f846c41d0ef10ec9a5ff' ,
 				{
-					firstName: 'anon' ,
-					lastName: 'anon' ,
+					firstName: 'Anon' ,
+					lastName: 'Nyme' ,
 					email: 'anon@yopmail.com' ,
 					password: 'az78s' ,
 					publicAccess: 'none' ,
@@ -6820,10 +6899,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: "Anon" ,
+				lastName: "Nyme" ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6834,7 +6914,8 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6845,10 +6926,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6868,10 +6950,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6882,7 +6965,8 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6893,10 +6977,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6913,10 +6998,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6936,10 +7022,11 @@ describe( "Access" , () => {
 			expect( ( data = getFiltered( response ) ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6972,10 +7059,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6986,7 +7074,8 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6997,10 +7086,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7020,10 +7110,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7034,7 +7125,8 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7045,10 +7137,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7065,10 +7158,11 @@ describe( "Access" , () => {
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
 				email: "anon@yopmail.com" ,
-				firstName: "anon" ,
-				lastName: "anon" ,
+				firstName: 'Anon' ,
+				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
-				slugId: "anon-anon" ,
+				slugId: "anon-nyme" ,
+				hid: "Anon Nyme" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -8747,7 +8841,7 @@ describe( "Misc" , () => {
 
 	it( "App's all collection exec tags" , async () => {
 		var { app , performer } = await commonApp() ;
-		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "regenerateSlug" , "generateFake" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
+		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "regenerateSlug" , "regenerateHid" , "generateFake" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
 	} ) ;
 
 	it.opt( "Collection with a user/password in URL" , async () => {
