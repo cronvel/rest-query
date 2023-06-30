@@ -4008,6 +4008,71 @@ describe( "HID (Human ID) usages" , () => {
 			hid: 'Joana Smith' ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
+
+		response = await app.patch( '/Users/5437f846e41d0e910ec9abcd' ,
+			{
+				firstName: "Paul" ,
+				lastName: "Smith"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846e41d0e910ec9abcd' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Paul" ,
+			lastName: "Smith" ,
+			hid: 'Paul Smith' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+	} ) ;
+
+	it( "when a document change (PATCH) and would regenerate the same HID but the hidGeneration.retry option is set in the schema, it should retry by appending a random number to the HID" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Users/5437f846c41d0e910ec9a876' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.put( '/Users/5437f846e41d0e910ec9abcd' ,
+			{
+				firstName: "Joana" ,
+				lastName: "Smith" ,
+				email: "joana.smith@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846e41d0e910ec9abcd' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joana" ,
+			lastName: "Smith" ,
+			hid: 'Joana Smith' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+
+		response = await app.patch( '/Users/5437f846e41d0e910ec9abcd' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846e41d0e910ec9abcd' , { performer: performer } ) ;
+		expect( response.output.data.hid.match( /^Joe Doe \([0-9]{3}\)$/ ) ).to.be.ok() ;
 	} ) ;
 } ) ;
 
