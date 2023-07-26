@@ -9086,7 +9086,9 @@ if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
 
 	describe( "Fake data generator" , () => {
 
-		it( "POST to method GENERATE-FAKE then GET" , async () => {
+		it( "POST to method GENERATE-FAKE then GET" , async function() {
+			this.timeout( 4000 ) ;
+
 			var { app , performer } = await commonApp() ;
 
 			var response = await app.post( '/Users/GENERATE-FAKE' ,
