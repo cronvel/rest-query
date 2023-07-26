@@ -49,6 +49,9 @@ scheduler:
 		default:
 			runners: @@jobRunners.js
 
+http:
+	allowOrigin: "*"
+
 log:
 	minLevel: 3
 	overrideConsole: false
