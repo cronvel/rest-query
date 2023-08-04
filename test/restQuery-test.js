@@ -1575,7 +1575,7 @@ describe( "Queries of nested object" , () => {
 
 describe( "Links" , () => {
 
-	it( "GET on a link" , async () => {
+	it( "GET on a link target" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , godfatherId , userId ;
@@ -1794,7 +1794,94 @@ describe( "Links" , () => {
 
 	it( "PUT through a link" ) ;
 
-	it( "PATCH on a link" , async () => {
+	it( "Set the link directly by doing a PATCH on the link with an ID" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response , userId , godfatherId , godfatherId2 ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "THE" ,
+				lastName: "GODFATHER" ,
+				email: "godfather@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "DAT" ,
+				lastName: "GODFATHER!?" ,
+				email: "godfather2@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		godfatherId2 = response.output.data.id ;
+
+		// Set the godfather
+
+		response = await app.patch( '/Users/' + userId ,
+			{
+				godfather: godfatherId
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'THE' ,
+			lastName: 'GODFATHER' ,
+			slugId: 'the-godfather' ,
+			email: 'godfather@gmail.com' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+		expect( response.output.data._id.toString() ).to.be( godfatherId.toString() ) ;
+		expect( godfatherId.toString() ).to.be( godfatherId.toString() ) ;
+
+		// Set the godfather again
+
+		response = await app.patch( '/Users/' + userId ,
+			{
+				godfather: godfatherId2
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'DAT' ,
+			lastName: 'GODFATHER!?' ,
+			slugId: 'dat-godfather' ,
+			email: 'godfather2@gmail.com' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+		expect( response.output.data._id.toString() ).to.be( godfatherId2.toString() ) ;
+		expect( godfatherId2.toString() ).to.be( godfatherId2.toString() ) ;
+	} ) ;
+
+	it( "PATCH on a link target" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , userId , godfatherId ;
@@ -1840,7 +1927,7 @@ describe( "Links" , () => {
 
 	it( "PATCH through a link" ) ;
 
-	it( "DELETE on a link" , async () => {
+	it( "DELETE a link target" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , userId , godfatherId ;
@@ -9118,9 +9205,9 @@ if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
 			// Check if slugs are generated appropriately
 			for ( let index = 0 ; index < 3 ; index ++ ) {
 				expect( response.output.data[ index ].slugId ).to.be(
-					string.latinize( response.output.data[ index ].firstName ).toLowerCase()
+					string.latinize( response.output.data[ index ].firstName ).toLowerCase().replace( / / , '-' )
 					+ '-'
-					+ string.latinize( response.output.data[ index ].lastName ).toLowerCase()
+					+ string.latinize( response.output.data[ index ].lastName ).toLowerCase().replace( / / , '-' )
 				) ;
 			}
 		} ) ;

@@ -312,33 +312,28 @@ function multipartRequest( query ) {
 
 
 
-/* Hooks */
-
-
-
-before( () => {
-	return Promise.all( [ connect() , runApp() ] ) ;
-} ) ;
-
-
-
-after( () => {
-	return killApp() ;
-} ) ;
-
-
-
-beforeEach( clearDB ) ;
-
-
-
-
-
 /* Tests */
 
 
 
 describe( "Service" , () => {
+
+	// Should not be top-level, or they will be launched concurrently with other unit-test files
+
+	before( async () => {
+		//log.hdebug( "Executing before" ) ;
+		//await Promise.resolveTimeout( 1000 ) ;
+		await Promise.all( [ connect() , runApp() ] ) ;
+		//log.hdebug( "Executing before done" ) ;
+	} ) ;
+
+	after( () => {
+		return killApp() ;
+	} ) ;
+
+	beforeEach( clearDB ) ;
+
+
 
 	describe( "Basics tests" , () => {
 
