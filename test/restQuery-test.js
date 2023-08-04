@@ -1794,7 +1794,7 @@ describe( "Links" , () => {
 
 	it( "PUT through a link" ) ;
 
-	it( "Set the link directly by doing a PATCH on the link with an ID" , async () => {
+	it( "Set/unset the link directly by doing a PATCH on the link with an ID/null" , async () => {
 		var { app , performer } = await commonApp() ;
 
 		var response , userId , godfatherId , godfatherId2 ;
@@ -1879,6 +1879,39 @@ describe( "Links" , () => {
 		} ) ;
 		expect( response.output.data._id.toString() ).to.be( godfatherId2.toString() ) ;
 		expect( godfatherId2.toString() ).to.be( godfatherId2.toString() ) ;
+
+		// delete the godfather link
+
+		response = await app.patch( '/Users/' + userId ,
+			{
+				godfather: null
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		await expect( () => app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
+
+		// Set the godfather
+
+		response = await app.patch( '/Users/' + userId ,
+			{
+				godfather: godfatherId
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		
+		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: 'THE' ,
+			lastName: 'GODFATHER' ,
+			slugId: 'the-godfather' ,
+			email: 'godfather@gmail.com' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+		expect( response.output.data._id.toString() ).to.be( godfatherId.toString() ) ;
+		expect( godfatherId.toString() ).to.be( godfatherId.toString() ) ;
 	} ) ;
 
 	it( "PATCH on a link target" , async () => {
