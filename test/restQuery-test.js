@@ -7128,6 +7128,7 @@ describe( "Access" , () => {
 				firstName: "Anon" ,
 				lastName: "Nyme" ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7155,6 +7156,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7179,6 +7181,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7206,6 +7209,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7227,6 +7231,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7251,6 +7256,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7288,6 +7294,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7315,6 +7322,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7339,6 +7347,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7366,6 +7375,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -7387,6 +7397,7 @@ describe( "Access" , () => {
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
 				login: "anon@yopmail.com" ,
+				friends: [] ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
 				parent: {
@@ -9235,8 +9246,56 @@ if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
 				}
 			] ) ;
 
+			var fatherIdStrings = response.output.data.map( e => '' + e._id ) ;
+
+
+			// Now father/godfather links could be created
+			response = await app.post( '/Users/GENERATE-FAKE' ,
+				{
+					count: 3
+				} ,
+				null ,
+				{ performer: performer }
+			) ;
+
+			//log( "response.output.data: %I" , response.output.data ) ;
+			response = await app.get( '/Users' , { performer: performer } ) ;
+			//log( "response.output.data: %[2l100000]I" , response.output.data ) ;
+			expect( response.output.data ).to.partially.equal( [
+				{
+					parent: { id: '/' , collection: 'root' }
+				} ,
+				{
+					parent: { id: '/' , collection: 'root' }
+				} ,
+				{
+					parent: { id: '/' , collection: 'root' }
+				} ,
+				{
+					parent: { id: '/' , collection: 'root' }
+				} ,
+				{
+					parent: { id: '/' , collection: 'root' }
+				} ,
+				{
+					parent: { id: '/' , collection: 'root' }
+				}
+			] ) ;
+
+
+			// .father link is always created, check it now!
+			for ( let index = 0 ; index < 6 ; index ++ ) {
+				if ( ! fatherIdStrings.includes( '' + response.output.data[ index ]._id ) ) {
+					// So this is NOT a father, so it MUST have a father
+					expect( response.output.data[ index ].father._id ).to.be.an( 'objectId' ) ;
+					expect( fatherIdStrings ).to.include( '' + response.output.data[ index ].father._id ) ;
+					expect( response.output.data[ index ].friends.length ).to.be.within( 1 , 3 ) ;
+					//log( "response.output.data[%i].friends: %I" , index , response.output.data[ index ].friends ) ;
+				}
+			}
+
 			// Check if slugs are generated appropriately
-			for ( let index = 0 ; index < 3 ; index ++ ) {
+			for ( let index = 0 ; index < 6 ; index ++ ) {
 				expect( response.output.data[ index ].slugId ).to.be(
 					string.latinize( response.output.data[ index ].firstName ).toLowerCase().replace( / / , '-' )
 					+ '-'
