@@ -1,4 +1,10 @@
 
+v0.69.11
+--------
+
+Creating API keys is no restrained to system performer anymore, it just need 'apiKeyManagement' to be granted
+
+
 v0.69.10
 --------
 

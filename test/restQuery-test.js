@@ -4379,7 +4379,7 @@ describe( "Tokens" , () => {
 			agentId: "0123456789"
 		} ) ;
 
-		// Test the API key with the WHO-AM-I method
+		// Test the token with the WHO-AM-I method
 		response = await app.get( '/Users/WHO-AM-I' , { performer: tokenPerformer } ) ;
 		expect( response.output.data ).to.equal( {
 			authBy: 'token' ,
