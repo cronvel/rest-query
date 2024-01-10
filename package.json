@@ -26,18 +26,18 @@
     "rest-query-shared": "^0.35.0",
     "roots-db": "^0.39.1",
     "roots-scheduler": "^0.2.1",
-    "server-kit": "^0.10.1",
+    "server-kit": "^0.10.2",
     "seventh": "^0.9.2",
     "string-kit": "^0.18.0",
     "token-kit": "^0.2.1",
-    "tree-kit": "^0.8.1",
+    "tree-kit": "^0.8.3",
     "utterminal": "^0.7.0"
   },
   "devDependencies": {
     "form-data": "^4.0.0",
     "fs-kit": "^0.6.5",
     "minimist": "^1.2.8",
-    "mongodb": "^5.7.0",
+    "mongodb": "^5.9.2",
     "stream-kit": "^0.4.15"
   },
   "scripts": {
