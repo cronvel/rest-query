@@ -1,4 +1,10 @@
 
+v0.69.13
+--------
+
+Import improved: 'onDuplicateKey' hook fully supported, embedded links supported (using wildcard)
+
+
 v0.69.12
 --------
 
