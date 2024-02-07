@@ -1,4 +1,10 @@
 
+v0.69.16
+--------
+
+Fix a nasty bug with config having values that are method's name of Object.prototype (fix the 'sanitize: toString' bug)
+
+
 v0.69.15
 --------
 
