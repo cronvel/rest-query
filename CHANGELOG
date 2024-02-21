@@ -1,4 +1,10 @@
 
+v0.69.18
+--------
+
+Now an index can be used as the default for collation
+
+
 v0.69.17
 --------
 
