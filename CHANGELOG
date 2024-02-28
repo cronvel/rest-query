@@ -1,4 +1,10 @@
 
+v0.69.19
+--------
+
+Doormen and RootsDB upgraded: fix major bugs with document patching (NaN bug, patch to inner embedded array, overlaping patch keys)
+
+
 v0.69.18
 --------
 
