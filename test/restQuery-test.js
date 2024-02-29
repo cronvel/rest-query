@@ -4194,6 +4194,28 @@ describe( "HID (Human ID) usages" , () => {
 		response = await app.get( '/Users/5437f846e41d0e910ec9abcd' , { performer: performer } ) ;
 		expect( response.output.data.hid.match( /^Joe Doe \([0-9]{3}\)$/ ) ).to.be.ok() ;
 	} ) ;
+
+	it( "using the hidGeneration.format property" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/UniqueUsers/5437f846e41d9e910ec9abcd' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/UniqueUsers/5437f846e41d9e910ec9abcd' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			hid: 'Doe (Joe)' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+	} ) ;
 } ) ;
 
 

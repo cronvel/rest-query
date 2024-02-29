@@ -22,5 +22,6 @@ slugGeneration:
 	retry: true
 hidGeneration:
 	properties:
-		- firstName
 		- lastName
+		- firstName
+	format: %s (%s)
