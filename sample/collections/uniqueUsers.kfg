@@ -9,6 +9,9 @@ properties:
 	lastName:
 		type: string
 		fake: lastName
+	age:
+		type: number
+		fake: number.int
 
 fakeDataGenerator:
 	type: faker
@@ -24,4 +27,7 @@ hidGeneration:
 	properties:
 		- lastName
 		- firstName
-	format: %s (%s)
+		- age
+	# Use %s for the age, because we are testing a bug where the value 0 was giving undefined with %s
+	# due to a bad cast before calling string-kit.format()
+	format: %s, %s (%s)

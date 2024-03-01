@@ -1,4 +1,10 @@
 
+v0.69.21
+--------
+
+Fixing new HID format feature, where the value was falsy
+
+
 v0.69.20
 --------
 

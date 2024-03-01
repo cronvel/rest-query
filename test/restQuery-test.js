@@ -4041,6 +4041,7 @@ describe( "HID (Human ID) usages" , () => {
 			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
+				age: 42 ,
 				publicAccess: 'all'
 			} ,
 			null ,
@@ -4051,6 +4052,7 @@ describe( "HID (Human ID) usages" , () => {
 			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
+				age: 42 ,
 				publicAccess: 'all'
 			} ,
 			null ,
@@ -4202,6 +4204,7 @@ describe( "HID (Human ID) usages" , () => {
 			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
+				age: 42 ,
 				publicAccess: 'all'
 			} ,
 			null ,
@@ -4212,7 +4215,27 @@ describe( "HID (Human ID) usages" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			firstName: "Joe" ,
 			lastName: "Doe" ,
-			hid: 'Doe (Joe)' ,
+			hid: 'Doe, Joe (42)' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+
+		// Check that the bug with 0 as a string is fixed
+		response = await app.put( '/UniqueUsers/5497f846e41d9e910ec9abcd' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				age: 0 ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/UniqueUsers/5497f846e41d9e910ec9abcd' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			hid: 'Doe, Joe (0)' ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
