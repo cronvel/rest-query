@@ -1,4 +1,10 @@
 
+v0.69.22
+--------
+
+New CLI command: clear-collections. It interactively clears collections.
+
+
 v0.69.21
 --------
 
