@@ -887,7 +887,7 @@ describe( "Service" , () => {
 				email: "joe.doe2@gmail.com" ,
 				login: "joe.doe2@gmail.com" ,
 				friends: [] ,
-				//groups: {} ,
+				//groups: [] ,
 				slugId: data.slugId ,	// Cannot be predicted
 				hid: "Joe Doe2" ,
 				parent: {
@@ -910,7 +910,7 @@ describe( "Service" , () => {
 				email: "joe.doe2@gmail.com" ,
 				login: "joe.doe2@gmail.com" ,
 				friends: [] ,
-				groups: {} ,
+				groups: [] ,
 				slugId: data.slugId ,	// Cannot be predicted
 				hid: "Joe Doe2" ,
 				userAccess: {} ,
@@ -1024,7 +1024,7 @@ describe( "Service" , () => {
 				email: "joe.doe2@gmail.com" ,
 				login: "joe.doe2@gmail.com" ,
 				friends: [] ,
-				//groups: {} ,
+				//groups: [] ,
 				slugId: data.slugId ,	// Cannot be predicted
 				hid: "Joe Doe2" ,
 				avatar: {
@@ -1121,7 +1121,7 @@ describe( "Service" , () => {
 				email: "joe.doe2@gmail.com" ,
 				login: "joe.doe2@gmail.com" ,
 				friends: [] ,
-				//groups: {} ,
+				//groups: [] ,
 				slugId: data.slugId ,	// Cannot be predicted
 				hid: "Joe Doe2" ,
 				avatar: {
@@ -1234,7 +1234,7 @@ describe( "Service" , () => {
 				email: "joe.doe2@gmail.com" ,
 				login: "joe.doe2@gmail.com" ,
 				friends: [] ,
-				//groups: {} ,
+				//groups: [] ,
 				slugId: data.slugId ,	// Cannot be predicted
 				hid: "Joe Doe2" ,
 				avatar: {
@@ -1360,7 +1360,7 @@ describe( "Service" , () => {
 				email: "joe.doe2@gmail.com" ,
 				login: "joe.doe2@gmail.com" ,
 				friends: [] ,
-				//groups: {} ,
+				//groups: [] ,
 				slugId: data.slugId ,	// Cannot be predicted
 				hid: "Joe Doe2" ,
 				avatar: {
@@ -2348,7 +2348,7 @@ describe( "Service" , () => {
 				login: "joe.doe@gmail.com" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				hid: "Joe Doe" ,
-				//groups: {} ,
+				//groups: [] ,
 				parent: {
 					collection: 'root' ,
 					id: '/'
@@ -2362,7 +2362,7 @@ describe( "Service" , () => {
 					friends: [] ,
 					slugId: data.father.slugId ,
 					hid: "Big Joe Doe" ,
-					//groups: {} ,
+					//groups: [] ,
 					parent: {
 						collection: 'root' ,
 						id: "/"
@@ -2377,7 +2377,7 @@ describe( "Service" , () => {
 					friends: [] ,
 					slugId: data.godfather.slugId ,
 					hid: "THE GODFATHER" ,
-					//groups: {} ,
+					//groups: [] ,
 					parent: {
 						collection: 'root' ,
 						id: "/"
@@ -2406,7 +2406,7 @@ describe( "Service" , () => {
 				login: "joe.doe@gmail.com" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				hid: "Joe Doe" ,
-				groups: {} ,
+				groups: [] ,
 				parent: {
 					collection: 'root' ,
 					id: '/'
@@ -2427,7 +2427,7 @@ describe( "Service" , () => {
 					friends: [] ,
 					slugId: data.father.slugId ,
 					hid: "Big Joe Doe" ,
-					groups: {} ,
+					groups: [] ,
 					userAccess: {} ,
 					groupAccess: {} ,
 					publicAccess: { traverse: true , read: true , create: true } ,
@@ -2445,7 +2445,7 @@ describe( "Service" , () => {
 					friends: [] ,
 					slugId: data.godfather.slugId ,
 					hid: "THE GODFATHER" ,
-					groups: {} ,
+					groups: [] ,
 					userAccess: {} ,
 					groupAccess: {} ,
 					publicAccess: { traverse: true , read: true , create: true } ,
@@ -2477,7 +2477,7 @@ describe( "Service" , () => {
 				login: "joe.doe@gmail.com" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				hid: "Joe Doe" ,
-				groups: {} ,
+				groups: [] ,
 				parent: {
 					collection: 'root' ,
 					id: '/'
@@ -2606,7 +2606,7 @@ describe( "Service" , () => {
 					login: "big.joe.doe@gmail.com" ,
 					slugId: data[ 0 ].slugId ,
 					hid: "Big Joe Doe" ,
-					//groups: {} ,
+					//groups: [] ,
 					//father: null, godfather: null,
 					friends: [] ,
 					parent: {
@@ -2622,7 +2622,7 @@ describe( "Service" , () => {
 					login: "joe.doe@gmail.com" ,
 					slugId: data[ 1 ].slugId ,	// Cannot be predicted
 					hid: "Joe Doe" ,
-					//groups: {} ,
+					//groups: [] ,
 					parent: {
 						collection: 'root' ,
 						id: '/'
@@ -2636,7 +2636,7 @@ describe( "Service" , () => {
 						friends: [] ,
 						slugId: data[ 0 ].slugId ,
 						hid: "Big Joe Doe" ,
-						//groups: {} ,
+						//groups: [] ,
 						parent: {
 							collection: 'root' ,
 							id: "/"
@@ -2651,7 +2651,7 @@ describe( "Service" , () => {
 						friends: [] ,
 						slugId: data[ 2 ].slugId ,
 						hid: "THE GODFATHER" ,
-						//groups: {} ,
+						//groups: [] ,
 						parent: {
 							collection: 'root' ,
 							id: "/"
@@ -2667,7 +2667,7 @@ describe( "Service" , () => {
 					login: "godfather@gmail.com" ,
 					slugId: data[ 2 ].slugId ,
 					hid: "THE GODFATHER" ,
-					//groups: {} ,
+					//groups: [] ,
 					//father: null, godfather: null,
 					friends: [] ,
 					parent: {
@@ -2705,7 +2705,7 @@ describe( "Service" , () => {
 					friends: [] ,
 					slugId: data[ 0 ].slugId ,
 					hid: "Big Joe Doe" ,
-					groups: {} ,
+					groups: [] ,
 					//father: null, godfather: null,
 					friends: [] ,
 					userAccess: {} ,
@@ -2725,7 +2725,7 @@ describe( "Service" , () => {
 					friends: [] ,
 					slugId: data[ 1 ].slugId ,	// Cannot be predicted
 					hid: "Joe Doe" ,
-					groups: {} ,
+					groups: [] ,
 					userAccess: {} ,
 					groupAccess: {} ,
 					publicAccess: { traverse: true , read: true , create: true } ,
@@ -2742,7 +2742,7 @@ describe( "Service" , () => {
 						friends: [] ,
 						slugId: data[ 0 ].slugId ,
 						hid: "Big Joe Doe" ,
-						groups: {} ,
+						groups: [] ,
 						userAccess: {} ,
 						groupAccess: {} ,
 						publicAccess: { traverse: true , read: true , create: true } ,
@@ -2760,7 +2760,7 @@ describe( "Service" , () => {
 						friends: [] ,
 						slugId: data[ 2 ].slugId ,
 						hid: "THE GODFATHER" ,
-						groups: {} ,
+						groups: [] ,
 						userAccess: {} ,
 						groupAccess: {} ,
 						publicAccess: { traverse: true , read: true , create: true } ,
@@ -2780,7 +2780,7 @@ describe( "Service" , () => {
 					friends: [] ,
 					slugId: data[ 2 ].slugId ,
 					hid: "THE GODFATHER" ,
-					groups: {} ,
+					groups: [] ,
 					//father: null, godfather: null,
 					friends: [] ,
 					userAccess: {} ,
@@ -2818,7 +2818,7 @@ describe( "Service" , () => {
 					login: "big.joe.doe@gmail.com" ,
 					slugId: data[ 0 ].slugId ,
 					hid: "Big Joe Doe" ,
-					groups: {} ,
+					groups: [] ,
 					//father: null, godfather: null,
 					friends: [] ,
 					userAccess: {} ,
@@ -2836,7 +2836,7 @@ describe( "Service" , () => {
 					email: "joe.doe@gmail.com" ,
 					login: "joe.doe@gmail.com" ,
 					slugId: data[ 1 ].slugId ,	// Cannot be predicted
-					groups: {} ,
+					groups: [] ,
 					hid: "Joe Doe" ,
 					userAccess: {} ,
 					groupAccess: {} ,
@@ -2875,7 +2875,7 @@ describe( "Service" , () => {
 					login: "godfather@gmail.com" ,
 					slugId: data[ 2 ].slugId ,
 					hid: "THE GODFATHER" ,
-					groups: {} ,
+					groups: [] ,
 					//father: null, godfather: null,
 					friends: [] ,
 					userAccess: {} ,

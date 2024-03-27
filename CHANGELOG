@@ -1,4 +1,10 @@
 
+v0.70.0
+-------
+
+Roots-DB BREAKING change: back-links are stored as arrays and proxified as arrays even when empty
+
+
 v0.69.26
 --------
 

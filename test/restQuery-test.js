@@ -4430,7 +4430,7 @@ describe( "Tokens" , () => {
 			authBy: 'token' ,
 			performer: {
 				_id: id ,
-				groups: {} ,
+				groups: [] ,
 				login: "bobby.fisher@gmail.com" ,
 				slugId: "bobby-fisher"
 			}
@@ -5038,7 +5038,7 @@ describe( "API keys" , () => {
 			authBy: 'apiKey' ,
 			performer: {
 				_id: userId ,
-				groups: {} ,
+				groups: [] ,
 				login: "bobby.fisher@gmail.com" ,
 				slugId: "bobby-fisher"
 			}
@@ -7262,7 +7262,7 @@ describe( "Access" , () => {
 					id: "/"
 				} ,
 				
-				groups: {} ,
+				groups: [] ,
 				
 				publicAccess: {} ,
 				userAccess: userAccess ,
@@ -7284,7 +7284,7 @@ describe( "Access" , () => {
 					id: "/"
 				} ,
 				
-				groups: {} ,
+				groups: [] ,
 				
 				publicAccess: {} ,
 				userAccess: userAccess ,
@@ -7309,7 +7309,7 @@ describe( "Access" , () => {
 					id: "/"
 				} ,
 				
-				groups: {} ,
+				groups: [] ,
 				
 				publicAccess: {} ,
 				userAccess: userAccess ,
@@ -7428,7 +7428,7 @@ describe( "Access" , () => {
 					id: "/"
 				} ,
 				
-				groups: {} ,
+				groups: [] ,
 				
 				publicAccess: {} ,
 				userAccess: userAccess ,
@@ -7450,7 +7450,7 @@ describe( "Access" , () => {
 					id: "/"
 				} ,
 				
-				groups: {} ,
+				groups: [] ,
 				
 				publicAccess: {} ,
 				userAccess: userAccess ,
