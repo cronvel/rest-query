@@ -8801,6 +8801,74 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 		expect( response.output.data ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
 	} ) ;
 
+	it( "Custom collection batch method" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		var userId1 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Bob" ,
+				lastName: "Ross" ,
+				email: "bob.ross@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		var userId2 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fischer" ,
+				email: "bobby.fischer@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		var userId3 = response.output.data.id ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Jack" ,
+				lastName: "Doe" ,
+				email: "jack.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		var userId4 = response.output.data.id ;
+
+		response = await app.get( '/Users/GET-FIRST-NAMES' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' , 'Bob' , 'Bobby' , 'Jack' ] ) ;
+
+		response = await app.get( '/Users/GET-FIRST-NAMES' , { performer: performer , input: { query: { filter: { lastName: 'Doe' } } } } ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' , 'Jack' ] ) ;
+
+		response = await app.post( '/Users/GET-FIRST-NAMES' , {} , null , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' , 'Bob' , 'Bobby' , 'Jack' ] ) ;
+
+		response = await app.post( '/Users/GET-FIRST-NAMES' , {} , null , { performer: performer , input: { query: { filter: { lastName: 'Doe' } } } } ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' , 'Jack' ] ) ;
+	} ) ;
+
 	it( "Custom object method" , async () => {
 		var { app , performer } = await commonApp() ;
 

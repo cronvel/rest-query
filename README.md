@@ -329,6 +329,8 @@ This is the data structure of a context:
 * targetCollectionNode `CollectionNode` (optional) *internal usage only*
 * ancestors `Array` *internal usage only*
 * batchOf `Array` (optional) *internal usage only*
+* getBatchQuery `Object` (optional) *internal usage only*
+* getBatchOptions `Object` (optional) *internal usage only*
 * linkerObjectNode `ObjectNode` (optional) the *objectNode* that is linking to the current node
 * linkerPath (optional) *internal usage only*
 * document `Document` (optional) the targeted/created/related document in its final state, for object methods it is the same as `.objectNode.object`
@@ -348,6 +350,10 @@ This is the data structure of a context:
 Furthermore, the context object has this public methods:
 
 * done(): mark the current request as done/finished, preventing any Rest Query's default behavior
+* getBatch(): an **async** function (only works for collection methods) returning the same batch that would be returned by the query
+  if there wasn't any method part in the URL.
+  Query-string filters, sort, limits, populate and so on are also applied.
+  This is useful for collection methods that are not simple namespaced methods, but instead methods that are applied on a batch.
 
 
 

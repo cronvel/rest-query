@@ -36,7 +36,7 @@ const Promise = require( 'seventh' ) ;
 
 
 exports.doSomething = context => {
-	log.debug( '>>>>>>>>>> doSomething, context: %I' , context ) ;
+	//log.debug( '>>>>>>>>>> doSomething, context: %I' , context ) ;
 	
 	if ( ! context.input.document ) {
 		context.output.data = { done: "nothing" , cause: "this is a GET request" } ;
@@ -44,6 +44,23 @@ exports.doSomething = context => {
 	else {
 		context.output.data = { done: "something" , to: context.input.document.to } ;
 	}
+	
+	return Promise.resolved ;
+} ;
+
+
+
+exports.getFirstNames = async ( context ) => {
+	var batch = await context.getBatch() ;
+	//log.hdebug( 'context.getBatch(): %I' , batch ) ;
+	
+	var names = new Set() ;
+
+	for ( let user of batch ) {
+		names.add( user.firstName ) ;
+	}
+
+	context.output.data = [ ... names ] ;
 	
 	return Promise.resolved ;
 } ;

@@ -39,6 +39,10 @@ hooks: @@users.hooks.js
 
 indexes:
 	-	properties:
+			fistName: 1
+	-	properties:
+			lastName: 1
+	-	properties:
 			godfather: 1
 
 fakeDataGenerator:
