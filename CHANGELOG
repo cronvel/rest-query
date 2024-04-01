@@ -1,4 +1,10 @@
 
+v0.70.2
+-------
+
+Improved batch-oriented method API: context.getUserBatch() / context.getRealBatch()
+
+
 v0.70.1
 -------
 

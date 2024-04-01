@@ -139,14 +139,14 @@ async function commonApp( override = null ) {
 		clearCollection( app.collectionNodes.posts.collection ) ,
 		clearCollection( app.collectionNodes.comments.collection ) ,
 		clearCollection( app.collectionNodes.images.collection ) ,
-		
+
 		clearCollection( app.versionsCollection ) ,
 		clearCollection( app.jobsCollection )
 	] ) ;
 
 	// Sometime .buildIndexes() is really slow (more than 2 seconds) on new mongoDB
 	await app.buildIndexes() ;
-	
+
 	await app.loadSystemDocuments() ;
 	await app.init() ;
 
@@ -174,7 +174,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 	it( "GET on the root object" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response = await app.get( '/' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			name: '/' ,
@@ -182,7 +182,9 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: [ 'id' , 'content' , 'system-content' ] , query: true , create: true }
+			publicAccess: {
+				traverse: true , read: [ 'id' , 'content' , 'system-content' ] , query: true , create: true
+			}
 		} ) ;
 	} ) ;
 
@@ -214,13 +216,13 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 	it( "PATCH on the root object" , async () => {
 		var { app , performer } = await commonApp() ;
-		
+
 		var response = await app.patch( '/' ,
 			{ description: 'A wonderful website' } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			name: '/' ,
@@ -277,7 +279,9 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		expect( response.output.data ).to.be( 'My wonderful life' ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/.userAccess.' + randomId , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( { traverse: true , read: ['id','content','system-content'] , exec: ['id','content'] , query: true } ) ;
+		expect( response.output.data ).to.equal( {
+			traverse: true , read: [ 'id' , 'content' , 'system-content' ] , exec: [ 'id' , 'content' ] , query: true
+		} ) ;
 	} ) ;
 
 	it( "POST then GET" , async () => {
@@ -457,8 +461,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 		var { app , performer } = await commonApp() ;
 
 		var response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
-			{
-				title: 'My wonderful life 2!!!' ,
+			{ title: 'My wonderful life 2!!!' ,
 				description: 'This is a supa blog! (x2)' ,
 				publicAccess: 'all' } ,
 			null ,
@@ -481,7 +484,7 @@ describe( "Basic queries of top-level collections" , () => {
 	it( "GET on an empty collection" , async () => {
 		var { app , performer } = await commonApp() ;
 		var response = await app.get( '/Blogs' , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( [] ) ;
+		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
 
 	it( "GET on a collection with items" , async () => {
@@ -504,7 +507,7 @@ describe( "Basic queries of top-level collections" , () => {
 		await blog2.save() ;
 
 		var response = await app.get( '/Blogs' , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( [
+		expect( response.output.data ).to.be.like( [
 			{
 				title: 'My wonderful life' ,
 				description: 'This is a supa blog!' ,
@@ -567,7 +570,7 @@ describe( "Query: skip, limit, sort" , () => {
 		await blog3.save() ;
 
 		var response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 } } } ) ;
-		expect( response.output.data ).to.equal( [
+		expect( response.output.data ).to.be.like( [
 			{
 				title: 'My wonderful life' ,
 				description: 'This is a supa blog!' ,
@@ -597,7 +600,7 @@ describe( "Query: skip, limit, sort" , () => {
 		] ) ;
 
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { skip: 1 } } } ) ;
-		expect( response.output.data ).to.equal( [
+		expect( response.output.data ).to.be.like( [
 			{
 				title: 'YAB' ,
 				description: 'Yet Another Blog' ,
@@ -658,16 +661,16 @@ describe( "Query: skip, limit, sort" , () => {
 		] ;
 
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 1 } } } } ) ;
-		expect( response.output.data ).to.equal( expected ) ;
+		expect( response.output.data ).to.be.like( expected ) ;
 
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: '1' } } } } ) ;
-		expect( response.output.data ).to.equal( expected ) ;
+		expect( response.output.data ).to.be.like( expected ) ;
 
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'asc' } } } } ) ;
-		expect( response.output.data ).to.equal( expected ) ;
+		expect( response.output.data ).to.be.like( expected ) ;
 
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'ascendant' } } } } ) ;
-		expect( response.output.data ).to.equal( expected ) ;
+		expect( response.output.data ).to.be.like( expected ) ;
 
 
 		// descendant sorting
@@ -701,16 +704,16 @@ describe( "Query: skip, limit, sort" , () => {
 		] ;
 
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: -1 } } } } ) ;
-		expect( response.output.data ).to.equal( expected ) ;
+		expect( response.output.data ).to.be.like( expected ) ;
 
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: '-1' } } } } ) ;
-		expect( response.output.data ).to.equal( expected ) ;
-		
+		expect( response.output.data ).to.be.like( expected ) ;
+
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'desc' } } } } ) ;
-		expect( response.output.data ).to.equal( expected ) ;
+		expect( response.output.data ).to.be.like( expected ) ;
 
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'descendant' } } } } ) ;
-		expect( response.output.data ).to.equal( expected ) ;
+		expect( response.output.data ).to.be.like( expected ) ;
 	} ) ;
 } ) ;
 
@@ -735,7 +738,7 @@ describe( "Query: filters and text search" , () => {
 			content: 'First post content.' ,
 			date: new Date( '2018-12-12' ) ,
 			likes: 19 ,
-			emotes: ['happy','thumb-up'] ,
+			emotes: [ 'happy' , 'thumb-up' ] ,
 			parent: { collection: 'blogs' , id: blog.getId() } ,
 			publicAccess: 'all'
 		} ) ;
@@ -747,7 +750,7 @@ describe( "Query: filters and text search" , () => {
 			content: 'Second post content.' ,
 			date: new Date( '2018-12-14' ) ,
 			likes: 28 ,
-			emotes: ['sad'] ,
+			emotes: [ 'sad' ] ,
 			parent: { collection: 'blogs' , id: blog.getId() } ,
 			publicAccess: 'all'
 		} ) ;
@@ -764,7 +767,7 @@ describe( "Query: filters and text search" , () => {
 		} ) ;
 
 		await post3.save() ;
-		
+
 		expectedPost1 = {
 			_id: post1.getId() ,
 			slugId: post1.slugId ,
@@ -772,7 +775,7 @@ describe( "Query: filters and text search" , () => {
 			content: 'First post content.' ,
 			date: post1.date ,
 			likes: 19 ,
-			emotes: ['happy','thumb-up'] ,
+			emotes: [ 'happy' , 'thumb-up' ] ,
 			parent: { id: blog.getId() , collection: 'blogs' } ,
 			userAccess: {} ,
 			groupAccess: {} ,
@@ -780,7 +783,7 @@ describe( "Query: filters and text search" , () => {
 				traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 			}
 		} ;
-		
+
 		expectedPost2 = {
 			_id: post2.getId() ,
 			slugId: post2.slugId ,
@@ -788,7 +791,7 @@ describe( "Query: filters and text search" , () => {
 			content: 'Second post content.' ,
 			date: post2.date ,
 			likes: 28 ,
-			emotes: ['sad'] ,
+			emotes: [ 'sad' ] ,
 			parent: { id: blog.getId() , collection: 'blogs' } ,
 			userAccess: {} ,
 			groupAccess: {} ,
@@ -796,7 +799,7 @@ describe( "Query: filters and text search" , () => {
 				traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
 			}
 		} ;
-		
+
 		expectedPost3 = {
 			_id: post3.getId() ,
 			slugId: post3.slugId ,
@@ -809,144 +812,144 @@ describe( "Query: filters and text search" , () => {
 			groupAccess: {} ,
 			publicAccess: {
 				traverse: true , read: true , write: true , delete: true , overwrite: true , exec: true , query: true , create: true
-			} 
+			}
 		} ;
 	} ) ;
 
 	it( "GET on a collection with a filter using standard match on scalar fields" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { title: 'Third post' } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost3 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost3 ] ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: 19 } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $eq perfect match" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $eq: 19 } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using standard match on array fields should match when the array has that argument as element" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: 'happy' } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $eq perfect match on array fields should throw if the argument is not an array" , async () => {
 		await expect( () => app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: 'happy' } } } } } ) )
 			.to.reject.with( ErrorStatus , { type: 'badRequest' } ) ;
 	} ) ;
-	
-	it( "GET on a collection with a filter using $eq perfect match on array fields should match when the argument is the full array" , async () => {
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: ['happy','thumb-up'] } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
 
-		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: ['happy'] } } } } } ) ;
-		expect( response.output.data ).to.equal( [] ) ;
+	it( "GET on a collection with a filter using $eq perfect match on array fields should match when the argument is the full array" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: [ 'happy' , 'thumb-up' ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: [ 'happy' ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $ne match" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $ne: 19 } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost2 , expectedPost3 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost2 , expectedPost3 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $gt match" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $gt: 19 } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost2 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost2 ] ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $gt: 40 } } } } } ) ;
-		expect( response.output.data ).to.equal( [] ) ;
+		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $gte match" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $gte: 19 } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost2 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 , expectedPost2 ] ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $gte: 40 } } } } } ) ;
-		expect( response.output.data ).to.equal( [] ) ;
+		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $lt match" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $lt: 19 } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost3 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost3 ] ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $lt: 4 } } } } } ) ;
-		expect( response.output.data ).to.equal( [] ) ;
+		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $lte match" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $lte: 19 } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost3 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 , expectedPost3 ] ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $lte: 4 } } } } } ) ;
-		expect( response.output.data ).to.equal( [] ) ;
+		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $in match on _id" , async () => {
 		// Without sanitizing
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { _id: { $in: [ post1.getId() , post3.getId() ] } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost3 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 , expectedPost3 ] ) ;
 
 		// With sanitizing needed
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { _id: { $in: [ post1.getKey() , post3.getKey() ] } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost3 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 , expectedPost3 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $in match on scalar fields should match when the value is one of the element of the array argument" , async () => {
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $in: [10,11,12,19,20] } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $in: [ 10 , 11 , 12 , 19 , 20 ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
 
-		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $in: [10,11,12,20] } } } } } ) ;
-		expect( response.output.data ).to.equal( [] ) ;
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $in: [ 10 , 11 , 12 , 20 ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $in match on array fields should match when the array has one of the element of the array argument" , async () => {
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $in: ['bob','thumb-up'] } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 ] ) ;
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $in: [ 'bob' , 'thumb-up' ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
 
-		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $in: ['bob','thumb-down'] } } } } } ) ;
-		expect( response.output.data ).to.equal( [] ) ;
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $in: [ 'bob' , 'thumb-down' ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $nin match on scalar fields should NOT match when the value is one of the element of the array argument" , async () => {
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $nin: [10,11,12,19,20] } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost2 , expectedPost3 ] ) ;
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $nin: [ 10 , 11 , 12 , 19 , 20 ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost2 , expectedPost3 ] ) ;
 
-		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $nin: [10,11,12,20] } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost2 , expectedPost3 ] ) ;
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { likes: { $nin: [ 10 , 11 , 12 , 20 ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 , expectedPost2 , expectedPost3 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using $nin match on array fields should NOT match when the array has one of the element of the array argument" , async () => {
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $nin: ['bob','thumb-up'] } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost2 , expectedPost3 ] ) ;
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $nin: [ 'bob' , 'thumb-up' ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost2 , expectedPost3 ] ) ;
 
-		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $nin: ['bob','thumb-down'] } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost1 , expectedPost2 , expectedPost3 ] ) ;
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $nin: [ 'bob' , 'thumb-down' ] } } } } } ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 , expectedPost2 , expectedPost3 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using standard match with a Date object" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { date: post3.date } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost3 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost3 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using standard match with a date string, the string should be sanitized to a Date instance" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { date: '2018-12-16' } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost3 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost3 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection with a filter using 'greater than or equal' to a Date object" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { date: { $gte: post2.date } } } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost2 , expectedPost3 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost2 , expectedPost3 ] ) ;
 	} ) ;
-	
+
 	it( "GET on a collection filtering on a text search" , async () => {
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { search: 'second' } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost2 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost2 ] ) ;
 
 		// search
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { search: 'content' } } } ) ;
-		expect( response.output.data ).to.equal( [ expectedPost3 , expectedPost2 , expectedPost1 ] ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost3 , expectedPost2 , expectedPost1 ] ) ;
 	} ) ;
-	
+
 	it( "indexed and unindexed queries with the 'unindexedQueries' collection option" ) ;
 } ) ;
 
@@ -955,7 +958,7 @@ describe( "Query: filters and text search" , () => {
 describe( "Advanced PATCH commands" , () => {
 
 	// Patches are using doormen.applyPatch() behind the scene
-	
+
 	it( "PATCH and $delete/$unset command" , async () => {
 		var { app , performer } = await commonApp() ;
 
@@ -963,7 +966,7 @@ describe( "Advanced PATCH commands" , () => {
 			{
 				title: 'My wonderful life!!!' ,
 				description: 'This is a supa blog!' ,
-				embedded: { a: 'a' , b: 'b' , array: [1,2,3] } ,
+				embedded: { a: 'a' , b: 'b' , array: [ 1 , 2 , 3 ] } ,
 				publicAccess: 'all'
 			} ,
 			null ,
@@ -972,7 +975,7 @@ describe( "Advanced PATCH commands" , () => {
 
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
-				"embedded.a": { $unset: true } ,
+				"embedded.a": { $unset: true }
 			} ,
 			null ,
 			{ performer: performer }
@@ -982,7 +985,7 @@ describe( "Advanced PATCH commands" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			description: 'This is a supa blog!' ,
-			embedded: { b: 'b' , array: [1,2,3] } ,
+			embedded: { b: 'b' , array: [ 1 , 2 , 3 ] } ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
@@ -994,7 +997,7 @@ describe( "Advanced PATCH commands" , () => {
 			{
 				title: 'My wonderful life!!!' ,
 				description: 'This is a supa blog!' ,
-				embedded: { a: 'a' , b: 'b' , array: [1,2,3] } ,
+				embedded: { a: 'a' , b: 'b' , array: [ 1 , 2 , 3 ] } ,
 				publicAccess: 'all'
 			} ,
 			null ,
@@ -1003,7 +1006,7 @@ describe( "Advanced PATCH commands" , () => {
 
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
-				"embedded.array": { $push: 18 } ,
+				"embedded.array": { $push: 18 }
 			} ,
 			null ,
 			{ performer: performer }
@@ -1013,7 +1016,7 @@ describe( "Advanced PATCH commands" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life!!!' ,
 			description: 'This is a supa blog!' ,
-			embedded: { a: 'a' , b: 'b' , array: [1,2,3,18] } ,
+			embedded: { a: 'a' , b: 'b' , array: [ 1 , 2 , 3 , 18 ] } ,
 			parent: { id: '/' , collection: 'root' }
 		} ) ;
 	} ) ;
@@ -1087,7 +1090,7 @@ describe( "Advanced PATCH commands" , () => {
 		) ;
 
 		groupId = response.output.data.id ;
-		
+
 		response = await app.get( '/Groups/' + groupId , { performer: performer } ) ;
 		expect( response.output.data.users ).to.equal( [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ] ) ;
 
@@ -1416,7 +1419,7 @@ describe( "Queries of nested object" , () => {
 
 		expect( response.output.data ).to.have.length( 3 ) ;
 
-		expect( response.output.data ).to.partially.equal( [
+		expect( response.output.data ).to.be.partially.like( [
 			{
 				title: 'My first post!' ,
 				content: 'Blah blah blah.' ,
@@ -1660,7 +1663,7 @@ describe( "Links" , () => {
 		userId = response.output.data.id ;
 
 		response = await app.get( '/Users/' , { performer: performer , input: { query: { filter: { godfather: godfatherId } } } } ) ;
-		expect( response.output.data ).to.partially.equal( [ {
+		expect( response.output.data ).to.be.partially.like( [ {
 			firstName: 'Joe' ,
 			lastName: 'Doe' ,
 			slugId: 'joe-doe' ,
@@ -1669,7 +1672,7 @@ describe( "Links" , () => {
 			godfather: { _id: godfatherId }
 		} ] ) ;
 	} ) ;
-	
+
 	it( "GET through a link" ) ;
 
 	it( "PUT (create) on a link" , async () => {
@@ -1847,7 +1850,7 @@ describe( "Links" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			firstName: 'THE' ,
@@ -1868,7 +1871,7 @@ describe( "Links" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			firstName: 'DAT' ,
@@ -1889,7 +1892,7 @@ describe( "Links" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		await expect( () => app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 
 		// Set the godfather
@@ -1901,7 +1904,7 @@ describe( "Links" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Users/' + userId + '/~godfather' , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			firstName: 'THE' ,
@@ -2230,7 +2233,7 @@ describe( "Links" , () => {
 				email: "godfather@gmail.com"
 			}
 		} ) ;
-		
+
 		// Remove another link
 		response = await app.delete( '/Users/' + godfatherId , { performer: performer } ) ;
 		response = await app.get( '/Users/' + userId , { performer: performer , query: { populate: [ 'father' , 'godfather' ] } } ) ;
@@ -2527,24 +2530,24 @@ describe( "Multi-links" , () => {
 
 		// Without operator behavior
 		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: userId1 } } } } ) ;
-		expect( response.output.data ).to.partially.equal( [ {
+		expect( response.output.data ).to.be.partially.like( [ {
 			name: "The Group" ,
 			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]
 		} ] ) ;
 
 		// With the element-compatible operator $in
 		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $in: userId1 } } } } } ) ;
-		expect( response.output.data ).to.partially.equal( [ {
+		expect( response.output.data ).to.be.partially.like( [ {
 			name: "The Group" ,
 			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]
 		} ] ) ;
 
 		// With element-compatible operator $nin
 		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $nin: userId1 } } } } } ) ;
-		expect( response.output.data ).to.partially.equal( [] ) ;
-		
+		expect( response.output.data ).to.be.partially.like( [] ) ;
+
 		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $nin: userId4 } } } } } ) ;
-		expect( response.output.data ).to.partially.equal( [ {
+		expect( response.output.data ).to.be.partially.like( [ {
 			name: "The Group" ,
 			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]
 		} ] ) ;
@@ -2662,8 +2665,7 @@ describe( "Multi-links" , () => {
 		userId2 = response.output.data.id ;
 
 		response = await app.post( '/Groups' ,
-			{
-				name: "The Group" ,
+			{ name: "The Group" ,
 				users: [ userId1 , userId2 ] ,
 				publicAccess: "all" } ,
 			null ,
@@ -2672,8 +2674,7 @@ describe( "Multi-links" , () => {
 		groupId = response.output.data.id ;
 
 		response = await app.patch( '/Groups/' + groupId + '/~~users/' + userId1 ,
-			{
-				firstName: "Joey" ,
+			{ firstName: "Joey" ,
 				email: "joey.doe@gmail.com" } ,
 			null ,
 			{ performer: performer }
@@ -2738,7 +2739,7 @@ describe( "Multi-links" , () => {
 		response = await app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } ) ;
 		batch = response.output.data ;
 		expect( batch ).to.have.length( 2 ) ;
-		expect( batch ).to.partially.equal( [
+		expect( batch ).to.be.partially.like( [
 			{
 				_id: userId1 ,
 				firstName: 'Joe' ,
@@ -2759,7 +2760,7 @@ describe( "Multi-links" , () => {
 		response = await app.get( '/Groups/' + groupId + '/~~users' , { performer: performer } ) ;
 		batch = response.output.data ;
 		expect( batch ).to.have.length( 1 ) ;
-		expect( batch ).to.partially.equal( [ {
+		expect( batch ).to.be.partially.like( [ {
 			_id: userId2 ,
 			firstName: 'Jack' ,
 			lastName: 'Wallace'
@@ -2922,7 +2923,7 @@ describe( "Multi-links" , () => {
 				}
 			]
 		} ) ;
-		
+
 		response = await app.delete( '/Users/' + userId1 , { performer: performer } ) ;
 
 		response = await app.get( '/Groups/' + groupId , { performer: performer , query: { populate: [ 'users' ] } } ) ;
@@ -2941,7 +2942,7 @@ describe( "Multi-links" , () => {
 				}
 			]
 		} ) ;
-		
+
 	} ) ;
 } ) ;
 
@@ -3120,7 +3121,9 @@ describe( "Attachment links" , () => {
 			} ) ,
 			//'avatar' ,	// the documentPath is optional because we put on the attachment link
 			null ,
-			{ filename: 'random.bin' , contentType: 'bin/random' , hash: badContentHash , fileSize: 40 }
+			{
+				filename: 'random.bin' , contentType: 'bin/random' , hash: badContentHash , fileSize: 40
+			}
 		) ;
 
 		badAttachmentStreams.end() ;
@@ -3128,7 +3131,7 @@ describe( "Attachment links" , () => {
 		await expect( () => app.put( '/Users/' + userId + '/~avatar' , null , badAttachmentStreams , { performer: performer } ) )
 			.to.eventually.throw( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
 
-		
+
 		// Then, with a bad file size
 
 		var badAttachmentStreams2 = new rootsDb.AttachmentStreams() ;
@@ -3139,7 +3142,9 @@ describe( "Attachment links" , () => {
 			} ) ,
 			//'avatar' ,	// the documentPath is optional because we put on the attachment link
 			null ,
-			{ filename: 'random.bin' , contentType: 'bin/random' , hash: contentHash , fileSize: 15 }
+			{
+				filename: 'random.bin' , contentType: 'bin/random' , hash: contentHash , fileSize: 15
+			}
 		) ;
 
 		badAttachmentStreams2.end() ;
@@ -3147,9 +3152,9 @@ describe( "Attachment links" , () => {
 		await expect( () => app.put( '/Users/' + userId + '/~avatar' , null , badAttachmentStreams2 , { performer: performer } ) )
 			.to.eventually.throw( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
 
-		
+
 		// Start over with the correct checksum
-		
+
 		var attachmentStreams = new rootsDb.AttachmentStreams() ;
 
 		attachmentStreams.addStream(
@@ -3158,7 +3163,9 @@ describe( "Attachment links" , () => {
 			} ) ,
 			//'avatar' ,	// the documentPath is optional because we put on the attachment link
 			null ,
-			{ filename: 'random.bin' , contentType: 'bin/random' , hash: contentHash , fileSize: 40 }
+			{
+				filename: 'random.bin' , contentType: 'bin/random' , hash: contentHash , fileSize: 40
+			}
 		) ;
 
 		attachmentStreams.end() ;
@@ -3169,8 +3176,8 @@ describe( "Attachment links" , () => {
 			{ performer: performer }
 		) ;
 
-		
-		
+
+
 		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
 		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
@@ -3430,7 +3437,7 @@ describe( "AttachmentSet links" , () => {
 		var content = await streamKit.getFullString( response.output.data ) ;
 		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
-	
+
 	it( "with 'attachmentAppendExtension' option on, the attachment ID and the file storage should have the extension" , async function() {
 		this.timeout( 4000 ) ;
 
@@ -3475,7 +3482,7 @@ describe( "AttachmentSet links" , () => {
 			publicUrl: PUBLIC_URL + '/images/' + imageId + '/' + response.output.data.id ,
 			id: response.output.data.id	// unpredictable
 		} ) ;
-		
+
 		expect( path.extname( response.output.data.id ) ).to.be( '.jpg' ) ;
 		expect( path.extname( response.output.data.publicUrl ) ).to.be( '.jpg' ) ;
 
@@ -3485,7 +3492,7 @@ describe( "AttachmentSet links" , () => {
 		var content = await streamKit.getFullString( response.output.data ) ;
 		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
-	
+
 	it( "More array of attachmentSet to do, also with the set key..." ) ;
 } ) ;
 
@@ -3608,7 +3615,7 @@ describe( "Users" , () => {
 		expect( response.output.data.password.algo ).to.be( 'sha512' ) ;
 		expect( response.output.data.password.salt ).to.be.a( 'string' ) ;
 		expect( response.output.data.password.hash ).to.be.a( 'string' ) ;
-		
+
 		// check back the password
 		expect( hash.password( "a-secret-password" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
 	} ) ;
@@ -3640,7 +3647,7 @@ describe( "Groups" , () => {
 
 
 describe( "Versioned collections" , () => {
-	
+
 	it( "POST, then PUT (overwrite), then GET" , async () => {
 		var { app , performer } = await commonApp() ;
 
@@ -3668,7 +3675,7 @@ describe( "Versioned collections" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			_version: 1 ,
 			title: 'My first post!!!' ,
-			content: 'Blah blah blah...' ,
+			content: 'Blah blah blah...'
 		} ) ;
 		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
 
@@ -3676,7 +3683,7 @@ describe( "Versioned collections" , () => {
 		response = await app.put( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId  ,
 			{
 				title: 'My first post!!!' ,
-				content: 'Edit: Blah blah blah...' ,
+				content: 'Edit: Blah blah blah...'
 			} ,
 			null ,
 			{ performer: performer }
@@ -3686,7 +3693,7 @@ describe( "Versioned collections" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			_version: 2 ,
 			title: 'My first post!!!' ,
-			content: 'Edit: Blah blah blah...' ,
+			content: 'Edit: Blah blah blah...'
 		} ) ;
 		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
 
@@ -3703,13 +3710,13 @@ describe( "Versioned collections" , () => {
 		expect( response.output.data ).to.partially.equal( {
 			_version: 3 ,
 			title: 'My 1st post!!!' ,
-			content: 'Edit: Blah blah blah...' ,
+			content: 'Edit: Blah blah blah...'
 		} ) ;
 		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
-		
-		
+
+
 		// Now check that everything was correctly versioned as it should
-		
+
 		var batch = await app.versionsCollection.find( { '_activeVersion._id': postId , '_activeVersion._collection': 'versionedPosts' } ) ;
 		expect( batch ).to.be.partially.like( [
 			{
@@ -3722,7 +3729,7 @@ describe( "Versioned collections" , () => {
 				} ,
 				title: 'My first post!!!' ,
 				content: 'Blah blah blah...'
-            } ,
+			} ,
 			{
 				_id: batch[ 1 ]._id ,   // unpredictable
 				_version: 2 ,
@@ -3733,16 +3740,16 @@ describe( "Versioned collections" , () => {
 				} ,
 				title: 'My first post!!!' ,
 				content: 'Edit: Blah blah blah...'
-            } 
-        ] ) ;
+			}
+		] ) ;
 
 		// DELETE
 		response = await app.delete( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId  , { performer: performer } ) ;
 		await expect( () => app.get( '/Blogs/' + blog.getId() + '/VersionedPosts/' + postId , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
-		
-		
+
+
 		// Now check that all versions are still there
-		
+
 		var batch = await app.versionsCollection.find( { '_activeVersion._id': postId , '_activeVersion._collection': 'versionedPosts' } ) ;
 		expect( batch ).to.be.partially.like( [
 			{
@@ -3755,7 +3762,7 @@ describe( "Versioned collections" , () => {
 				} ,
 				title: 'My first post!!!' ,
 				content: 'Blah blah blah...'
-            } ,
+			} ,
 			{
 				_id: batch[ 1 ]._id ,   // unpredictable
 				_version: 2 ,
@@ -3766,7 +3773,7 @@ describe( "Versioned collections" , () => {
 				} ,
 				title: 'My first post!!!' ,
 				content: 'Edit: Blah blah blah...'
-            } ,
+			} ,
 			{
 				_id: batch[ 2 ]._id ,   // unpredictable
 				_version: 3 ,
@@ -3777,8 +3784,8 @@ describe( "Versioned collections" , () => {
 				} ,
 				title: 'My 1st post!!!' ,
 				content: 'Edit: Blah blah blah...'
-            } 
-        ] ) ;
+			}
+		] ) ;
 	} ) ;
 } ) ;
 
@@ -4493,8 +4500,7 @@ describe( "Tokens" , () => {
 		var { app , performer } = await commonApp() ;
 
 		var response = await app.post( '/Blogs' ,
-			{
-				title: 'My wonderful life' ,
+			{ title: 'My wonderful life' ,
 				description: 'This is a supa blog!' ,
 				publicAccess: 'all' } ,
 			null ,
@@ -5044,7 +5050,7 @@ describe( "API keys" , () => {
 			}
 		} ) ;
 	} ) ;
-	
+
 	it( "POST to the REVOKE-API-KEY method should remove a specific API key from the user document" , async () => {
 		var { app , performer } = await commonApp() ;
 
@@ -5100,7 +5106,7 @@ describe( "API keys" , () => {
 				start: apiKey2.slice( 0 , 6 )
 			}
 		] ) ;
-		
+
 		// Revoke the API key now
 		response = await app.post( '/Users/' + userId + '/REVOKE-API-KEY' , { apiKey: apiKey1 } , null , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( { removed: 1 } ) ;
@@ -5124,7 +5130,7 @@ describe( "API keys" , () => {
 		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
 		expect( response.output.data.apiKeys ).to.equal( [] ) ;
 	} ) ;
-	
+
 	it( "POST to the REVOKE-ALL-API-KEYS method should remove all API key from the user document" , async () => {
 		var { app , performer } = await commonApp() ;
 
@@ -5180,7 +5186,7 @@ describe( "API keys" , () => {
 				start: apiKey2.slice( 0 , 6 )
 			}
 		] ) ;
-		
+
 		// Revoke ALL API key now
 		response = await app.post( '/Users/' + userId + '/REVOKE-ALL-API-KEYS' , {} , null , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( { removed: 2 } ) ;
@@ -5373,9 +5379,9 @@ describe( "Access" , () => {
 
 	it( "Check that groups are correctly initialized" , async () => {
 		var groups ;
-		
+
 		//authorizedByGroupPerformer.reset() ;
-		
+
 		groups = await authorizedByGroupPerformer.getGroups() ;
 		expect( groups ).to.be.partially.like( [
 			{ _id: unauthorizedGroupId , name: "unauthorized group" } ,
@@ -5387,14 +5393,14 @@ describe( "Access" , () => {
 			{ _id: unauthorizedGroupId , name: "unauthorized group" }
 		] ) ;
 	} ) ;
-	
+
 	it( "GET a restricted resource performed by various connected and non-connected users" , async () => {
 		var response , userAccess ;
 
 		userAccess = {} ;
 		userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass the check
 		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass the check
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 2!!!' ,
@@ -5420,7 +5426,7 @@ describe( "Access" , () => {
 		// User not listed in specific rights
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-		
+
 		// User listed, but with too low rights
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
@@ -5448,7 +5454,7 @@ describe( "Access" , () => {
 			token: response.output.data.token ,
 			agentId: "0123456789"
 		} ) ;
-		
+
 		userAccess = {} ;
 		userAccess[ authorizedId ] = 'read' ;	// Minimal right that pass the check
 
@@ -5462,7 +5468,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.partially.equal( {
 			title: 'My wonderful life 2!!!' ,
@@ -5486,11 +5492,11 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		userAccess = {} ;
 		userAccess[ authorizedId ] = 'read' ;
 		userAccess[ notEnoughAuthorizedId ] = 'read' ;
-		
+
 		response = await app.post( '/Blogs' ,
 			{
 				title: 'Selective' ,
@@ -5501,11 +5507,11 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		userAccess = {} ;
 		userAccess[ authorizedId ] = 'read' ;
 		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;
-		
+
 		response = await app.post( '/Blogs' ,
 			{
 				title: 'Closed' ,
@@ -5516,13 +5522,13 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// User that can see everything
 		response = await app.get( '/Blogs/' , { performer: authorizedPerformer } ) ;
 		titles = response.output.data.map( e => e.title ) ;
 		expect( titles ).to.have.length( 3 ) ;
 		expect( titles ).to.contain( 'Public' , 'Selective' , 'Closed' ) ;
-		
+
 		// Non-connected user
 		response = await app.get( '/Blogs/' , { performer: notConnectedPerformer } ) ;
 		titles = response.output.data.map( e => e.title ) ;
@@ -5534,7 +5540,7 @@ describe( "Access" , () => {
 		titles = response.output.data.map( e => e.title ) ;
 		expect( titles ).to.have.length( 1 ) ;
 		expect( titles ).to.contain( 'Public' ) ;
-		
+
 		// User listed, but with too low rights
 		response = await app.get( '/Blogs/' , { performer: notEnoughAuthorizedPerformer } ) ;
 		titles = response.output.data.map( e => e.title ) ;
@@ -5544,11 +5550,11 @@ describe( "Access" , () => {
 
 	it( "PUT (overwrite) a restricted resource performed by various connected and non-connected users" , async () => {
 		var response , userAccess ;
-		
+
 		userAccess = {} ;
 		userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass the check
 		userAccess[ notEnoughAuthorizedId ] = 'readCreate' ;	// Maximal right that does not pass the check
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 2!!!' ,
@@ -5559,11 +5565,11 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		userAccess = {} ;
 		userAccess[ authorizedId ] = 'readCreateModifyReplace' ;	// Minimal right that pass the check
 		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass the check
-		
+
 		// By the authorized user
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -5575,7 +5581,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// Non-connected user
 		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" , description: 'Seriously!' } , null , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
@@ -5606,10 +5612,10 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// By the authorized user
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I've changed my mind!" } , null , { performer: authorizedPerformer } ) ;
-		
+
 		// Non-connected user
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" } , null , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public patch forbidden.' } ) ;
@@ -5617,7 +5623,7 @@ describe( "Access" , () => {
 		// User not listed in specific rights
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" } , null , { performer: unauthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
-		
+
 		// User listed, but with too low rights
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { title: "I can't do that!" } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
@@ -5625,11 +5631,11 @@ describe( "Access" , () => {
 
 	it( "DELETE a restricted resource performed by various connected and non-connected users" , async () => {
 		var response , userAccess ;
-		
+
 		userAccess = {} ;
 		userAccess[ authorizedId ] = 'all' ;	// Minimal right that pass the check
 		userAccess[ notEnoughAuthorizedId ] = 'readCreateModify' ;	// Maximal right that does not pass the check
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 2!!!' ,
@@ -5648,22 +5654,22 @@ describe( "Access" , () => {
 		// User not listed in specific rights
 		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-		
+
 		// User listed, but with too low rights
 		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-		
+
 		// By the authorized user
 		response = await app.delete( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
 	} ) ;
 
 	it( "PUT (create) into a restricted resource performed by various connected and non-connected users" , async () => {
 		var response , userAccess ;
-		
+
 		userAccess = {} ;
 		userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass the check
 		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass the check
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 2!!!' ,
@@ -5674,7 +5680,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
 				title: 'Put one' ,
@@ -5684,7 +5690,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// Non-connected user
 		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d1' ,
 			{
@@ -5695,7 +5701,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: notConnectedPerformer }
 		) ).to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
-		
+
 		// User not listed in specific rights
 		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d2' ,
 			{
@@ -5706,7 +5712,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: unauthorizedPerformer }
 		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-		
+
 		// User listed, but with too low rights
 		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d3' ,
 			{
@@ -5721,11 +5727,11 @@ describe( "Access" , () => {
 
 	it( "POST into a restricted resource performed by various connected and non-connected users" , async () => {
 		var response , userAccess ;
-		
+
 		userAccess = {} ;
 		userAccess[ authorizedId ] = 'readCreate' ;	// Minimal right that pass the check
 		userAccess[ notEnoughAuthorizedId ] = 'read' ;	// Maximal right that does not pass the check
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 2!!!' ,
@@ -5736,7 +5742,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// By the authorized user
 		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
 			{
@@ -5758,7 +5764,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: notConnectedPerformer }
 		) ).to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
-		
+
 		// User not listed in specific rights
 		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
 			{
@@ -5784,10 +5790,10 @@ describe( "Access" , () => {
 
 	it( "Access by groups" , async () => {
 		var response , groupAccess ;
-		
+
 		groupAccess = {} ;
 		groupAccess[ authorizedGroupId ] = 'read' ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 2!!!' ,
@@ -5798,7 +5804,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// User authorized by its group
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedByGroupPerformer } ) ;
 		expect( response.output.data ).to.partially.equal( {
@@ -5817,7 +5823,7 @@ describe( "Access" , () => {
 
 	it( "Access by groups with inheritance" , async () => {
 		var response , groupAccess ;
-		
+
 		groupAccess = {} ;
 		groupAccess[ authorizedGroupId ] = {
 			collections: {
@@ -5827,7 +5833,7 @@ describe( "Access" , () => {
 				}
 			}
 		} ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 2!!!' ,
@@ -5836,17 +5842,17 @@ describe( "Access" , () => {
 				publicAccess: { traverse: true }
 			}
 		) ;
-		
-		// Test per-collection create 
+
+		// Test per-collection create
 		await expect( () => app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
 				title: 'A boring title' ,
-				content: 'Blah blah blah...' ,
+				content: 'Blah blah blah...'
 			} ,
 			null ,
 			{ performer: unauthorizedPerformer }
 		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
 				title: 'A boring title' ,
@@ -5856,7 +5862,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedByGroupPerformer }
 		) ;
-		
+
 		// User not yet authorized by its group
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
@@ -5882,9 +5888,9 @@ describe( "Access" , () => {
 			}
 		} ;
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { groupAccess: groupAccess } ) ;
-		
+
 		// First try the read/query inheritance on the collection
-		
+
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' , { performer: authorizedByGroupPerformer } ) ;
 		expect( response.output.data ).to.be.partially.like( [ {
 			title: 'A boring title' ,
@@ -5901,7 +5907,7 @@ describe( "Access" , () => {
 
 
 		// Then try on the nested object
-		
+
 		// User authorized by its group
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) ;
 		expect( response.output.data ).to.be.partially.like( {
@@ -5935,7 +5941,7 @@ describe( "Access" , () => {
 			}
 		} ;
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { groupAccess: groupAccess } ) ;
-		
+
 		// it was deleted
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
@@ -5944,7 +5950,7 @@ describe( "Access" , () => {
 				publicAccess: { traverse: true }
 			}
 		) ;
-		
+
 		// User authorized by its group
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedByGroupPerformer } ) ;
 		expect( response.output.data ).to.be.partially.like( {
@@ -5966,9 +5972,9 @@ describe( "Access" , () => {
 
 	it( "PATCH of nested resource with inheritance" , async () => {
 		var response , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			read: true ,
 			write: true ,
@@ -5991,7 +5997,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
 				title: 'A boring title' ,
@@ -6000,7 +6006,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// Authorized user
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I've changed my mind!" } , null , { performer: authorizedPerformer } ) ;
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) ;
@@ -6017,8 +6023,8 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
-		
-		
+
+
 		// Now give public access
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -6040,7 +6046,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: notConnectedPerformer }
 		) ;
-		
+
 		// User not listed in specific rights
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) ;
 		expect( response.output.data ).to.partially.equal( { title: "I can do that!" } ) ;
@@ -6048,9 +6054,9 @@ describe( "Access" , () => {
 
 	it( "tag-less object-method execution should be public" , async () => {
 		var response , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			traverse: true ,
 			read: true ,
@@ -6068,7 +6074,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// Authorized user
 		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/PUBLIC-DOUBLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 6 } ) ;
@@ -6084,15 +6090,15 @@ describe( "Access" , () => {
 
 	it( "tagged object-method execution should rely on the 'exec' access" , async () => {
 		var response , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			traverse: true ,
 			read: true ,
 			write: true ,
 			create: true ,
-			exec: [ 'method.double' ] ,
+			exec: [ 'method.double' ]
 			//inheritance: { read: true , write: true }
 		} ;
 
@@ -6102,7 +6108,7 @@ describe( "Access" , () => {
 			read: true ,
 			write: true ,
 			create: true ,
-			exec: [ 'random-tag' ] ,
+			exec: [ 'random-tag' ]
 			//inheritance: { read: true , write: true }
 		} ;
 
@@ -6116,7 +6122,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// Authorized user
 		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/DOUBLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 6 } ) ;
@@ -6132,7 +6138,7 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/DOUBLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
-		
+
 		// Now give public access
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -6162,9 +6168,9 @@ describe( "Access" , () => {
 
 	it( "object-method access inheritance" , async () => {
 		var response , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			traverse: true ,
 			read: true ,
@@ -6193,7 +6199,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
 				title: 'A boring title' ,
@@ -6202,7 +6208,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// Authorized user
 		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 6 } ) ;
@@ -6218,7 +6224,7 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0/DOUBLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
-		
+
 		// Now give public access
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -6247,9 +6253,9 @@ describe( "Access" , () => {
 
 	it( "tag-less collection-method execution should be public" , async () => {
 		var response , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			traverse: true ,
 			read: true ,
@@ -6261,7 +6267,7 @@ describe( "Access" , () => {
 			userAccess: userAccess ,
 			publicAccess: 'passThrough'
 		} ) ;
-		
+
 		// Authorized user
 		response = await app.post( '/Blogs/PUBLIC-TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
@@ -6277,15 +6283,15 @@ describe( "Access" , () => {
 
 	it( "tagged collection-method execution should rely on the 'exec' access" , async () => {
 		var response , publicAccess , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			traverse: true ,
 			read: true ,
 			write: true ,
 			create: true ,
-			exec: [ 'method.triple' ] ,
+			exec: [ 'method.triple' ]
 		} ;
 
 		// Maximal right that does not pass the check
@@ -6294,18 +6300,18 @@ describe( "Access" , () => {
 			read: true ,
 			write: true ,
 			create: true ,
-			exec: [ 'random-tag' ] ,
+			exec: [ 'random-tag' ]
 		} ;
 
 		response = await app.patch( '/' , {
 			userAccess: userAccess ,
 			publicAccess: 'passThrough'
 		} ) ;
-		
+
 		// Authorized user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
-		
+
 		// Non-connected user
 		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
@@ -6317,7 +6323,7 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
-		
+
 		// Now give public access
 		publicAccess = { traverse: true , exec: [ 'method.triple' ] } ;
 		response = await app.patch( '/' , { publicAccess } ) ;
@@ -6325,7 +6331,7 @@ describe( "Access" , () => {
 		// Authorized user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
-		
+
 		// Non-connected user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
@@ -6337,7 +6343,7 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
-		
+
 		// Now shadow everything with a 'collections' access
 		publicAccess.collections = {} ;
 		userAccess[ authorizedId ].collections = {} ;
@@ -6347,7 +6353,7 @@ describe( "Access" , () => {
 		// Authorized user
 		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
-		
+
 		// Non-connected user
 		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
@@ -6359,7 +6365,7 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
-		
+
 		// Now shadow add correct 'collections' access for authorizedPerformer on 'blogs'
 		publicAccess.collections.blogs = { exec: [ 'random-tag' ] } ;
 		userAccess[ authorizedId ].collections.blogs = { exec: [ 'method.triple' ] } ;
@@ -6369,7 +6375,7 @@ describe( "Access" , () => {
 		// Authorized user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
-		
+
 		// Non-connected user
 		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
@@ -6389,7 +6395,7 @@ describe( "Access" , () => {
 		// Authorized user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
-		
+
 		// Non-connected user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
@@ -6405,9 +6411,9 @@ describe( "Access" , () => {
 
 	it( "collection-method access inheritance from the root-object" , async () => {
 		var response , publicAccess , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			traverse: true ,
 			read: true ,
@@ -6427,11 +6433,11 @@ describe( "Access" , () => {
 
 		publicAccess = { traverse: true } ;
 		response = await app.patch( '/' , { publicAccess , userAccess } ) ;
-		
+
 		// Authorized user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
-		
+
 		// Non-connected user
 		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
@@ -6443,16 +6449,16 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
-		
-		
+
+
 		// Now add inheritance to public access
 		publicAccess.inheritance = { read: true , write: true , exec: [ 'method.triple' ] } ;
 		response = await app.patch( '/' , { publicAccess } ) ;
-		
+
 		// Authorized user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
-		
+
 		// Non-connected user
 		response = await app.post( '/Blogs/TRIPLE' , { value: 3 } , null , { performer: notConnectedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
@@ -6468,9 +6474,9 @@ describe( "Access" , () => {
 
 	it( "collection-method access inheritance" , async () => {
 		var response , publicAccess , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			traverse: true ,
 			read: true ,
@@ -6499,7 +6505,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
 				title: 'A boring title' ,
@@ -6508,7 +6514,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// Authorized user
 		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: authorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
@@ -6524,7 +6530,7 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
-		
+
 
 		// Now give public access
 		publicAccess = {
@@ -6548,8 +6554,8 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		response = await app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) ;
 		expect( response.output.data ).to.equal( { result: 9 } ) ;
-		
-		
+
+
 		// Now removes all inheritance
 		publicAccess.inheritance = null ;
 		userAccess[ authorizedId ].inheritance = null ;
@@ -6571,7 +6577,7 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/TRIPLE' , { value: 3 } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 } ) ;
-		
+
 
 		// Now add an inheritance on the blog collection for a user
 		userAccess[ authorizedId ].inheritance = { exec: [ 'method.triple' ] } ;
@@ -6618,9 +6624,9 @@ describe( "Access" , () => {
 
 	it( "PATCH of nested resource with per-collection inheritance" , async () => {
 		var response , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			read: true ,
 			write: true ,
@@ -6648,7 +6654,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
 				title: 'A boring title' ,
@@ -6657,7 +6663,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// Authorized user
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I've changed my mind!" } , null , { performer: authorizedPerformer } ) ;
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) ;
@@ -6676,8 +6682,8 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.patch( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { title: "I can't do that!" } , null , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Patch forbidden.' } ) ;
-		
-		
+
+
 		// Now give public access
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
@@ -6704,7 +6710,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: notConnectedPerformer }
 		) ;
-		
+
 		// User not listed in specific rights
 		response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: unauthorizedPerformer } ) ;
 		expect( response.output.data ).to.partially.equal( { title: "I can do that!" } ) ;
@@ -6715,9 +6721,9 @@ describe( "Access" , () => {
 
 	it( "per-collection-access shadowing object access for collection once defined (whether specific or not)" , async () => {
 		var response , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			read: true ,
 			write: true ,
@@ -6734,7 +6740,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
 			{
 				title: 'A boring title' ,
@@ -6743,7 +6749,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ).to.eventually.be.ok() ;
-		
+
 		// It should be sufficient to shadow the base-object
 		userAccess[ authorizedId ].collections = {} ;
 		response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' ,
@@ -6751,7 +6757,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
 			{
 				title: 'A boring title' ,
@@ -6768,7 +6774,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
 			{
 				title: 'A boring title' ,
@@ -6781,9 +6787,9 @@ describe( "Access" , () => {
 
 	it( "DELETE of nested resource with per-collection inheritance" , async () => {
 		var response , userAccess , groupAccess ;
-		
+
 		userAccess = {} ;
-		
+
 		userAccess[ authorizedId ] = {
 			read: true ,
 			write: true ,
@@ -6793,7 +6799,7 @@ describe( "Access" , () => {
 					query: true ,
 					inheritance: {
 						read: true ,
-						write: true ,
+						write: true
 						//delete: true
 					}
 				}
@@ -6812,7 +6818,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' ,
 			{
 				title: 'A boring title' ,
@@ -6821,7 +6827,7 @@ describe( "Access" , () => {
 			null ,
 			{ performer: authorizedPerformer }
 		) ;
-		
+
 		// Non-connected user
 		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notConnectedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Public access forbidden.' } ) ;
@@ -6833,7 +6839,7 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-		
+
 		// Not yet authorized user
 		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
@@ -6853,7 +6859,7 @@ describe( "Access" , () => {
 		// User listed, but with too low rights
 		await expect( () => app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-		
+
 		// Authorized user
 		response = await app.delete( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) ;
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8/Posts/5437f846c41d0e910e59a5d0' , { performer: authorizedPerformer } ) )
@@ -6870,7 +6876,7 @@ describe( "Access" , () => {
 		userAccess = {} ;
 		userAccess[ authorizedId ] = { read: [ 'content' , 'system-content' ] } ;	// Minimal right that pass the check
 		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass the check
-		
+
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 			{
 				title: 'My wonderful life 2!!!' ,
@@ -6896,7 +6902,7 @@ describe( "Access" , () => {
 		// User not listed in specific rights
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: unauthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-		
+
 		// User listed, but with too low rights
 		await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: notEnoughAuthorizedPerformer } ) )
 			.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
@@ -6904,22 +6910,22 @@ describe( "Access" , () => {
 
 
 	describe( "Access tag-masking" , () => {
-		
-		// /!\ Not perfect... should use something more clean... 
+
+		// /!\ Not perfect... should use something more clean...
 		// /!\ Perhaps a new roots-db method...
 		function getFiltered( response ) {
 			return JSON.parse( restQuery.misc.serializeContextData( response ) ) ;
 		}
-		
-		
+
+
 		it( "GET resource tag-masking based on access tags (tag-list and special value)" , async () => {
 			var response , userAccess ;
 
 			// Start with no read access
-			
+
 			userAccess = {} ;
 			userAccess[ authorizedId ] = { read: false } ;
-			
+
 			response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
 				{
 					title: 'My wonderful life 2!!!' ,
@@ -6927,7 +6933,7 @@ describe( "Access" , () => {
 					secret: 'a secret' ,
 					userAccess: userAccess ,
 					publicAccess: 'none'
-				} ,
+				}
 			) ;
 
 			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) )
@@ -6938,20 +6944,20 @@ describe( "Access" , () => {
 
 			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Read forbidden.' } ) ;
-			
+
 			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-			
+
 
 			// Add more access
-			
+
 			userAccess[ authorizedId ] = { read: [ 'id' ] } ;
 			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
 
 			// By default, access is [id,content], so it fails here
 			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-			
+
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
@@ -6961,7 +6967,7 @@ describe( "Access" , () => {
 				} ,
 				slugId: "my-wonderful-life-2"
 			} ) ;
-			
+
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
@@ -6974,10 +6980,10 @@ describe( "Access" , () => {
 
 			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-			
-			
+
+
 			// Add more access
-			
+
 			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'system-content' ] } ;
 			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
 
@@ -6992,7 +6998,7 @@ describe( "Access" , () => {
 				title: "My wonderful life 2!!!" ,
 				description: "This is a supa blog! (x2)"
 			} ) ;
-			
+
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
@@ -7002,7 +7008,7 @@ describe( "Access" , () => {
 				} ,
 				slugId: "my-wonderful-life-2"
 			} ) ;
-			
+
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
@@ -7017,10 +7023,10 @@ describe( "Access" , () => {
 
 			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-			
-			
+
+
 			// Add more access
-			
+
 			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'system-content' , 'secret' ] } ;
 			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
 
@@ -7035,7 +7041,7 @@ describe( "Access" , () => {
 				title: "My wonderful life 2!!!" ,
 				description: "This is a supa blog! (x2)"
 			} ) ;
-			
+
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
@@ -7045,7 +7051,7 @@ describe( "Access" , () => {
 				} ,
 				slugId: "my-wonderful-life-2"
 			} ) ;
-			
+
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
@@ -7061,10 +7067,10 @@ describe( "Access" , () => {
 
 			await expect( () => app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-			
-			
+
+
 			// Add more access
-			
+
 			userAccess[ authorizedId ] = { read: true } ;
 			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
 
@@ -7079,7 +7085,7 @@ describe( "Access" , () => {
 				title: "My wonderful life 2!!!" ,
 				description: "This is a supa blog! (x2)"
 			} ) ;
-			
+
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
@@ -7089,7 +7095,7 @@ describe( "Access" , () => {
 				} ,
 				slugId: "my-wonderful-life-2"
 			} ) ;
-			
+
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
@@ -7105,7 +7111,7 @@ describe( "Access" , () => {
 				userAccess: userAccess ,
 				groupAccess: {}
 			} ) ;
-			
+
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
@@ -7127,12 +7133,12 @@ describe( "Access" , () => {
 			var response , data , userAccess , groupAccess ;
 
 			// Start with no read access
-			
+
 			userAccess = {} ;
 			userAccess[ authorizedId ] = { read: false } ;
 			groupAccess = {} ;
 			groupAccess[ authorizedGroupId ] = { read: false } ;
-			
+
 			response = await app.put( '/Users/5437f846c41d0ef10ec9a5ff' ,
 				{
 					firstName: 'Anon' ,
@@ -7156,13 +7162,13 @@ describe( "Access" , () => {
 
 			await expect( () => app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all-granted' } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Read forbidden.' } ) ;
-			
+
 			await expect( () => app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all' } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-			
+
 
 			// Add more access
-			
+
 			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'system-content' ] } ;
 			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { userAccess: userAccess } ) ;
 
@@ -7212,10 +7218,10 @@ describe( "Access" , () => {
 
 			await expect( () => app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all' } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-			
-			
+
+
 			// Add more access
-			
+
 			userAccess[ authorizedId ] = { read: true } ;
 			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { userAccess: userAccess } ) ;
 
@@ -7246,7 +7252,7 @@ describe( "Access" , () => {
 					id: "/"
 				}
 			} ) ;
-			
+
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
@@ -7261,12 +7267,12 @@ describe( "Access" , () => {
 					collection: "root" ,
 					id: "/"
 				} ,
-				
+
 				groups: [] ,
-				
+
 				publicAccess: {} ,
 				userAccess: userAccess ,
-				groupAccess: groupAccess ,
+				groupAccess: groupAccess
 			} ) ;
 
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all' } ) ;
@@ -7283,17 +7289,17 @@ describe( "Access" , () => {
 					collection: "root" ,
 					id: "/"
 				} ,
-				
+
 				groups: [] ,
-				
+
 				publicAccess: {} ,
 				userAccess: userAccess ,
-				groupAccess: groupAccess ,
+				groupAccess: groupAccess
 			} ) ;
 
-			
+
 			// Only system can read 'security' tags
-			
+
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { access: 'all' } ) ;
 			expect( ( data = getFiltered( response ) ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
@@ -7308,13 +7314,13 @@ describe( "Access" , () => {
 					collection: "root" ,
 					id: "/"
 				} ,
-				
+
 				groups: [] ,
-				
+
 				publicAccess: {} ,
 				userAccess: userAccess ,
 				groupAccess: groupAccess ,
-				
+
 				// Security
 				password: {
 					algo: "sha512" ,
@@ -7325,10 +7331,10 @@ describe( "Access" , () => {
 				token: {}
 			} ) ;
 
-			
+
 			// Now test groups
 			// Add more access to group
-			
+
 			groupAccess[ authorizedGroupId ] = { read: [ 'id' , 'content' , 'system-content' ] } ;
 			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { groupAccess: groupAccess } ) ;
 
@@ -7378,10 +7384,10 @@ describe( "Access" , () => {
 
 			await expect( () => app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer , access: 'all' } ) )
 				.to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
-			
-			
+
+
 			// Add more access to group
-			
+
 			groupAccess[ authorizedGroupId ] = { read: true } ;
 			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { groupAccess: groupAccess } ) ;
 
@@ -7412,7 +7418,7 @@ describe( "Access" , () => {
 					id: "/"
 				}
 			} ) ;
-			
+
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
@@ -7427,12 +7433,12 @@ describe( "Access" , () => {
 					collection: "root" ,
 					id: "/"
 				} ,
-				
+
 				groups: [] ,
-				
+
 				publicAccess: {} ,
 				userAccess: userAccess ,
-				groupAccess: groupAccess ,
+				groupAccess: groupAccess
 			} ) ;
 
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer , access: 'all' } ) ;
@@ -7449,12 +7455,12 @@ describe( "Access" , () => {
 					collection: "root" ,
 					id: "/"
 				} ,
-				
+
 				groups: [] ,
-				
+
 				publicAccess: {} ,
 				userAccess: userAccess ,
-				groupAccess: groupAccess ,
+				groupAccess: groupAccess
 			} ) ;
 		} ) ;
 	} ) ;
@@ -7528,7 +7534,7 @@ describe( "Hooks" , () => {
 				}
 			}
 		) ;
-		
+
 		expect( hookRan ).to.be.true() ;
 
 		var id = response.output.data.id.toString() ;
@@ -7598,7 +7604,7 @@ describe( "Hooks" , () => {
 				}
 			}
 		) ;
-		
+
 		expect( hookRan ).to.be.true() ;
 
 		var id = response.output.data.id.toString() ;
@@ -7627,7 +7633,7 @@ describe( "Hooks" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		// Overwrite
 		var hookRan = false ;
 		response = await app.put(
@@ -7847,7 +7853,7 @@ describe( "Hooks" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		// Overwrite
 		var hookRan = false ;
 		response = await app.put(
@@ -7902,7 +7908,7 @@ describe( "Hooks" , () => {
 				}
 			}
 		) ;
-		
+
 		expect( hookRan ).to.be.true() ;
 
 		var id = response.output.data.id.toString() ;
@@ -7930,7 +7936,7 @@ describe( "Hooks" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		// Patch
 		var hookRan = false ;
 		response = await app.patch(
@@ -8012,7 +8018,7 @@ describe( "Hooks" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		// Patch
 		var hookRan = false ;
 		response = await app.patch(
@@ -8085,7 +8091,7 @@ describe( "Hooks" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		// Delete
 		var hookRan = false ;
 		response = await app.delete(
@@ -8153,7 +8159,7 @@ describe( "Hooks" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		// Delete
 		var hookRan = false ;
 		response = await app.delete(
@@ -8221,7 +8227,7 @@ describe( "Hooks" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		var hookRan = false ;
 		response = await app.get(
 			'/Blogs' ,
@@ -8258,17 +8264,17 @@ describe( "Hooks" , () => {
 
 						// Change the query to something that actually exist
 						context.input.query.search = 'wonderful' ;
-						
+
 						// Must be at the end
 						hookRan = true ;
 					}
 				}
 			}
 		) ;
-		
+
 		expect( hookRan ).to.be.true() ;
 
-		expect( response.output.data ).to.partially.equal( [ {
+		expect( response.output.data ).to.be.partially.like( [ {
 			title: 'My wonderful life!!!' ,
 			description: 'This is a supa blog!'
 		} ] ) ;
@@ -8289,9 +8295,9 @@ describe( "Hooks" , () => {
 				}
 			}
 		) ;
-		
+
 		expect( hookRan ).to.be.true() ;
-		expect( response.output.data ).to.equal( [] ) ;
+		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
 
 	it( "The 'beforeCreateToken' hook should be triggered on POST on /Users/CREATE-TOKEN" , async () => {
@@ -8310,7 +8316,7 @@ describe( "Hooks" , () => {
 		) ;
 
 		var id = response.output.data.id ;
-		
+
 		var hookRan = false ;
 		response = await app.post( '/Users/CREATE-TOKEN' ,
 			{
@@ -8357,7 +8363,7 @@ describe( "Hooks" , () => {
 
 						// Fix the bad password
 						context.hook.incomingDocument.password = 'pw' ;
-						
+
 						// Must be at the end
 						hookRan = true ;
 					}
@@ -8369,7 +8375,7 @@ describe( "Hooks" , () => {
 
 		expect( response.output.data ).to.partially.equal( { userId: id } ) ;
 	} ) ;
-	
+
 	it( "The 'afterCreateToken' hook should be triggered on POST on /Users/CREATE-TOKEN, after token creation" , async () => {
 		var { app , performer } = await commonApp() ;
 
@@ -8414,7 +8420,7 @@ describe( "Hooks" , () => {
 						//expect( context.objectNode.object ).to.be( context.document ) ;
 						expect( context.document._.raw ).to.partially.equal( {
 							firstName: "Bobby" ,
-							lastName: "Fisher" ,
+							lastName: "Fisher"
 						} ) ;
 						expect( context.parentObjectNode.object ).to.partially.equal( {
 							title: "Root" ,
@@ -8453,7 +8459,7 @@ describe( "Hooks" , () => {
 	it( "'afterRegenerateToken' (user) hooks" ) ;
 	it( "'beforeCreateApiKey' (user) hooks" ) ;
 	it( "'afterCreateApiKey' (user) hooks" ) ;
-	
+
 	it( "All hook throwing/rejecting, except 'after*' hooks, must abort the request as well as remaining hooks with an error" , async () => {
 		var { app , performer } = await commonApp() ;
 
@@ -8483,13 +8489,13 @@ describe( "Hooks" , () => {
 				}
 			}
 		) ).to.eventually.throw() ;
-		
+
 		expect( preHookRan ).to.be.true() ;
 		expect( hookRan ).to.be.false() ;
 
 		await expect( app.get( '/Blogs/5437f846c41d0e910ec9e111' , { performer: performer } ) ).to.reject.with.an( ErrorStatus , { type: 'notFound' } ) ;
 
-		
+
 		// Async
 		preHookRan = hookRan = false ;
 
@@ -8516,7 +8522,7 @@ describe( "Hooks" , () => {
 				}
 			}
 		) ).to.reject() ;
-		
+
 		expect( preHookRan ).to.be.true() ;
 		expect( hookRan ).to.be.false() ;
 
@@ -8552,7 +8558,7 @@ describe( "Hooks" , () => {
 				}
 			}
 		) ;
-		
+
 		expect( preHookRan ).to.be.true() ;
 		expect( hookRan ).to.be.false() ;
 
@@ -8564,7 +8570,7 @@ describe( "Hooks" , () => {
 
 		var hookRan = false ,
 			preHookRan = false ;
-		
+
 		var response = await app.post(
 			'/Blogs' ,
 			{
@@ -8652,7 +8658,7 @@ describe( "Hooks" , () => {
 				}
 			}
 		) ;
-		
+
 		expect( preHookRan ).to.be.true() ;
 		expect( hookRan ).to.be.true() ;
 
@@ -8715,7 +8721,7 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 		expect( response.objectNode ).to.be.a( restQuery.ObjectNode ) ;
 		expect( response.document._ ).to.be.a( rootsDb.Document ) ;
 		expect( response.objectNode.object ).to.be( response.document ) ;
-		
+
 		// It should still be the Root Object
 		expect( response.document._.raw ).to.partially.equal( {
 			title: "Root" ,
@@ -8746,13 +8752,13 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 			{ performer: performer }
 		) ;
 		var userId = response.output.data.id ;
-		
+
 		response = await app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' ,
 			{ firstName: 'Toto' } ,
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		expect( response ).to.be.a( restQuery.Context ) ;
 		expect( response.app ).to.be.a( restQuery.App ) ;
 		expect( response.app ).to.be( app ) ;
@@ -8768,7 +8774,7 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 			lastName: "Doe" ,
 			email: "joe.doe@gmail.com"
 		} ) ;
-		
+
 		// Parent Object Node is the Root Object
 		expect( response.parentObjectNode.object._.raw ).to.partially.equal( {
 			title: "Root" ,
@@ -8796,26 +8802,29 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 
 		var response = await app.post( '/Users/DO-SOMETHING' , { to: 'toto' } , null , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( { done: "something" , to: "toto" } ) ;
-		
+
 		response = await app.get( '/Users/DO-SOMETHING' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( { done: "nothing" , cause: "this is a GET request" } ) ;
 	} ) ;
 
 	it( "Custom collection batch method" , async () => {
-		var { app , performer } = await commonApp() ;
+		var { app , systemPerformer } = await commonApp() ;
 
+		// Create users
+		
 		var response = await app.post( '/Users' ,
 			{
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
-				password: "pw" ,
+				password: "dojo!" ,
 				publicAccess: "all"
 			} ,
 			null ,
-			{ performer: performer }
+			{ performer: systemPerformer }
 		) ;
 		var userId1 = response.output.data.id ;
+		var performerId = userId1 ;
 
 		response = await app.post( '/Users' ,
 			{
@@ -8826,9 +8835,13 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 				publicAccess: "all"
 			} ,
 			null ,
-			{ performer: performer }
+			{ performer: systemPerformer }
 		) ;
 		var userId2 = response.output.data.id ;
+
+		// Now create users that does not have public access
+		var userAccess = {} ;
+		//userAccess[ performerId ] = 'read' ;
 
 		response = await app.post( '/Users' ,
 			{
@@ -8836,10 +8849,11 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 				lastName: "Fischer" ,
 				email: "bobby.fischer@gmail.com" ,
 				password: "pw" ,
-				publicAccess: "all"
+				userAccess: userAccess ,
+				publicAccess: 'none'
 			} ,
 			null ,
-			{ performer: performer }
+			{ performer: systemPerformer }
 		) ;
 		var userId3 = response.output.data.id ;
 
@@ -8849,24 +8863,60 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 				lastName: "Doe" ,
 				email: "jack.doe@gmail.com" ,
 				password: "pw" ,
-				publicAccess: "all"
+				userAccess: userAccess ,
+				publicAccess: 'none'
 			} ,
 			null ,
-			{ performer: performer }
+			{ performer: systemPerformer }
 		) ;
 		var userId4 = response.output.data.id ;
 
-		response = await app.get( '/Users/GET-FIRST-NAMES' , { performer: performer } ) ;
+
+		// Create a performer
+
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
+				type: "header" ,
+				login: "joe.doe@gmail.com" ,
+				password: "dojo!" ,
+				agentId: "0123456789"
+			} ,
+			null ,
+			{ performer: systemPerformer }
+		) ;
+
+		var performer = app.createPerformer( {
+			type: "header" ,
+			userId: response.output.data.userId ,
+			token: response.output.data.token ,
+			agentId: "0123456789"
+		} ) ;
+
+		
+		response = await app.get( '/Users/GET-REAL-FIRST-NAMES' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( [ 'Joe' , 'Bob' , 'Bobby' , 'Jack' ] ) ;
+
+		response = await app.get( '/Users/GET-REAL-FIRST-NAMES' , { performer: performer , input: { query: { filter: { lastName: 'Doe' } } } } ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' , 'Jack' ] ) ;
+
+		response = await app.post( '/Users/GET-REAL-FIRST-NAMES' , {} , null , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' , 'Bob' , 'Bobby' , 'Jack' ] ) ;
+
+		response = await app.post( '/Users/GET-REAL-FIRST-NAMES' , {} , null , { performer: performer , input: { query: { filter: { lastName: 'Doe' } } } } ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' , 'Jack' ] ) ;
+
+
+		response = await app.get( '/Users/GET-FIRST-NAMES' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' , 'Bob' ] ) ;
 
 		response = await app.get( '/Users/GET-FIRST-NAMES' , { performer: performer , input: { query: { filter: { lastName: 'Doe' } } } } ) ;
-		expect( response.output.data ).to.equal( [ 'Joe' , 'Jack' ] ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' ] ) ;
 
 		response = await app.post( '/Users/GET-FIRST-NAMES' , {} , null , { performer: performer } ) ;
-		expect( response.output.data ).to.equal( [ 'Joe' , 'Bob' , 'Bobby' , 'Jack' ] ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' , 'Bob' ] ) ;
 
 		response = await app.post( '/Users/GET-FIRST-NAMES' , {} , null , { performer: performer , input: { query: { filter: { lastName: 'Doe' } } } } ) ;
-		expect( response.output.data ).to.equal( [ 'Joe' , 'Jack' ] ) ;
+		expect( response.output.data ).to.equal( [ 'Joe' ] ) ;
 	} ) ;
 
 	it( "Custom object method" , async () => {
@@ -8884,7 +8934,7 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 			{ performer: performer }
 		) ;
 		var userId = response.output.data.id ;
-		
+
 		response = await app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' ,
 			{ lastName: 'Toto' } ,
 			null ,
@@ -8894,7 +8944,7 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 			done: 'nothing' ,
 			to: { firstName: 'Joe' , lastName: 'Doe' }
 		} ) ;
-		
+
 		response = await app.post( '/Users/' + userId + '/CHANGE-FIRST-NAME' ,
 			{ firstName: 'Toto' } ,
 			null ,
@@ -8904,13 +8954,13 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 			done: 'something' ,
 			to: { firstName: 'Toto' , lastName: 'Doe' }
 		} ) ;
-		
+
 		response = await app.get( '/Users/' + userId + '/CHANGE-FIRST-NAME' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( {
 			done: 'nothing' ,
 			cause: "this is a GET request"
 		} ) ;
-		
+
 		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
 		expect( response.output.data ).to.be.partially.like( {
 			firstName: 'Toto' ,
@@ -8941,7 +8991,7 @@ describe( "Alter Schema" , () => {
 			publicAccess: 'all'
 		} ) ;
 		await blog.save() ;
-		
+
 		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/SCHEMA' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal(
 			tree.extend( { deep: true } , app.root.children.blogs.children.posts.schema , { properties: { custom: { type: 'string' } } } )
@@ -8965,7 +9015,7 @@ describe( "Alter Schema" , () => {
 			publicAccess: 'all'
 		} ) ;
 		await blog.save() ;
-		
+
 		await expect( () => app.post( '/Blogs/' + blog.getId() + '/Posts/' ,
 			{
 				title: 'My first post!' ,
@@ -8984,7 +9034,7 @@ describe( "Alter Schema" , () => {
 			null ,
 			{ performer: performer }
 		) ).to.reject( doormen.ValidatorError , { name: 'ValidatorError' } ) ;
-		
+
 		var response = await app.post( '/Blogs/' + blog.getId() + '/Posts/' ,
 			{
 				title: 'My first post!' ,
@@ -8995,7 +9045,7 @@ describe( "Alter Schema" , () => {
 			{ performer: performer }
 		) ;
 		var postId = response.output.data.id ;
-		
+
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
 		expect( response.output.data ).to.be.partially.like( {
 			title: 'My first post!' ,
@@ -9023,7 +9073,7 @@ describe( "Alter Schema" , () => {
 			publicAccess: 'all'
 		} ) ;
 		await blog.save() ;
-		
+
 		await expect( () => app.put( '/Blogs/' + blog.getId() + '/Posts/' + postId ,
 			{
 				title: 'My first post!' ,
@@ -9052,7 +9102,7 @@ describe( "Alter Schema" , () => {
 			null ,
 			{ performer: performer }
 		) ;
-		
+
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
 		expect( response.output.data ).to.be.partially.like( {
 			title: 'My first post!' ,
@@ -9078,27 +9128,27 @@ describe( "Alter Schema" , () => {
 			publicAccess: 'all'
 		} ) ;
 		await blog.save() ;
-		
+
 		var response = await app.post( '/Blogs/' + blog.getId() + '/Posts/' , {
-				title: 'My first post!' ,
-				content: 'Blah blah blah.' ,
-				custom: 'value'
-			} ,
-			null ,
-			{ performer: performer }
+			title: 'My first post!' ,
+			content: 'Blah blah blah.' ,
+			custom: 'value'
+		} ,
+		null ,
+		{ performer: performer }
 		) ;
 		var postId = response.output.data.id ;
-		
+
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
 		expect( response.output.data ).to.be.partially.like( {
 			title: 'My first post!' ,
 			content: 'Blah blah blah.' ,
 			custom: 'value'
 		} ) ;
-		
+
 		await expect( () => app.patch( '/Blogs/' + blog.getId() + '/Posts/' + postId , { custom: 12 } , null , { performer: performer } ) )
 			.to.reject( doormen.ValidatorError , { name: 'ValidatorError' } ) ;
-			
+
 		response = await app.patch( '/Blogs/' + blog.getId() + '/Posts/' + postId , { custom: 'value2' } , null , { performer: performer } ) ;
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/' + postId , { performer: performer } ) ;
 		expect( response.output.data ).to.be.partially.like( {
@@ -9113,11 +9163,11 @@ describe( "Alter Schema" , () => {
 
 describe( "Scheduler" , () => {
 
-	it( "Basic test" , async function() {
+	it( "Basic test" , async () => {
 		//this.timeout( 5000 ) ;
-		
+
 		var runnerCalls = [] ;
-		
+
 		var { app , performer } = await commonApp( {
 			scheduler: {
 				retrieveDelay: 200 ,
@@ -9132,7 +9182,7 @@ describe( "Scheduler" , () => {
 				}
 			}
 		} ) ;
-		
+
 		await app.scheduler.start() ;
 		app.scheduler.addJob( { runner: 'unit' , scheduledFor: Date.now() + 500 , data: { key: 'value' } } ) ;
 		await Promise.resolveTimeout( 400 ) ;
@@ -9184,9 +9234,11 @@ describe( "Misc" , () => {
 	it( "Shema's 'defaultPublicAccess'" , async () => {
 		var { app , performer } = await commonApp() ;
 		expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
-			.to.equal( { traverse: true , read: ['id','content','system-content'] , exec: ['id','content'] , query: true , create: true } ) ;
+			.to.equal( {
+				traverse: true , read: [ 'id' , 'content' , 'system-content' ] , exec: [ 'id' , 'content' ] , query: true , create: true
+			} ) ;
 		expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
-			.to.equal( { read: ['id','content'] } ) ;
+			.to.equal( { read: [ 'id' , 'content' ] } ) ;
 	} ) ;
 
 	it( "App's all collection exec tags" , async () => {
@@ -9208,7 +9260,7 @@ describe( "Misc" , () => {
 			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: ['id','content','system-content'] , create: true }
+			publicAccess: { traverse: true , read: [ 'id' , 'content' , 'system-content' ] , create: true }
 		} ) ;
 	} ) ;
 
@@ -9220,7 +9272,7 @@ describe( "Misc" , () => {
 	it( "Test agentId (token, API key)" ) ;
 
 	it( "Test root's refreshTimeout" ) ;
-	
+
 	it( "Test --buildIndexes" ) ;
 	it( "Test --initDb <filepath>" ) ;
 } ) ;
@@ -9261,7 +9313,7 @@ describe( "Historical bugs" , () => {
 		godfatherId = response.output.data.id ;
 
 		// It must reject! path leading inside an opaque object!
-		await expect( app.patch( '/Users/' + userId , { "godfather._id": ''+ godfatherId } , null , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'badRequest' } ) ;
+		await expect( app.patch( '/Users/' + userId , { "godfather._id": '' + godfatherId } , null , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'badRequest' } ) ;
 
 		// Regular patch, check that the godfather has been modified, but don't contain extra data
 		response = await app.patch( '/Users/' + userId , { godfather: { _id: godfatherId , firstName: "should be removed" , lastName: "should be removed" } } , null , { performer: performer } ) ;
@@ -9269,7 +9321,7 @@ describe( "Historical bugs" , () => {
 		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectId ) ;
 		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
 	} ) ;
-	
+
 	it( "PATCH on/through a multi-link" , async () => {
 		var { app , performer } = await commonApp() ;
 
@@ -9303,8 +9355,7 @@ describe( "Historical bugs" , () => {
 		userId2 = response.output.data.id ;
 
 		response = await app.post( '/Groups' ,
-			{
-				name: "The Group" ,
+			{ name: "The Group" ,
 				//users: [ userId1 , userId2 ] ,
 				publicAccess: "all" } ,
 			null ,
@@ -9313,7 +9364,7 @@ describe( "Historical bugs" , () => {
 		groupId = response.output.data.id ;
 
 		// It must reject! path leading inside an opaque object!
-		await expect( app.patch( '/Groups/' + groupId , { "users.0._id": ''+ userId1 } , null , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'badRequest' } ) ;
+		await expect( app.patch( '/Groups/' + groupId , { "users.0._id": '' + userId1 } , null , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'badRequest' } ) ;
 
 		// Regular patch, check that the group has been modified, but don't contain extra data
 		response = await app.patch( '/Groups/' + groupId , { users: [ { _id: '' + userId1 , firstName: "Jack" , lastName: "O' Lantern" } , { _id: '' + userId2 } ] } , null , { performer: performer } ) ;
@@ -9347,7 +9398,7 @@ if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
 
 			response = await app.get( '/Users' , { performer: performer } ) ;
 			//log( "response.output.data: %[2l100000]I" , response.output.data ) ;
-			expect( response.output.data ).to.partially.equal( [
+			expect( response.output.data ).to.be.partially.like( [
 				{
 					parent: { id: '/' , collection: 'root' }
 				} ,
@@ -9374,7 +9425,7 @@ if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
 			//log( "response.output.data: %I" , response.output.data ) ;
 			response = await app.get( '/Users' , { performer: performer } ) ;
 			//log( "response.output.data: %[2l100000]I" , response.output.data ) ;
-			expect( response.output.data ).to.partially.equal( [
+			expect( response.output.data ).to.be.partially.like( [
 				{
 					parent: { id: '/' , collection: 'root' }
 				} ,

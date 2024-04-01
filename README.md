@@ -350,10 +350,17 @@ This is the data structure of a context:
 Furthermore, the context object has this public methods:
 
 * done(): mark the current request as done/finished, preventing any Rest Query's default behavior
-* getBatch(): an **async** function (only works for collection methods) returning the same batch that would be returned by the query
+* getUserBatch(): an **async** function (only works for collection methods) returning the same batch that would be returned by the query
   if there wasn't any method part in the URL.
-  Query-string filters, sort, limits, populate and so on are also applied.
+  Query-string filters, sort, limits, skips, populate and so on are also applied.
   This is useful for collection methods that are not simple namespaced methods, but instead methods that are applied on a batch.
+  Because it is the same batch that would be returned without the method part of the URL, this means that **RIGHT MANAGEMENTS ARE ALSO APPLIED**,
+  filtering document that are not visible to this specific user.
+* getRealBatch(): an **async** function (only works for collection methods), mostly like .getUserBatch() but it returns all documents,
+  even those that the right management would ignore.
+  It should be used for methods that **DO NOT RETURN THOSE DOCUMENTS** but instead compute things on them, like anonymous statistics.
+  Moreover, no population of any kind is applied, but query-string filters, sort, limits and skips are still valid.
+  This is because we only want the correct document list.
 
 
 
