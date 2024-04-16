@@ -1,4 +1,10 @@
 
+v0.70.3
+-------
+
+Fix a minor slugify bug (enforce min length to 2)
+
+
 v0.70.2
 -------
 
