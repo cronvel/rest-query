@@ -1,4 +1,10 @@
 
+v0.70.6
+-------
+
+slug/HID can now have a variable length of dedup numbers
+
+
 v0.70.5
 -------
 
