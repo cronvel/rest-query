@@ -1,4 +1,11 @@
 
+v0.70.7
+-------
+
+MongoDB use zstd compression now
+import: empty strings are no more considered as valid link ID
+
+
 v0.70.6
 -------
 
