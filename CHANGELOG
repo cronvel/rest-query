@@ -1,4 +1,11 @@
 
+v0.71.0
+-------
+
+MAYBE BREAKING: now serializers add a _collection property on all Document instances
+support for anyCollection links string syntax: ID@collection
+
+
 v0.70.9
 -------
 

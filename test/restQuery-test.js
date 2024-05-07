@@ -6961,6 +6961,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6971,6 +6972,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -6990,6 +6992,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7002,6 +7005,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7012,6 +7016,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7033,6 +7038,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7045,6 +7051,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7055,6 +7062,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7077,6 +7085,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7089,6 +7098,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7099,6 +7109,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7115,6 +7126,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer , access: 'all' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0e910ec9a5d8" ,
+				_collection: "blogs" ,
 				parent: {
 					collection: "root" ,
 					id: "/"
@@ -7175,6 +7187,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: "Anon" ,
 				lastName: "Nyme" ,
@@ -7191,6 +7204,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				login: "anon@yopmail.com" ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
@@ -7203,6 +7217,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
@@ -7228,6 +7243,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
@@ -7244,6 +7260,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				login: "anon@yopmail.com" ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
@@ -7256,6 +7273,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
@@ -7278,6 +7296,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer , access: 'all' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
@@ -7303,6 +7322,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { access: 'all' } ) ;
 			expect( ( data = getFiltered( response ) ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
@@ -7341,6 +7361,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
@@ -7357,6 +7378,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				login: "anon@yopmail.com" ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
@@ -7369,6 +7391,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
@@ -7394,6 +7417,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
@@ -7410,6 +7434,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer , access: 'id' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				login: "anon@yopmail.com" ,
 				slugId: "anon-nyme" ,
 				hid: "Anon Nyme" ,
@@ -7422,6 +7447,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer , access: 'all-granted' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,
@@ -7444,6 +7470,7 @@ describe( "Access" , () => {
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer , access: 'all' } ) ;
 			expect( getFiltered( response ) ).to.equal( {
 				_id: "5437f846c41d0ef10ec9a5ff" ,
+				_collection: "users" ,
 				email: "anon@yopmail.com" ,
 				firstName: 'Anon' ,
 				lastName: 'Nyme' ,

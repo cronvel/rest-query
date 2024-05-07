@@ -387,6 +387,7 @@ describe( "Service" , () => {
 			
 			expect( data ).to.equal( {
 				_id: "543bb877bd15489d0d7b0120" ,
+				_collection: 'blogs' ,
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
 				slugId: data.slugId ,	// Cannot be predicted
@@ -405,6 +406,7 @@ describe( "Service" , () => {
 			
 			expect( data ).to.equal( {
 				_id: "543bb877bd15489d0d7b0120" ,
+				_collection: 'blogs' ,
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
 				slugId: data.slugId ,	// Cannot be predicted
@@ -460,6 +462,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: postDocument.id ,
+				_collection: 'blogs' ,
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
 				slugId: data.slugId ,	// Cannot be predicted
@@ -477,6 +480,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: postDocument.id ,
+				_collection: 'blogs' ,
 				title: "My website!" ,
 				description: "... about my wonderful life" ,
 				slugId: data.slugId ,	// Cannot be predicted
@@ -543,6 +547,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb877bd15489d0d7b0121" ,
+				_collection: 'blogs' ,
 				title: "My *NEW* website!" ,
 				description: "... about my wonderful life" ,
 				slugId: data.slugId ,	// Cannot be predicted
@@ -561,6 +566,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb877bd15489d0d7b0121" ,
+				_collection: 'blogs' ,
 				title: "My *NEW* website!" ,
 				description: "... about my wonderful life" ,
 				slugId: data.slugId ,	// Cannot be predicted
@@ -696,6 +702,7 @@ describe( "Service" , () => {
 			expect( data ).to.equal( [
 				{
 					_id: "543bb877bd15489d0d7b0121" ,
+					_collection: 'blogs' ,
 					title: "First post!" ,
 					description: "Everything started with that." ,
 					slugId: data[ 0 ].slugId ,	// Cannot be predicted
@@ -706,6 +713,7 @@ describe( "Service" , () => {
 				} ,
 				{
 					_id: "543bb877bd15489d0d7b0122" ,
+					_collection: 'blogs' ,
 					title: "About" ,
 					description: "About this blog." ,
 					slugId: data[ 1 ].slugId ,	// Cannot be predicted
@@ -716,6 +724,7 @@ describe( "Service" , () => {
 				} ,
 				{
 					_id: "543bb877bd15489d0d7b0123" ,
+					_collection: 'blogs' ,
 					title: "10 things about nothing" ,
 					description: "10 things you should know... or not..." ,
 					slugId: data[ 2 ].slugId ,	// Cannot be predicted
@@ -769,6 +778,7 @@ describe( "Service" , () => {
 			
 			expect( data ).to.equal( {
 				_id: "543bb877bd15489d0d7b0aaa" ,
+				_collection: 'blogs' ,
 				title: "My wonderful website!" ,
 				description: "... about my wonderful life" ,
 				slugId: 'my-wonderful-website' ,
@@ -815,6 +825,7 @@ describe( "Service" , () => {
 			
 			expect( data ).to.equal( {
 				_id: "543bb877bd15489d0d7b0bbb" ,
+				_collection: 'blogs' ,
 				title: 'عِنْدَمَا ذَهَبْتُ إِلَى ٱلْمَكْتَبَةِ' ,
 				description: 'كنت أريد أن أقرأ كتابا عن تاريخ المرأة في فرنسا' ,
 				slugId: 'عِنْدَمَا-ذَهَبْتُ-إِلَى-ٱلْمَكْتَبَةِ' ,
@@ -882,6 +893,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb877bd15489d0d7b0130" ,
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
@@ -905,6 +917,7 @@ describe( "Service" , () => {
 			
 			expect( data ).to.equal( {
 				_id: "543bb877bd15489d0d7b0130" ,
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
@@ -1019,6 +1032,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb877bd15c89dad7b0130" ,
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
@@ -1116,6 +1130,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7b0130" ,
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
@@ -1229,6 +1244,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb877bd15c89dad7b0130" ,
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
@@ -1355,6 +1371,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7b0130" ,
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
@@ -1451,6 +1468,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7ba130" ,
+				_collection: 'images' ,
 				name: "image" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				file: {
@@ -1545,6 +1563,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7ba130" ,
+				_collection: 'images' ,
 				name: "image" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				file: {
@@ -1656,6 +1675,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7ba130" ,
+				_collection: 'images' ,
 				name: "image" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				file: {
@@ -1730,6 +1750,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7ba130" ,
+				_collection: 'images' ,
 				name: "image" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				file: {
@@ -1820,6 +1841,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7ba130" ,
+				_collection: 'images' ,
 				name: "image" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				file: {
@@ -1898,6 +1920,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7ba130" ,
+				_collection: 'images' ,
 				name: "image" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				file: {
@@ -1979,6 +2002,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7ba130" ,
+				_collection: 'images' ,
 				name: "image" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				file: {
@@ -2092,6 +2116,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: "543bb8d7bd15a89dad7ba130" ,
+				_collection: 'images' ,
 				name: "image" ,
 				slugId: data.slugId ,	// Cannot be predicted
 				file: {
@@ -2342,6 +2367,7 @@ describe( "Service" , () => {
 			delete data.godfather.password ;
 			expect( data ).to.equal( {
 				_id: data._id ,
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -2355,6 +2381,7 @@ describe( "Service" , () => {
 				} ,
 				father: {
 					_id: data.father._id ,
+					_collection: 'users' ,
 					firstName: "Big Joe" ,
 					lastName: "Doe" ,
 					email: "big.joe.doe@gmail.com" ,
@@ -2370,6 +2397,7 @@ describe( "Service" , () => {
 				} ,
 				godfather: {
 					_id: data.godfather._id ,
+					_collection: 'users' ,
 					firstName: "THE" ,
 					lastName: "GODFATHER" ,
 					email: "godfather@gmail.com" ,
@@ -2400,6 +2428,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: data._id ,
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -2420,6 +2449,7 @@ describe( "Service" , () => {
 				groupAccess: {} ,
 				father: {
 					_id: data.father._id ,
+					_collection: 'users' ,
 					firstName: "Big Joe" ,
 					lastName: "Doe" ,
 					email: "big.joe.doe@gmail.com" ,
@@ -2438,6 +2468,7 @@ describe( "Service" , () => {
 				} ,
 				godfather: {
 					_id: data.godfather._id ,
+					_collection: 'users' ,
 					firstName: "THE" ,
 					lastName: "GODFATHER" ,
 					email: "godfather@gmail.com" ,
@@ -2471,6 +2502,7 @@ describe( "Service" , () => {
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
 				_id: data._id ,
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
@@ -2491,6 +2523,7 @@ describe( "Service" , () => {
 				groupAccess: {} ,
 				father: {
 					_id: data.father._id ,
+					_collection: 'users' ,
 					slugId: "big-joe-doe" ,
 					hid: "Big Joe Doe" ,
 					login: "big.joe.doe@gmail.com" ,
@@ -2501,6 +2534,7 @@ describe( "Service" , () => {
 				} ,
 				godfather: {
 					_id: data.godfather._id ,
+					_collection: 'users' ,
 					slugId: "the-godfather" ,
 					hid: "THE GODFATHER" ,
 					login: "godfather@gmail.com" ,
@@ -2526,11 +2560,13 @@ describe( "Service" , () => {
 			expect( response.body ).to.be.ok() ;
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
 				father: {
 					_id: data.father._id ,
+					_collection: 'users' ,
 					slugId: "big-joe-doe" ,
 					hid: "Big Joe Doe" ,
 					login: "big.joe.doe@gmail.com" ,
@@ -2541,6 +2577,7 @@ describe( "Service" , () => {
 				} ,
 				godfather: {
 					_id: data.godfather._id ,
+					_collection: 'users' ,
 					slugId: "the-godfather" ,
 					hid: "THE GODFATHER" ,
 					login: "godfather@gmail.com" ,
@@ -2566,16 +2603,19 @@ describe( "Service" , () => {
 			expect( response.body ).to.be.ok() ;
 			data = JSON.parse( response.body ) ;
 			expect( data ).to.equal( {
+				_collection: 'users' ,
 				firstName: "Joe" ,
 				lastName: "Doe" ,
 				email: "joe.doe@gmail.com" ,
 				father: {
+					_collection: 'users' ,
 					email: "big.joe.doe@gmail.com" ,
 					firstName: "Big Joe" ,
 					lastName: "Doe" ,
 					friends: []
 				} ,
 				godfather: {
+					_collection: 'users' ,
 					email: "godfather@gmail.com" ,
 					firstName: "THE" ,
 					lastName: "GODFATHER" ,
@@ -2600,6 +2640,7 @@ describe( "Service" , () => {
 			expect( data ).to.equal( [
 				{
 					_id: data[ 0 ]._id ,
+					_collection: 'users' ,
 					firstName: "Big Joe" ,
 					lastName: "Doe" ,
 					email: "big.joe.doe@gmail.com" ,
@@ -2616,6 +2657,7 @@ describe( "Service" , () => {
 				} ,
 				{
 					_id: data[ 1 ]._id ,
+					_collection: 'users' ,
 					firstName: "Joe" ,
 					lastName: "Doe" ,
 					email: "joe.doe@gmail.com" ,
@@ -2629,6 +2671,7 @@ describe( "Service" , () => {
 					} ,
 					father: {
 						_id: data[ 0 ]._id ,
+						_collection: 'users' ,
 						firstName: "Big Joe" ,
 						lastName: "Doe" ,
 						email: "big.joe.doe@gmail.com" ,
@@ -2644,6 +2687,7 @@ describe( "Service" , () => {
 					} ,
 					godfather: {
 						_id: data[ 2 ]._id ,
+						_collection: 'users' ,
 						firstName: "THE" ,
 						lastName: "GODFATHER" ,
 						email: "godfather@gmail.com" ,
@@ -2661,6 +2705,7 @@ describe( "Service" , () => {
 				} ,
 				{
 					_id: data[ 2 ]._id ,
+					_collection: 'users' ,
 					firstName: "THE" ,
 					lastName: "GODFATHER" ,
 					email: "godfather@gmail.com" ,
@@ -2698,6 +2743,7 @@ describe( "Service" , () => {
 			expect( data ).to.equal( [
 				{
 					_id: data[ 0 ]._id ,
+					_collection: 'users' ,
 					firstName: "Big Joe" ,
 					lastName: "Doe" ,
 					email: "big.joe.doe@gmail.com" ,
@@ -2718,6 +2764,7 @@ describe( "Service" , () => {
 				} ,
 				{
 					_id: data[ 1 ]._id ,
+					_collection: 'users' ,
 					firstName: "Joe" ,
 					lastName: "Doe" ,
 					email: "joe.doe@gmail.com" ,
@@ -2735,6 +2782,7 @@ describe( "Service" , () => {
 					} ,
 					father: {
 						_id: data[ 0 ]._id ,
+						_collection: 'users' ,
 						firstName: "Big Joe" ,
 						lastName: "Doe" ,
 						email: "big.joe.doe@gmail.com" ,
@@ -2753,6 +2801,7 @@ describe( "Service" , () => {
 					} ,
 					godfather: {
 						_id: data[ 2 ]._id ,
+						_collection: 'users' ,
 						firstName: "THE" ,
 						lastName: "GODFATHER" ,
 						email: "godfather@gmail.com" ,
@@ -2773,6 +2822,7 @@ describe( "Service" , () => {
 				} ,
 				{
 					_id: data[ 2 ]._id ,
+					_collection: 'users' ,
 					firstName: "THE" ,
 					lastName: "GODFATHER" ,
 					email: "godfather@gmail.com" ,
@@ -2812,6 +2862,7 @@ describe( "Service" , () => {
 			expect( data ).to.equal( [
 				{
 					_id: data[ 0 ]._id ,
+					_collection: 'users' ,
 					firstName: "Big Joe" ,
 					lastName: "Doe" ,
 					email: "big.joe.doe@gmail.com" ,
@@ -2831,6 +2882,7 @@ describe( "Service" , () => {
 				} ,
 				{
 					_id: data[ 1 ]._id ,
+					_collection: 'users' ,
 					firstName: "Joe" ,
 					lastName: "Doe" ,
 					email: "joe.doe@gmail.com" ,
@@ -2847,6 +2899,7 @@ describe( "Service" , () => {
 					} ,
 					father: {
 						_id: data[ 0 ]._id ,
+						_collection: 'users' ,
 						login: "big.joe.doe@gmail.com" ,
 						slugId: "big-joe-doe" ,
 						hid: "Big Joe Doe" ,
@@ -2857,6 +2910,7 @@ describe( "Service" , () => {
 					} ,
 					godfather: {
 						_id: data[ 2 ]._id ,
+						_collection: 'users' ,
 						slugId: "the-godfather" ,
 						hid: "THE GODFATHER" ,
 						login: "godfather@gmail.com" ,
@@ -2869,6 +2923,7 @@ describe( "Service" , () => {
 				} ,
 				{
 					_id: data[ 2 ]._id ,
+					_collection: 'users' ,
 					firstName: "THE" ,
 					lastName: "GODFATHER" ,
 					email: "godfather@gmail.com" ,
@@ -2890,6 +2945,135 @@ describe( "Service" , () => {
 		} ) ;
 
 		it( "Populate * test (TODO!)" ) ;
+	} ) ;
+
+
+
+	describe( "Filter on an anyCollection link" , () => {
+
+		it( "create an anyCollection link and get a document based on an anyCollection link, both using the string format: ID@collection" , async () => {
+			var response , data , acl1 , acl2 , acl3 ;
+
+			var postQuery1 = {
+				method: 'POST' ,
+				path: '/AnyCollectionLinks' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					name: "doc1" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			var postQuery2 = {
+				method: 'POST' ,
+				path: '/AnyCollectionLinks' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					name: "doc2" ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			var postQuery3 , getQuery ;
+			
+			response = await requester( postQuery1 ) ;
+			expect( response.status ).to.be( 201 ) ;
+			acl1 = JSON.parse( response.body ).id ;
+			
+			response = await requester( postQuery2 ) ;
+			expect( response.status ).to.be( 201 ) ;
+			acl2 = JSON.parse( response.body ).id ;
+
+			var postQuery3 = {
+				method: 'POST' ,
+				path: '/AnyCollectionLinks' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					name: "doc3" ,
+					link: acl1 + '@anyCollectionLinks' ,
+					publicAccess: { traverse: true , read: true , create: true }
+				}
+			} ;
+
+			response = await requester( postQuery3 ) ;
+			expect( response.status ).to.be( 201 ) ;
+			acl3 = JSON.parse( response.body ).id ;
+			
+			var getQuery = {
+				method: 'GET' ,
+				path: '/AnyCollectionLinks/' + acl3 + '?populate=[link]' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: data._id ,
+				_collection: 'anyCollectionLinks' ,
+				slugId: data.slugId ,
+				name: "doc3" ,
+				link: {
+					_id: acl1 ,
+					_collection: 'anyCollectionLinks' ,
+					slugId: data.link.slugId ,
+					name: "doc1" ,
+					backLink: [] ,
+					//groups: [] ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				} ,
+				backLink: [] ,
+				parent: {
+					collection: 'root' ,
+					id: "/"
+				}
+			} ) ;
+
+			getQuery = {
+				method: 'GET' ,
+				path: '/AnyCollectionLinks?filter.link=' + acl1 + '@anyCollectionLinks' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+			
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( [
+				{
+					_id: data[ 0 ]._id ,
+					_collection: 'anyCollectionLinks' ,
+					slugId: data[ 0 ].slugId ,
+					name: "doc3" ,
+					link: {
+						_id: acl1 ,
+						_collection: 'anyCollectionLinks'
+					} ,
+					backLink: [] ,
+					parent: {
+						collection: 'root' ,
+						id: "/"
+					}
+				}
+			] ) ;
+		} ) ;
 	} ) ;
 } ) ;
 

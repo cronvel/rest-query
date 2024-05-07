@@ -1,0 +1,21 @@
+path: /anyCollectionLinks
+
+defaultPublicAccess:
+	read: content
+
+properties:
+	name:
+		type: string
+	link:
+		type: link
+		anyCollection: true
+	backLink:
+		type: backLink
+		collection: anyCollectionLinks
+		path: link
+
+
+indexes:
+	-	links:
+			link: 1
+
