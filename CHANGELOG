@@ -1,4 +1,10 @@
 
+v0.71.1
+-------
+
+Performer#getUser() fixed when the auth only contains grant:true
+
+
 v0.71.0
 -------
 
