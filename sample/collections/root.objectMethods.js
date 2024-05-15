@@ -50,3 +50,18 @@ exports.double = context => {
 
 //exports.double.tags = [ 'content' ] ;
 
+
+
+exports.params = context => {
+	if ( ! context.input.query.params ) {
+		context.output.data = null ;
+	}
+	else {
+		context.output.data = context.input.query.params ;
+	}
+	
+	return Promise.resolved ;
+} ;
+
+//exports.double.tags = [ 'content' ] ;
+

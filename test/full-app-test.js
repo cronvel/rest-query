@@ -351,6 +351,27 @@ describe( "Service" , () => {
 			expect( response.body ).not.to.be.ok() ;
 		} ) ;
 
+		it( "getting method's params from the query string 'params' object" , async () => {
+			var getQuery = {
+				method: 'GET' ,
+				path: '/PARAMS?params.name=Alice&params.age=28' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			var response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+
+			var data = JSON.parse( response.body ) ;
+			
+			expect( data ).to.equal( {
+				name: 'Alice' ,
+				age: 28 ,
+			} ) ;
+		} ) ;
+
 		it( "PUT then GET on a blog" , async () => {
 			var response , data ;
 			

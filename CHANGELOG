@@ -1,4 +1,10 @@
 
+v0.71.2
+-------
+
+Support for method's params in query string, using the query string property 'params', e.g.: ?params.name=Alice
+
+
 v0.71.1
 -------
 
