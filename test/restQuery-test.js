@@ -8994,6 +8994,8 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 			lastName: 'Doe'
 		} ) ;
 	} ) ;
+
+	it( "methods using .get*Batch( methodFilter )" ) ;
 } ) ;
 
 

@@ -1,4 +1,10 @@
 
+v0.71.3
+-------
+
+New: context#get*Batch() with a methodFilter argument
+
+
 v0.71.2
 -------
 
