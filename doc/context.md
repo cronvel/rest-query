@@ -14,7 +14,7 @@ This is the data structure of a context:
 * input `Object` contains data that have been passed as input (e.g. by a HTTP client), where:
 	* method `string` the original method used (i.e. the lower-cased HTTP method)
 	* pathParts `Array` the fully parsed path to the resource
-	* query `Object` particular query (filters, populate, etc...) to apply on the resource
+	* query `Object` particular query (filters, populate, params -- for methods, etc...) to apply on the resource
 	* document `Object` (optional) the given document, if any (e.g. the body of a HTTP PUT request)
 	* attachmentStreams `Object` (optional) the given binary stream, if any (e.g. a part of a multipart body of a HTTP PUT request)
 * output `Object` contains data that goes alongside with the main resource about to be sent (e.g. to a HTTP client or to a hook, etc), where:
