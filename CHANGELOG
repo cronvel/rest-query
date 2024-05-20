@@ -1,4 +1,10 @@
 
+v0.71.5
+-------
+
+.getRealBatch() doesn't force a limit in the query anymore
+
+
 v0.71.4
 -------
 
