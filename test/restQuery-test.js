@@ -4399,6 +4399,7 @@ describe( "Tokens" , () => {
 
 		expect( response.output.data ).to.equal( {
 			userId: id ,
+			userLogin: "bobby.fisher@gmail.com" ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -4587,6 +4588,7 @@ describe( "Tokens" , () => {
 
 		expect( response.output.data ).to.equal( {
 			userId: id ,
+			userLogin: "bobby.fisher@gmail.com" ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -4630,6 +4632,7 @@ describe( "Tokens" , () => {
 
 		expect( response.output.data ).to.equal( {
 			userId: id ,
+			userLogin: "bobby.fisher@gmail.com" ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -4674,6 +4677,7 @@ describe( "Tokens" , () => {
 
 		expect( response.output.data ).to.equal( {
 			userId: id ,
+			userLogin: "bobby.fisher@gmail.com" ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -4724,6 +4728,7 @@ describe( "Tokens" , () => {
 
 		expect( response.output.data ).to.equal( {
 			userId: id ,
+			userLogin: "bobby.fisher@gmail.com" ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -4763,6 +4768,7 @@ describe( "Tokens" , () => {
 
 		expect( response.output.data ).to.equal( {
 			userId: id ,
+			userLogin: "bobby.fisher@gmail.com" ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -4829,6 +4835,7 @@ describe( "Tokens" , () => {
 
 		expect( response.output.data ).to.equal( {
 			userId: id ,
+			userLogin: "bobby.fisher@gmail.com" ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -5008,6 +5015,7 @@ describe( "API keys" , () => {
 
 		expect( response.output.data ).to.equal( {
 			userId: userId ,
+			userLogin: "bobby.fisher@gmail.com" ,
 			type: "header" ,
 			agentId: "0123456789012345678901234567890123456789" ,
 			apiKey: response.output.data.apiKey		// unpredictable

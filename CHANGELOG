@@ -1,4 +1,10 @@
 
+v0.71.6
+-------
+
+Add 'userLogin' to response's data of all built-in users' methods
+
+
 v0.71.5
 -------
 
