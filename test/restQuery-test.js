@@ -9355,6 +9355,7 @@ describe( "Historical bugs" , () => {
 		// Regular patch, check that the godfather has been modified, but don't contain extra data
 		response = await app.patch( '/Users/' + userId , { godfather: { _id: godfatherId , firstName: "should be removed" , lastName: "should be removed" } } , null , { performer: performer } ) ;
 		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		console.log( ">>> " , response.output.data.godfather._id ) ;
 		expect( response.output.data.godfather._id ).to.be.an( mongodb.ObjectId ) ;
 		expect( response.output.data.godfather ).to.only.have.own.key( '_id' ) ;
 	} ) ;
