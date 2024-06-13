@@ -140,6 +140,7 @@ async function commonApp( override = null ) {
 		clearCollection( app.collectionNodes.comments.collection ) ,
 		clearCollection( app.collectionNodes.images.collection ) ,
 
+		clearCollection( app.countersCollection ) ,
 		clearCollection( app.versionsCollection ) ,
 		clearCollection( app.jobsCollection )
 	] ) ;
@@ -9235,6 +9236,30 @@ describe( "Scheduler" , () => {
 describe( "Client error management" , () => {
 
 	it( "Test client error management" ) ;
+} ) ;
+
+
+
+describe( "Counters API" , () => {
+
+	it( "Get next counter value" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.getNextCounterFor( 'invoice' ) ;
+		expect( response ).to.be( 1 ) ;
+
+		response = await app.getNextCounterFor( 'invoice' ) ;
+		expect( response ).to.be( 2 ) ;
+
+		response = await app.getNextCounterFor( 'num' ) ;
+		expect( response ).to.be( 1 ) ;
+
+		response = await app.getNextCounterFor( 'invoice' ) ;
+		expect( response ).to.be( 3 ) ;
+
+		response = await app.getNextCounterFor( 'num' ) ;
+		expect( response ).to.be( 2 ) ;
+	} ) ;
 } ) ;
 
 
