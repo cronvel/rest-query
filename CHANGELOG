@@ -1,4 +1,10 @@
 
+v0.72.2
+-------
+
+Fix generateSlug()/generateHid() behavior, since it can be called from userland, it should always generate a new one (pre-existance test is now made outside of those methods)
+
+
 v0.72.1
 -------
 
