@@ -47,6 +47,16 @@ module.exports = {
 		}
 	] ,
 	
+	beforeCreateAfterValidate: [
+		async ( context ) => {
+			if ( context.usr.beforeCreateAfterValidatePreHookTest ) { await context.usr.beforeCreateAfterValidatePreHookTest( context ) ; }
+			if ( context.usr.beforeCreateAfterValidatePreHookDone ) { context.done() ; }
+		} ,
+		async ( context ) => {
+			if ( context.usr.beforeCreateAfterValidateTest ) { await context.usr.beforeCreateAfterValidateTest( context ) ; }
+		}
+	] ,
+	
 	afterCreate: async ( context ) => {
 		if ( context.usr.afterCreateTest ) { await context.usr.afterCreateTest( context ) ; }
 	} ,

@@ -7744,6 +7744,66 @@ describe( "Hooks" , () => {
 		} ) ;
 	} ) ;
 
+	it( "'beforeCreateAfterValidate' hook effects and context for a POST request" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var hookRan = false ;
+		var response = await app.post(
+			'/Blogs' ,
+			{
+				title: 'My wonderful life!!!' ,
+				description: 'This is a supa blog!' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{
+				performer: performer ,
+				usr: {
+					beforeCreateAfterValidateTest: context => {
+						expect( hookRan ).to.be.false() ;
+
+						expect( context ).to.be.a( restQuery.Context ) ;
+						expect( context.app ).to.be.a( restQuery.App ) ;
+						expect( context.app ).to.be( app ) ;
+						expect( context.performer ).to.be.a( restQuery.Performer ) ;
+						expect( context.performer ).to.be( performer ) ;
+						expect( context.collectionNode ).to.be.a( restQuery.CollectionNode ) ;
+						expect( context.collectionNode.name ).to.be( 'blogs' ) ;
+						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
+						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
+						expect( context.document._.raw ).to.partially.equal( {
+							title: "My wonderful life!!!" ,
+							description: "This is a supa blog!" ,
+							parent: {
+								collection: "root" ,
+								id: "/"
+							}
+						} ) ;
+
+						// Make the hook alter the incoming document
+						context.document.description += ' [validated]' ;
+
+						// Must be at the end
+						hookRan = true ;
+					}
+				}
+			}
+		) ;
+
+		expect( hookRan ).to.be.true() ;
+
+		var id = response.output.data.id.toString() ;
+		expect( id ).to.be.a( 'string' ) ;
+		expect( id ).to.have.length.of( 24 ) ;
+
+		response = await app.get( '/Blogs/' + id , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My wonderful life!!!' ,
+			description: 'This is a supa blog! [validated]' ,
+			parent: { id: '/' , collection: 'root' }
+		} ) ;
+	} ) ;
+
 	it( "'afterCreate' hook effects and context for a POST request" , async () => {
 		var { app , performer } = await commonApp() ;
 

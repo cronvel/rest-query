@@ -1,4 +1,10 @@
 
+v0.72.1
+-------
+
+New hook: 'beforeCreateAfterValidate', forcing a document validation before running the hook
+
+
 v0.72.0
 -------
 

@@ -99,6 +99,33 @@ If `context.linkerObjectNode` is set, then the resource about to be created is l
 
 
 
+#### *beforeCreateAfterValidate*
+
+When:
+
+* a POST request creating a new document (not POST request executing a method)
+* a PUT request creating a new document or overwriting a whole document
+* executed before the document is inserted
+* it forces a document's validation (which is usually done when saving it to the DB)
+* executed after a successful validation, if the hook rejects, the document is dropped, thus never saved to the DB
+
+The `context.document` contains the freshly created and validated document (but not saved/inserted into the DB,
+also note that `context.hook.incomingDocument` does not exist anymore, contrary to the *beforeCreate* hook,
+it's already turned into a Document instance).
+
+The `context.hook.existingDocument` contains the document about to be replaced, it is only set for PUT request overwriting an existing document.
+
+The `context.parentObjectNode` is the parent *objectNode* of the resource about to be created (e.g. PUT, POST on a collection).
+
+The `context.objectNode` is more contextual, for PUT overwriting a document, it is the existing *objectNode* about to be overwritten,
+for POST or PUT creating a new document, this is the same than `context.parentObjectNode`.
+In fact `context.objectNode` is always the last existing *objectNode* during the URL traversal.
+It is often recommended not to use `context.objectNode` which is more for Rest Query internal stuff.
+
+If `context.linkerObjectNode` is set, then the resource about to be created is linked by that *objectNode* (e.g. PUT on a link).
+
+
+
 #### *afterCreate*
 
 When:
