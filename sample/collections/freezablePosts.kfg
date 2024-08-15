@@ -1,0 +1,35 @@
+path: /freezablePosts
+extraProperties: true
+properties:
+	title:
+		type: string
+	content:
+		type: string
+	date:
+		type: date
+		sanitize: toDate
+		optional: true
+	likes:
+		type: integer
+		sanitize: toInteger
+		optional: true
+	emotes:
+		type: array
+		of:
+			type: string
+		optional: true
+slugGeneration:
+	properties:
+		- date
+		- title
+	retry: true
+unindexedQueries: true
+freezable: true
+indexes:
+	-	properties:
+			content: text
+	-	properties:
+			title: 1
+	-	properties:
+			date: 1
+

@@ -1,4 +1,12 @@
 
+v0.73.0
+-------
+
+BREAKING: 'canLock' -> 'lockable'
+Support for immutable properties
+Support for freezing/unfreezing a Document
+
+
 v0.72.2
 -------
 

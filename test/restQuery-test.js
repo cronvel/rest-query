@@ -137,8 +137,11 @@ async function commonApp( override = null ) {
 		clearCollection( app.collectionNodes.groups.collection ) ,
 		clearCollection( app.collectionNodes.blogs.collection ) ,
 		clearCollection( app.collectionNodes.posts.collection ) ,
+		clearCollection( app.collectionNodes.versionedPosts.collection ) ,
+		clearCollection( app.collectionNodes.freezablePosts.collection ) ,
 		clearCollection( app.collectionNodes.comments.collection ) ,
 		clearCollection( app.collectionNodes.images.collection ) ,
+		clearCollection( app.collectionNodes.anyCollectionLinks.collection ) ,
 
 		clearCollection( app.countersCollection ) ,
 		clearCollection( app.versionsCollection ) ,
@@ -3787,6 +3790,103 @@ describe( "Versioned collections" , () => {
 				content: 'Edit: Blah blah blah...'
 			}
 		] ) ;
+	} ) ;
+} ) ;
+
+
+
+describe( "Freezable collections" , () => {
+
+	it( "POST, then PATCH, then freeze, then PATCH" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog.save() ;
+
+		var response = await app.post( '/Blogs/' + blog.getId() + '/FreezablePosts' ,
+			{
+				title: 'My first post!!!' ,
+				content: 'Blah blah blah...' ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var postId = response.output.data.id ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My first post!!!' ,
+			content: 'Blah blah blah...'
+		} ) ;
+		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
+
+		// PATCH
+		response = await app.patch( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId  ,
+			{
+				title: 'My 1st post!!!'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My 1st post!!!' ,
+			content: 'Blah blah blah...'
+		} ) ;
+		expect( response.output.data.parent.id.toString() ).to.be( blog.getId().toString() ) ;
+
+
+		// Freeze the document NOW!
+		response = await app.post( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId + '/FREEZE' , { performer: performer } ) ;
+
+		// PATCH is not possible anymore
+		await expect( () => app.patch( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId  ,
+			{
+				title: 'My 2st post!!!'
+			} ,
+			null ,
+			{ performer: performer }
+		) ).to.reject( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
+
+		// DELETE is not possible anymore
+		await expect( () => app.delete( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId  , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
+		
+		// Check that nothing was modified
+		response = await app.get( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My 1st post!!!' ,
+			content: 'Blah blah blah...'
+		} ) ;
+
+
+		// Unfreeze the document NOW!
+		response = await app.post( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId + '/UNFREEZE' , { performer: performer } ) ;
+
+		// PATCH is possible again
+		await app.patch( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId  ,
+			{
+				title: 'My 3rd post!!!'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		response = await app.get( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			title: 'My 3rd post!!!' ,
+			content: 'Blah blah blah...'
+		} ) ;
+
+		// DELETE is possible again
+		await app.delete( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId  , { performer: performer } ) ;
+		await expect( () => app.get( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'notFound' , httpStatus: 404 } ) ;
 	} ) ;
 } ) ;
 
@@ -9365,7 +9465,7 @@ describe( "Misc" , () => {
 
 	it( "App's all collection exec tags" , async () => {
 		var { app , performer } = await commonApp() ;
-		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "generateFake" , "regenerateSlug" , "regenerateHid" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
+		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "generateFake" , "freeze" , "regenerateSlug" , "regenerateHid" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
 	} ) ;
 
 	it.opt( "Collection with a user/password in URL" , async () => {
