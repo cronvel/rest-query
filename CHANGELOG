@@ -1,4 +1,10 @@
 
+v0.74.0
+-------
+
+BREAKING: changed whitelisted properties for the SCHEMA method
+
+
 v0.73.1
 -------
 
