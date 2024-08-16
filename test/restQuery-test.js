@@ -3822,6 +3822,7 @@ describe( "Freezable collections" , () => {
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
+			_frozen: false ,
 			title: 'My first post!!!' ,
 			content: 'Blah blah blah...'
 		} ) ;

@@ -1,4 +1,10 @@
 
+v0.73.1
+-------
+
+_frozen is now 'system-content' instead of 'content', so it is readable by the API consumers
+
+
 v0.73.0
 -------
 
