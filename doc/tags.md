@@ -1,11 +1,11 @@
 
 ## Tags
 
-### Generic tags
+### Standardized and built-in tags
 
 **id**:
 Everything related to identification, sometime recommended for things like name, title, login.
-**Internally used for:** *_id*, *slugId*.
+**Internally used for:** *_id*, *slugId*, *hid*, *parent*.
 Reading access to identification should be provided most of time, as it should contain no sensistive data.
 **This is also part of the hardcoded default public access for reading**, when there is no userland *defaultPublicAccess* defined.
 
@@ -50,4 +50,16 @@ Should be reserved to admins, or the owner of the account.
 **schema**:
 Give access to schema retrieving methods.
 **Internally used for:** access to the *SCHEMA* method (retrieve the current schema).
+
+**freeze**:
+Give access to the *freeze* and *unfreeze* methods.
+
+**regenerateSlug**:
+Give access to the *regenerateSlug* method.
+
+**regenerateHid**:
+Give access to the *regenerateHid* method.
+
+**generateFake**:
+Give access to the *generateFake* method.
 
