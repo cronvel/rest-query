@@ -3622,6 +3622,56 @@ describe( "Users" , () => {
 
 		// check back the password
 		expect( hash.password( "a-secret-password" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
+
+		// Now again using the new 'passwordInput' field
+
+		response = await app.put( '/Users/5437f846e41d0e910ec9a5d9' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe2@gmail.com" ,
+				password: "a-secret-password2"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846e41d0e910ec9a5d9' , { performer: performer } ) ;
+
+		expect( response.output.data.password ).to.be.an( 'object' ) ;
+		expect( response.output.data.password.algo ).to.be( 'sha512' ) ;
+		expect( response.output.data.password.salt ).to.be.a( 'string' ) ;
+		expect( response.output.data.password.hash ).to.be.a( 'string' ) ;
+
+		// check back the password
+		expect( hash.password( "a-secret-password2" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
+	} ) ;
+
+	it( "updating the password" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.put( '/Users/5437f846e41d0e910ec9a5d8' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "a-secret-password"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( hash.password( "a-secret-password" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
+
+		await app.patch( '/Users/5437f846e41d0e910ec9a5d8' , { password: "changed-password" } , null , { performer: performer } ) ;
+		response = await app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( hash.password( "changed-password" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
+
+		// Now again using the new 'passwordInput' field
+		await app.patch( '/Users/5437f846e41d0e910ec9a5d8' , { passwordInput: "changed-password-again" } , null , { performer: performer } ) ;
+		response = await app.get( '/Users/5437f846e41d0e910ec9a5d8' , { performer: performer } ) ;
+		expect( hash.password( "changed-password-again" , response.output.data.password.salt , response.output.data.password.algo ) ).to.be( response.output.data.password.hash ) ;
 	} ) ;
 } ) ;
 

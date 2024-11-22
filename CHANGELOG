@@ -1,4 +1,10 @@
 
+v0.74.3
+-------
+
+New pa'sswordInput' field on User documents, always erased, supersed the usage of the 'password' field with a string (the goal is to keep a clean schema, the client app doesn't have to infer things like the 'password' field, which is declared as an object, can be a string when patching)
+
+
 v0.74.2
 -------
 
