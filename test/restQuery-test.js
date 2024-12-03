@@ -187,7 +187,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			userAccess: {} ,
 			groupAccess: {} ,
 			publicAccess: {
-				traverse: true , read: [ 'id' , 'content' , 'system-content' ] , query: true , create: true
+				traverse: true , read: [ 'id' , 'content' , 'systemContent' ] , query: true , create: true
 			}
 		} ) ;
 	} ) ;
@@ -234,7 +234,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 			description: 'A wonderful website' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: [ 'id' , 'content' , 'system-content' ] , create: true }
+			publicAccess: { traverse: true , read: [ 'id' , 'content' , 'systemContent' ] , create: true }
 		} ) ;
 	} ) ;
 
@@ -284,7 +284,7 @@ describe( "Basic queries of object of a top-level collection" , () => {
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/.userAccess.' + randomId , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( {
-			traverse: true , read: [ 'id' , 'content' , 'system-content' ] , exec: [ 'id' , 'content' ] , query: true
+			traverse: true , read: [ 'id' , 'content' , 'systemContent' ] , exec: [ 'id' , 'content' ] , query: true
 		} ) ;
 	} ) ;
 
@@ -7034,7 +7034,7 @@ describe( "Access" , () => {
 		var response , userAccess ;
 
 		userAccess = {} ;
-		userAccess[ authorizedId ] = { read: [ 'content' , 'system-content' ] } ;	// Minimal right that pass the check
+		userAccess[ authorizedId ] = { read: [ 'content' , 'systemContent' ] } ;	// Minimal right that pass the check
 		userAccess[ notEnoughAuthorizedId ] = 'passThrough' ;	// Maximal right that does not pass the check
 
 		response = await app.put( '/Blogs/5437f846c41d0e910ec9a5d8' ,
@@ -7146,7 +7146,7 @@ describe( "Access" , () => {
 
 			// Add more access
 
-			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'system-content' ] } ;
+			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'systemContent' ] } ;
 			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
 
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
@@ -7192,7 +7192,7 @@ describe( "Access" , () => {
 
 			// Add more access
 
-			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'system-content' , 'secret' ] } ;
+			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'systemContent' , 'secret' ] } ;
 			response = await app.patch( '/Blogs/5437f846c41d0e910ec9a5d8' , { userAccess: userAccess } ) ;
 
 			response = await app.get( '/Blogs/5437f846c41d0e910ec9a5d8' , { performer: authorizedPerformer } ) ;
@@ -7341,7 +7341,7 @@ describe( "Access" , () => {
 
 			// Add more access
 
-			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'system-content' ] } ;
+			userAccess[ authorizedId ] = { read: [ 'id' , 'content' , 'systemContent' ] } ;
 			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { userAccess: userAccess } ) ;
 
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedPerformer } ) ;
@@ -7515,7 +7515,7 @@ describe( "Access" , () => {
 			// Now test groups
 			// Add more access to group
 
-			groupAccess[ authorizedGroupId ] = { read: [ 'id' , 'content' , 'system-content' ] } ;
+			groupAccess[ authorizedGroupId ] = { read: [ 'id' , 'content' , 'systemContent' ] } ;
 			response = await app.patch( '/Users/5437f846c41d0ef10ec9a5ff' , { groupAccess: groupAccess } ) ;
 
 			response = await app.get( '/Users/5437f846c41d0ef10ec9a5ff' , { performer: authorizedByGroupPerformer } ) ;
@@ -9508,7 +9508,7 @@ describe( "Misc" , () => {
 		var { app , performer } = await commonApp() ;
 		expect( app.collectionNodes.blogs.collection.documentSchema.properties.publicAccess.default )
 			.to.equal( {
-				traverse: true , read: [ 'id' , 'content' , 'system-content' ] , exec: [ 'id' , 'content' ] , query: true , create: true
+				traverse: true , read: [ 'id' , 'content' , 'systemContent' ] , exec: [ 'id' , 'content' ] , query: true , create: true
 			} ) ;
 		expect( app.collectionNodes.comments.collection.documentSchema.properties.publicAccess.default )
 			.to.equal( { read: [ 'id' , 'content' ] } ) ;
@@ -9516,7 +9516,7 @@ describe( "Misc" , () => {
 
 	it( "App's all collection exec tags" , async () => {
 		var { app , performer } = await commonApp() ;
-		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "generateFake" , "freeze" , "regenerateSlug" , "regenerateHid" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
+		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "export" , "generateFake" , "freeze" , "regenerateSlug" , "regenerateHid" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
 	} ) ;
 
 	it.opt( "Collection with a user/password in URL" , async () => {
@@ -9533,7 +9533,7 @@ describe( "Misc" , () => {
 			description: 'Root object' ,
 			userAccess: {} ,
 			groupAccess: {} ,
-			publicAccess: { traverse: true , read: [ 'id' , 'content' , 'system-content' ] , create: true }
+			publicAccess: { traverse: true , read: [ 'id' , 'content' , 'systemContent' ] , create: true }
 		} ) ;
 	} ) ;
 
