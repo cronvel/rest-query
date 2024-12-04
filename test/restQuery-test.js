@@ -1199,6 +1199,42 @@ describe( "Built-in object method: REGENERATE-SLUG" , () => {
 
 
 
+describe( "Built-in collection method: EXPORT-CSV" , () => {
+
+	it( "should get the CSV export of a collection" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var blog1 = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog1.save() ;
+
+		var blog2 = app.root.children.blogs.collection.createDocument( {
+			title: 'YAB' ,
+			description: 'Yet Another Blog' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog2.save() ;
+
+		var blog3 = app.root.children.blogs.collection.createDocument( {
+			title: 'Third' ,
+			description: 'The Third' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog3.save() ;
+
+		var response = await app.get( '/Blogs/EXPORT-CSV' , { performer: performer } ) ;
+		//expect( response.output.data ).to.equal( app.collectionNodes.blogs.schema ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "Queries of nested object" , () => {
 
 	it( "GET on an unexisting nested item" , async () => {
