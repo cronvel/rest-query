@@ -38,7 +38,7 @@
     "fs-kit": "^0.6.5",
     "minimist": "^1.2.8",
     "mongodb": "^6.11.0",
-    "stream-kit": "^0.6.2"
+    "stream-kit": "^0.6.3"
   },
   "scripts": {
     "test": "tea-time -R dot"
