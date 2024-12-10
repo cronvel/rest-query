@@ -678,7 +678,7 @@ describe( "Query: skip, limit, sort" , () => {
 
 
 		// descendant sorting
-		var expected = [
+		expected = [
 			{
 				title: 'YAB' ,
 				description: 'Yet Another Blog' ,
@@ -950,7 +950,7 @@ describe( "Query: filters and text search" , () => {
 		expect( response.output.data ).to.be.like( [ expectedPost2 ] ) ;
 
 		// search
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { search: 'content' } } } ) ;
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { search: 'content' } } } ) ;
 		expect( response.output.data ).to.be.like( [ expectedPost3 , expectedPost2 , expectedPost1 ] ) ;
 	} ) ;
 
@@ -1229,6 +1229,10 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		await blog3.save() ;
 
 		var response = await app.get( '/Blogs/EXPORT-CSV' , { performer: performer } ) ;
+		//await Promise.resolveTimeout( 200 ) ;
+		//console.log( "response.output.data:" , response.output.data ) ;
+		var content = await streamKit.getFullString( response.output.data ) ; console.log( "Content:\n" + content ) ;
+		
 		//expect( response.output.data ).to.equal( app.collectionNodes.blogs.schema ) ;
 	} ) ;
 } ) ;
@@ -3360,7 +3364,7 @@ describe( "AttachmentSet links" , () => {
 		response = await app.get( '/Images/' + imageId + '/~file/~source' , { performer: performer } ) ;
 		expect( response.output.data ).to.be.a( stream.Readable ) ;
 
-		var content = await streamKit.getFullString( response.output.data ) ;
+		content = await streamKit.getFullString( response.output.data ) ;
 		expect( content ).to.be( 'b'.repeat( 40 ) ) ;
 	} ) ;
 
@@ -3840,7 +3844,7 @@ describe( "Versioned collections" , () => {
 
 		// Now check that all versions are still there
 
-		var batch = await app.versionsCollection.find( { '_activeVersion._id': postId , '_activeVersion._collection': 'versionedPosts' } ) ;
+		batch = await app.versionsCollection.find( { '_activeVersion._id': postId , '_activeVersion._collection': 'versionedPosts' } ) ;
 		expect( batch ).to.be.partially.like( [
 			{
 				_id: batch[ 0 ]._id ,   // unpredictable
@@ -3945,7 +3949,7 @@ describe( "Freezable collections" , () => {
 
 		// DELETE is not possible anymore
 		await expect( () => app.delete( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId  , { performer: performer } ) ).to.reject( ErrorStatus , { type: 'badRequest' , httpStatus: 400 } ) ;
-		
+
 		// Check that nothing was modified
 		response = await app.get( '/Blogs/' + blog.getId() + '/FreezablePosts/' + postId , { performer: performer } ) ;
 		expect( response.output.data ).to.partially.equal( {
@@ -5973,8 +5977,8 @@ describe( "Access" , () => {
 		) ).to.reject.with( ErrorStatus , { type: 'forbidden' , httpStatus: 403 , message: 'Access forbidden.' } ) ;
 
 		// User listed, but with too low rights
-		 await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
-		 	{
+		await expect( () => app.post( '/Blogs/5437f846c41d0e910ec9a5d8/Posts' ,
+			{
 				title: 'Post four' ,
 				content: 'Blah blah blah...' ,
 				publicAccess: 'read'
@@ -9094,7 +9098,7 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 		var { app , systemPerformer } = await commonApp() ;
 
 		// Create users
-		
+
 		var response = await app.post( '/Users' ,
 			{
 				firstName: "Joe" ,
@@ -9175,7 +9179,7 @@ describe( "Custom methods (POST to a METHOD)" , () => {
 			agentId: "0123456789"
 		} ) ;
 
-		
+
 		response = await app.get( '/Users/GET-REAL-FIRST-NAMES' , { performer: performer } ) ;
 		expect( response.output.data ).to.equal( [ 'Joe' , 'Bob' , 'Bobby' , 'Jack' ] ) ;
 
