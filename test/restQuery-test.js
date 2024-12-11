@@ -1203,39 +1203,61 @@ describe( "Built-in object method: REGENERATE-SLUG" , () => {
 describe( "Built-in collection method: EXPORT-CSV" , () => {
 
 	it( "should get the CSV export of a collection" , async () => {
+		var response , content , expected ;
+
 		var { app , performer } = await commonApp() ;
 
-		var blog1 = app.root.children.blogs.collection.createDocument( {
-			title: 'My wonderful life' ,
-			description: 'This is a supa blog!' ,
-			publicAccess: 'all'
-		} ) ;
+		response = await app.put( '/Users/5437f846c41d0e910ec9a501' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
 
-		await blog1.save() ;
+		response = await app.put( '/Users/5437f846c41d0e910ec9a502' ,
+			{
+				firstName: "Jack" ,
+				lastName: "Wallace" ,
+				email: "jack.wallace@gmail.com" ,
+				godfather: '5437f846c41d0e910ec9a501' ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
 
-		var blog2 = app.root.children.blogs.collection.createDocument( {
-			title: 'YAB' ,
-			description: 'Yet Another Blog' ,
-			publicAccess: 'all'
-		} ) ;
+		response = await app.put( '/Users/5437f846c41d0e910ec9a503' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fischer" ,
+				email: "bobby.fischer@gmail.com" ,
+				godfather: '5437f846c41d0e910ec9a501' ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
 
-		await blog2.save() ;
-
-		var blog3 = app.root.children.blogs.collection.createDocument( {
-			title: 'Third' ,
-			description: 'The Third' ,
-			publicAccess: 'all'
-		} ) ;
-
-		await blog3.save() ;
-
-		var response = await app.get( '/Blogs/EXPORT-CSV' , { performer: performer } ) ;
-		//await Promise.resolveTimeout( 200 ) ;
-		//console.log( "response.output.data:" , response.output.data ) ;
-		var content = await streamKit.getFullString( response.output.data ) ; console.log( "Content:\n" + content ) ;
-		await fs.promises.writeFile( 'test/expost.csv' , content ) ;
+		response = await app.get( '/Users/EXPORT-CSV' , { performer: performer } ) ;
 		
-		//expect( response.output.data ).to.equal( app.collectionNodes.blogs.schema ) ;
+		//console.log( "response.output.data:" , response.output.data ) ;
+		content = await streamKit.getFullString( response.output.data ) ;
+		expected = "_id,slugId,hid,parent,login,firstName,lastName,email,avatar,bigAvatar,father,godfather,friends\r\n5437f846c41d0e910ec9a501,joe-doe,\"Joe Doe\",\"{\"\"collection\"\":\"\"root\"\",\"\"id\"\":\"\"/\"\"}\",joe.doe@gmail.com,Joe,Doe,joe.doe@gmail.com,,,,,\"[]\"\r\n5437f846c41d0e910ec9a502,jack-wallace,\"Jack Wallace\",\"{\"\"collection\"\":\"\"root\"\",\"\"id\"\":\"\"/\"\"}\",jack.wallace@gmail.com,Jack,Wallace,jack.wallace@gmail.com,,,,5437f846c41d0e910ec9a501,\"[]\"\r\n5437f846c41d0e910ec9a503,bobby-fischer,\"Bobby Fischer\",\"{\"\"collection\"\":\"\"root\"\",\"\"id\"\":\"\"/\"\"}\",bobby.fischer@gmail.com,Bobby,Fischer,bobby.fischer@gmail.com,,,,5437f846c41d0e910ec9a501,\"[]\"\r\n" ;
+		expect( content ).to.be( expected ) ;
+
+		/*
+		console.log( "Content:\n" + content ) ;
+		console.log( "Content:\n" , JSON.stringify( content ) ) ;
+		console.log( "Content:\n" , content ) ;
+		await fs.promises.writeFile( 'test/expost.csv' , content ) ;
+		//*/
 	} ) ;
 } ) ;
 

@@ -384,12 +384,28 @@ Furthermore, the context object has this public methods:
   Because it is the same batch that would be returned without the method part of the URL, this means that **RIGHT MANAGEMENTS ARE ALSO APPLIED**,
   filtering document that are not visible to this specific user.
   The optional argument *methodFilter* pass an extra filter passed by the method for its particular usage.
-* getRealBatch( methodFilter ): an **async** function (only works for collection methods), mostly like .getUserBatch() but it returns all documents,
+* getRealBatch( methodFilter ): an **async** function (only works for collection methods), mostly like `.getUserBatch()` but it returns all documents,
   even those that the right management would ignore.
   It should be used for methods that **DO NOT RETURN THOSE DOCUMENTS** but instead compute things on them, like anonymous statistics.
   Moreover, no population of any kind is applied, but query-string filters, sort, limits and skips are still valid.
   This is because we only want the correct document list.
   The optional argument *methodFilter* pass an extra filter passed by the method for its particular usage.
+* streamUserBatch( callbacks , methodFilter ): an **async** function (only works for collection methods).
+  Similar to `.getUserBatch()`, but used for streaming.
+  Each document is passed to the iterator.
+  The `callbacks` argument is an object where:
+    * document: (mandatory) async callback used to transform each document, having arguments:
+        * context: the Context
+        * document: the current document
+    * head: (optional) async callback used to add thing at the begining, having arguments:
+        * context: the Context
+    * trail: (optional) async callback used to add thing at the end, having arguments:
+        * context: the Context
+* streamRealBatch( callbacks , methodFilter ): an **async** function (only works for collection methods), mostly like `.streamUserBatch()`
+  but it returns all documents.
+  Similar to `.getRealBatch()`, but used for streaming.
+  Each document is passed to the iterator.
+  The `callbacks` works the same than `.streamUserBatch()`.
 
 
 
