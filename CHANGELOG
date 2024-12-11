@@ -1,4 +1,11 @@
 
+v0.75.0
+-------
+
+BREAKING: BREAKING change: tag 'system-content' renamed 'systemContent'
+PATCH: Export CSV method (still a bit rough)
+
+
 v0.74.4
 -------
 

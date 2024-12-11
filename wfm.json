@@ -1,16 +1,3 @@
 {
-	"prepare": {
-		"prereleaseCount": 2,
-		"fromVersion": "0.74.4",
-		"forceVersionGte": "0.74.4",
-		"statusType": "alpha",
-		"releaseType": "breaking",
-		"nextVersion": "0.75.0-alpha.2",
-		"entries": [
-			{
-				"type": "breaking",
-				"message": "BREAKING change: tag 'system-content' renamed 'systemContent'"
-			}
-		]
-	}
+	"prepare": {}
 }
