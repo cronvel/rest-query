@@ -52,6 +52,7 @@ const mongodb = require( 'mongodb' ) ;
 const doormen = require( 'doormen' ) ;
 
 const path = require( 'path' ) ;
+const fs = require( 'fs' ) ;
 const fsKit = require( 'fs-kit' ) ;
 
 const hash = require( 'hash-kit' ) ;
@@ -1232,6 +1233,7 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		//await Promise.resolveTimeout( 200 ) ;
 		//console.log( "response.output.data:" , response.output.data ) ;
 		var content = await streamKit.getFullString( response.output.data ) ; console.log( "Content:\n" + content ) ;
+		await fs.promises.writeFile( 'test/expost.csv' , content ) ;
 		
 		//expect( response.output.data ).to.equal( app.collectionNodes.blogs.schema ) ;
 	} ) ;
