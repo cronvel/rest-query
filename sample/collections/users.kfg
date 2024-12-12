@@ -12,7 +12,7 @@ properties:
 	lastName:
 		type: string
 		fake: lastName
-	email: 
+	email:
 		type: email
 		fake: email
 	avatar:
@@ -21,15 +21,15 @@ properties:
 	bigAvatar:
 		type: attachment
 		optional: true
-	father: 
+	father:
 		type: link
 		collection: users
 		optional: true
-	godfather: 
+	godfather:
 		type: link
 		collection: users
 		optional: true 
-	friends: 
+	friends:
 		type: multiLink
 		collection: users
 		optional: true 
