@@ -10,6 +10,7 @@ collections:
 	freezablePosts: @@collections/freezablePosts.kfg
 	comments: @@collections/comments.kfg
 	images: @@collections/images.kfg
+	contacts: @@collections/contacts.kfg
 	anyCollectionLinks: @@collections/anyCollectionLinks.kfg
 
 tree:
@@ -17,6 +18,7 @@ tree:
 	uniqueUsers: null
 	groups: null
 	scheduledTasks: null
+	contacts: null
 	blogs:
 		users: null
 		posts:
@@ -26,6 +28,7 @@ tree:
 		freezablePosts:
 			comments: null
 	images: null
+	contacts: null
 	anyCollectionLinks: null
 
 defaultDomain: mongodb://localhost:27017/restQuery

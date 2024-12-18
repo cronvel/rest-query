@@ -39,7 +39,7 @@ hooks: @@users.hooks.js
 
 indexes:
 	-	properties:
-			fistName: 1
+			firstName: 1
 	-	properties:
 			lastName: 1
 	-	properties:

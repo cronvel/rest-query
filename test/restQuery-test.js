@@ -142,6 +142,7 @@ async function commonApp( override = null ) {
 		clearCollection( app.collectionNodes.freezablePosts.collection ) ,
 		clearCollection( app.collectionNodes.comments.collection ) ,
 		clearCollection( app.collectionNodes.images.collection ) ,
+		clearCollection( app.collectionNodes.contacts.collection ) ,
 		clearCollection( app.collectionNodes.anyCollectionLinks.collection ) ,
 
 		clearCollection( app.countersCollection ) ,
@@ -1250,6 +1251,50 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		//console.log( "response.output.data:" , response.output.data ) ;
 		content = await streamKit.getFullString( response.output.data ) ;
 		expected = "_id,slugId,hid,parent,login,firstName,lastName,email,avatar,bigAvatar,father,godfather,friends\r\n5437f846c41d0e910ec9a501,joe-doe,\"Joe Doe\",\"{\"\"collection\"\":\"\"root\"\",\"\"id\"\":\"\"/\"\"}\",joe.doe@gmail.com,Joe,Doe,joe.doe@gmail.com,,,,,\"[]\"\r\n5437f846c41d0e910ec9a502,jack-wallace,\"Jack Wallace\",\"{\"\"collection\"\":\"\"root\"\",\"\"id\"\":\"\"/\"\"}\",jack.wallace@gmail.com,Jack,Wallace,jack.wallace@gmail.com,,,,5437f846c41d0e910ec9a501,\"[]\"\r\n5437f846c41d0e910ec9a503,bobby-fischer,\"Bobby Fischer\",\"{\"\"collection\"\":\"\"root\"\",\"\"id\"\":\"\"/\"\"}\",bobby.fischer@gmail.com,Bobby,Fischer,bobby.fischer@gmail.com,,,,5437f846c41d0e910ec9a501,\"[]\"\r\n" ;
+		expect( content ).to.be( expected ) ;
+
+		/*
+		console.log( "Content:\n" + content ) ;
+		console.log( "Content:\n" , JSON.stringify( content ) ) ;
+		console.log( "Content:\n" , content ) ;
+		await fs.promises.writeFile( 'test/expost.csv' , content ) ;
+		//*/
+	} ) ;
+
+	it( "should query embedded array for the CSV export" , async () => {
+		var response , content , expected ;
+
+		var { app , performer } = await commonApp() ;
+
+		response = await app.put( '/Contacts/5437f846c41d0e910ec9a501' ,
+			{
+				name: "Joe Doe" ,
+				phones: [
+					{ type: "commercial" , phone: "06 90 73 64 18" } ,
+					{ type: "delivery" , phone: "06 90 73 62 37" }
+				]
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.put( '/Contacts/5437f846c41d0e910ec9a502' ,
+			{
+				name: "Jim Wallace" ,
+				phones: [
+					{ type: "invoice" , phone: "06 58 84 29 09" } ,
+					{ type: "delivery" , phone: "06 58 84 29 68" }
+				]
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Contacts/EXPORT-CSV' , { performer: performer , access: 'content' } ) ;
+		
+		//console.log( "response.output.data:" , response.output.data ) ;
+		content = await streamKit.getFullString( response.output.data ) ;
+		expected = "name,phones.commercial,phones.invoice,phones.delivery\r\n\"Joe Doe\",\"06 90 73 64 18\",,\"06 90 73 62 37\"\r\n\"Jim Wallace\",,\"06 58 84 29 09\",\"06 58 84 29 68\"\r\n" ;
 		expect( content ).to.be( expected ) ;
 
 		/*

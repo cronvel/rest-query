@@ -1,0 +1,48 @@
+path: /contacts
+extraProperties: true
+properties:
+	name:
+		type: string
+	phones:
+		type: array
+		default: <Array>
+		tabular:
+			flatten: true
+			subPath: phone
+			queries:
+				commercial:
+					type: commercial
+				invoice:
+					type: invoice
+				delivery:
+					type: delivery
+		of:
+			type: strictObject
+			properties:
+				type:
+					type: string
+					in:
+						- commercial
+						- invoice
+						- delivery
+						- n/a
+					default: n/a
+				phone:
+					type: string
+
+
+unindexedQueries: true
+indexes:
+	-	properties:
+			name: 1
+
+slugGeneration:
+	properties:
+		- name
+	unicode: true
+	retry: true
+hidGeneration:
+	properties:
+		- name
+	retry: true
+
