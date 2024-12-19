@@ -1269,6 +1269,10 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		response = await app.put( '/Contacts/5437f846c41d0e910ec9a501' ,
 			{
 				name: "Joe Doe" ,
+				addresses: [
+					{ type: "commercial" , address: "9 place de la République" , zipCode: "12345" , city: "Zorglub" } ,
+					{ type: "delivery" , address: "9 bis place de la République" , zipCode: "12345" , city: "Zorglub" }
+				] ,
 				phones: [
 					{ type: "commercial" , phone: "06 90 73 64 18" } ,
 					{ type: "delivery" , phone: "06 90 73 62 37" }
@@ -1281,6 +1285,10 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		response = await app.put( '/Contacts/5437f846c41d0e910ec9a502' ,
 			{
 				name: "Jim Wallace" ,
+				addresses: [
+					{ type: "commercial" , address: "18 place de la République" , zipCode: "12345" , city: "Zorglub" } ,
+					{ type: "delivery" , address: "18 ter place de la République" , zipCode: "12345" , city: "Zorglub" }
+				] ,
 				phones: [
 					{ type: "invoice" , phone: "06 58 84 29 09" } ,
 					{ type: "delivery" , phone: "06 58 84 29 68" }
@@ -1294,7 +1302,7 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		
 		//console.log( "response.output.data:" , response.output.data ) ;
 		content = await streamKit.getFullString( response.output.data ) ;
-		expected = "name,phones.commercial,phones.invoice,phones.delivery\r\n\"Joe Doe\",\"06 90 73 64 18\",,\"06 90 73 62 37\"\r\n\"Jim Wallace\",,\"06 58 84 29 09\",\"06 58 84 29 68\"\r\n" ;
+		expected = "name,addresses.commercial,addresses.invoice,addresses.delivery,phones.commercial,phones.invoice,phones.delivery\r\n\"Joe Doe\",\"9 place de la République\n12345 Zorglub\",,\"9 bis place de la République\n12345 Zorglub\",\"06 90 73 64 18\",,\"06 90 73 62 37\"\r\n\"Jim Wallace\",\"18 place de la République\n12345 Zorglub\",,\"18 ter place de la République\n12345 Zorglub\",,\"06 58 84 29 09\",\"06 58 84 29 68\"\r\n" ;
 		expect( content ).to.be( expected ) ;
 
 		/*
@@ -1304,6 +1312,9 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		await fs.promises.writeFile( 'test/expost.csv' , content ) ;
 		//*/
 	} ) ;
+
+	// TODO
+	it( "should map/format embedded object for the CSV export" ) ;
 } ) ;
 
 

@@ -3,6 +3,43 @@ extraProperties: true
 properties:
 	name:
 		type: string
+
+	addresses:
+		type: array
+		default: <Array>
+		tabular:
+			flatten: true
+			subPath: phone
+			format: "%s\n%s %s"
+			subPaths:
+				- address
+				- zipCode
+				- city
+			queries:
+				commercial:
+					type: commercial
+				invoice:
+					type: invoice
+				delivery:
+					type: delivery
+		of:
+			type: strictObject
+			properties:
+				type:
+					type: string
+					in:
+						- commercial
+						- invoice
+						- delivery
+						- n/a
+					default: n/a
+				address:
+					type: string
+				zipCode:
+					type: string
+				city:
+					type: string
+
 	phones:
 		type: array
 		default: <Array>
