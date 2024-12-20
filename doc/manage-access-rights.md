@@ -167,7 +167,7 @@ part of that child-collection.
 
 While performing the HTTP request, choosing with parts of the document to retrieve is done by providing the list of tags
 to the *access* property of the query-string.
-If no *access* property is given, RestQuery always assumes *id*, *content* and *system-content*.
+If no *access* property is given, RestQuery always assumes *id*, *content* and *systemContent*.
 
 Example of query-string: `&access=id,content,someUserTag`.
 
