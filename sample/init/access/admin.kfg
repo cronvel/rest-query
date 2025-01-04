@@ -1,0 +1,182 @@
+traverse: true
+read: true
+write: true
+query: true
+create: true
+exec: true
+inheritance:
+	depth: 1
+	traverse: true
+	read: true
+	write: true
+	overwrite: true
+	delete: true
+	query: true
+	create: true
+	exec: true
+collections:
+	carousels:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	credits:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	deposits:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	invoices:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	notes:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	organizations:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	payments:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	products:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	returns:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	tests:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true
+	users:
+		inheritance:
+			depth: 1
+			traverse: true
+			query: true
+			create: true
+			overwrite: true
+			delete: true
+			read: true
+			write: true
+			exec: true
+		traverse: true
+		query: true
+		create: true
+		exec: true

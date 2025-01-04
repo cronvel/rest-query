@@ -9595,6 +9595,17 @@ describe( "Counters API" , () => {
 
 
 
+describe( "Init DB" , () => {
+
+	it( "zzz should init the DB using a config file" , async () => {
+		var { app , performer } = await commonApp() ;
+		
+		await app.initDb( path.join( __dirname , '../sample/init/initDb.kfg' ) ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "Misc" , () => {
 
 	it( "Test of the test: test helper commonApp() should clean previously created items" , async () => {
@@ -9667,7 +9678,6 @@ describe( "Misc" , () => {
 	it( "Test root's refreshTimeout" ) ;
 
 	it( "Test --buildIndexes" ) ;
-	it( "Test --initDb <filepath>" ) ;
 } ) ;
 
 

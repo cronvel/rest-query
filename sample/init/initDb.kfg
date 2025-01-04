@@ -1,0 +1,50 @@
+-	collection: users
+	# Merge existing documents
+	mode: merge
+	# The ID is stored in this key for further uses
+	storeKey: admin
+	# Existence recognition is based on this field/those fields
+	fingerprint:
+		- firstName
+		- lastName
+	document:
+		firstName: admin
+		lastName: admin
+		email: admin@admin.net
+
+-	collection: groups
+	# Merge existing documents
+	mode: merge
+	# Existence recognition is based on this field/those fields
+	fingerprint: name
+	ensureMultiLinks:
+		users:
+			- admin
+	document:
+		name: admin
+
+-	collection: groups
+	# Merge existing documents
+	mode: merge
+	# Existence recognition is based on this field/those fields
+	fingerprint: name
+	# Create multiple documents sharing the same config
+	batch:
+		-	name: manager
+		-	name: employee
+		-	name: client
+
+-	collection: root
+	# Replace existing documents
+	mode: replace
+	# Existence recognition is based on this field/those fields
+	fingerprint: name
+	groupAccess: <Object>
+	userAccess:
+		admin: @@access/admin.kfg
+	document:
+		title: RestQuery
+		name: "/"
+		publicAccess:
+			traverse: true
+
