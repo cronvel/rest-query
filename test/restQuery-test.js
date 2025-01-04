@@ -9600,7 +9600,10 @@ describe( "Init DB" , () => {
 	it( "zzz should init the DB using a config file" , async () => {
 		var { app , performer } = await commonApp() ;
 		
-		await app.initDb( path.join( __dirname , '../sample/init/initDb.kfg' ) ) ;
+		var filepath = path.join( __dirname , '../sample/init/initDb.kfg' ) ;
+
+		await app.initDb( filepath ) ;
+		//await app.initDb( filepath ) ;
 	} ) ;
 } ) ;
 

@@ -17,9 +17,10 @@
 	mode: merge
 	# Existence recognition is based on this field/those fields
 	fingerprint: name
-	ensureMultiLinks:
-		users:
-			- admin
+	references:
+		ensureMultiLinks:
+			users:
+				- admin
 	document:
 		name: admin
 
@@ -39,9 +40,10 @@
 	mode: replace
 	# Existence recognition is based on this field/those fields
 	fingerprint: name
-	groupAccess: <Object>
-	userAccess:
-		admin: @@access/admin.kfg
+	references:
+		groupAccess: <Object>
+		userAccess:
+			admin: @@access/admin.kfg
 	document:
 		title: RestQuery
 		name: "/"
