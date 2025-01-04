@@ -1,3 +1,13 @@
 role: group
 path: /groups
 properties: <object>
+
+slugGeneration:
+	properties:
+		- name
+	unicode: true
+	retry: true
+hidGeneration:
+	properties:
+		- name
+	retry: true

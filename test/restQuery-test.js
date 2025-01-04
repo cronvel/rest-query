@@ -9597,14 +9597,57 @@ describe( "Counters API" , () => {
 
 describe( "Init DB" , () => {
 
-	it( "zzz should init the DB using a config file" , async () => {
+	it( "should init the DB using a config file" , async () => {
+		console.log( "\n\n\n#########\n\n\n" ) ;
 		var { app , performer } = await commonApp() ;
 		
 		var filepath = path.join( __dirname , '../sample/init/initDb.kfg' ) ;
 
 		await app.initDb( filepath ) ;
-		//await app.initDb( filepath ) ;
+		console.log( "\n\n\n######### AFTER\n\n\n" ) ;
+
+		//await Promise.resolveTimeout( 1500 ) ;
+		var response = await app.get( '/' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			name: '/' ,
+			title: 'RestQuery'
+		} ) ;
+		
+		response = await app.get( '/Users/admin-admin' , { performer: performer } ) ;
+		var adminUser = response.output.data ;
+		expect( adminUser ).to.partially.equal( {
+			firstName: 'admin' ,
+			lastName: 'admin'
+		} ) ;
+
+		response = await app.get( '/Groups/admin' , { performer: performer } ) ;
+		var adminGroup = response.output.data ;
+		//console.log( "Groups:" , adminGroup ) ;
+		expect( adminGroup ).to.partially.equal( {
+			name: 'admin' ,
+			slugId: 'admin' ,
+			hid: 'admin'
+		} ) ;
+		expect( adminGroup.users ).to.equal( [ { _id: adminUser._id } ] ) ;
+
+
+		// Now check that it works twice without messing things up
+
+
+		await app.initDb( filepath ) ;
+
+		response = await app.get( '/Groups/admin' , { performer: performer } ) ;
+		var adminGroup = response.output.data ;
+		expect( adminGroup ).to.partially.equal( {
+			name: 'admin' ,
+			slugId: 'admin' ,
+			hid: 'admin'
+		} ) ;
+		expect( adminGroup.users ).to.equal( [ { _id: adminUser._id } ] ) ;
 	} ) ;
+	
+	it( "Test mode=new" ) ;
+	it( "Test mode=replace" ) ;
 } ) ;
 
 
