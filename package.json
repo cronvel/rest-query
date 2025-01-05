@@ -19,7 +19,7 @@
     "exm": "^0.5.12",
     "hash-kit": "^0.3.10",
     "json-kit": "^0.7.3",
-    "kung-fig": "^0.67.4",
+    "kung-fig": "^0.67.5",
     "logfella": "^2.0.2",
     "logfella-client": "^1.3.0",
     "qs-kit": "^0.7.0",
