@@ -2,11 +2,10 @@
 	# Merge existing documents
 	mode: merge
 	# The ID is stored in this key for further uses
-	storeKey: admin
+	storeKey: adminUser
 	# Existence recognition is based on this field/those fields
 	fingerprint:
-		- firstName
-		- lastName
+		- email
 	document:
 		firstName: admin
 		lastName: admin
@@ -15,12 +14,14 @@
 -	collection: groups
 	# Merge existing documents
 	mode: merge
+	# The ID is stored in this key for further uses
+	storeKey: adminGroup
 	# Existence recognition is based on this field/those fields
 	fingerprint: name
 	references:
 		ensureMultiLinks:
 			users:
-				- admin
+				- adminUser
 	document:
 		name: admin
 
@@ -41,11 +42,13 @@
 	# Existence recognition is based on this field/those fields
 	fingerprint: name
 	references:
-		groupAccess: <Object>
+		groupAccess:
+			adminGroup: @@access/admin.kfg
 		userAccess:
-			admin: @@access/admin.kfg
+			adminUser: @@access/admin.kfg
 	document:
 		title: RestQuery
+		description: RestQuery unit test
 		name: "/"
 		publicAccess:
 			traverse: true

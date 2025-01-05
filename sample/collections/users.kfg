@@ -43,10 +43,6 @@ indexes:
 	-	properties:
 			lastName: 1
 	-	properties:
-			firstName: 1
-			lastName: 1
-		unique: true
-	-	properties:
 			email: 1
 		unique: true
 	-	properties:

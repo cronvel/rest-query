@@ -150,7 +150,6 @@ async function commonApp( override = null ) {
 		clearCollection( app.jobsCollection )
 	] ) ;
 
-	// Sometime .buildIndexes() is really slow (more than 2 seconds) on new mongoDB
 	await app.buildIndexes() ;
 
 	await app.loadSystemDocuments() ;
@@ -3748,7 +3747,7 @@ describe( "Users" , () => {
 		response = await app.put( '/Users/5437f846e41d0e910ec9a5d9' ,
 			{
 				firstName: "Joe" ,
-				lastName: "Doe" ,
+				lastName: "Doe2" ,
 				email: "joe.doe2@gmail.com" ,
 				password: "a-secret-password2"
 			} ,
@@ -9597,22 +9596,15 @@ describe( "Counters API" , () => {
 
 describe( "Init DB" , () => {
 
-	it( "should init the DB using a config file" , async () => {
-		console.log( "\n\n\n#########\n\n\n" ) ;
+	it( "should init the DB using a config file (mode=merge and mode=replace)" , async () => {
 		var { app , performer } = await commonApp() ;
 		
+		var response ;
+		var expectedAdminAccess = require( 'kung-fig' ).load( path.join( __dirname , '../sample/init/access/admin.kfg' ) ) ;
 		var filepath = path.join( __dirname , '../sample/init/initDb.kfg' ) ;
 
 		await app.initDb( filepath ) ;
-		console.log( "\n\n\n######### AFTER\n\n\n" ) ;
 
-		//await Promise.resolveTimeout( 1500 ) ;
-		var response = await app.get( '/' , { performer: performer } ) ;
-		expect( response.output.data ).to.partially.equal( {
-			name: '/' ,
-			title: 'RestQuery'
-		} ) ;
-		
 		response = await app.get( '/Users/admin-admin' , { performer: performer } ) ;
 		var adminUser = response.output.data ;
 		expect( adminUser ).to.partially.equal( {
@@ -9630,6 +9622,19 @@ describe( "Init DB" , () => {
 		} ) ;
 		expect( adminGroup.users ).to.equal( [ { _id: adminUser._id } ] ) ;
 
+		response = await app.get( '/' , { performer: performer } ) ;
+		expect( response.output.data ).to.partially.equal( {
+			name: '/' ,
+			title: 'RestQuery' ,
+			description: 'RestQuery unit test' ,
+			userAccess: {
+				[ '' + adminUser.getId() ] : expectedAdminAccess
+			} ,
+			groupAccess: {
+				[ '' + adminGroup.getId() ] : expectedAdminAccess
+			}
+		} ) ;
+		
 
 		// Now check that it works twice without messing things up
 
@@ -9647,7 +9652,6 @@ describe( "Init DB" , () => {
 	} ) ;
 	
 	it( "Test mode=new" ) ;
-	it( "Test mode=replace" ) ;
 } ) ;
 
 
