@@ -9636,6 +9636,31 @@ describe( "Init DB" , () => {
 		} ) ;
 		
 
+		// Now check that we can log in with the created user
+
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
+				type: "header" ,
+				login: "admin@admin.net" ,
+				password: "bobadmin" ,
+				agentId: "0123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+		expect( response.output.data ).to.equal( {
+			userId: adminUser.getId() ,
+			userLogin: "admin@admin.net" ,
+			token: response.output.data.token ,	// unpredictable
+			type: "header" ,
+			agentId: "0123456789" ,
+			creationTime: response.output.data.creationTime ,	// not predictable at all
+			expirationTime: response.output.data.expirationTime ,	// not predictable at all
+			duration: 900000
+		} ) ;
+
+
+
 		// Now check that it works twice without messing things up
 
 

@@ -10,6 +10,8 @@
 		firstName: admin
 		lastName: admin
 		email: admin@admin.net
+		login: admin@admin.net
+		passwordInput: bobadmin
 
 -	collection: groups
 	# Merge existing documents
