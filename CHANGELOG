@@ -1,4 +1,10 @@
 
+v0.76.3
+-------
+
+Fix bad error reporting for method exportCsv, forcing HTTP method GET
+
+
 v0.76.2
 -------
 
