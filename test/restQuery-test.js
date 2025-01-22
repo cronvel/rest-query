@@ -9589,6 +9589,14 @@ describe( "Counters API" , () => {
 
 		response = await app.getNextCounterFor( 'num' ) ;
 		expect( response ).to.be( 2 ) ;
+
+		await app.setNextCounterFor( 'invoice' , 1 ) ;
+		response = await app.getNextCounterFor( 'invoice' ) ;
+		expect( response ).to.be( 1 ) ;
+
+		response = await app.getNextCounterFor( 'invoice' ) ;
+		expect( response ).to.be( 2 ) ;
+
 	} ) ;
 } ) ;
 
