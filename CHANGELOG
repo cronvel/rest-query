@@ -1,4 +1,10 @@
 
+v0.76.7
+-------
+
+Kung-fig dependency (allow includes to insert in array instead of merge arrays)
+
+
 v0.76.6
 -------
 
