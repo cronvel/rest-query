@@ -1,4 +1,10 @@
 
+v0.76.8
+-------
+
+Kung-fig dependency (bugfixes of array-like in recursive merge of includes)
+
+
 v0.76.7
 -------
 
