@@ -1,4 +1,10 @@
 
+v0.76.12
+--------
+
+Fix bug when a corrupted API Key is passed, move authorization-based error from 'badRequest' to 'unauthorized'
+
+
 v0.76.11
 --------
 
