@@ -5251,6 +5251,123 @@ describe( "Tokens" , () => {
 			.to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 , message: 'Token not found.' } ) ;
 	} ) ;
 
+	it( "using a token with the WHO-AM-I method" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var id = response.output.data.id ;
+		expect( id ).to.be.an( 'objectId' ) ;
+
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var token = response.output.data.token ,
+			tokenPerformer = app.createPerformer( { type: "header" , token: token , agentId: "0123456789" } ) ;
+
+		// Test the token with the WHO-AM-I method
+		response = await app.get( '/Users/WHO-AM-I' , { performer: tokenPerformer } ) ;
+		expect( response.output.data ).to.equal( {
+			authBy: 'token' ,
+			performer: {
+				_id: id ,
+				groups: [] ,
+				login: "bobby.fisher@gmail.com" ,
+				slugId: "bobby-fisher"
+			}
+		} ) ;
+	} ) ;
+
+	it( "using a bad token (not correct length) with the WHO-AM-I method" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var id = response.output.data.id ;
+		expect( id ).to.be.an( 'objectId' ) ;
+
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var token = "toto" ,
+			tokenPerformer = app.createPerformer( { type: "header" , token: token , agentId: "0123456789" } ) ;
+
+		// Test the token with the WHO-AM-I method
+		await expect( app.get( '/Users/WHO-AM-I' , { performer: tokenPerformer } ) ).to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+	} ) ;
+
+	it( "using a corrupted token (with correct length) with the WHO-AM-I method" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var response = await app.post( '/Users' ,
+			{
+				firstName: "Bobby" ,
+				lastName: "Fisher" ,
+				email: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				publicAccess: 'all'
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var id = response.output.data.id ;
+		expect( id ).to.be.an( 'objectId' ) ;
+
+		response = await app.post( '/Users/CREATE-TOKEN' ,
+			{
+				type: "header" ,
+				login: "bobby.fisher@gmail.com" ,
+				password: "pw" ,
+				agentId: "0123456789"
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var token = response.output.data.token.slice( 0 , -1 ) + "q" ,
+			tokenPerformer = app.createPerformer( { type: "header" , token: token , agentId: "0123456789" } ) ;
+
+		// Test the token with the WHO-AM-I method
+		await expect( app.get( '/Users/WHO-AM-I' , { performer: tokenPerformer } ) ).to.reject( ErrorStatus , { type: 'unauthorized' , httpStatus: 401 } ) ;
+	} ) ;
+
 	it( "'Too many tokens'" ) ;
 } ) ;
 

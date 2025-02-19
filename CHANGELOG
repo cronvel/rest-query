@@ -1,4 +1,10 @@
 
+v0.76.11
+--------
+
+Fix bug when a corrupted token is passed
+
+
 v0.76.10
 --------
 
