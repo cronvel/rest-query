@@ -1,4 +1,10 @@
 
+v0.76.14
+--------
+
+Importer: fix issue with compoundProperties not logging missing errors on a CSV
+
+
 v0.76.13
 --------
 
