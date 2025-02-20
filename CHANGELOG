@@ -1,4 +1,10 @@
 
+v0.76.13
+--------
+
+Importer can now log errors if there are missing properties on a CSV
+
+
 v0.76.12
 --------
 
