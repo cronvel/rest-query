@@ -1,4 +1,10 @@
 
+v0.76.15
+--------
+
+New API shorthand: App.createSystemPerformer()
+
+
 v0.76.14
 --------
 
