@@ -1,4 +1,10 @@
 
+v0.76.16
+--------
+
+Add 'date' to the list of headers for the 'access-control-expose-headers' HTTP header
+
+
 v0.76.15
 --------
 
