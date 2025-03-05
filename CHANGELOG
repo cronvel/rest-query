@@ -1,4 +1,10 @@
 
+v0.76.19
+--------
+
+Import: fix CLI progress-bar bug when not at the bottom of the screen
+
+
 v0.76.18
 --------
 
