@@ -1,4 +1,10 @@
 
+v0.76.20
+--------
+
+UsersCollectionNode#createToken() is now consistent with UsersCollectionNode#checkTokenMethod()
+
+
 v0.76.19
 --------
 

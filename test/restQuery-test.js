@@ -4671,6 +4671,8 @@ describe( "Tokens" , () => {
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			userLogin: "bobby.fisher@gmail.com" ,
+			userSlugId: "bobby-fisher" ,
+			userParent: { id: "/" , collection: "root" } ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -4860,6 +4862,8 @@ describe( "Tokens" , () => {
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			userLogin: "bobby.fisher@gmail.com" ,
+			userSlugId: "bobby-fisher" ,
+			userParent: { id: "/" , collection: "root" } ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -4904,6 +4908,8 @@ describe( "Tokens" , () => {
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			userLogin: "bobby.fisher@gmail.com" ,
+			userSlugId: "bobby-fisher" ,
+			userParent: { id: "/" , collection: "root" } ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -4949,6 +4955,8 @@ describe( "Tokens" , () => {
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			userLogin: "bobby.fisher@gmail.com" ,
+			userSlugId: "bobby-fisher" ,
+			userParent: { id: "/" , collection: "root" } ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -5000,6 +5008,8 @@ describe( "Tokens" , () => {
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			userLogin: "bobby.fisher@gmail.com" ,
+			userSlugId: "bobby-fisher" ,
+			userParent: { id: "/" , collection: "root" } ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -5040,6 +5050,8 @@ describe( "Tokens" , () => {
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			userLogin: "bobby.fisher@gmail.com" ,
+			userSlugId: "bobby-fisher" ,
+			userParent: { id: "/" , collection: "root" } ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -5107,6 +5119,8 @@ describe( "Tokens" , () => {
 		expect( response.output.data ).to.equal( {
 			userId: id ,
 			userLogin: "bobby.fisher@gmail.com" ,
+			userSlugId: "bobby-fisher" ,
+			userParent: { id: "/" , collection: "root" } ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
@@ -9776,6 +9790,8 @@ describe( "Init DB" , () => {
 		expect( response.output.data ).to.equal( {
 			userId: adminUser.getId() ,
 			userLogin: "admin@admin.net" ,
+			userSlugId: "admin-admin" ,
+			userParent: { id: "/" , collection: "root" } ,
 			token: response.output.data.token ,	// unpredictable
 			type: "header" ,
 			agentId: "0123456789" ,
