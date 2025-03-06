@@ -1,4 +1,10 @@
 
+v0.76.21
+--------
+
+QS-Kit (query string parser) dependency: 'autoNumber' option is now non-destructive, if there is a leading zero, the value is kept as a string
+
+
 v0.76.20
 --------
 
