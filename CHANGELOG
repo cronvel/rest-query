@@ -1,4 +1,11 @@
 
+v0.77.0
+-------
+
+BREAKING: SCHEMA method now have the tag 'systemContent' instead of 'schema', since its uses is widespread
+new collection method: COUNT, just retrieve the number of found documents, useful for navigation
+
+
 v0.76.21
 --------
 

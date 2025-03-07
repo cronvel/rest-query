@@ -955,6 +955,29 @@ describe( "Query: filters and text search" , () => {
 		expect( response.output.data ).to.be.like( [ expectedPost3 , expectedPost2 , expectedPost1 ] ) ;
 	} ) ;
 
+	it( "using the COUNT method to retrieve the number of found documents" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { filter: { title: 'Third post' } } } } ) ;
+		expect( response.output.data ).to.equal( { count: 1 } ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { filter: { likes: 19 } } } } ) ;
+		expect( response.output.data ).to.equal( { count: 1 } ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { filter: { likes: { $eq: 19 } } } } } ) ;
+		expect( response.output.data ).to.equal( { count: 1 } ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { filter: { likes: { $ne: 19 } } } } } ) ;
+		expect( response.output.data ).to.equal( { count: 2 } ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { filter: { likes: { $lte: 4 } } } } } ) ;
+		expect( response.output.data ).to.equal( { count: 0 } ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { filter: { likes: { $nin: [ 10 , 11 , 12 , 20 ] } } } } } ) ;
+		expect( response.output.data ).to.equal( { count: 3 } ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { search: 'content' } } } ) ;
+		expect( response.output.data ).to.equal( { count: 3 } ) ;
+	} ) ;
+
 	it( "indexed and unindexed queries with the 'unindexedQueries' collection option" ) ;
 } ) ;
 
@@ -9863,7 +9886,7 @@ describe( "Misc" , () => {
 
 	it( "App's all collection exec tags" , async () => {
 		var { app , performer } = await commonApp() ;
-		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "schema" , "export" , "generateFake" , "freeze" , "regenerateSlug" , "regenerateHid" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
+		expect( [ ... app.allCollectionExecTags ] ).to.equal( [ "systemContent" , "export" , "generateFake" , "freeze" , "regenerateSlug" , "regenerateHid" , "security" , "apiKeyManagement" , "misc" , "method.double" , "method.triple" ] ) ;
 	} ) ;
 
 	it.opt( "Collection with a user/password in URL" , async () => {
