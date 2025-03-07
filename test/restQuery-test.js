@@ -956,7 +956,12 @@ describe( "Query: filters and text search" , () => {
 	} ) ;
 
 	it( "using the COUNT method to retrieve the number of found documents" , async () => {
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { filter: { title: 'Third post' } } } } ) ;
+		var response
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer } ) ;
+		expect( response.output.data ).to.equal( { count: 3 } ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { filter: { title: 'Third post' } } } } ) ;
 		expect( response.output.data ).to.equal( { count: 1 } ) ;
 
 		response = await app.get( '/Blogs/' + blog.getId() + '/Posts/COUNT' , { performer: performer , input: { query: { filter: { likes: 19 } } } } ) ;

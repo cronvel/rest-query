@@ -1,4 +1,10 @@
 
+v0.77.1
+-------
+
+COUNT collection method bugfixed (was not supporting empty query)
+
+
 v0.77.0
 -------
 
