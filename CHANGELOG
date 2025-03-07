@@ -1,4 +1,10 @@
 
+v0.77.3
+-------
+
+Support for create hooks inside InitDB (modify hook are not supported, too tricky, because initDB contains documents, not patches)
+
+
 v0.77.2
 -------
 
