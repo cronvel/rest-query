@@ -1,4 +1,10 @@
 
+v0.77.2
+-------
+
+Fixed beforeCreateToken hook
+
+
 v0.77.1
 -------
 

@@ -8866,17 +8866,11 @@ describe( "Hooks" , () => {
 						expect( context.collectionNode.name ).to.be( 'users' ) ;
 						expect( context.objectNode ).to.be.a( restQuery.ObjectNode ) ;
 						expect( context.document._ ).to.be.a( rootsDb.Document ) ;
-						expect( context.objectNode.object ).to.be( context.document ) ;
 						expect( context.document._.raw ).to.partially.equal( {
-							title: "Root" ,
-							name: "/" ,
-							description: "Root object" ,
-							parent: {
-								collection: "root" ,
-								id: "/"
-							}
+							firstName: "Bobby" ,
+							lastName: "Fisher" ,
+							email: "bobby.fisher@gmail.com"
 						} ) ;
-						expect( context.parentObjectNode.object ).to.be( context.document ) ;
 
 						expect( context.hook ).to.only.have.own.key( 'incomingDocument' ) ;
 						expect( context.hook.incomingDocument ).to.equal( {

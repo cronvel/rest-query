@@ -224,11 +224,12 @@ For documents of collection: Users.
 When:
 
 * the createToken method is invoked on a user
+* executed after a user had matched
+* executed before the password check
 * executed before the token creation, if it rejects the token creation is aborted
 
 The `context.hook.incomingDocument` contains the connection document: it can be altered by the hook.
-
-**BETA**, not well specified yet.
+The `context.document` contains the matching user for which a token could be created.
 
 
 
@@ -240,11 +241,12 @@ When:
 
 * the createToken method is invoked on a user
 * executed after the token creation
+* the user document is already saved
 
 The `context.document` contains the user for which the token is created.
 The `context.hook.token` contains the token data.
 
-**BETA**, not well specified yet.
+Can be useful for things like setting `lastVisit`.
 
 
 
@@ -255,9 +257,10 @@ For documents of collection: Users.
 When:
 
 * the regenerateToken method is invoked on a user
+* executed after checking and retrieving the connected user performing the request
 * executed before the new token creation, if it rejects the new token creation is aborted
 
-**BETA**, not well specified yet.
+The `context.document` contains the connected user user performing the request.
 
 
 
@@ -273,8 +276,6 @@ When:
 The `context.document` contains the user for which a new token is created.
 The `context.hook.token` contains the token.
 
-**BETA**, not well specified yet.
-
 
 
 #### *beforeCreateApiKey*
@@ -287,8 +288,7 @@ When:
 * executed before the API key creation, if it rejects the token creation is aborted
 
 The `context.hook.incomingDocument` contains the incoming document: it can be altered by the hook.
-
-**BETA**, not well specified yet.
+The `context.document` contains the matching user for which a token could be created.
 
 
 
@@ -303,6 +303,4 @@ When:
 
 The `context.document` contains the user for which the API key is created.
 The `context.hook.apiKey` contains the API key.
-
-**BETA**, not well specified yet.
 
