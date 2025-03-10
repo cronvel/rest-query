@@ -1,4 +1,10 @@
 
+v0.77.4
+-------
+
+Doormen dependency (support for 'toStringEmpty' sanitizer)
+
+
 v0.77.3
 -------
 
