@@ -1,4 +1,11 @@
 
+v0.77.5
+-------
+
+Bugfix beforeCreateAfterValidate hook processing, generating again hid and slugId if not set by incomingDocument
+ObjectNode#putNewLinkedDocument() fixed (bad reference to collectionNode instead of targetCollectionNode)
+
+
 v0.77.4
 -------
 
