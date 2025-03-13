@@ -1,4 +1,10 @@
 
+v0.77.7
+-------
+
+EXPORT-CSV method now supports localization parameters, like separator and locale, and it exports date and datetime differently
+
+
 v0.77.6
 -------
 
