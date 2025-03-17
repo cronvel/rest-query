@@ -1,4 +1,10 @@
 
+v0.77.8
+-------
+
+EXPORT-CSV method now support parameter 'bom' that add the Byte Order Mask, so that shitty Microsoft Excel could read UTF-8
+
+
 v0.77.7
 -------
 
