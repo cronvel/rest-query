@@ -1,4 +1,10 @@
 
+v0.77.11
+--------
+
+Should support wildcards in query-string filters
+
+
 v0.77.10
 --------
 

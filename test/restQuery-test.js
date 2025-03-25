@@ -834,14 +834,19 @@ describe( "Query: filters and text search" , () => {
 		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
 	} ) ;
 
-	it( "GET on a collection with a filter using standard match on array fields should match when the array has that argument as element" , async () => {
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: 'happy' } } } } ) ;
+	it( "GET on a collection with a wildcard filter on an array should match when the array has that argument as element" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { "emotes.*": 'happy' } } } } ) ;
 		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
 	} ) ;
 
 	it( "GET on a collection with a filter using $eq perfect match on array fields should throw if the argument is not an array" , async () => {
 		await expect( () => app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $eq: 'happy' } } } } } ) )
 			.to.reject.with( ErrorStatus , { type: 'badRequest' } ) ;
+	} ) ;
+
+	it( "GET on a collection with a wildcard filter on an array using $eq perfect match should match when the array has that argument as element" , async () => {
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { "emotes.*": { $eq: 'happy' } } } } } ) ;
+		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
 	} ) ;
 
 	it( "GET on a collection with a filter using $eq perfect match on array fields should match when the argument is the full array" , async () => {
