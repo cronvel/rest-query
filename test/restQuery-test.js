@@ -720,6 +720,82 @@ describe( "Query: skip, limit, sort" , () => {
 		response = await app.get( '/Blogs' , { performer: performer , input: { query: { limit: 2 , sort: { title: 'descendant' } } } } ) ;
 		expect( response.output.data ).to.be.like( expected ) ;
 	} ) ;
+
+	it( "wildcard sorts" , async () => {
+		var { app , performer } = await commonApp() ;
+
+		var blog = app.root.children.blogs.collection.createDocument( {
+			title: 'My wonderful life' ,
+			description: 'This is a supa blog!' ,
+			publicAccess: 'all'
+		} ) ;
+
+		await blog.save() ;
+
+		var post1 = await app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'About' ,
+			content: 'First post content.' ,
+			date: new Date( '2018-12-12' ) ,
+			likes: 19 ,
+			emotes: [ 'happy' , 'thumb-up' ] ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post1.save() ;
+
+		var post2 = await app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'Bad news' ,
+			content: 'Second post content.' ,
+			date: new Date( '2018-12-14' ) ,
+			likes: 28 ,
+			emotes: [ 'sad' ] ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post2.save() ;
+
+		var post3 = await app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'Holiday' ,
+			content: 'Third post content.' ,
+			date: new Date( '2018-12-16' ) ,
+			likes: 7 ,
+			emotes: [ 'airplane' ] ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post3.save() ;
+
+		var post4 = await app.root.children.blogs.children.posts.collection.createDocument( {
+			title: 'Pets' ,
+			content: 'Fourth post content.' ,
+			date: new Date( '2018-12-21' ) ,
+			likes: 7 ,
+			emotes: [ 'dog' , 'turtle' ] ,
+			parent: { collection: 'blogs' , id: blog.getId() } ,
+			publicAccess: 'all'
+		} ) ;
+
+		await post4.save() ;
+
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { sort: { "emotes.*": 1 } } } } ) ;
+		expect( response.output.data.map( e => e.title ) ).to.equal( [
+			'Holiday' ,
+			'Pets' ,
+			'About' ,
+			'Bad news' ,
+		] ) ;
+
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { sort: { "emotes.*": -1 } } } } ) ;
+		expect( response.output.data.map( e => e.title ) ).to.equal( [
+			'Pets' ,
+			'About' ,
+			'Bad news' ,
+			'Holiday' ,
+		] ) ;
+	} ) ;
 } ) ;
 
 
@@ -913,10 +989,10 @@ describe( "Query: filters and text search" , () => {
 	} ) ;
 
 	it( "GET on a collection with a filter using $in match on array fields should match when the array has one of the element of the array argument" , async () => {
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $in: [ 'bob' , 'thumb-up' ] } } } } } ) ;
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { "emotes.*": { $in: [ 'bob' , 'thumb-up' ] } } } } } ) ;
 		expect( response.output.data ).to.be.like( [ expectedPost1 ] ) ;
 
-		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $in: [ 'bob' , 'thumb-down' ] } } } } } ) ;
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { "emotes.*": { $in: [ 'bob' , 'thumb-down' ] } } } } } ) ;
 		expect( response.output.data ).to.be.like( [] ) ;
 	} ) ;
 
@@ -929,10 +1005,10 @@ describe( "Query: filters and text search" , () => {
 	} ) ;
 
 	it( "GET on a collection with a filter using $nin match on array fields should NOT match when the array has one of the element of the array argument" , async () => {
-		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $nin: [ 'bob' , 'thumb-up' ] } } } } } ) ;
+		var response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { "emotes.*": { $nin: [ 'bob' , 'thumb-up' ] } } } } } ) ;
 		expect( response.output.data ).to.be.like( [ expectedPost2 , expectedPost3 ] ) ;
 
-		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { emotes: { $nin: [ 'bob' , 'thumb-down' ] } } } } } ) ;
+		response = await app.get( '/Blogs/' + blog.getId() + '/Posts' , { performer: performer , input: { query: { filter: { "emotes.*": { $nin: [ 'bob' , 'thumb-down' ] } } } } } ) ;
 		expect( response.output.data ).to.be.like( [ expectedPost1 , expectedPost2 , expectedPost3 ] ) ;
 	} ) ;
 
@@ -2684,25 +2760,26 @@ describe( "Multi-links" , () => {
 
 		groupId = response.output.data.id ;
 
+		//log( "indexedProperties: %Y" , app.world.collections.groups.indexedProperties ) ;
 		// Without operator behavior
-		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: userId1 } } } } ) ;
+		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { "users.*": userId1 } } } } ) ;
 		expect( response.output.data ).to.be.partially.like( [ {
 			name: "The Group" ,
 			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]
 		} ] ) ;
 
 		// With the element-compatible operator $in
-		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $in: userId1 } } } } } ) ;
+		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { "users.*": { $in: userId1 } } } } } ) ;
 		expect( response.output.data ).to.be.partially.like( [ {
 			name: "The Group" ,
 			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]
 		} ] ) ;
 
 		// With element-compatible operator $nin
-		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $nin: userId1 } } } } } ) ;
+		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { "users.*": { $nin: userId1 } } } } } ) ;
 		expect( response.output.data ).to.be.partially.like( [] ) ;
 
-		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { users: { $nin: userId4 } } } } } ) ;
+		response = await app.get( '/Groups/' , { performer: performer , input: { query: { filter: { "users.*": { $nin: userId4 } } } } } ) ;
 		expect( response.output.data ).to.be.partially.like( [ {
 			name: "The Group" ,
 			users: [ { _id: userId1 } , { _id: userId2 } , { _id: userId3 } ]

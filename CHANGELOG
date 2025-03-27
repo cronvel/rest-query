@@ -1,4 +1,10 @@
 
+v0.78.0
+-------
+
+BREAKING: Wildcard indexes and wildcard sorts
+
+
 v0.77.11
 --------
 
