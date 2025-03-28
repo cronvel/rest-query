@@ -1,4 +1,10 @@
 
+v0.78.2
+-------
+
+Fix query-string parser issue, fixing sort on nested object
+
+
 v0.78.1
 -------
 
