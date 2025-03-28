@@ -45,7 +45,7 @@ indexes:
 	-	properties:
 			email: 1
 		unique: true
-	-	properties:
+	-	links:
 			godfather: 1
 
 fakeDataGenerator:
