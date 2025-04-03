@@ -1,4 +1,10 @@
 
+v0.78.3
+-------
+
+Fix MongoDB query-object bug
+
+
 v0.78.2
 -------
 
