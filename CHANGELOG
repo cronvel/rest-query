@@ -1,4 +1,10 @@
 
+v0.78.4
+-------
+
+EXPORT-CSV: support for arbitrary column export (params.columns=[col1,col2,...]), support for populate (WARNING: it's SLOW ATM, it would require pre-populate in RootsDB)
+
+
 v0.78.3
 -------
 
