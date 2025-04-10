@@ -1421,9 +1421,9 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		//*/
 	} ) ;
 
-	// TODO
 	it( "should map/format embedded object for the CSV export" ) ;
-	it( "populate/prepopulate for the CSV export" ) ;
+	it( "populate for the CSV export" ) ;
+	it( "populate anyCollection links having allowedCollections for the CSV export" ) ;
 } ) ;
 
 
