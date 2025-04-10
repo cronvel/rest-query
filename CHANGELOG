@@ -1,4 +1,10 @@
 
+v0.78.5
+-------
+
+Streaming documents should be more efficient when population is required
+
+
 v0.78.4
 -------
 

@@ -375,31 +375,36 @@ This is the data structure of a context:
 Furthermore, the context object has this public methods:
 
 * done(): mark the current request as done/finished, preventing any Rest Query's default behavior
-* getUserBatch( methodFilter ): an **async** function (only works for collection methods) returning the same batch that would be returned by the query
+* getUserBatch( [methodFilter] ): an **async** function (only works for collection methods) returning the same batch that would be returned by the query
   if there wasn't any method part in the URL.
   Query-string filters, sort, limits, skips, populate and so on are also applied.
   This is useful for collection methods that are not simple namespaced methods, but instead methods that are applied on a batch.
   Because it is the same batch that would be returned without the method part of the URL, this means that **RIGHT MANAGEMENTS ARE ALSO APPLIED**,
   filtering document that are not visible to this specific user.
   The optional argument *methodFilter* pass an extra filter passed by the method for its particular usage.
-* getRealBatch( methodFilter ): an **async** function (only works for collection methods), mostly like `.getUserBatch()` but it returns all documents,
+* getRealBatch( [methodFilter] ): an **async** function (only works for collection methods), mostly like `.getUserBatch()` but it returns all documents,
   even those that the right management would ignore.
   It should be used for methods that **DO NOT RETURN THOSE DOCUMENTS** but instead compute things on them, like anonymous statistics.
   Moreover, no population of any kind is applied, but query-string filters, sort, limits and skips are still valid.
   This is because we only want the correct document list.
   The optional argument *methodFilter* pass an extra filter passed by the method for its particular usage.
-* streamUserBatch( callbacks , methodFilter ): an **async** function (only works for collection methods).
+* streamUserBatch( callbacks , [batchSize] , [methodFilter] ): an **async** function (only works for collection methods).
+  The `batchSize` argument is used to define the underlying batch size of RootsDB stream: lower values use less memory but are inefficient
+  when the batch have to be populated (population is done once per partial batch), on the contrary higher value is faster when population
+  is needed at the cost of high memory footprint (default to RootsDB default `.findPartialBatchGenerator()`'s `batchSize` option)
   Similar to `.getUserBatch()`, but used for streaming.
   Each document is passed to the iterator.
   The `callbacks` argument is an object where:
+    * prepare: (optional) callback (sync) used to prepare things once the context object is up to date, executed before any other callback, having arguments:
+        * context: the Context
+    * head: (optional) async callback used to add thing at the begining, having arguments:
+        * context: the Context
     * document: (mandatory) async callback used to transform each document, having arguments:
         * context: the Context
         * document: the current document
-    * head: (optional) async callback used to add thing at the begining, having arguments:
-        * context: the Context
     * trail: (optional) async callback used to add thing at the end, having arguments:
         * context: the Context
-* streamRealBatch( callbacks , methodFilter ): an **async** function (only works for collection methods), mostly like `.streamUserBatch()`
+* streamRealBatch( callbacks , [batchSize] , [methodFilter] ): an **async** function (only works for collection methods), mostly like `.streamUserBatch()`
   but it returns all documents.
   Similar to `.getRealBatch()`, but used for streaming.
   Each document is passed to the iterator.
