@@ -1309,7 +1309,7 @@ describe( "Built-in object method: REGENERATE-SLUG" , () => {
 
 
 
-describe( "Built-in collection method: EXPORT-CSV" , () => {
+describe( "Built-in collection method: EXPORT-CSV -- exporting a collection in the CSV format" , () => {
 
 	it( "should get the CSV export of a collection" , async () => {
 		var response , content , expected ;
@@ -1355,8 +1355,6 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		) ;
 
 		response = await app.get( '/Users/EXPORT-CSV' , { performer: performer } ) ;
-		
-		//console.log( "response.output.data:" , response.output.data ) ;
 		content = await streamKit.getFullString( response.output.data ) ;
 		expected = "_id,slugId,hid,parent,login,firstName,lastName,email,avatar,bigAvatar,father,godfather,friends\r\n5437f846c41d0e910ec9a501,joe-doe,\"Joe Doe\",\"{\"\"collection\"\":\"\"root\"\",\"\"id\"\":\"\"/\"\"}\",joe.doe@gmail.com,Joe,Doe,joe.doe@gmail.com,,,,,\"[]\"\r\n5437f846c41d0e910ec9a502,jack-wallace,\"Jack Wallace\",\"{\"\"collection\"\":\"\"root\"\",\"\"id\"\":\"\"/\"\"}\",jack.wallace@gmail.com,Jack,Wallace,jack.wallace@gmail.com,,,,5437f846c41d0e910ec9a501,\"[]\"\r\n5437f846c41d0e910ec9a503,bobby-fischer,\"Bobby Fischer\",\"{\"\"collection\"\":\"\"root\"\",\"\"id\"\":\"\"/\"\"}\",bobby.fischer@gmail.com,Bobby,Fischer,bobby.fischer@gmail.com,,,,5437f846c41d0e910ec9a501,\"[]\"\r\n" ;
 		expect( content ).to.be( expected ) ;
@@ -1369,7 +1367,7 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		//*/
 	} ) ;
 
-	it( "should query embedded array for the CSV export" , async () => {
+	it( "should query embedded array" , async () => {
 		var response , content , expected ;
 
 		var { app , performer } = await commonApp() ;
@@ -1407,8 +1405,6 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		) ;
 
 		response = await app.get( '/Contacts/EXPORT-CSV' , { performer: performer , access: 'content' } ) ;
-		
-		//console.log( "response.output.data:" , response.output.data ) ;
 		content = await streamKit.getFullString( response.output.data ) ;
 		expected = "name,addresses.commercial,addresses.invoice,addresses.delivery,phones.commercial,phones.invoice,phones.delivery\r\n\"Joe Doe\",\"9 place de la République\n12345 Zorglub\",,\"9 bis place de la République\n12345 Zorglub\",\"06 90 73 64 18\",,\"06 90 73 62 37\"\r\n\"Jim Wallace\",\"18 place de la République\n12345 Zorglub\",,\"18 ter place de la République\n12345 Zorglub\",,\"06 58 84 29 09\",\"06 58 84 29 68\"\r\n" ;
 		expect( content ).to.be( expected ) ;
@@ -1421,8 +1417,101 @@ describe( "Built-in collection method: EXPORT-CSV" , () => {
 		//*/
 	} ) ;
 
-	it( "should map/format embedded object for the CSV export" ) ;
-	it( "populate for the CSV export" ) ;
+	it( "should select and rename columns" , async () => {
+		var response , content , expected ;
+
+		var { app , performer } = await commonApp() ;
+
+		response = await app.put( '/Contacts/5437f846c41d0e910ec9a501' ,
+			{
+				name: "Joe Doe" ,
+				addresses: [
+					{ type: "commercial" , address: "9 place de la République" , zipCode: "12345" , city: "Zorglub" } ,
+					{ type: "delivery" , address: "9 bis place de la République" , zipCode: "12345" , city: "Zorglub" }
+				] ,
+				phones: [
+					{ type: "commercial" , phone: "06 90 73 64 18" } ,
+					{ type: "delivery" , phone: "06 90 73 62 37" }
+				]
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.put( '/Contacts/5437f846c41d0e910ec9a502' ,
+			{
+				name: "Jim Wallace" ,
+				addresses: [
+					{ type: "commercial" , address: "18 place de la République" , zipCode: "12345" , city: "Zorglub" } ,
+					{ type: "delivery" , address: "18 ter place de la République" , zipCode: "12345" , city: "Zorglub" }
+				] ,
+				phones: [
+					{ type: "invoice" , phone: "06 58 84 29 09" } ,
+					{ type: "delivery" , phone: "06 58 84 29 68" }
+				]
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var params = {
+			columns: [ 'name' , 'address@addresses.commercial' , 'phone@phones.commercial' ]
+		} ;
+
+		response = await app.get( '/Contacts/EXPORT-CSV' , { performer: performer , access: 'content' , input: { query: { params } } } ) ;
+		content = await streamKit.getFullString( response.output.data ) ;
+		expected = "name,address,phone\r\n\"Joe Doe\",\"9 place de la République\n12345 Zorglub\",\"06 90 73 64 18\"\r\n\"Jim Wallace\",\"18 place de la République\n12345 Zorglub\",\r\n" ;
+		expect( content ).to.be( expected ) ;
+	} ) ;
+
+	it( "should aggregate embedded arrays" , async () => {
+		var response , content , expected ;
+
+		var { app , performer } = await commonApp() ;
+
+		response = await app.put( '/Contacts/5437f846c41d0e910ec9a501' ,
+			{
+				name: "Joe Doe" ,
+				phones: [
+					{ type: "commercial" , phone: "06 90 73 64 18" } ,
+					{ type: "delivery" , phone: "06 90 73 62 37" }
+				]
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.put( '/Contacts/5437f846c41d0e910ec9a502' ,
+			{
+				name: "Jim Wallace" ,
+				phones: [
+					{ type: "invoice" , phone: "06 58 84 29 09" } ,
+					{ type: "delivery" , phone: "06 58 84 29 68" }
+				]
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		var params = {
+			columns: [ 'name' , 'phones@phones.*.phone' ] ,
+			aggregate: [ 'phones.*.phone' ]
+		} ;
+
+		response = await app.get( '/Contacts/EXPORT-CSV' , { performer: performer , access: 'content' , input: { query: { params } } } ) ;
+		content = await streamKit.getFullString( response.output.data ) ;
+		expected = "name,phones\r\n\"Joe Doe\",\"06 90 73 64 18\n06 90 73 62 37\"\r\n\"Jim Wallace\",\"06 58 84 29 09\n06 58 84 29 68\"\r\n" ;
+		expect( content ).to.be( expected ) ;
+
+		params.joint = ', ' ;
+		response = await app.get( '/Contacts/EXPORT-CSV' , { performer: performer , access: 'content' , input: { query: { params } } } ) ;
+		content = await streamKit.getFullString( response.output.data ) ;
+		expected = "name,phones\r\n\"Joe Doe\",\"06 90 73 64 18, 06 90 73 62 37\"\r\n\"Jim Wallace\",\"06 58 84 29 09, 06 58 84 29 68\"\r\n" ;
+		expect( content ).to.be( expected ) ;
+	} ) ;
+
+	it( "should map/format embedded object" ) ;
+	it( "populate" ) ;
 	it( "populate anyCollection links having allowedCollections for the CSV export" ) ;
 } ) ;
 

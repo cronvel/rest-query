@@ -1,6 +1,6 @@
 {
   "name": "rest-query",
-  "version": "0.78.8",
+  "version": "0.78.10",
   "engines": {
     "node": ">=16.20.1"
   },
@@ -10,7 +10,7 @@
     "test": "test"
   },
   "bin": {
-    "rest-query": "./bin/rest-query"
+    "rest-query": "bin/rest-query"
   },
   "dependencies": {
     "array-kit": "^0.2.6",
@@ -45,7 +45,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cronvel/rest-query.git"
+    "url": "git+https://github.com/cronvel/rest-query.git"
   },
   "keywords": [
     "rest",

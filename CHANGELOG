@@ -1,4 +1,10 @@
 
+v0.78.10
+--------
+
+EXPORT-CSV: new method parameters 'aggregate' and 'joint', allowing wildcard to be given that will construct a single value out of multiple one, joined with the given joint
+
+
 v0.78.8
 -------
 
