@@ -1,4 +1,10 @@
 
+v0.78.12
+--------
+
+Expose hash-kit as restQuery.hash
+
+
 v0.78.11
 --------
 
