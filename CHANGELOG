@@ -1,4 +1,10 @@
 
+v0.78.14
+--------
+
+Fixing important Doormen bug: 'Invalid Date' should not pass the type-checker
+
+
 v0.78.13
 --------
 
