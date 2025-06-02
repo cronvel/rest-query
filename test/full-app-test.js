@@ -62,6 +62,7 @@ var appProcess ;
 var dbUrl = 'mongodb://localhost:27017/restQuery' ;
 var db ;
 var PUBLIC_URL = 'cdn.example.com/app' ;	// From the config sample/main.kfg
+var DEBUG_SERVER = false ;
 
 
 
@@ -137,7 +138,7 @@ function runApp() {
 			'server' ,
 			'--config' , __dirname + '/../sample/main.kfg' ,
 			'--port' , appPort ,
-			//'--log.minLevel' , 'debug' ,
+			... ( DEBUG_SERVER ? [ '--log.minLevel' , 'debug' ] : [] ) ,
 			'--buildIndexes'
 		] ,
 		{ stdio: 'pipe' }
@@ -145,7 +146,7 @@ function runApp() {
 
 	// Exists with .spawn() but not with .fork() unless stdio: 'pipe' is used
 	appProcess.stdout.on( 'data' , data => {
-		//log.debug( "[appProcess STDOUT] %s" , data.toString() ) ;
+		if ( DEBUG_SERVER ) { log.debug( "[appProcess STDOUT] %s" , data.toString() ) ; }
 	} ) ;
 
 	appProcess.stderr.on( 'data' , data => {
@@ -229,7 +230,7 @@ function requester( query_ ) {
 	} ) ;
 
 	request.on( 'error' , ( error ) => {
-		//console.log( '[requester] problem with request: ' + error.message ) ;
+		log.error( "[requester] problem with request: %E\nQuery: %Y" , error , query_ ) ;
 		promise.reject( error ) ;
 	} ) ;
 
