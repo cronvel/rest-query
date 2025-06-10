@@ -1065,6 +1065,7 @@ describe( "Service" , () => {
 				hid: "Joe Doe2" ,
 				avatar: {
 					contentType: 'text/plain' ,
+					binaryContentType: null ,
 					filename: 'test.txt' ,
 					extension: 'txt' ,
 					hashType: 'sha256' ,
@@ -1163,6 +1164,7 @@ describe( "Service" , () => {
 				hid: "Joe Doe2" ,
 				avatar: {
 					contentType: 'text/plain' ,
+					binaryContentType: null ,
 					filename: 'test2.txt' ,
 					extension: 'txt' ,
 					hashType: 'sha256' ,
@@ -1277,6 +1279,7 @@ describe( "Service" , () => {
 				hid: "Joe Doe2" ,
 				avatar: {
 					contentType: 'text/plain' ,
+					binaryContentType: null ,
 					filename: 'test.txt' ,
 					extension: 'txt' ,
 					hashType: 'sha256' ,
@@ -1404,6 +1407,7 @@ describe( "Service" , () => {
 				hid: "Joe Doe2" ,
 				avatar: {
 					contentType: 'text/plain' ,
+					binaryContentType: null ,
 					filename: 'test2.txt' ,
 					extension: 'txt' ,
 					hashType: 'sha256' ,
@@ -1497,6 +1501,7 @@ describe( "Service" , () => {
 					attachments: {
 						source: {
 							contentType: "text/plain" ,
+							binaryContentType: null ,
 							filename: "image.png" ,
 							extension: 'png' ,
 							hashType: "sha256" ,
@@ -1592,6 +1597,7 @@ describe( "Service" , () => {
 					attachments: {
 						source: {
 							contentType: "text/plain" ,
+							binaryContentType: null ,
 							filename: "image.png" ,
 							extension: 'png' ,
 							hashType: "sha256" ,
@@ -1603,6 +1609,7 @@ describe( "Service" , () => {
 						} ,
 						thumbnail: {
 							contentType: "text/plain" ,
+							binaryContentType: null ,
 							filename: "thumbnail.png" ,
 							extension: 'png' ,
 							hashType: "sha256" ,
@@ -1707,6 +1714,7 @@ describe( "Service" , () => {
 				arrayOfAttachments: [
 					{
 						contentType: "text/plain" ,
+						binaryContentType: null ,
 						filename: "image.png" ,
 						extension: 'png' ,
 						hashType: "sha256" ,
@@ -1782,6 +1790,7 @@ describe( "Service" , () => {
 				arrayOfAttachments: [
 					{
 						contentType: "text/plain" ,
+						binaryContentType: null ,
 						filename: "image.png" ,
 						extension: 'png' ,
 						hashType: "sha256" ,
@@ -1793,6 +1802,7 @@ describe( "Service" , () => {
 					} ,
 					{
 						contentType: "text/plain" ,
+						binaryContentType: null ,
 						filename: "image2.png" ,
 						extension: 'png' ,
 						hashType: "sha256" ,
@@ -1876,6 +1886,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -1955,6 +1966,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -1971,6 +1983,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image2.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2037,6 +2050,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2053,6 +2067,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image2.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2069,6 +2084,7 @@ describe( "Service" , () => {
 						attachments: {
 							archive: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image3.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2151,6 +2167,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2162,6 +2179,7 @@ describe( "Service" , () => {
 							} ,
 							small: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image5.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2178,6 +2196,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image2.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2194,6 +2213,7 @@ describe( "Service" , () => {
 						attachments: {
 							archive: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image3.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2205,6 +2225,7 @@ describe( "Service" , () => {
 							} ,
 							thumbnail: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image4.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,

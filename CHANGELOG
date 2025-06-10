@@ -1,4 +1,10 @@
 
+v0.79.0
+-------
+
+Maybe breaking: support for binary content-type enforcement (RootsDB)
+
+
 v0.78.15
 --------
 
