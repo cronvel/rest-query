@@ -1,4 +1,10 @@
 
+v0.79.1
+-------
+
+Fixing dropping multipart bad client requests
+
+
 v0.79.0
 -------
 
