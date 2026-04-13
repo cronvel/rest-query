@@ -1,4 +1,10 @@
 
+v0.79.4
+-------
+
+Fix a bug with PATCH and multipart/formdata being unflatten: now multipart/formdata part's name are unflatten for anything EXCEPT PATCH request
+
+
 v0.79.3
 -------
 
