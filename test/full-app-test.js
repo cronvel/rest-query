@@ -3280,10 +3280,10 @@ describe( "Service" , () => {
 				} ,
 				multipartFormData: {
 					name: "Bob" ,
-					"phones[0].type": "invoice" ,
-					"phones[0].phone": "0123456708" ,
-					"phones[1].type": "delivery" ,
-					"phones[1].phone": "0123456709" ,
+					"phones.0.type": "invoice" ,
+					"phones.0.phone": "0123456708" ,
+					"phones.1.type": "delivery" ,
+					"phones.1.phone": "0123456709" ,
 					publicAccess: { traverse: true , read: true , write: true , delete: true , create: true }
 				}
 			} ;
