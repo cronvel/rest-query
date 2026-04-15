@@ -62,7 +62,7 @@ var appProcess ;
 var dbUrl = 'mongodb://localhost:27017/restQuery' ;
 var db ;
 var PUBLIC_URL = 'cdn.example.com/app' ;	// From the config sample/main.kfg
-var DEBUG_SERVER = false ;
+var DEBUG_SERVER = true ;
 var DEBUG_SERVER_FOR_THIS_QUERY = false ;
 
 
@@ -3255,6 +3255,64 @@ describe( "Service" , () => {
 					{ type: "delivery" , phone: "0123456706" } ,
 					{ type: "invoice" , phone: "0123456701" } ,
 					{ type: "delivery" , phone: "0123456702" }
+				] ,
+				addresses: [] ,
+				slugId: data.slugId ,	// Cannot be predicted
+				hid: "Bob" ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+		} ) ;
+
+		it( "PUT a document having embedded using multipart/form-data and the bracket notation" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ;
+
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e01' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				multipartFormData: {
+					name: "Bob" ,
+					"phones[0].type": "invoice" ,
+					"phones[0].phone": "0123456708" ,
+					"phones[1].type": "delivery" ,
+					"phones[1].phone": "0123456709" ,
+					publicAccess: { traverse: true , read: true , write: true , delete: true , create: true }
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e01' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			DEBUG_SERVER_FOR_THIS_QUERY = false ;
+			response = await requester( putQuery ) ;
+			console.log( "Response:" , response ) ;
+			expect( response.status ).to.be( 201 ) ;
+			DEBUG_SERVER_FOR_THIS_QUERY = true ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0e01" ,
+				_collection: 'contacts' ,
+				name: "Bob" ,
+				phones: [
+					{ type: "invoice" , phone: "0123456708" } ,
+					{ type: "delivery" , phone: "0123456709" }
 				] ,
 				addresses: [] ,
 				slugId: data.slugId ,	// Cannot be predicted
