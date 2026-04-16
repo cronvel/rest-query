@@ -1,4 +1,10 @@
 
+v0.79.6
+-------
+
+multipart/formdata feature: setting Content-Disposition name to '.' set the full-document in only one part
+
+
 v0.79.5
 -------
 

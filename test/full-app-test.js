@@ -3266,7 +3266,7 @@ describe( "Service" , () => {
 			} ) ;
 		} ) ;
 
-		it( "PUT a document having embedded using multipart/form-data and the bracket notation" , async function() {
+		it( "PUT a document having embedded data using multipart/form-data and dot notation for array-paving" , async function() {
 			this.timeout( 4000 ) ;
 
 			var response , data ;
@@ -3285,6 +3285,72 @@ describe( "Service" , () => {
 					"phones.1.type": "delivery" ,
 					"phones.1.phone": "0123456709" ,
 					publicAccess: { traverse: true , read: true , write: true , delete: true , create: true }
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e01' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			DEBUG_SERVER_FOR_THIS_QUERY = false ;
+			response = await requester( putQuery ) ;
+			console.log( "Response:" , response ) ;
+			expect( response.status ).to.be( 201 ) ;
+			DEBUG_SERVER_FOR_THIS_QUERY = true ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0e01" ,
+				_collection: 'contacts' ,
+				name: "Bob" ,
+				phones: [
+					{ type: "invoice" , phone: "0123456708" } ,
+					{ type: "delivery" , phone: "0123456709" }
+				] ,
+				addresses: [] ,
+				slugId: data.slugId ,	// Cannot be predicted
+				hid: "Bob" ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+		} ) ;
+
+		it( "PUT a document having embedded data using multipart/form-data and the full-document in one part feature, by setting Content-Disposition name to \".\"" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ;
+
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e01' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				multipartFormData: {
+					".": {
+						name: "Bob" ,
+						phones: [
+							{
+								type: "invoice" ,
+								phone: "0123456708"
+							} ,
+							{
+								type: "delivery" ,
+								phone: "0123456709"
+							}
+						] ,
+						publicAccess: { traverse: true , read: true , write: true , delete: true , create: true }
+					}
 				}
 			} ;
 
