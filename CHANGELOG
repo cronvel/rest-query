@@ -1,4 +1,10 @@
 
+v0.79.7
+-------
+
+Fix Content-Disposition front-end issue (when a form-data set the Content-Type, it forces a filename defaulting to 'blob', so RestQuery detect it as a file... now if Content-Disposition's name is '.', it consider it as a non-file anyway)
+
+
 v0.79.6
 -------
 
