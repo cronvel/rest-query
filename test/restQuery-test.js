@@ -10199,6 +10199,197 @@ describe( "Historical bugs" , () => {
 
 
 
+describe( "Temporary (should be removed or improved)" , () => {
+
+	it( "PATCHING attachment metadata without a stream" , async function() {
+		this.timeout( 4000 ) ;
+
+		var { app , performer } = await commonApp() ;
+
+		var response , userId , fileId , filePublicUrl ;
+
+		// We need to create an AttachmentStreams manually
+		var attachmentStreams = new rootsDb.AttachmentStreams() ;
+
+		var contentHash = crypto.createHash( 'sha256' ).update( 'a'.repeat( 40 ) ).digest( 'base64' ) ;
+
+		attachmentStreams.addStream(
+			new streamKit.FakeReadable( {
+				timeout: 20 , chunkSize: 10 , chunkCount: 4 , filler: 'a'.charCodeAt( 0 )
+			} ) ,
+			'avatar' ,
+			{ filename: 'random.bin' , contentType: 'bin/random' }
+		) ;
+
+		attachmentStreams.end() ;
+
+		response = await app.post( '/Users' ,
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				email: "joe.doe@gmail.com" ,
+				password: "pw" ,
+				publicAccess: "all"
+			} ,
+			attachmentStreams ,
+			{ performer: performer }
+		) ;
+		userId = response.output.data.id ;
+
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		filePublicUrl = PUBLIC_URL + '/users/' + userId + '/' + response.output.data.avatar.id ;
+		fileId = response.output.data.avatar.id ;
+		expect( response.output.data ).to.be.partially.like( {
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			slugId: 'joe-doe' ,
+			email: 'joe.doe@gmail.com' ,
+			parent: { id: '/' , collection: 'root' } ,
+			avatar: {
+				contentType: "bin/random" ,
+				filename: "random.bin" ,
+				extension: "bin" ,
+				hashType: 'sha256' ,
+				hash: contentHash ,
+				fileSize: 40 ,
+				metadata: {} ,
+				publicUrl: filePublicUrl ,
+				id: fileId
+			}
+		} ) ;
+
+		// Re-send the same data that have been received
+		response = await app.patch( '/Users/' + userId ,
+			{
+				avatar: {
+					contentType: "bin/random" ,
+					filename: "random.bin" ,
+					extension: "bin" ,
+					hashType: 'sha256' ,
+					hash: contentHash ,
+					fileSize: 40 ,
+					metadata: {} ,
+					publicUrl: filePublicUrl ,
+					id: fileId
+				}
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			slugId: 'joe-doe' ,
+			email: 'joe.doe@gmail.com' ,
+			parent: { id: '/' , collection: 'root' } ,
+			avatar: {
+				contentType: "bin/random" ,
+				filename: "random.bin" ,
+				extension: "bin" ,
+				hashType: 'sha256' ,
+				hash: contentHash ,
+				fileSize: 40 ,
+				metadata: {} ,
+				publicUrl: filePublicUrl ,
+				id: fileId
+			}
+		} ) ;
+
+		// Modify unimportant attachment data
+		response = await app.patch( '/Users/' + userId ,
+			{
+				avatar: {
+					contentType: "bin/random" ,
+					filename: "file.bin" ,
+					extension: "bin" ,
+					hashType: 'sha256' ,
+					hash: contentHash ,
+					fileSize: 40 ,
+					metadata: {} ,
+					publicUrl: filePublicUrl ,
+					id: fileId
+				}
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			slugId: 'joe-doe' ,
+			email: 'joe.doe@gmail.com' ,
+			parent: { id: '/' , collection: 'root' } ,
+			avatar: {
+				contentType: "bin/random" ,
+				filename: "file.bin" ,
+				extension: "bin" ,
+				hashType: 'sha256' ,
+				hash: contentHash ,
+				fileSize: 40 ,
+				metadata: {} ,
+				publicUrl: filePublicUrl ,
+				id: fileId
+			}
+		} ) ;
+
+		// /!\ WARNING /!\ SHOULD NOT BE POSSIBLE IN THE FUTURE, or it should at least clean up the mess...
+		// Modify ID
+		let newFileId = fileId.substr( 0 , fileId.length - 4 ) + "f000" ;
+		let newFilePublicUrl = filePublicUrl.substr( 0 , filePublicUrl.length - 4 ) + "f000" ;	// automatically modified when ID change
+		response = await app.patch( '/Users/' + userId ,
+			{
+				avatar: {
+					contentType: "bin/random" ,
+					filename: "file.bin" ,
+					extension: "bin" ,
+					hashType: 'sha256' ,
+					hash: contentHash ,
+					fileSize: 40 ,
+					metadata: {} ,
+					publicUrl: filePublicUrl ,
+					id: newFileId
+				}
+			} ,
+			null ,
+			{ performer: performer }
+		) ;
+
+		response = await app.get( '/Users/' + userId , { performer: performer } ) ;
+		expect( response.output.data ).to.be.partially.like( {
+			firstName: 'Joe' ,
+			lastName: 'Doe' ,
+			slugId: 'joe-doe' ,
+			email: 'joe.doe@gmail.com' ,
+			parent: { id: '/' , collection: 'root' } ,
+			avatar: {
+				contentType: "bin/random" ,
+				filename: "file.bin" ,
+				extension: "bin" ,
+				hashType: 'sha256' ,
+				hash: contentHash ,
+				fileSize: 40 ,
+				metadata: {} ,
+				publicUrl: newFilePublicUrl ,
+				id: newFileId
+			}
+		} ) ;
+
+		/*
+		response = await app.get( '/Users/' + userId + '/~avatar' , { performer: performer } ) ;
+		expect( response.output.data ).to.be.a( stream.Readable ) ;
+
+		var content = await streamKit.getFullString( response.output.data ) ;
+		expect( content ).to.be( 'a'.repeat( 40 ) ) ;
+		*/
+	} ) ;
+} ) ;
+
+
+
 if ( rootsDb.hasFakeDataGenerator( 'faker' ) ) {
 
 	describe( "Fake data generator" , () => {
