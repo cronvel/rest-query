@@ -3331,6 +3331,7 @@ describe( "Attachment links" , () => {
 		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
 		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
+			binaryContentType: null ,
 			filename: "random.bin" ,
 			extension: "bin" ,
 			hashType: 'sha256' ,
@@ -3393,6 +3394,7 @@ describe( "Attachment links" , () => {
 		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
 		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
+			binaryContentType: null ,
 			filename: "random.bin" ,
 			extension: "bin" ,
 			hashType: 'sha256' ,
@@ -3504,6 +3506,7 @@ describe( "Attachment links" , () => {
 		response = await app.get( '/Users/' + userId + '/.avatar' , { performer: performer } ) ;
 		expect( response.output.data ).to.be.like( {
 			contentType: "bin/random" ,
+			binaryContentType: null ,
 			filename: "random.bin" ,
 			extension: "bin" ,
 			hashType: 'sha256' ,
@@ -3564,6 +3567,7 @@ describe( "AttachmentSet links" , () => {
 			attachments: {
 				source: {
 					contentType: "image/jpeg" ,
+					binaryContentType: null ,
 					filename: "avatar.jpg" ,
 					extension: "jpg" ,
 					hashType: 'sha256' ,
@@ -3621,6 +3625,7 @@ describe( "AttachmentSet links" , () => {
 			attachments: {
 				source: {
 					contentType: "image/jpeg" ,
+					binaryContentType: null ,
 					filename: "avatar.jpg" ,
 					extension: "jpg" ,
 					hashType: 'sha256' ,
@@ -3685,6 +3690,7 @@ describe( "AttachmentSet links" , () => {
 			attachments: {
 				source: {
 					contentType: "image/jpeg" ,
+					binaryContentType: null ,
 					filename: "avatar.jpg" ,
 					extension: "jpg" ,
 					hashType: 'sha256' ,
@@ -3742,6 +3748,7 @@ describe( "AttachmentSet links" , () => {
 			attachments: {
 				archive: {
 					contentType: "image/jpeg" ,
+					binaryContentType: null ,
 					filename: "avatar.jpg" ,
 					extension: "jpg" ,
 					hashType: 'sha256' ,
@@ -3796,6 +3803,7 @@ describe( "AttachmentSet links" , () => {
 		response = await app.get( '/Images/' + imageId + '/.arrayOfAttachments.0' , { performer: performer } ) ;
 		expect( response.output.data ).to.be.like( {
 			contentType: "image/jpeg" ,
+			binaryContentType: null ,
 			filename: "avatar.jpg" ,
 			extension: "jpg" ,
 			hashType: 'sha256' ,

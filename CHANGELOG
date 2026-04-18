@@ -1,4 +1,82 @@
 
+v0.79.7
+-------
+
+Fix Content-Disposition front-end issue (when a form-data set the Content-Type, it forces a filename defaulting to 'blob', so RestQuery detect it as a file... now if Content-Disposition's name is '.', it consider it as a non-file anyway)
+
+
+v0.79.6
+-------
+
+multipart/formdata feature: setting Content-Disposition name to '.' set the full-document in only one part
+
+
+v0.79.5
+-------
+
+multipart/formdata now use dotPath nstead of path everywhere, path part being a positive or zero integer pave arrays instead of objects
+
+
+v0.79.4
+-------
+
+Fix a bug with PATCH and multipart/formdata being unflatten: now multipart/formdata part's name are unflatten for anything EXCEPT PATCH request
+
+
+v0.79.3
+-------
+
+Fix a bug with PATCH and multipart/formdata being unflatten: now multipart/formdata part's name are unflatten for anything EXCEPT PATCH request
+
+
+v0.79.2
+-------
+
+Fixing file-type modules errors
+
+
+v0.79.1
+-------
+
+Fixing dropping multipart bad client requests
+
+
+v0.79.0
+-------
+
+Maybe breaking: support for binary content-type enforcement (RootsDB)
+
+
+v0.78.15
+--------
+
+Fix Multipart/Form-Data bug when a user provide no file for an input file (the browser still send d an empty part)
+
+
+v0.78.14
+--------
+
+Fixing important Doormen bug: 'Invalid Date' should not pass the type-checker
+
+
+v0.78.13
+--------
+
+Fixing missing stream-kit dependency
+
+
+v0.78.12
+--------
+
+Expose hash-kit as restQuery.hash
+
+
+v0.78.11
+--------
+
+Dependencies
+
+
 v0.78.10
 --------
 

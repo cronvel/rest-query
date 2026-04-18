@@ -62,6 +62,8 @@ var appProcess ;
 var dbUrl = 'mongodb://localhost:27017/restQuery' ;
 var db ;
 var PUBLIC_URL = 'cdn.example.com/app' ;	// From the config sample/main.kfg
+var DEBUG_SERVER = true ;
+var DEBUG_SERVER_FOR_THIS_QUERY = false ;
 
 
 
@@ -99,13 +101,15 @@ function debug() {
 
 // clear DB: remove every item, so we can safely test
 function clearDB() {
+	DEBUG_SERVER_FOR_THIS_QUERY = false ;
 	return Promise.all( [
 		//clearCollection( 'root' ) ,	// Don't clear this collection here, this causes troubles with the cache
 		clearCollection( 'blogs' ) ,
 		clearCollection( 'posts' ) ,
 		clearCollection( 'comments' ) ,
 		clearCollection( 'users' ) ,
-		clearCollection( 'images' )
+		clearCollection( 'images' ) ,
+		clearCollection( 'contacts' )
 	] ) ;
 }
 
@@ -137,7 +141,7 @@ function runApp() {
 			'server' ,
 			'--config' , __dirname + '/../sample/main.kfg' ,
 			'--port' , appPort ,
-			//'--log.minLevel' , 'debug' ,
+			... ( DEBUG_SERVER ? [ '--log.minLevel' , 'debug' ] : [] ) ,
 			'--buildIndexes'
 		] ,
 		{ stdio: 'pipe' }
@@ -145,7 +149,7 @@ function runApp() {
 
 	// Exists with .spawn() but not with .fork() unless stdio: 'pipe' is used
 	appProcess.stdout.on( 'data' , data => {
-		//log.debug( "[appProcess STDOUT] %s" , data.toString() ) ;
+		if ( DEBUG_SERVER && DEBUG_SERVER_FOR_THIS_QUERY ) { log.debug( "[appProcess STDOUT] %s" , data.toString() ) ; }
 	} ) ;
 
 	appProcess.stderr.on( 'data' , data => {
@@ -229,7 +233,7 @@ function requester( query_ ) {
 	} ) ;
 
 	request.on( 'error' , ( error ) => {
-		//console.log( '[requester] problem with request: ' + error.message ) ;
+		log.error( "[requester] problem with request: %E\nQuery: %Y" , error , query_ ) ;
 		promise.reject( error ) ;
 	} ) ;
 
@@ -332,6 +336,7 @@ describe( "Service" , () => {
 	} ) ;
 
 	beforeEach( clearDB ) ;
+	beforeEach( () => DEBUG_SERVER_FOR_THIS_QUERY = true ) ;
 
 
 
@@ -1064,6 +1069,7 @@ describe( "Service" , () => {
 				hid: "Joe Doe2" ,
 				avatar: {
 					contentType: 'text/plain' ,
+					binaryContentType: null ,
 					filename: 'test.txt' ,
 					extension: 'txt' ,
 					hashType: 'sha256' ,
@@ -1162,6 +1168,7 @@ describe( "Service" , () => {
 				hid: "Joe Doe2" ,
 				avatar: {
 					contentType: 'text/plain' ,
+					binaryContentType: null ,
 					filename: 'test2.txt' ,
 					extension: 'txt' ,
 					hashType: 'sha256' ,
@@ -1276,6 +1283,7 @@ describe( "Service" , () => {
 				hid: "Joe Doe2" ,
 				avatar: {
 					contentType: 'text/plain' ,
+					binaryContentType: null ,
 					filename: 'test.txt' ,
 					extension: 'txt' ,
 					hashType: 'sha256' ,
@@ -1403,6 +1411,7 @@ describe( "Service" , () => {
 				hid: "Joe Doe2" ,
 				avatar: {
 					contentType: 'text/plain' ,
+					binaryContentType: null ,
 					filename: 'test2.txt' ,
 					extension: 'txt' ,
 					hashType: 'sha256' ,
@@ -1496,6 +1505,7 @@ describe( "Service" , () => {
 					attachments: {
 						source: {
 							contentType: "text/plain" ,
+							binaryContentType: null ,
 							filename: "image.png" ,
 							extension: 'png' ,
 							hashType: "sha256" ,
@@ -1591,6 +1601,7 @@ describe( "Service" , () => {
 					attachments: {
 						source: {
 							contentType: "text/plain" ,
+							binaryContentType: null ,
 							filename: "image.png" ,
 							extension: 'png' ,
 							hashType: "sha256" ,
@@ -1602,6 +1613,7 @@ describe( "Service" , () => {
 						} ,
 						thumbnail: {
 							contentType: "text/plain" ,
+							binaryContentType: null ,
 							filename: "thumbnail.png" ,
 							extension: 'png' ,
 							hashType: "sha256" ,
@@ -1706,6 +1718,7 @@ describe( "Service" , () => {
 				arrayOfAttachments: [
 					{
 						contentType: "text/plain" ,
+						binaryContentType: null ,
 						filename: "image.png" ,
 						extension: 'png' ,
 						hashType: "sha256" ,
@@ -1781,6 +1794,7 @@ describe( "Service" , () => {
 				arrayOfAttachments: [
 					{
 						contentType: "text/plain" ,
+						binaryContentType: null ,
 						filename: "image.png" ,
 						extension: 'png' ,
 						hashType: "sha256" ,
@@ -1792,6 +1806,7 @@ describe( "Service" , () => {
 					} ,
 					{
 						contentType: "text/plain" ,
+						binaryContentType: null ,
 						filename: "image2.png" ,
 						extension: 'png' ,
 						hashType: "sha256" ,
@@ -1875,6 +1890,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -1954,6 +1970,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -1970,6 +1987,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image2.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2036,6 +2054,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2052,6 +2071,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image2.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2068,6 +2088,7 @@ describe( "Service" , () => {
 						attachments: {
 							archive: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image3.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2150,6 +2171,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2161,6 +2183,7 @@ describe( "Service" , () => {
 							} ,
 							small: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image5.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2177,6 +2200,7 @@ describe( "Service" , () => {
 						attachments: {
 							source: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image2.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2193,6 +2217,7 @@ describe( "Service" , () => {
 						attachments: {
 							archive: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image3.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -2204,6 +2229,7 @@ describe( "Service" , () => {
 							} ,
 							thumbnail: {
 								contentType: "text/plain" ,
+								binaryContentType: null ,
 								filename: "image4.png" ,
 								extension: 'png' ,
 								hashType: "sha256" ,
@@ -3094,6 +3120,274 @@ describe( "Service" , () => {
 					}
 				}
 			] ) ;
+		} ) ;
+	} ) ;
+
+	describe( "Historical bugs" , () => {
+
+		it( "PATCH a document having embedded data with multipart/form-data" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ;
+
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e00' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					name: "Bob" ,
+					phones: [
+						{ type: "commercial" , phone: "0123456700" } ,
+						{ type: "invoice" , phone: "0123456701" } ,
+						{ type: "delivery" , phone: "0123456702" }
+					] ,
+					publicAccess: { traverse: true , read: true , write: true , delete: true , create: true }
+				}
+			} ;
+
+			// This one always worked
+			var patchQuery = {
+				method: 'PATCH' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e00' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				body: {
+					"phones.0.type": "invoice" ,
+					"phones.0.phone": "0123456705"
+				}
+			} ;
+
+			// This one was the historical bug
+			var patchMultipartQuery = {
+				method: 'PATCH' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e00' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				multipartFormData: {
+					"phones.0.type": "delivery" ,
+					"phones.0.phone": "0123456706"
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e00' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			DEBUG_SERVER_FOR_THIS_QUERY = false ;
+			response = await requester( putQuery ) ;
+			//console.log( "Response:" , response ) ;
+			expect( response.status ).to.be( 201 ) ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0e00" ,
+				_collection: 'contacts' ,
+				name: "Bob" ,
+				phones: [
+					{ type: "commercial" , phone: "0123456700" } ,
+					{ type: "invoice" , phone: "0123456701" } ,
+					{ type: "delivery" , phone: "0123456702" }
+				] ,
+				addresses: [] ,
+				slugId: data.slugId ,	// Cannot be predicted
+				hid: "Bob" ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			response = await requester( patchQuery ) ;
+			//console.log( "Response:" , response ) ;
+			expect( response.status ).to.be( 204 ) ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0e00" ,
+				_collection: 'contacts' ,
+				name: "Bob" ,
+				phones: [
+					{ type: "invoice" , phone: "0123456705" } ,
+					{ type: "invoice" , phone: "0123456701" } ,
+					{ type: "delivery" , phone: "0123456702" }
+				] ,
+				addresses: [] ,
+				slugId: data.slugId ,	// Cannot be predicted
+				hid: "Bob" ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+
+			DEBUG_SERVER_FOR_THIS_QUERY = true ;
+			response = await requester( patchMultipartQuery ) ;
+			console.log( "Response:" , response ) ;
+			expect( response.status ).to.be( 204 ) ;
+			DEBUG_SERVER_FOR_THIS_QUERY = false ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0e00" ,
+				_collection: 'contacts' ,
+				name: "Bob" ,
+				phones: [
+					{ type: "delivery" , phone: "0123456706" } ,
+					{ type: "invoice" , phone: "0123456701" } ,
+					{ type: "delivery" , phone: "0123456702" }
+				] ,
+				addresses: [] ,
+				slugId: data.slugId ,	// Cannot be predicted
+				hid: "Bob" ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+		} ) ;
+
+		it( "PUT a document having embedded data using multipart/form-data and dot notation for array-paving" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ;
+
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e01' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				multipartFormData: {
+					name: "Bob" ,
+					"phones.0.type": "invoice" ,
+					"phones.0.phone": "0123456708" ,
+					"phones.1.type": "delivery" ,
+					"phones.1.phone": "0123456709" ,
+					publicAccess: { traverse: true , read: true , write: true , delete: true , create: true }
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e01' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			DEBUG_SERVER_FOR_THIS_QUERY = false ;
+			response = await requester( putQuery ) ;
+			console.log( "Response:" , response ) ;
+			expect( response.status ).to.be( 201 ) ;
+			DEBUG_SERVER_FOR_THIS_QUERY = true ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0e01" ,
+				_collection: 'contacts' ,
+				name: "Bob" ,
+				phones: [
+					{ type: "invoice" , phone: "0123456708" } ,
+					{ type: "delivery" , phone: "0123456709" }
+				] ,
+				addresses: [] ,
+				slugId: data.slugId ,	// Cannot be predicted
+				hid: "Bob" ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
+		} ) ;
+
+		it( "PUT a document having embedded data using multipart/form-data and the full-document in one part feature, by setting Content-Disposition name to \".\"" , async function() {
+			this.timeout( 4000 ) ;
+
+			var response , data ;
+
+			var putQuery = {
+				method: 'PUT' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e01' ,
+				headers: {
+					Host: 'localhost' ,
+					"content-type": 'application/json'
+				} ,
+				multipartFormData: {
+					".": {
+						name: "Bob" ,
+						phones: [
+							{
+								type: "invoice" ,
+								phone: "0123456708"
+							} ,
+							{
+								type: "delivery" ,
+								phone: "0123456709"
+							}
+						] ,
+						publicAccess: { traverse: true , read: true , write: true , delete: true , create: true }
+					}
+				}
+			} ;
+
+			var getQuery = {
+				method: 'GET' ,
+				path: '/Contacts/543bb877bd15489d0d7b0e01' ,
+				headers: {
+					Host: 'localhost'
+				}
+			} ;
+
+			DEBUG_SERVER_FOR_THIS_QUERY = false ;
+			response = await requester( putQuery ) ;
+			console.log( "Response:" , response ) ;
+			expect( response.status ).to.be( 201 ) ;
+			DEBUG_SERVER_FOR_THIS_QUERY = true ;
+
+			response = await requester( getQuery ) ;
+			expect( response.status ).to.be( 200 ) ;
+			expect( response.body ).to.be.ok() ;
+			data = JSON.parse( response.body ) ;
+			expect( data ).to.equal( {
+				_id: "543bb877bd15489d0d7b0e01" ,
+				_collection: 'contacts' ,
+				name: "Bob" ,
+				phones: [
+					{ type: "invoice" , phone: "0123456708" } ,
+					{ type: "delivery" , phone: "0123456709" }
+				] ,
+				addresses: [] ,
+				slugId: data.slugId ,	// Cannot be predicted
+				hid: "Bob" ,
+				parent: {
+					collection: 'root' ,
+					id: '/'
+				}
+			} ) ;
 		} ) ;
 	} ) ;
 } ) ;
